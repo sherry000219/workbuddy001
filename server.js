@@ -18,8 +18,47 @@ const DINGTALK = {
 };
 
 // Session store: token → { openId, nick, avatarUrl, createdAt }
-const sessions = new Map();
+// Use a Map for in-memory cache, but persist to disk so sessions survive server restarts.
 const SESSION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+const SESSION_FILE = path.join(DB_DIR, 'sessions.json');
+const sessions = loadSessions();
+
+function loadSessions() {
+  try {
+    const raw = fs.readFileSync(SESSION_FILE, 'utf8');
+    const data = JSON.parse(raw);
+    const map = new Map();
+    const now = Date.now();
+    Object.entries(data).forEach(([token, session]) => {
+      if (session && session.createdAt && (now - session.createdAt <= SESSION_MAX_AGE)) {
+        map.set(token, session);
+      }
+    });
+    return map;
+  } catch (e) {
+    return new Map();
+  }
+}
+
+function saveSessions() {
+  try {
+    const obj = {};
+    sessions.forEach((session, token) => { obj[token] = session; });
+    fs.writeFileSync(SESSION_FILE, JSON.stringify(obj, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[session] save failed:', e.message);
+  }
+}
+
+function setSession(token, session) {
+  sessions.set(token, session);
+  saveSessions();
+}
+
+function deleteSession(token) {
+  sessions.delete(token);
+  saveSessions();
+}
 
 function generateSessionToken() {
   return 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
@@ -30,7 +69,7 @@ function getSession(req) {
   if (!token) return null;
   const session = sessions.get(token);
   if (!session || Date.now() - session.createdAt > SESSION_MAX_AGE) {
-    if (session) sessions.delete(token);
+    if (session) deleteSession(token);
     return null;
   }
   return session;
@@ -356,7 +395,7 @@ app.post('/api/auth/dd-code', async (req, res) => {
   try {
     const userInfo = await exchangeDingTalkCode(code);
     const token = generateSessionToken();
-    sessions.set(token, {
+    setSession(token, {
       openId: userInfo.openId,
       unionId: userInfo.unionId,
       nick: userInfo.nick,
@@ -386,7 +425,7 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
   try {
     const userInfo = await exchangeDingTalkCode(code);
     const token = generateSessionToken();
-    sessions.set(token, {
+    setSession(token, {
       openId: userInfo.openId,
       unionId: userInfo.unionId,
       nick: userInfo.nick,
@@ -436,7 +475,7 @@ app.get('/api/auth/me', (req, res) => {
 // POST /api/auth/logout
 app.post('/api/auth/logout', (req, res) => {
   const token = req.cookies && req.cookies.dd_session;
-  if (token) sessions.delete(token);
+  if (token) deleteSession(token);
   res.clearCookie('dd_session');
   res.json({ success: true });
 });
