@@ -1,0 +1,165 @@
+{
+  "entries": [
+    {
+      "id": "entry_1782800781942_sukg3c",
+      "name": "刘相丞",
+      "dept": "职能中台",
+      "subdept": "企业文化",
+      "track": "business",
+      "title": "测试03",
+      "scene": "测试03",
+      "process_text": "测试03",
+      "result_text": "测试03",
+      "extra": "",
+      "attachmentName": null,
+      "attachmentPath": null,
+      "status": "approved",
+      "createdAt": "2026-06-30T06:26:21.942Z"
+    },
+    {
+      "id": "entry_1782800737849_uhn6mb",
+      "name": "刘相丞",
+      "dept": "职能中台",
+      "subdept": "企业文化",
+      "track": "efficiency",
+      "title": "测试02",
+      "scene": "测试02",
+      "process_text": "测试02",
+      "result_text": "测试02",
+      "extra": "",
+      "attachmentName": null,
+      "attachmentPath": null,
+      "status": "approved",
+      "createdAt": "2026-06-30T06:25:37.849Z"
+    }
+  ],
+  "votes": [
+    {
+      "entryId": "entry_1782800781942_sukg3c",
+      "voterName": "刘相丞",
+      "createdAt": "2026-06-30T06:45:16.955Z"
+    },
+    {
+      "entryId": "entry_1782800737849_uhn6mb",
+      "voterName": "测试",
+      "createdAt": "2026-06-30T06:46:03.344Z"
+    },
+    {
+      "entryId": "entry_1782800737849_uhn6mb",
+      "voterName": "xxx",
+      "createdAt": "2026-06-30T06:50:56.357Z"
+    },
+    {
+      "entryId": "entry_1782800737849_uhn6mb",
+      "voterName": "aaa",
+      "createdAt": "2026-06-30T06:51:05.793Z"
+    },
+    {
+      "entryId": "entry_1782800781942_sukg3c",
+      "voterName": "qqq",
+      "createdAt": "2026-06-30T06:51:20.639Z"
+    },
+    {
+      "entryId": "entry_1782800781942_sukg3c",
+      "voterId": "qHFb13ALXHzhuoCrGUaaiPAiEiE",
+      "voterName": "徐聪明",
+      "createdAt": "2026-06-30T11:45:24.654Z"
+    }
+  ],
+  "judgeScores": [
+    {
+      "entryId": "entry_1782800781942_sukg3c",
+      "judgeName": "001",
+      "practicality": 30,
+      "innovation": 25,
+      "scalability": 3,
+      "presentation": 3,
+      "updatedAt": "2026-06-30T06:44:10.876Z"
+    },
+    {
+      "entryId": "entry_1782800781942_sukg3c",
+      "judgeName": "002",
+      "practicality": 30,
+      "innovation": 25,
+      "scalability": 25,
+      "presentation": 20,
+      "updatedAt": "2026-06-30T06:53:25.594Z"
+    },
+    {
+      "entryId": "entry_1782800737849_uhn6mb",
+      "judgeName": "002",
+      "practicality": 12,
+      "innovation": 10,
+      "scalability": 10,
+      "presentation": 10,
+      "updatedAt": "2026-06-30T06:53:40.254Z"
+    },
+    {
+      "entryId": "entry_1782800781942_sukg3c",
+      "judgeName": "003",
+      "practicality": 6,
+      "innovation": 6,
+      "scalability": 6,
+      "presentation": 6,
+      "updatedAt": "2026-06-30T07:09:43.317Z"
+    },
+    {
+      "entryId": "entry_1782800737849_uhn6mb",
+      "judgeName": "003",
+      "practicality": 5,
+      "innovation": 5,
+      "scalability": 5,
+      "presentation": 5,
+      "updatedAt": "2026-06-30T07:09:44.480Z"
+    },
+    {
+      "entryId": "entry_1782800781942_sukg3c",
+      "judgeName": "徐铭瑞",
+      "practicality": 30,
+      "innovation": 3,
+      "scalability": 4,
+      "presentation": 2,
+      "updatedAt": "2026-06-30T11:34:43.536Z"
+    },
+    {
+      "entryId": "entry_1782800737849_uhn6mb",
+      "judgeName": "徐铭瑞",
+      "practicality": 21,
+      "innovation": 2,
+      "scalability": 2,
+      "presentation": 2,
+      "updatedAt": "2026-06-30T11:35:01.204Z"
+    },
+    {
+      "entryId": "entry_1782800737849_uhn6mb",
+      "judgeName": "001",
+      "practicality": 21,
+      "innovation": 3,
+      "scalability": 4,
+      "presentation": 4,
+      "updatedAt": "2026-06-30T11:36:13.274Z"
+    }
+  ],
+  "settings": {
+    "judgePassword": "wb2026",
+    "adminPassword": "yzfwb2026",
+    "votingEnabled": false
+  },
+  "users": {
+    "16553702451766789": {
+      "nick": "徐铭瑞",
+      "jobNumber": "E03427",
+      "email": "xumingrui@yunzhangfang.com",
+      "dept": "人力运营与发展",
+      "title": "COE-企业文化",
+      "corpId": "ding8216a14c6ca8bfd8"
+    }
+  },
+  "sessions": {
+    "36f30e06-a2b1-4bbc-adb9-1063c495940d": {
+      "unionId": "16553702451766789",
+      "nick": "徐铭瑞",
+      "createdAt": "2026-06-30T04:28:29.605Z"
+    }
+  }
+}
