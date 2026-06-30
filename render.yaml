@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: workbuddy-contest
+    runtime: node
+    repo: https://github.com/sherry000219/workbuddy001
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: NODE_ENV
+        value: production
