@@ -366,9 +366,11 @@ app.post('/api/auth/dd-code', async (req, res) => {
     res.cookie('dd_session', token, {
       maxAge: SESSION_MAX_AGE,
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'none',
       secure: true,
+      path: '/',
     });
+    console.log('[dd] set session cookie for JSAPI login, openId:', userInfo.openId);
     res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, avatarUrl: userInfo.avatarUrl } });
   } catch (e) {
     console.error('DingTalk auth error:', e.message);
@@ -379,6 +381,7 @@ app.post('/api/auth/dd-code', async (req, res) => {
 // GET /auth/dingtalk/callback — OAuth redirect callback (for regular browser)
 app.get('/auth/dingtalk/callback', async (req, res) => {
   const { code, state } = req.query;
+  console.log('[dd] OAuth callback received, code present:', !!code);
   if (!code) return res.status(400).send('Missing authorization code');
   try {
     const userInfo = await exchangeDingTalkCode(code);
@@ -393,9 +396,11 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
     res.cookie('dd_session', token, {
       maxAge: SESSION_MAX_AGE,
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'none',
       secure: true,
+      path: '/',
     });
+    console.log('[dd] OAuth callback success, redirecting to /, openId:', userInfo.openId);
     res.redirect('/');
   } catch (e) {
     console.error('DingTalk callback error:', e.message);
@@ -413,8 +418,12 @@ app.get('/api/auth/dd-url', (req, res) => {
 
 // GET /api/auth/me — get current logged-in user (or null)
 app.get('/api/auth/me', (req, res) => {
+  console.log('[dd] /api/auth/me — cookies:', req.cookies ? Object.keys(req.cookies) : 'none', 'dd_session:', req.cookies && req.cookies.dd_session ? 'present' : 'missing');
   const session = getSession(req);
-  if (!session) return res.json({ user: null });
+  if (!session) {
+    console.log('[dd] /api/auth/me — no session found');
+    return res.json({ user: null });
+  }
   // Count votes for this user
   const voteCount = db.votes.filter(v => v.voterId === session.openId).length;
   res.json({

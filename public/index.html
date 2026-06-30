@@ -495,7 +495,7 @@ async function exchangeCode(code) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code }),
-      credentials: 'same-origin'
+      credentials: 'include'
     });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || '登录失败');
@@ -513,7 +513,7 @@ async function exchangeCode(code) {
 
 async function checkAuth() {
   try {
-    const resp = await fetch('/api/auth/me', { credentials: 'same-origin' });
+    const resp = await fetch('/api/auth/me', { credentials: 'include' });
     const data = await resp.json();
     if (data.user) {
       ddAuthed = true;
@@ -551,7 +551,7 @@ function updateUserUI() {
 
 async function ddLogout() {
   try {
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
   } catch(e) {}
   ddAuthed = false;
   ddUser = null;
@@ -563,7 +563,7 @@ async function ddLogout() {
 
 async function refreshAuthState() {
   try {
-    const resp = await fetch('/api/auth/me', { credentials: 'same-origin' });
+    const resp = await fetch('/api/auth/me', { credentials: 'include' });
     const data = await resp.json();
     if (data.user) {
       ddAuthed = true;
@@ -622,7 +622,7 @@ async function api(url, options = {}) {
   const resp = await fetch(url, {
     ...options,
     headers: { ...options.headers },
-    credentials: 'same-origin'
+    credentials: 'include'
   });
   const data = await resp.json();
   if (!resp.ok) throw new Error(data.error || 'Request failed');
@@ -753,7 +753,7 @@ async function submitEntry() {
     const resp = await fetch('/api/entries', {
       method: 'POST',
       body: formData,
-      credentials: 'same-origin'
+      credentials: 'include'
     });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || '提交失败');
@@ -841,7 +841,7 @@ async function voteEntry(entryId) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
-      credentials: 'same-origin'
+      credentials: 'include'
     });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || '投票失败');
