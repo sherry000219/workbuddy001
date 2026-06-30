@@ -522,7 +522,8 @@ app.post('/api/auth/dd-code', async (req, res) => {
       path: '/',
     });
     console.log('[dd] set session cookie for JSAPI login, openId:', userInfo.openId);
-    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, avatarUrl: userInfo.avatarUrl } });
+    const voteCount = db.votes.filter(v => v.voterId === userInfo.openId).length;
+    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, 5 - voteCount) });
   } catch (e) {
     console.error('DingTalk auth error:', e.message);
     res.status(400).json({ error: e.message || '钉钉授权失败' });

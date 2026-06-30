@@ -517,7 +517,7 @@ async function exchangeCode(code) {
     if (!resp.ok) throw new Error(data.error || '登录失败');
     ddAuthed = true;
     ddUser = data.user;
-    ddRemaining = 5;
+    ddRemaining = data.remainingVotes;
     updateUserUI();
     showToast('钉钉登录成功，欢迎 ' + ddUser.nick + '！', 'success');
     // Refresh current page
