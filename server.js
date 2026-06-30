@@ -363,7 +363,8 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
 
 // Judge password: env > db.settings > hardcoded default
 function getJudgePassword() {
-  return process.env.JUDGE_PASSWORD || db.settings.judgePassword || 'judge2026';
+  // 优先环境变量，硬编码作兜底。忽略 db.settings 防止 GitHub data 同步后密码意外回退
+  return process.env.JUDGE_PASSWORD || 'judge2026';
 }
 
 // ========== API: JUDGE ==========
