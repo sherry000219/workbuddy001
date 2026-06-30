@@ -355,11 +355,16 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
   res.json({ success: true, voteCount: db.votes.filter(v => v.entryId === req.params.entryId).length, remaining });
 });
 
+// Judge password: env > db.settings > hardcoded default
+function getJudgePassword() {
+  return process.env.JUDGE_PASSWORD || db.settings.judgePassword || 'judge2026';
+}
+
 // ========== API: JUDGE ==========
 app.post('/api/judge/scores/:entryId', (req, res) => {
   const { judgeName, practicality, innovation, scalability, presentation, judgePassword } = req.body;
   if (!judgeName) return res.status(400).json({ error: '请输入评委姓名' });
-  if (judgePassword !== (db.settings.judgePassword || 'judge2026')) {
+  if (judgePassword !== getJudgePassword()) {
     return res.status(403).json({ error: '评委密码错误' });
   }
   const entry = db.entries.find(e => e.id === req.params.entryId);
@@ -378,7 +383,7 @@ app.post('/api/judge/scores/:entryId', (req, res) => {
 app.get('/api/judge/my-scores', (req, res) => {
   const { judgeName, judgePassword } = req.query;
   if (!judgeName) return res.status(400).json({ error: '缺少评委姓名' });
-  if (judgePassword !== (db.settings.judgePassword || 'judge2026')) {
+  if (judgePassword !== getJudgePassword()) {
     return res.status(403).json({ error: '评委密码错误' });
   }
   const scores = db.judgeScores
