@@ -582,7 +582,7 @@ function getCompositeScore(entryId) {
   const voteCount = getVoteCount(entryId);
   const maxVotes = Math.max(1, ...Object.values(data.votes).map(v => v.length));
   const normalizedVotes = maxVotes > 0 ? (voteCount / maxVotes) * 100 : 0;
-  return Math.round(judgeScore * 0.6 + normalizedVotes * 0.4);
+  return Math.round(judgeScore * 0.8 + normalizedVotes * 0.2);
 }
 
 // ========== BADGES & STATS ==========

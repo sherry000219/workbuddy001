@@ -409,7 +409,7 @@ app.get('/api/ranking', (req, res) => {
     const scores = db.judgeScores.filter(s => s.entryId === e.id);
     const judgeAvg = scores.length > 0 ? Math.round(scores.reduce((s, sc) => s + sc.practicality + sc.innovation + sc.scalability + sc.presentation, 0) / scores.length) : 0;
     const voteScore = Math.round((voteCount / maxVotes) * 100);
-    const composite = Math.round(judgeAvg * 0.6 + voteScore * 0.4);
+    const composite = Math.round(judgeAvg * 0.8 + voteScore * 0.2);
     return { ...e, voteCount, judgeAvg, composite };
   });
   enriched.sort((a, b) => b.composite - a.composite);
@@ -442,7 +442,7 @@ app.get('/api/export/csv', verifyAdminToken, (req, res) => {
     const scores = db.judgeScores.filter(s => s.entryId === e.id);
     const avgScore = scores.length > 0 ? Math.round(scores.reduce((s, sc) => s + sc.practicality + sc.innovation + sc.scalability + sc.presentation, 0) / scores.length) : 0;
     const voteScore = Math.round((voteCount / maxVotes) * 100);
-    const composite = Math.round(avgScore * 0.6 + voteScore * 0.4);
+    const composite = Math.round(avgScore * 0.8 + voteScore * 0.2);
     const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`
     csv += `${esc(e.id)},${esc(e.status === 'approved' ? '已收录' : '待审核')},${esc(e.name)},${esc(e.dept)},${esc(e.subdept)},${esc(trackLabel[e.track] || e.track)},${esc(e.title)},${esc(e.scene)},${esc(e.process_text)},${esc(e.result_text)},${esc(e.extra)},${esc(e.attachmentName)},${esc(e.createdAt)},${voteCount},${avgScore},${composite}\n`;
   });
