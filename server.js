@@ -172,7 +172,7 @@ const DEFAULT_DB = {
   entries: [],
   votes: [],
   judgeScores: [],
-  settings: { judgePassword: 'judge2026', adminPassword: 'yzfwb2016' }
+  settings: { judgePassword: 'judge2026', adminPassword: 'yzfwb2016', votingEnabled: false }
 };
 
 function loadDB() {
@@ -335,7 +335,13 @@ app.get('/api/entries/:id', (req, res) => {
 });
 
 // ========== API: VOTES ==========
+// Public — check if voting is enabled
+app.get('/api/voting/status', (req, res) => {
+  res.json({ votingEnabled: !!db.settings.votingEnabled });
+});
+
 app.post('/api/votes/:entryId', requireAuth, (req, res) => {
+  if (!db.settings.votingEnabled) return res.status(403).json({ error: '投票暂未开启，请等待管理员开启后再投票' });
   const userId = req.ddUser.openId;
   const entry = db.entries.find(e => e.id === req.params.entryId && e.status === 'approved');
   if (!entry) return res.status(404).json({ error: '作品不存在' });
@@ -457,9 +463,10 @@ app.post('/api/settings', verifyAdminToken, async (req, res) => {
   if (req.body.adminPassword !== undefined) {
     db.settings.adminPassword = req.body.adminPassword;
   }
+  if (req.body.votingEnabled !== undefined) {
+    db.settings.votingEnabled = Boolean(req.body.votingEnabled);
+  }
   saveDB();
-  // Force immediate push to GitHub — don't wait for 30s debounce
-  // so the new password survives a redeploy
   ghPush().catch(e => console.error('[settings] GitHub push failed:', e.message));
   res.json({ success: true });
 });
