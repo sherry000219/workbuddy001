@@ -14,6 +14,7 @@ const DINGTALK = {
   appSecret: 'oo65T3Lew-22gSG_FwLKqSLfqEP9XZv0Kgtpn2r7IjFwG1FliqCSKAzAvcKz7SdJ',
   authUrl: 'https://login.dingtalk.com/oauth2/auth',
   tokenUrl: 'https://api.dingtalk.com/v1.0/oauth2/userAccessToken',
+  userInfoUrl: 'https://api.dingtalk.com/v1.0/contact/users/me',
 };
 
 // Session store: token → { openId, nick, avatarUrl, createdAt }
@@ -64,28 +65,47 @@ function ddApi(method, url, body, accessToken) {
 
 // Exchange DingTalk auth code for user info
 async function exchangeDingTalkCode(code) {
-  // Exchange code for access token (this endpoint returns user info directly for web apps)
+  // Step 1: Exchange code for access token
   const tokenResp = await ddApi('POST', DINGTALK.tokenUrl, {
     clientId: DINGTALK.appKey,
     clientSecret: DINGTALK.appSecret,
     code,
     grantType: 'authorization_code',
   });
+  console.log('[dd] token resp:', JSON.stringify(tokenResp));
 
   if (tokenResp.code && tokenResp.code !== '0') {
     throw new Error(tokenResp.message || tokenResp.msg || '获取钉钉授权失败');
   }
+  if (!tokenResp.accessToken) {
+    throw new Error('获取accessToken失败，响应中没有accessToken');
+  }
 
-  // For web apps, token response includes: accessToken, openId, unionId, (and sometimes nick)
-  // We do NOT call /contact/users/me because it requires internal-app permissions
-  console.log('[dd] token response keys:', Object.keys(tokenResp).join(', '));
-  const openId = tokenResp.openId || '';
-  const unionId = tokenResp.unionId || '';
-  const nick = tokenResp.nick || tokenResp.nickname || ('钉钉用户_' + openId.slice(-6));
-  const avatarUrl = tokenResp.avatarUrl || tokenResp.avatar || '';
+  // Step 2: Try to get user info via contact/users/me (needs "个人手机号信息" or similar permission)
+  let openId = tokenResp.openId || '';
+  let unionId = tokenResp.unionId || '';
+  let nick = tokenResp.nick || tokenResp.nickname || '';
+  let avatarUrl = tokenResp.avatarUrl || tokenResp.avatar || '';
 
+  if (!nick || !openId) {
+    try {
+      const userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
+      console.log('[dd] user resp:', JSON.stringify(userResp));
+      openId = openId || userResp.openId || '';
+      unionId = unionId || userResp.unionId || '';
+      nick = nick || userResp.nick || '';
+      avatarUrl = avatarUrl || userResp.avatarUrl || '';
+    } catch (e) {
+      console.log('[dd] contact/users/me failed (expected if no permission):', e.message);
+    }
+  }
+
+  // Step 3: Fallback — if still no nick, use a display name
   if (!openId) {
     throw new Error('授权失败：未能获取用户身份');
+  }
+  if (!nick) {
+    nick = '钉钉用户_' + openId.slice(-6);
   }
 
   return { openId, unionId, nick, avatarUrl };
