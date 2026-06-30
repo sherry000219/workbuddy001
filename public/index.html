@@ -454,13 +454,17 @@ let ddAuthed = false;
 let ddUser = null;
 let ddRemaining = 5;
 
-async function checkDingTalkEnv() {
-  return typeof dd !== 'undefined' && dd.env && typeof dd.env.platform !== 'undefined';
+function isInDingTalk() {
+  try {
+    return typeof dd !== 'undefined' && dd.env && dd.env.platform && dd.env.platform !== 'notInDingTalk';
+  } catch(e) {
+    return false;
+  }
 }
 
 async function ddLogin() {
   // Strategy 1: Inside DingTalk app → use JSAPI authCode
-  if (typeof dd !== 'undefined' && dd.env && dd.env.platform) {
+  if (isInDingTalk()) {
     dd.ready(function() {
       dd.runtime.permission.requestAuthCode({
         corpId: '',
