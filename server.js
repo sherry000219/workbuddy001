@@ -347,6 +347,41 @@ app.post('/api/auth/dd-code', async (req, res) => {
   }
 });
 
+// GET /auth/dingtalk/callback — OAuth redirect callback (for regular browser)
+app.get('/auth/dingtalk/callback', async (req, res) => {
+  const { code, state } = req.query;
+  if (!code) return res.status(400).send('Missing authorization code');
+  try {
+    const userInfo = await exchangeDingTalkCode(code);
+    const token = generateSessionToken();
+    sessions.set(token, {
+      openId: userInfo.openId,
+      unionId: userInfo.unionId,
+      nick: userInfo.nick,
+      avatarUrl: userInfo.avatarUrl,
+      createdAt: Date.now(),
+    });
+    res.cookie('dd_session', token, {
+      maxAge: SESSION_MAX_AGE,
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: true,
+    });
+    res.redirect('/');
+  } catch (e) {
+    console.error('DingTalk callback error:', e.message);
+    res.status(400).send('DingTalk login failed: ' + (e.message || 'unknown error'));
+  }
+});
+
+// GET /api/auth/dd-url — get OAuth redirect URL (for regular browser fallback)
+app.get('/api/auth/dd-url', (req, res) => {
+  const redirectUri = `https://${req.hostname}/auth/dingtalk/callback`;
+  const state = Math.random().toString(36).slice(2, 12);
+  const authUrl = `${DINGTALK.authUrl}?redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${DINGTALK.appKey}&scope=openid&state=${state}&prompt=consent`;
+  res.json({ url: authUrl, state });
+});
+
 // GET /api/auth/me — get current logged-in user (or null)
 app.get('/api/auth/me', (req, res) => {
   const session = getSession(req);

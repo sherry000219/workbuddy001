@@ -459,25 +459,29 @@ async function checkDingTalkEnv() {
 }
 
 async function ddLogin() {
-  // Check if in DingTalk
-  try {
-    if (typeof dd !== 'undefined' && dd.ready) {
-      dd.ready(function() {
-        dd.runtime.permission.requestAuthCode({
-          corpId: '',
-          onSuccess: function(result) {
-            exchangeCode(result.code);
-          },
-          onFail: function(err) {
-            showToast('获取钉钉授权失败，请重试', 'error');
-          }
-        });
+  // Strategy 1: Inside DingTalk app → use JSAPI authCode
+  if (typeof dd !== 'undefined' && dd.env && dd.env.platform) {
+    dd.ready(function() {
+      dd.runtime.permission.requestAuthCode({
+        corpId: '',
+        onSuccess: function(result) {
+          exchangeCode(result.code);
+        },
+        onFail: function(err) {
+          showToast('获取钉钉授权失败，请重试', 'error');
+        }
       });
-    } else {
-      showToast('请在钉钉中打开此页面进行登录', 'error');
-    }
+    });
+    return;
+  }
+  
+  // Strategy 2: Regular browser → redirect to DingTalk OAuth
+  try {
+    const resp = await fetch('/api/auth/dd-url');
+    const data = await resp.json();
+    window.location.href = data.url;
   } catch(e) {
-    showToast('请在钉钉中打开此页面进行登录', 'error');
+    showToast('无法发起钉钉登录，请重试', 'error');
   }
 }
 
