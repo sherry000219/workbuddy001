@@ -1,10 +1,92 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 
 // ========== CONFIG ==========
 const PORT = process.env.PORT || 3000;
+
+// DingTalk OAuth config
+const DINGTALK = {
+  appKey: 'dingrdgv8ra8guvuj6pm',
+  appSecret: 'oo65T3Lew-22gSG_FwLKqSLfqEP9XZv0Kgtpn2r7IjFwG1FliqCSKAzAvcKz7SdJ',
+  authUrl: 'https://login.dingtalk.com/oauth2/auth',
+  tokenUrl: 'https://api.dingtalk.com/v1.0/oauth2/userAccessToken',
+  userInfoUrl: 'https://api.dingtalk.com/v1.0/contact/users/me',
+};
+
+// Session store: token → { openId, nick, avatarUrl, createdAt }
+const sessions = new Map();
+const SESSION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+
+function generateSessionToken() {
+  return 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+}
+
+function getSession(req) {
+  const token = req.cookies && req.cookies.dd_session;
+  if (!token) return null;
+  const session = sessions.get(token);
+  if (!session || Date.now() - session.createdAt > SESSION_MAX_AGE) {
+    if (session) sessions.delete(token);
+    return null;
+  }
+  return session;
+}
+
+// DingTalk API helper: call REST API
+function ddApi(method, url, body, accessToken) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const options = {
+      hostname: urlObj.hostname,
+      path: urlObj.pathname + urlObj.search,
+      method,
+      headers: { 'Content-Type': 'application/json' },
+    };
+    if (accessToken) {
+      options.headers['x-acs-dingtalk-access-token'] = accessToken;
+    }
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); }
+        catch { reject(new Error(data)); }
+      });
+    });
+    req.on('error', reject);
+    if (body) req.write(JSON.stringify(body));
+    req.end();
+  });
+}
+
+// Exchange DingTalk auth code for user info
+async function exchangeDingTalkCode(code) {
+  // Step 1: Get access token
+  const tokenResp = await ddApi('POST', DINGTALK.tokenUrl, {
+    clientId: DINGTALK.appKey,
+    clientSecret: DINGTALK.appSecret,
+    code,
+    grantType: 'authorization_code',
+  });
+  if (!tokenResp.accessToken) {
+    throw new Error(tokenResp.message || '获取钉钉授权失败');
+  }
+  // Step 2: Get user info
+  const userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
+  if (!userResp.nick) {
+    throw new Error(userResp.message || '获取用户信息失败');
+  }
+  return {
+    openId: userResp.openId || '',
+    unionId: userResp.unionId || '',
+    nick: userResp.nick,
+    avatarUrl: userResp.avatarUrl || '',
+  };
+}
 
 // ========== JSON FILE STORAGE ==========
 const DB_DIR = path.join(__dirname, 'data');
@@ -40,10 +122,21 @@ const db = loadDB();
 const app = express();
 app.use(express.json({ limit: '60mb' }));
 app.use(express.urlencoded({ extended: true, limit: '60mb' }));
+app.use(cookieParser());
 app.use(express.static('public'));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 const upload = multer({ dest: UPLOAD_DIR, limits: { fileSize: 50 * 1024 * 1024 } });
+
+// ========== AUTH MIDDLEWARE ==========
+function requireAuth(req, res, next) {
+  const session = getSession(req);
+  if (!session) {
+    return res.status(401).json({ error: '请先通过钉钉登录', needAuth: true });
+  }
+  req.ddUser = session;
+  next();
+}
 
 // ========== API: ENTRIES ==========
 app.get('/api/entries', (req, res) => {
@@ -96,19 +189,24 @@ app.get('/api/entries/:id', (req, res) => {
 });
 
 // ========== API: VOTES ==========
-app.post('/api/votes/:entryId', (req, res) => {
-  const { voterName } = req.body;
-  if (!voterName) return res.status(400).json({ error: '请输入投票人姓名' });
+app.post('/api/votes/:entryId', requireAuth, (req, res) => {
+  const userId = req.ddUser.openId;
   const entry = db.entries.find(e => e.id === req.params.entryId && e.status === 'approved');
   if (!entry) return res.status(404).json({ error: '作品不存在' });
-  if (db.votes.some(v => v.entryId === req.params.entryId && v.voterName === voterName)) {
+  if (db.votes.some(v => v.entryId === req.params.entryId && v.voterId === userId)) {
     return res.status(400).json({ error: '你已经投过票了' });
   }
-  const userVotes = db.votes.filter(v => v.voterName === voterName).length;
-  if (userVotes >= 5) return res.status(400).json({ error: '每人最多投5个作品' });
-  db.votes.push({ entryId: req.params.entryId, voterName, createdAt: new Date().toISOString() });
+  const userVoteCount = db.votes.filter(v => v.voterId === userId).length;
+  if (userVoteCount >= 5) return res.status(400).json({ error: '每人最多投5个作品' });
+  db.votes.push({
+    entryId: req.params.entryId,
+    voterId: userId,
+    voterName: req.ddUser.nick,
+    createdAt: new Date().toISOString()
+  });
   saveDB();
-  res.json({ success: true, voteCount: db.votes.filter(v => v.entryId === req.params.entryId).length });
+  const remaining = 5 - userVoteCount - 1;
+  res.json({ success: true, voteCount: db.votes.filter(v => v.entryId === req.params.entryId).length, remaining });
 });
 
 // ========== API: JUDGE ==========
@@ -220,6 +318,55 @@ function verifyAdminToken(req, res, next) {
   adminTokens.set(token, Date.now() + 2 * 60 * 60 * 1000);
   next();
 }
+
+// ========== API: DINGTALK AUTH ==========
+// POST /api/auth/dd-code — exchange DingTalk JSAPI auth code for session
+app.post('/api/auth/dd-code', async (req, res) => {
+  const { code } = req.body;
+  if (!code) return res.status(400).json({ error: '缺少授权码' });
+  try {
+    const userInfo = await exchangeDingTalkCode(code);
+    const token = generateSessionToken();
+    sessions.set(token, {
+      openId: userInfo.openId,
+      unionId: userInfo.unionId,
+      nick: userInfo.nick,
+      avatarUrl: userInfo.avatarUrl,
+      createdAt: Date.now(),
+    });
+    res.cookie('dd_session', token, {
+      maxAge: SESSION_MAX_AGE,
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: true,
+    });
+    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, avatarUrl: userInfo.avatarUrl } });
+  } catch (e) {
+    console.error('DingTalk auth error:', e.message);
+    res.status(400).json({ error: e.message || '钉钉授权失败' });
+  }
+});
+
+// GET /api/auth/me — get current logged-in user (or null)
+app.get('/api/auth/me', (req, res) => {
+  const session = getSession(req);
+  if (!session) return res.json({ user: null });
+  // Count votes for this user
+  const voteCount = db.votes.filter(v => v.voterId === session.openId).length;
+  res.json({
+    user: { nick: session.nick, openId: session.openId, avatarUrl: session.avatarUrl },
+    remainingVotes: Math.max(0, 5 - voteCount),
+    totalVotes: 5,
+  });
+});
+
+// POST /api/auth/logout
+app.post('/api/auth/logout', (req, res) => {
+  const token = req.cookies && req.cookies.dd_session;
+  if (token) sessions.delete(token);
+  res.clearCookie('dd_session');
+  res.json({ success: true });
+});
 
 // ========== API: ADMIN ==========
 app.post('/api/admin/auth', (req, res) => {
