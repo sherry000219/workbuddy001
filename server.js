@@ -595,6 +595,21 @@ app.post('/api/admin/clear', verifyAdminToken, (req, res) => {
   res.json({ success: true });
 });
 
+// DELETE single entry
+app.delete('/api/admin/entries/:id', verifyAdminToken, (req, res) => {
+  const { id } = req.params;
+  const idx = db.entries.findIndex(e => e.id === id);
+  if (idx === -1) return res.status(404).json({ error: '作品不存在' });
+  const entry = db.entries[idx];
+  db.entries.splice(idx, 1);
+  // Also remove associated votes and judge scores
+  db.votes = db.votes.filter(v => v.entryId !== id);
+  db.judgeScores = db.judgeScores.filter(s => s.entryId !== id);
+  saveDB();
+  console.log('[admin] deleted entry:', entry.title, '| Also removed', db.votes.filter(v => v.entryId === id).length, 'votes and judged scores');
+  res.json({ success: true, title: entry.title });
+});
+
 // ========== START ==========
 app.listen(PORT, () => {
   console.log(`\n========================================`);

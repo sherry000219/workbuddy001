@@ -430,6 +430,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
             <th id="adminJudgeHeaders">评委评分</th>
             <th>均分</th>
             <th>评委数</th>
+            <th>操作</th>
           </tr>
         </thead>
         <tbody id="adminScoreBody"></tbody>
@@ -1096,7 +1097,7 @@ async function renderAdminDashboard() {
     // Build table body
     const tbody = document.getElementById('adminScoreBody');
     if (entryScores.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="${6 + allJudges.length}" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${7 + allJudges.length}" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>`;
       return;
     }
 
@@ -1120,6 +1121,7 @@ async function renderAdminDashboard() {
         ${judgeCells}
         <td style="font-weight:700;color:${hasScores ? '#1677ff' : '#ccc'};">${hasScores ? e.avgScore : '—'}</td>
         <td>${e.judgeCount}</td>
+        <td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry('${e.id}','${e.title.replace(/'/g,"\\'")}')">删除</button></td>
       </tr>`;
     }).join('');
 
@@ -1132,6 +1134,22 @@ async function renderAdminDashboard() {
 async function adminExportCSV() {
   if (!adminAuthed || !adminToken) return showToast('请先登录管理后台', 'error');
   window.open('/api/admin/export/csv?adminToken=' + encodeURIComponent(adminToken), '_blank');
+}
+
+async function deleteEntry(id, title) {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  if (!confirm(`确定删除作品「${title}」吗？\n\n此操作将同时删除该作品的投票和评委打分记录，不可恢复。`)) return;
+  try {
+    const resp = await api(`/api/admin/entries/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-token': adminToken }
+    });
+    showToast(`已删除「${resp.title}」`, 'success');
+    loadStats();
+    renderAdminDashboard();
+  } catch(e) {
+    showToast('删除失败：' + e.message, 'error');
+  }
 }
 
 // Settings (keep existing)
