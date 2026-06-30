@@ -163,6 +163,10 @@ async function exchangeDingTalkCode(code) {
 
 // ========== JSON FILE STORAGE ==========
 const DB_FILE = path.join(DB_DIR, 'contest.json');
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const GITHUB_REPO = 'sherry000219/workbuddy001';
+const GITHUB_DATA_BRANCH = 'data'; // separate branch so auto-push doesn't trigger Render redeploy
+const GITHUB_API_BASE = 'https://api.github.com';
 
 const DEFAULT_DB = {
   entries: [],
@@ -186,6 +190,79 @@ function saveDB() {
 }
 
 const db = loadDB();
+
+// ========== GITHUB SYNC — persist data across Render free-tier redeploys ==========
+let _ghSha = null;
+let _ghTimer = null;
+
+function ghReq(method, apiPath, body) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(GITHUB_API_BASE + apiPath);
+    const opts = {
+      hostname: url.hostname, path: url.pathname, method,
+      headers: {
+        'Authorization': 'Bearer ' + GITHUB_TOKEN,
+        'User-Agent': 'WorkBuddy-Contest',
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    };
+    if (body) {
+      const p = JSON.stringify(body);
+      opts.headers['Content-Type'] = 'application/json';
+      opts.headers['Content-Length'] = Buffer.byteLength(p);
+    }
+    const r = https.request(opts, (res) => {
+      let d = '';
+      res.on('data', c => d += c);
+      res.on('end', () => {
+        try { const j = JSON.parse(d); resolve({ status: res.statusCode, data: j }); }
+        catch { reject(new Error(d)); }
+      });
+    });
+    r.on('error', reject);
+    if (body) r.write(JSON.stringify(body));
+    r.end();
+  });
+}
+
+async function ghPull() {
+  if (!GITHUB_TOKEN) { console.log('[gh] No GITHUB_TOKEN, skip'); return; }
+  try {
+    const { status, data } = await ghReq('GET', `/repos/${GITHUB_REPO}/contents/data/contest.json?ref=${GITHUB_DATA_BRANCH}`);
+    if (status === 404) { console.log('[gh] No data on GitHub yet, starting fresh'); return; }
+    if (status >= 400) throw new Error(data.message || status);
+    _ghSha = data.sha;
+    const buf = Buffer.from(data.content, data.encoding || 'base64');
+    if (!fs.existsSync(path.dirname(DB_FILE))) fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
+    fs.writeFileSync(DB_FILE, buf, 'utf8');
+    console.log('[gh] Pulled data — sha:', _ghSha.slice(0, 7), 'bytes:', buf.length);
+  } catch (e) { console.error('[gh] Pull failed:', e.message); }
+}
+
+function ghPushSchedule() {
+  if (!GITHUB_TOKEN) return;
+  if (_ghTimer) clearTimeout(_ghTimer);
+  _ghTimer = setTimeout(ghPush, 30000);
+}
+
+async function ghPush() {
+  try {
+    const buf = fs.readFileSync(DB_FILE);
+    const body = { message: 'auto: sync data', content: buf.toString('base64'), branch: GITHUB_DATA_BRANCH };
+    if (_ghSha) body.sha = _ghSha;
+    const { status, data } = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest.json`, body);
+    if (status >= 400) throw new Error(data.message || status);
+    _ghSha = data.content.sha;
+    console.log('[gh] Pushed data — sha:', _ghSha.slice(0, 7));
+  } catch (e) { console.error('[gh] Push failed:', e.message); }
+}
+
+// Hook saveDB into GitHub sync
+const _realSaveDB = saveDB;
+saveDB = function() {
+  _realSaveDB();
+  ghPushSchedule();
+};
 
 // ========== EXPRESS ==========
 const app = express();
@@ -625,10 +702,22 @@ app.delete('/api/admin/entries/:id', verifyAdminToken, (req, res) => {
 });
 
 // ========== START ==========
-app.listen(PORT, () => {
-  console.log(`\n========================================`);
-  console.log(`  WorkBuddy Contest Platform running!`);
-  console.log(`  http://localhost:${PORT}`);
-  console.log(`  Database: ${DB_FILE}`);
-  console.log(`========================================\n`);
-});
+(async () => {
+  await ghPull();
+  // Reload after github data written to disk
+  const refreshed = loadDB();
+  db.entries = refreshed.entries;
+  db.votes = refreshed.votes;
+  db.judgeScores = refreshed.judgeScores;
+  db.settings = refreshed.settings;
+  console.log('[db] Loaded — entries:', db.entries.length, 'votes:', db.votes.length, 'scores:', db.judgeScores.length);
+
+  app.listen(PORT, () => {
+    console.log(`\n========================================`);
+    console.log(`  WorkBuddy Contest Platform running!`);
+    console.log(`  http://localhost:${PORT}`);
+    console.log(`  Database: ${DB_FILE}`);
+    console.log(`  GitHub sync: ${GITHUB_TOKEN ? 'ENABLED → ' + GITHUB_DATA_BRANCH + ' branch' : 'DISABLED'}`);
+    console.log(`========================================\n`);
+  });
+})().catch(e => { console.error('[fatal]', e); process.exit(1); });
