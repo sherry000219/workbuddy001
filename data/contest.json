@@ -31,35 +31,9 @@
       "attachmentPath": null,
       "status": "approved",
       "createdAt": "2026-06-30T06:25:37.849Z"
-    },
-    {
-      "id": "entry_1782800688656_w4dg45",
-      "name": "刘相丞",
-      "dept": "职能中台",
-      "subdept": "企业文化",
-      "track": "creative",
-      "title": "测试01",
-      "scene": "测试01",
-      "process_text": "测试01",
-      "result_text": "测试01",
-      "extra": "",
-      "attachmentName": null,
-      "attachmentPath": null,
-      "status": "approved",
-      "createdAt": "2026-06-30T06:24:48.656Z"
     }
   ],
   "votes": [
-    {
-      "entryId": "entry_1782800688656_w4dg45",
-      "voterName": "刘相丞",
-      "createdAt": "2026-06-30T06:38:28.937Z"
-    },
-    {
-      "entryId": "entry_1782800688656_w4dg45",
-      "voterName": "测试",
-      "createdAt": "2026-06-30T06:39:25.664Z"
-    },
     {
       "entryId": "entry_1782800781942_sukg3c",
       "voterName": "刘相丞",
@@ -69,16 +43,6 @@
       "entryId": "entry_1782800737849_uhn6mb",
       "voterName": "测试",
       "createdAt": "2026-06-30T06:46:03.344Z"
-    },
-    {
-      "entryId": "entry_1782800688656_w4dg45",
-      "voterName": "测",
-      "createdAt": "2026-06-30T06:48:38.290Z"
-    },
-    {
-      "entryId": "entry_1782800688656_w4dg45",
-      "voterName": "zzz",
-      "createdAt": "2026-06-30T06:50:16.912Z"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
@@ -94,16 +58,6 @@
       "entryId": "entry_1782800781942_sukg3c",
       "voterName": "qqq",
       "createdAt": "2026-06-30T06:51:20.639Z"
-    },
-    {
-      "entryId": "entry_1782800688656_w4dg45",
-      "voterName": "sda",
-      "createdAt": "2026-06-30T06:54:33.048Z"
-    },
-    {
-      "entryId": "entry_1782800688656_w4dg45",
-      "voterName": "qaz",
-      "createdAt": "2026-06-30T06:54:52.580Z"
     }
   ],
   "judgeScores": [
@@ -153,13 +107,22 @@
       "updatedAt": "2026-06-30T07:09:44.480Z"
     },
     {
-      "entryId": "entry_1782800688656_w4dg45",
-      "judgeName": "003",
-      "practicality": 1,
-      "innovation": 1,
-      "scalability": 1,
-      "presentation": 1,
-      "updatedAt": "2026-06-30T07:09:45.159Z"
+      "entryId": "entry_1782800781942_sukg3c",
+      "judgeName": "徐铭瑞",
+      "practicality": 30,
+      "innovation": 3,
+      "scalability": 4,
+      "presentation": 2,
+      "updatedAt": "2026-06-30T11:34:43.536Z"
+    },
+    {
+      "entryId": "entry_1782800737849_uhn6mb",
+      "judgeName": "徐铭瑞",
+      "practicality": 21,
+      "innovation": 2,
+      "scalability": 2,
+      "presentation": 2,
+      "updatedAt": "2026-06-30T11:35:01.204Z"
     }
   ],
   "settings": {
