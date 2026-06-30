@@ -14,7 +14,6 @@ const DINGTALK = {
   appSecret: 'oo65T3Lew-22gSG_FwLKqSLfqEP9XZv0Kgtpn2r7IjFwG1FliqCSKAzAvcKz7SdJ',
   authUrl: 'https://login.dingtalk.com/oauth2/auth',
   tokenUrl: 'https://api.dingtalk.com/v1.0/oauth2/userAccessToken',
-  userInfoUrl: 'https://api.dingtalk.com/v1.0/contact/users/me',
 };
 
 // Session store: token → { openId, nick, avatarUrl, createdAt }
@@ -65,27 +64,31 @@ function ddApi(method, url, body, accessToken) {
 
 // Exchange DingTalk auth code for user info
 async function exchangeDingTalkCode(code) {
-  // Step 1: Get access token
+  // Exchange code for access token (this endpoint returns user info directly for web apps)
   const tokenResp = await ddApi('POST', DINGTALK.tokenUrl, {
     clientId: DINGTALK.appKey,
     clientSecret: DINGTALK.appSecret,
     code,
     grantType: 'authorization_code',
   });
-  if (!tokenResp.accessToken) {
-    throw new Error(tokenResp.message || '获取钉钉授权失败');
+
+  if (tokenResp.code && tokenResp.code !== '0') {
+    throw new Error(tokenResp.message || tokenResp.msg || '获取钉钉授权失败');
   }
-  // Step 2: Get user info
-  const userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
-  if (!userResp.nick) {
-    throw new Error(userResp.message || '获取用户信息失败');
+
+  // For web apps, token response includes: accessToken, openId, unionId, (and sometimes nick)
+  // We do NOT call /contact/users/me because it requires internal-app permissions
+  console.log('[dd] token response keys:', Object.keys(tokenResp).join(', '));
+  const openId = tokenResp.openId || '';
+  const unionId = tokenResp.unionId || '';
+  const nick = tokenResp.nick || tokenResp.nickname || ('钉钉用户_' + openId.slice(-6));
+  const avatarUrl = tokenResp.avatarUrl || tokenResp.avatar || '';
+
+  if (!openId) {
+    throw new Error('授权失败：未能获取用户身份');
   }
-  return {
-    openId: userResp.openId || '',
-    unionId: userResp.unionId || '',
-    nick: userResp.nick,
-    avatarUrl: userResp.avatarUrl || '',
-  };
+
+  return { openId, unionId, nick, avatarUrl };
 }
 
 // ========== JSON FILE STORAGE ==========
