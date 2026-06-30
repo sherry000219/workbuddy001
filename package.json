@@ -1,0 +1,12 @@
+{
+  "name": "workbuddy-contest-platform",
+  "version": "1.0.0",
+  "description": "WorkBuddy AI Contest Platform - 报名投递+展示+评审一站",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}

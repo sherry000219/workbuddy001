@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI赋能·全员进化 — WorkBuddy实战应用大赛</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #333; min-height: 100vh; }
+
+/* ===== Header ===== */
+.header { background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%); color: #fff; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.header-left h1 { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+.header-left p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.header-right .status-badge { background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 20px; font-size: 13px; }
+
+/* ===== Tabs ===== */
+.tabs { background: #fff; display: flex; border-bottom: 1px solid #e8e8e8; padding: 0 32px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.tab { padding: 14px 24px; cursor: pointer; font-size: 15px; color: #666; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; font-weight: 500; }
+.tab:hover { color: #1677ff; }
+.tab.active { color: #1677ff; border-bottom-color: #1677ff; font-weight: 600; }
+.tab .badge { display: inline-block; background: #1677ff; color: #fff; font-size: 11px; padding: 1px 7px; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
+
+/* ===== Main ===== */
+.main { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ===== Stats ===== */
+.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: #fff; border-radius: 10px; padding: 18px 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.stat-card .num { font-size: 32px; font-weight: 700; color: #1677ff; }
+.stat-card .label { font-size: 13px; color: #999; margin-top: 4px; }
+
+/* ===== Section ===== */
+.section-title { font-size: 18px; font-weight: 700; margin: 28px 0 16px; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+.section-title::before { content: ''; width: 4px; height: 20px; background: #1677ff; border-radius: 2px; }
+
+/* ===== Buttons ===== */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-primary { background: #1677ff; color: #fff; }
+.btn-primary:hover { background: #0958d9; }
+.btn-success { background: #52c41a; color: #fff; }
+.btn-success:hover { background: #49ad17; }
+.btn-warning { background: #faad14; color: #fff; }
+.btn-outline { background: #fff; color: #1677ff; border: 1px solid #1677ff; }
+.btn-outline:hover { background: #e6f0ff; }
+.btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 6px; }
+.btn-danger { background: #ff4d4f; color: #fff; }
+.btn-ghost { background: transparent; color: #666; }
+.btn-ghost:hover { background: #f5f5f5; }
+
+/* ===== Form ===== */
+.form-card { background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.form-step { display: none; }
+.form-step.active { display: block; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #333; }
+.form-group label .required { color: #ff4d4f; margin-left: 2px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; transition: border 0.2s; font-family: inherit; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.15); }
+.form-group textarea { min-height: 100px; resize: vertical; }
+.form-hint { font-size: 12px; color: #999; margin-top: 4px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #f0f0f0; }
+
+/* ===== Success ===== */
+.success-page { text-align: center; padding: 60px 20px; }
+.success-page .icon { font-size: 64px; margin-bottom: 20px; }
+.success-page h2 { font-size: 22px; color: #52c41a; margin-bottom: 8px; }
+.success-page p { color: #666; margin-bottom: 24px; }
+
+/* ===== Gallery ===== */
+.gallery-toolbar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.gallery-toolbar input[type="text"] { padding: 8px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; flex: 1; min-width: 200px; }
+.gallery-toolbar select { padding: 8px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; background: #fff; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+.entry-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: all 0.25s; border: 1px solid #f0f0f0; position: relative; cursor: pointer; }
+.entry-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); transform: translateY(-2px); }
+.track-tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+.track-efficiency { background: #e6f7ff; color: #1677ff; }
+.track-creative { background: #fff7e6; color: #fa8c16; }
+.track-business { background: #f6ffed; color: #52c41a; }
+.entry-card h3 { font-size: 17px; margin-bottom: 6px; color: #1a1a1a; }
+.entry-card .meta { font-size: 13px; color: #999; margin-bottom: 10px; }
+.entry-card .desc { font-size: 14px; color: #555; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.entry-card .card-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
+.score-display { font-size: 20px; font-weight: 700; color: #faad14; }
+.votes { font-size: 12px; color: #999; }
+.empty-state { text-align: center; padding: 60px 20px; color: #999; }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+/* ===== Modal ===== */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal { background: #fff; border-radius: 16px; max-width: 700px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 32px; }
+.modal h2 { font-size: 20px; margin-bottom: 16px; }
+.modal .detail-row { margin-bottom: 14px; }
+.modal .detail-row .dlabel { font-size: 12px; color: #999; margin-bottom: 2px; }
+.modal .detail-row .dvalue { font-size: 15px; color: #333; line-height: 1.6; white-space: pre-wrap; }
+.modal .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ===== Judge ===== */
+.judge-login { background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); text-align: center; max-width: 400px; margin: 40px auto; }
+.judge-login input { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; margin: 10px 0; }
+.judge-panel { display: none; }
+.judge-panel.active { display: block; }
+.score-table { width: 100%; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.score-table table { width: 100%; border-collapse: collapse; }
+.score-table th { background: #fafafa; padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #666; border-bottom: 1px solid #f0f0f0; }
+.score-table td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid #f5f5f5; }
+.score-table tr:hover td { background: #fafbff; }
+.score-table .scored td { background: #f6ffed; }
+.score-table input[type="number"] { width: 60px; padding: 6px 8px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; text-align: center; }
+.judge-name-display { font-size: 14px; color: #666; margin-bottom: 16px; }
+
+/* ===== Data Mgmt ===== */
+.data-card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.data-card h3 { font-size: 16px; margin-bottom: 12px; }
+.data-card p { font-size: 14px; color: #666; line-height: 1.8; }
+
+/* ===== Ranking ===== */
+.ranking-list { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.rank-item { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f5f5f5; gap: 16px; cursor: pointer; }
+.rank-item:last-child { border-bottom: none; }
+.rank-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+.rank-num.top1 { background: #ffd700; color: #fff; }
+.rank-num.top2 { background: #c0c0c0; color: #fff; }
+.rank-num.top3 { background: #cd7f32; color: #fff; }
+.rank-num.normal { background: #f0f0f0; color: #666; }
+.rank-info { flex: 1; min-width: 0; }
+.rank-info .rname { font-weight: 600; font-size: 15px; }
+.rank-info .rdept { font-size: 12px; color: #999; }
+.rank-score { font-size: 22px; font-weight: 700; color: #1677ff; flex-shrink: 0; }
+
+/* ===== Toast ===== */
+.toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 28px; border-radius: 8px; font-size: 14px; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+.toast.success { background: #52c41a; }
+.toast.error { background: #ff4d4f; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .header { padding: 16px; }
+  .header-left h1 { font-size: 18px; }
+  .tabs { padding: 0 8px; }
+  .tab { padding: 12px 14px; font-size: 13px; }
+  .main { padding: 16px; }
+  .gallery-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .score-table { overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <div class="header-left">
+    <h1>AI赋能·全员进化</h1>
+    <p>WorkBuddy 实战应用大赛 — 报名 · 展示 · 评审一站式平台</p>
+  </div>
+  <div class="header-right">
+    <span class="status-badge">2026年7月–8月</span>
+    <span id="user-area"></span>
+  </div>
+</div>
+
+<!-- ===== TABS ===== -->
+<div class="tabs" id="tabNav">
+  <div class="tab active" data-tab="submit">报名投稿<span class="badge" id="badge-submit">0</span></div>
+  <div class="tab" data-tab="gallery">作品展示<span class="badge" id="badge-gallery">0</span></div>
+  <div class="tab" data-tab="ranking">实时排行</div>
+  <div class="tab" data-tab="judge">评委评审</div>
+  <div class="tab" data-tab="admin">数据管理</div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+
+<!-- ===== PAGE: SUBMIT ===== -->
+<div class="page active" id="page-submit">
+  <div class="stats-bar" id="submitStats"></div>
+  <div class="form-card" id="formCard">
+    <div class="section-title">作品投稿</div>
+    <p style="color:#999;margin-bottom:20px;font-size:14px;">不限次数，每个场景可独立提交一个作品</p>
+
+    <div class="form-step active" id="step1">
+      <div style="font-size:14px;color:#1677ff;margin-bottom:20px;font-weight:600;">第1步：基本信息</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>姓名 <span class="required">*</span></label>
+          <input type="text" id="f-name" placeholder="请输入你的姓名">
+        </div>
+        <div class="form-group">
+          <label>部门 <span class="required">*</span></label>
+          <select id="f-dept">
+            <option value="">请选择部门</option>
+            <option value="中小微-总部">中小微-总部</option>
+            <option value="中小微-区域团队">中小微-区域团队</option>
+            <option value="产研中心">产研中心</option>
+            <option value="职能中台">职能中台</option>
+            <option value="有度税智">有度税智</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>子部门名称 <span class="required">*</span></label>
+        <input type="text" id="f-subdept" placeholder="请填写你所在的子部门/团队名称">
+      </div>
+      <div class="form-group">
+        <label>参赛赛道 <span class="required">*</span></label>
+        <select id="f-track">
+          <option value="">请选择赛道</option>
+          <option value="efficiency">效率提升</option>
+          <option value="creative">创意应用</option>
+          <option value="business">业务赋能</option>
+        </select>
+        <div class="form-hint">鼓励方向，不强制归入；选最贴近的即可</div>
+      </div>
+      <div class="form-group">
+        <label>作品标题 <span class="required">*</span></label>
+        <input type="text" id="f-title" placeholder="给你的作品起个吸引人的名字">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="nextStep(2)">下一步</button>
+      </div>
+    </div>
+
+    <div class="form-step" id="step2">
+      <div style="font-size:14px;color:#1677ff;margin-bottom:20px;font-weight:600;">第2步：作品详情</div>
+      <div class="form-group">
+        <label>场景描述 <span class="required">*</span></label>
+        <textarea id="f-scene" rows="3" placeholder="描述你解决的是什么工作场景/问题？"></textarea>
+      </div>
+      <div class="form-group">
+        <label>使用过程 <span class="required">*</span></label>
+        <textarea id="f-process" rows="4" placeholder="描述你如何使用WorkBuddy完成这个任务？包括关键步骤、用到的功能等"></textarea>
+      </div>
+      <div class="form-group">
+        <label>效果呈现 <span class="required">*</span></label>
+        <textarea id="f-result" rows="3" placeholder="使用WorkBuddy后的效果如何？推荐用量化数据"></textarea>
+      </div>
+      <div class="form-group">
+        <label>作品链接 / 附加信息（选填）<br><small style="font-weight:400;color:#1677ff;">建议上传钉钉文档链接或网页链接展示作品，评委可直接点击查看</small></label>
+        <textarea id="f-extra" rows="2" placeholder="粘贴钉钉文档链接、网页链接，或补充其他说明"></textarea>
+        <div class="form-hint">链接提交后可在作品详情中直接点击跳转</div>
+      </div>
+      <div class="form-group">
+        <label>上传附件（选填，单文件 50MB 以内）</label>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <input type="file" id="f-attachment" style="display:none;" onchange="handleAttachmentSelect(event)">
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('f-attachment').click()">选择文件</button>
+          <span id="attachment-name" style="font-size:13px;color:#999;">未选择文件</span>
+          <button type="button" id="attachment-clear" class="btn btn-ghost btn-sm" style="display:none;" onclick="clearAttachment()">清除</button>
+        </div>
+        <div class="form-hint">支持图片、PDF、Word、Excel、压缩包等格式</div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="prevStep(1)">上一步</button>
+        <button class="btn btn-success" onclick="submitEntry()">提交作品</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: GALLERY ===== -->
+<div class="page" id="page-gallery">
+  <div class="stats-bar" id="galleryStats"></div>
+  <div class="section-title">全部作品</div>
+  <div class="gallery-toolbar">
+    <input type="text" id="gallerySearch" placeholder="搜索作品标题、姓名、部门..." oninput="renderGallery()">
+    <select id="galleryTrack" onchange="renderGallery()">
+      <option value="">全部赛道</option>
+      <option value="efficiency">效率提升</option>
+      <option value="creative">创意应用</option>
+      <option value="business">业务赋能</option>
+    </select>
+    <select id="galleryDept" onchange="renderGallery()">
+      <option value="">全部部门</option>
+    </select>
+    <select id="gallerySort" onchange="renderGallery()">
+      <option value="newest">最新提交</option>
+      <option value="score">得分最高</option>
+      <option value="votes">投票最多</option>
+    </select>
+  </div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+</div>
+
+<!-- ===== PAGE: RANKING ===== -->
+<div class="page" id="page-ranking">
+  <div class="stats-bar" id="rankingStats"></div>
+  <div class="section-title">综合排名 Top 20</div>
+  <p style="color:#999;font-size:14px;margin-bottom:16px;">按专家评审分（60%）+ 全员投票分（40%）合并计算</p>
+  <div class="gallery-toolbar">
+    <select id="rankTrack" onchange="renderRanking()">
+      <option value="">全部赛道</option>
+      <option value="efficiency">效率提升</option>
+      <option value="creative">创意应用</option>
+      <option value="business">业务赋能</option>
+    </select>
+  </div>
+  <div class="ranking-list" id="rankingList"></div>
+</div>
+
+<!-- ===== PAGE: JUDGE ===== -->
+<div class="page" id="page-judge">
+  <div class="judge-login" id="judgeLogin">
+    <div style="font-size:48px;margin-bottom:16px;"></div>
+    <h2>评委登录</h2>
+    <p style="color:#999;margin-top:8px;">请输入评委姓名和评审密码</p>
+    <div id="judge-auth-check" style="margin-top:20px;">
+      <input type="text" id="judgeNameInput" placeholder="评委姓名" style="width:100%;padding:10px 14px;border:1px solid #d9d9d9;border-radius:8px;font-size:14px;margin-bottom:10px;">
+      <input type="password" id="judgePwInput" placeholder="评审密码" onkeydown="if(event.key==='Enter')enterJudge()">
+      <button class="btn btn-primary" style="margin-top:8px;width:100%;" onclick="enterJudge()">进入评审</button>
+      <p style="font-size:12px;color:#ccc;margin-top:12px;">默认密码：judge2026</p>
+    </div>
+  </div>
+  <div class="judge-panel" id="judgePanel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="section-title" style="margin:0;">评委评审面板</div>
+        <div class="judge-name-display" id="judgeNameDisplay"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <select id="judgeTrackFilter" onchange="renderJudgePanel()">
+          <option value="">全部赛道</option>
+          <option value="efficiency">效率提升</option>
+          <option value="creative">创意应用</option>
+          <option value="business">业务赋能</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="logoutJudge()">退出</button>
+      </div>
+    </div>
+    <div style="background:#fff7e6;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:#8c6d00;">
+      <b>打分维度参考：</b>
+      实用性(30%)：解决了真实工作问题 |
+      创新性(25%)：场景/用法新颖有启发性 |
+      可推广性(25%)：其他同事可复用 |
+      效果呈现(20%)：有量化数据支撑
+    </div>
+    <div class="score-table">
+      <table>
+        <thead>
+          <tr>
+            <th>作品</th><th>姓名</th><th>部门</th><th>赛道</th>
+            <th>实用性<br><small>/30</small></th><th>创新性<br><small>/25</small></th><th>可推广性<br><small>/25</small></th><th>效果呈现<br><small>/20</small></th>
+            <th>总分</th><th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="judgeTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: ADMIN ===== -->
+<div class="page" id="page-admin">
+  <!-- Admin Login -->
+  <div class="judge-login" id="adminLogin">
+    <div style="font-size:48px;margin-bottom:16px;">🔐</div>
+    <h2>管理后台</h2>
+    <p style="color:#999;margin-top:8px;">请输入管理员密码</p>
+    <div style="margin-top:20px;">
+      <input type="password" id="adminPwInput" placeholder="管理员密码" onkeydown="if(event.key==='Enter')adminLogin()" style="width:100%;padding:10px 14px;border:1px solid #d9d9d9;border-radius:8px;font-size:14px;">
+      <button class="btn btn-primary" style="margin-top:8px;width:100%;" onclick="adminLogin()">进入后台</button>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div class="judge-panel" id="adminPanel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div class="section-title" style="margin:0;">管理后台 · 评委打分汇总</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-outline btn-sm" onclick="adminExportCSV()">📥 下载打分汇总CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="exportData()">📦 导出全部数据JSON</button>
+        <button class="btn btn-outline btn-sm" onclick="exportCSV()">📊 导出作品CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="adminLogout()">退出</button>
+      </div>
+    </div>
+
+    <!-- Summary stats -->
+    <div class="stats-bar" id="adminStatsBar"></div>
+
+    <!-- Settings section -->
+    <details style="margin-bottom:20px;">
+      <summary style="cursor:pointer;font-size:15px;font-weight:600;padding:8px 0;color:#666;">⚙️ 系统设置 & 危险操作</summary>
+      <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-top:12px;">
+        <div class="form-row" style="margin-bottom:16px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label>评委密码</label>
+            <input type="text" id="adminJudgePassword" placeholder="评委登录密码">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>管理员密码</label>
+            <input type="text" id="adminAdminPassword" placeholder="管理后台密码">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveSettings()">保存密码设置</button>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0;">
+          <p style="color:#ff4d4f;font-size:13px;margin-bottom:10px;">⚠️ 以下操作不可恢复</p>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-danger btn-sm" onclick="if(confirm('确定要清空所有数据吗？'))clearAllData('all')">清空所有数据</button>
+            <button class="btn btn-danger btn-sm" onclick="if(confirm('确定要清空评委打分吗？'))clearAllData('scores')">清空评委打分</button>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- Judge scores summary table -->
+    <div class="score-table" style="overflow-x:auto;">
+      <table style="min-width:900px;">
+        <thead>
+          <tr>
+            <th style="position:sticky;left:0;background:#fafafa;z-index:1;">作品</th>
+            <th>姓名</th>
+            <th>部门</th>
+            <th>赛道</th>
+            <th id="adminJudgeHeaders">评委评分</th>
+            <th>均分</th>
+            <th>评委数</th>
+          </tr>
+        </thead>
+        <tbody id="adminScoreBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== DETAIL MODAL ===== -->
+<div class="modal-overlay" id="detailModal" style="display:none;" onclick="if(event.target===this)closeDetail()">
+  <div class="modal" id="detailContent"></div>
+</div>
+
+<script>
+// ========== HELPERS ==========
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+function trackLabel(t) {
+  return { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' }[t] || t;
+}
+function trackClass(t) {
+  return { efficiency: 'track-efficiency', creative: 'track-creative', business: 'track-business' }[t] || '';
+}
+
+function linkify(text) {
+  if (!text) return '';
+  const urlRegex = /(https?:\/\/[^\s<]+)/gi;
+  return text.replace(/\n/g, '<br>').replace(urlRegex, function(url) {
+    let cleanUrl = url.replace(/[.,;:!?)\]]+$/, '');
+    return '<a href="' + cleanUrl + '" target="_blank" rel="noopener" style="color:#1677ff;word-break:break-all;">' + cleanUrl + '</a>';
+  });
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+// ========== API CALLS ==========
+async function api(url, options = {}) {
+  const resp = await fetch(url, {
+    ...options,
+    headers: { ...options.headers },
+    credentials: 'same-origin'
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+// ========== STATE ==========
+let allEntries = [];
+let judgePassword = '';
+
+// ========== TAB SWITCHING ==========
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('page-' + tab.dataset.tab).classList.add('active');
+    switch(tab.dataset.tab) {
+      case 'submit': renderSubmitPage(); break;
+      case 'gallery': renderGallery(); break;
+      case 'ranking': renderRanking(); break;
+      case 'judge': renderJudgePage(); break;
+      case 'admin': renderAdminPage(); break;
+    }
+  });
+});
+
+// ========== STATS ==========
+async function loadStats() {
+  try {
+    const stats = await api('/api/stats');
+    document.getElementById('badge-submit').textContent = stats.totalEntries;
+    document.getElementById('badge-gallery').textContent = stats.approvedEntries;
+    return stats;
+  } catch(e) { return {}; }
+}
+
+function renderStatsBar(containerId, stats) {
+  const container = document.getElementById(containerId);
+  if (!container || !stats) return;
+  container.innerHTML = `
+    <div class="stat-card"><div class="num">${stats.totalEntries || 0}</div><div class="label">总投稿数</div></div>
+    <div class="stat-card"><div class="num">${stats.approvedEntries || 0}</div><div class="label">已收录作品</div></div>
+    <div class="stat-card"><div class="num">${stats.judgeCount || 0}</div><div class="label">评审评委</div></div>
+    <div class="stat-card"><div class="num">${stats.topDept || '-'}</div><div class="label">投稿最多部门</div></div>
+    <div class="stat-card"><div class="num">${stats.totalVotes || 0}</div><div class="label">总投票数</div></div>
+  `;
+}
+
+// ========== SUBMIT PAGE ==========
+function renderSubmitPage() {
+  loadStats().then(stats => renderStatsBar('submitStats', stats));
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('step1').classList.add('active');
+  document.getElementById('step2').classList.remove('active');
+  ['f-name','f-subdept','f-title','f-scene','f-process','f-result','f-extra'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-dept').value = '';
+  document.getElementById('f-track').value = '';
+  clearAttachment();
+}
+
+function nextStep(n) {
+  const name = document.getElementById('f-name').value.trim();
+  const dept = document.getElementById('f-dept').value;
+  const subdept = document.getElementById('f-subdept').value.trim();
+  const track = document.getElementById('f-track').value;
+  const title = document.getElementById('f-title').value.trim();
+  if (!name) return showToast('请填写姓名', 'error');
+  if (!dept) return showToast('请选择部门', 'error');
+  if (!subdept) return showToast('请填写子部门名称', 'error');
+  if (!track) return showToast('请选择赛道', 'error');
+  if (!title) return showToast('请填写作品标题', 'error');
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+}
+
+function prevStep(n) {
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+}
+
+// ========== ATTACHMENT ==========
+let pendingFile = null;
+
+function handleAttachmentSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 50 * 1024 * 1024) {
+    showToast('文件大小不能超过 50MB！', 'error');
+    event.target.value = '';
+    return;
+  }
+  pendingFile = file;
+  document.getElementById('attachment-name').textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+  document.getElementById('attachment-clear').style.display = 'inline-flex';
+}
+
+function clearAttachment() {
+  pendingFile = null;
+  document.getElementById('attachment-name').textContent = '未选择文件';
+  document.getElementById('attachment-clear').style.display = 'none';
+  const fileInput = document.getElementById('f-attachment');
+  if (fileInput) fileInput.value = '';
+}
+
+// ========== SUBMIT ENTRY ==========
+async function submitEntry() {
+  const scene = document.getElementById('f-scene').value.trim();
+  const process = document.getElementById('f-process').value.trim();
+  const result = document.getElementById('f-result').value.trim();
+  if (!scene) return showToast('请填写场景描述', 'error');
+  if (!process) return showToast('请填写使用过程', 'error');
+  if (!result) return showToast('请填写效果呈现', 'error');
+  
+  const formData = new FormData();
+  formData.append('name', document.getElementById('f-name').value.trim());
+  formData.append('dept', document.getElementById('f-dept').value);
+  formData.append('subdept', document.getElementById('f-subdept').value.trim());
+  formData.append('track', document.getElementById('f-track').value);
+  formData.append('title', document.getElementById('f-title').value.trim());
+  formData.append('scene', scene);
+  formData.append('process_text', process);
+  formData.append('result_text', result);
+  formData.append('extra', document.getElementById('f-extra').value.trim());
+  if (pendingFile) formData.append('attachment', pendingFile);
+  
+  try {
+    const resp = await fetch('/api/entries', {
+      method: 'POST',
+      body: formData,
+      credentials: 'same-origin'
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '提交失败');
+    
+    showToast('作品提交成功！', 'success');
+    document.getElementById('formCard').innerHTML = `
+      <div class="success-page">
+        <div class="icon">🎉</div>
+        <h2>作品提交成功！</h2>
+        <p>你的作品已收录，可以在「作品展示」中查看。</p>
+        <p style="font-size:13px;color:#999;">每人可多次提交，欢迎继续投稿！</p>
+        <button class="btn btn-primary" onclick="location.reload()">继续投稿</button>
+        <button class="btn btn-outline" style="margin-left:8px;" onclick="switchTab('gallery')">查看全部作品</button>
+      </div>
+    `;
+    loadStats();
+  } catch(e) {
+    showToast('提交失败：' + e.message, 'error');
+  }
+}
+
+// ========== GALLERY ==========
+async function renderGallery() {
+  const stats = await loadStats();
+  renderStatsBar('galleryStats', stats);
+  
+  const search = document.getElementById('gallerySearch').value;
+  const track = document.getElementById('galleryTrack').value;
+  const dept = document.getElementById('galleryDept').value;
+  const sort = document.getElementById('gallerySort').value;
+  
+  let url = `/api/entries?sort=${sort}`;
+  if (track) url += `&track=${track}`;
+  if (dept) url += `&dept=${encodeURIComponent(dept)}`;
+  if (search) url += `&search=${encodeURIComponent(search)}`;
+  
+  try {
+    const data = await api(url);
+    allEntries = data.entries;
+    
+    // Populate dept filter
+    const deptSelect = document.getElementById('galleryDept');
+    const deptVal = deptSelect.value;
+    const depts = [...new Set(data.entries.map(e => e.dept))];
+    deptSelect.innerHTML = '<option value="">全部部门</option>' + depts.map(d => `<option value="${d}">${d}</option>`).join('');
+    deptSelect.value = deptVal;
+    
+    const grid = document.getElementById('galleryGrid');
+    if (data.entries.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">📭</div><p>暂无作品，快来投稿吧！</p></div>';
+      return;
+    }
+    
+    grid.innerHTML = data.entries.map(e => `
+      <div class="entry-card" onclick="openDetail('${e.id}')">
+        <span class="track-tag ${trackClass(e.track)}">${trackLabel(e.track)}${e.attachmentName ? ' 📎' : ''}</span>
+        <h3>${e.title}</h3>
+        <div class="meta">${e.name} · ${e.dept}${e.subdept ? ' / ' + e.subdept : ''} · ${new Date(e.createdAt).toLocaleDateString('zh-CN')}</div>
+        <div class="desc">${e.scene}</div>
+        ${e.extra ? `<div style="font-size:13px;color:#1677ff;margin-top:8px;word-break:break-all;">${linkify(e.extra.substring(0,100))}${e.extra.length>100?'...':''}</div>` : ''}
+        <div class="card-footer">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <span class="score-display">${e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分'}</span>
+            <span class="votes">👍 ${e.voteCount} 票</span>
+          </div>
+          <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();voteEntry('${e.id}')">👍 投票</button>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    console.error('Gallery error:', e);
+  }
+}
+
+async function voteEntry(entryId) {
+  const voterName = prompt('请输入你的姓名以进行投票：');
+  if (!voterName || !voterName.trim()) return;
+  try {
+    const data = await api(`/api/votes/${entryId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ voterName: voterName.trim() })
+    });
+    showToast('👍 投票成功！当前票数：' + data.voteCount, 'success');
+    renderGallery();
+  } catch(e) {
+    showToast(e.message, 'error');
+  }
+}
+
+// ========== DETAIL MODAL ==========
+async function openDetail(entryId) {
+  try {
+    const data = await api(`/api/entries/${entryId}`);
+    const e = data.entry;
+    
+    const compositeScore = Math.round((e.avgScore || 0) * 0.6 + (e.voteCount / Math.max(1, e.voteCount)) * 0.4 * 100 * 0.4);
+    
+    document.getElementById('detailContent').innerHTML = `
+      <h2>${e.title}</h2>
+      <div style="margin-bottom:12px;">
+        <span class="track-tag ${trackClass(e.track)}">${trackLabel(e.track)}</span>
+        <span style="font-size:13px;color:#999;margin-left:8px;">${e.name} · ${e.dept}${e.subdept ? ' / ' + e.subdept : ''} · ${new Date(e.createdAt).toLocaleString('zh-CN')}</span>
+      </div>
+      <div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">${e.scene}</div></div>
+      <div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">${e.process_text}</div></div>
+      <div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">${e.result_text}</div></div>
+      ${e.extra ? `<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">${linkify(e.extra)}</div></div>` : ''}
+      ${e.attachmentName ? `<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/${e.attachmentPath}" download="${e.attachmentName}" style="color:#1677ff;">📥 下载 ${e.attachmentName}</a></div></div>` : ''}
+      <div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0;">
+        <div><span style="font-size:24px;font-weight:700;color:#1677ff;">${e.avgScore || '-'}</span><span style="font-size:12px;color:#999;"> 评委均分</span></div>
+        <div><span style="font-size:16px;font-weight:600;">👍 ${e.voteCount}</span><span style="font-size:12px;color:#999;"> 票</span></div>
+        <div><span style="font-size:16px;font-weight:600;color:#faad14;">${e.judgeCount}</span><span style="font-size:12px;color:#999;"> 位评委打分</span></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline btn-sm" onclick="voteEntry('${e.id}')">👍 投票</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button>
+      </div>
+    `;
+    document.getElementById('detailModal').style.display = 'flex';
+  } catch(e) {
+    showToast('加载失败：' + e.message, 'error');
+  }
+}
+
+function closeDetail() { document.getElementById('detailModal').style.display = 'none'; }
+
+// ========== RANKING ==========
+async function renderRanking() {
+  const stats = await loadStats();
+  renderStatsBar('rankingStats', stats);
+  
+  const track = document.getElementById('rankTrack').value;
+  let url = '/api/ranking';
+  if (track) url += `?track=${track}`;
+  
+  try {
+    const data = await api(url);
+    const list = document.getElementById('rankingList');
+    if (data.ranking.length === 0) {
+      list.innerHTML = '<div class="empty-state"><div class="icon">🏆</div><p>暂无排名数据</p></div>';
+      return;
+    }
+    
+    list.innerHTML = data.ranking.map((e, i) => {
+      const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : 'normal';
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+      return `
+      <div class="rank-item" onclick="openDetail('${e.id}')">
+        <div class="rank-num ${rankClass}">${medal || (i+1)}</div>
+        <div class="rank-info">
+          <div class="rname">${e.title}</div>
+          <div class="rdept">${e.name} · ${e.dept}${e.subdept ? ' / ' + e.subdept : ''} · ${trackLabel(e.track)}</div>
+        </div>
+        <div class="rank-score">${e.composite}</div>
+      </div>`;
+    }).join('');
+  } catch(e) { console.error('Ranking error:', e); }
+}
+
+// ========== JUDGE PAGE ==========
+let judgeName = '';
+
+function renderJudgePage() {
+  document.getElementById('judgeLogin').style.display = 'block';
+  document.getElementById('judgePanel').classList.remove('active');
+  document.getElementById('judgeNameInput').value = '';
+  document.getElementById('judgePwInput').value = '';
+}
+
+function enterJudge() {
+  const name = document.getElementById('judgeNameInput').value.trim();
+  const pw = document.getElementById('judgePwInput').value.trim();
+  if (!name) return showToast('请输入评委姓名', 'error');
+  if (!pw) return showToast('请输入评审密码', 'error');
+  judgeName = name;
+  judgePassword = pw;
+  
+  // Verify password by fetching entries (password check happens server-side on score save)
+  document.getElementById('judgeLogin').style.display = 'none';
+  document.getElementById('judgePanel').classList.add('active');
+  document.getElementById('judgeNameDisplay').textContent = '当前评委：' + name;
+  renderJudgePanel();
+}
+
+function logoutJudge() {
+  judgePassword = '';
+  judgeName = '';
+  renderJudgePage();
+}
+
+async function renderJudgePanel() {
+  if (!judgeName || !judgePassword) return;
+  
+  const track = document.getElementById('judgeTrackFilter').value;
+  let url = '/api/entries?sort=newest';
+  if (track) url += `&track=${track}`;
+  
+  try {
+    const data = await api(url);
+    // Fetch existing scores to pre-fill
+    let myScores = {};
+    try {
+      const allScoresResp = await fetch(`/api/export/json`);
+      const allData = await allScoresResp.json();
+      (allData.judgeScores || []).forEach(s => {
+        if (s.judgeName === judgeName) myScores[s.entryId] = s;
+      });
+    } catch(e) {}
+    
+    const tbody = document.getElementById('judgeTableBody');
+    if (data.entries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">暂无作品</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = data.entries.map(e => {
+      const s = myScores[e.id] || {};
+      const total = (s.practicality||0) + (s.innovation||0) + (s.scalability||0) + (s.presentation||0);
+      const hasScored = myScores[e.id] ? 'scored' : '';
+      return `
+      <tr class="${hasScored}">
+        <td><a href="javascript:void(0)" onclick="openDetail('${e.id}')" style="color:#1677ff;">${e.title.substring(0,18)}${e.title.length>18?'...':''}</a></td>
+        <td>${e.name}</td>
+        <td>${e.dept}${e.subdept ? '/'+e.subdept : ''}</td>
+        <td>${trackLabel(e.track)}</td>
+        <td><input type="number" min="0" max="30" value="${s.practicality||''}" id="j_p_${e.id}" placeholder="0-30"></td>
+        <td><input type="number" min="0" max="25" value="${s.innovation||''}" id="j_c_${e.id}" placeholder="0-25"></td>
+        <td><input type="number" min="0" max="25" value="${s.scalability||''}" id="j_s_${e.id}" placeholder="0-25"></td>
+        <td><input type="number" min="0" max="20" value="${s.presentation||''}" id="j_r_${e.id}" placeholder="0-20"></td>
+        <td><strong>${total}</strong></td>
+        <td><button class="btn btn-sm ${hasScored ? 'btn-success' : 'btn-primary'}" onclick="saveScore('${e.id}')">${hasScored ? '更新' : '打分'}</button></td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.error('Judge panel error:', e); }
+}
+
+async function saveScore(entryId) {
+  const p = parseInt(document.getElementById('j_p_' + entryId)?.value) || 0;
+  const c = parseInt(document.getElementById('j_c_' + entryId)?.value) || 0;
+  const s = parseInt(document.getElementById('j_s_' + entryId)?.value) || 0;
+  const r = parseInt(document.getElementById('j_r_' + entryId)?.value) || 0;
+  
+  if (p > 30 || c > 25 || s > 25 || r > 20) {
+    return showToast('分数超出上限，请检查！', 'error');
+  }
+  
+  try {
+    const data = await api(`/api/judge/scores/${entryId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ judgeName, practicality: p, innovation: c, scalability: s, presentation: r, judgePassword })
+    });
+    showToast('打分已保存！总分：' + data.total, 'success');
+    renderJudgePanel();
+  } catch(e) {
+    showToast(e.message, 'error');
+  }
+}
+
+// ========== ADMIN ==========
+let adminAuthed = false;
+let adminToken = '';
+
+function renderAdminPage() {
+  document.getElementById('adminLogin').style.display = 'block';
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('adminPanel').classList.remove('active');
+  document.getElementById('adminPwInput').value = '';
+  adminAuthed = false;
+  adminToken = '';
+}
+
+async function adminLogin() {
+  const pw = document.getElementById('adminPwInput').value.trim();
+  if (!pw) return showToast('请输入管理员密码', 'error');
+  try {
+    const data = await api('/api/admin/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    adminAuthed = true;
+    adminToken = data.token;
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('adminPanel').classList.add('active');
+    await renderAdminDashboard();
+    // Load settings
+    const sdata = await api('/api/settings', {
+      headers: { 'x-admin-token': adminToken }
+    });
+    document.getElementById('adminJudgePassword').value = sdata.settings.judgePassword || '';
+    document.getElementById('adminAdminPassword').value = sdata.settings.adminPassword || '';
+  } catch(e) {
+    showToast(e.message, 'error');
+  }
+}
+
+function adminLogout() {
+  adminAuthed = false;
+  adminToken = '';
+  renderAdminPage();
+}
+
+async function renderAdminDashboard() {
+  if (!adminAuthed || !adminToken) return;
+  
+  try {
+    const data = await api('/api/admin/scores', {
+      headers: { 'x-admin-token': adminToken }
+    });
+    const { entryScores, allJudges, summary } = data;
+
+    // Stats bar
+    const statsBar = document.getElementById('adminStatsBar');
+    statsBar.innerHTML = `
+      <div class="stat-card"><div class="num">${summary.totalEntries}</div><div class="label">作品总数</div></div>
+      <div class="stat-card"><div class="num">${summary.totalJudges}</div><div class="label">评委人数</div></div>
+      <div class="stat-card"><div class="num">${summary.totalScores}</div><div class="label">打分总数</div></div>
+      <div class="stat-card"><div class="num">${summary.scoredEntries}</div><div class="label">已评作品</div></div>
+      <div class="stat-card"><div class="num" style="color:#ff4d4f;">${summary.unscoredEntries}</div><div class="label">未评作品</div></div>
+    `;
+
+    // Build table header dynamically
+    const th = document.getElementById('adminJudgeHeaders');
+    th.colSpan = allJudges.length;
+    th.innerHTML = allJudges.map(j => `${j}<br><small>总分</small>`).join(' | ');
+
+    // Build table body
+    const tbody = document.getElementById('adminScoreBody');
+    if (entryScores.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="${6 + allJudges.length}" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = entryScores.map(e => {
+      // Build per-judge cells
+      const judgeCells = allJudges.map(judge => {
+        const s = e.scores.find(sc => sc.judgeName === judge);
+        if (s) {
+          return `<td style="background:#f6ffed;font-weight:500;">${s.total}<br><small style="color:#999;font-weight:400;">实${s.practicality} 创${s.innovation} 推${s.scalability} 效${s.presentation}</small></td>`;
+        }
+        return '<td style="color:#ccc;">—</td>';
+      }).join('');
+
+      const hasScores = e.scores.length > 0;
+      return `
+      <tr>
+        <td style="position:sticky;left:0;background:#fff;z-index:1;"><a href="javascript:void(0)" onclick="openDetail('${e.id}')" style="color:#1677ff;font-weight:500;">${e.title.substring(0,16)}${e.title.length>16?'...':''}</a></td>
+        <td>${e.name}</td>
+        <td>${e.dept}${e.subdept ? '/'+e.subdept : ''}</td>
+        <td>${trackLabel(e.track)}</td>
+        ${judgeCells}
+        <td style="font-weight:700;color:${hasScores ? '#1677ff' : '#ccc'};">${hasScores ? e.avgScore : '—'}</td>
+        <td>${e.judgeCount}</td>
+      </tr>`;
+    }).join('');
+
+  } catch(e) {
+    console.error('Admin dashboard error:', e);
+    showToast('加载失败', 'error');
+  }
+}
+
+async function adminExportCSV() {
+  if (!adminAuthed || !adminToken) return showToast('请先登录管理后台', 'error');
+  window.open('/api/admin/export/csv?adminToken=' + encodeURIComponent(adminToken), '_blank');
+}
+
+// Settings (keep existing)
+async function saveSettings() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  const judgePw = document.getElementById('adminJudgePassword').value.trim();
+  const adminPw = document.getElementById('adminAdminPassword').value.trim();
+  try {
+    await api('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ judgePassword: judgePw, adminPassword: adminPw })
+    });
+    showToast('设置已保存！', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function exportData() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  window.open('/api/export/json?adminToken=' + encodeURIComponent(adminToken), '_blank');
+}
+
+function exportCSV() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  window.open('/api/export/csv?adminToken=' + encodeURIComponent(adminToken), '_blank');
+}
+
+async function clearAllData(type) {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  try {
+    await api('/api/admin/clear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ type })
+    });
+    showToast('操作完成', 'success');
+    loadStats();
+    if (adminAuthed) renderAdminDashboard();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+function switchTab(tabName) {
+  const tab = document.querySelector(`.tab[data-tab="${tabName}"]`);
+  if (tab) tab.click();
+}
+
+// ========== INIT ==========
+async function init() {
+  await loadStats();
+  renderSubmitPage();
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeDetail(); }
+  });
+}
+
+init();
+</script>
+</body>
+</html>
