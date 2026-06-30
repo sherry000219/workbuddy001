@@ -172,7 +172,7 @@ const DEFAULT_DB = {
   entries: [],
   votes: [],
   judgeScores: [],
-  settings: { judgePassword: 'judge2026', adminPassword: 'yzfwb2016', votingEnabled: false }
+  settings: { judgePassword: 'wb2026', adminPassword: 'yzfwb2016', votingEnabled: false }
 };
 
 function loadDB() {
@@ -363,8 +363,13 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
 
 // Judge password: env > db.settings > hardcoded default
 function getJudgePassword() {
-  // 优先环境变量，硬编码作兜底。忽略 db.settings 防止 GitHub data 同步后密码意外回退
-  return process.env.JUDGE_PASSWORD || 'judge2026';
+  // 忽略 db.settings，防止 GitHub data 同步覆盖
+  return process.env.JUDGE_PASSWORD || 'wb2026';
+}
+
+function getAdminPassword() {
+  // 忽略 db.settings，防止 GitHub data 同步覆盖
+  return process.env.ADMIN_PASSWORD || 'yzfwb2026';
 }
 
 // ========== API: JUDGE ==========
@@ -590,7 +595,7 @@ app.post('/api/auth/logout', (req, res) => {
 // ========== API: ADMIN ==========
 app.post('/api/admin/auth', (req, res) => {
   const { password } = req.body;
-  const adminPw = db.settings.adminPassword || 'yzfwb2016';
+  const adminPw = getAdminPassword();
   if (!password || password !== adminPw) {
     return res.status(403).json({ error: '管理员密码错误' });
   }
