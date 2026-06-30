@@ -968,11 +968,11 @@ async function renderJudgePanel() {
     // Fetch existing scores to pre-fill
     let myScores = {};
     try {
-      const allScoresResp = await fetch(`/api/export/json`);
-      const allData = await allScoresResp.json();
-      (allData.judgeScores || []).forEach(s => {
-        if (s.judgeName === judgeName) myScores[s.entryId] = s;
-      });
+      const resp = await fetch(`/api/judge/my-scores?judgeName=${encodeURIComponent(judgeName)}&judgePassword=${encodeURIComponent(judgePassword)}`);
+      if (resp.ok) {
+        const data = await resp.json();
+        (data.scores || []).forEach(s => { myScores[s.entryId] = s; });
+      }
     } catch(e) {}
     
     const tbody = document.getElementById('judgeTableBody');
@@ -1091,13 +1091,19 @@ async function renderAdminDashboard() {
 
     // Build table header dynamically
     const th = document.getElementById('adminJudgeHeaders');
-    th.colSpan = allJudges.length;
-    th.innerHTML = allJudges.map(j => `${j}<br><small>总分</small>`).join(' | ');
+    if (allJudges.length > 0) {
+      th.colSpan = allJudges.length;
+      th.innerHTML = allJudges.map(j => `${j}<br><small>总分</small>`).join(' | ');
+    } else {
+      th.colSpan = 1;
+      th.innerHTML = '暂无评委评分';
+    }
 
     // Build table body
     const tbody = document.getElementById('adminScoreBody');
     if (entryScores.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="${7 + allJudges.length}" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>`;
+      const totalCols = 7 + Math.max(1, allJudges.length);
+      tbody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>`;
       return;
     }
 
@@ -1121,7 +1127,7 @@ async function renderAdminDashboard() {
         ${judgeCells}
         <td style="font-weight:700;color:${hasScores ? '#1677ff' : '#ccc'};">${hasScores ? e.avgScore : '—'}</td>
         <td>${e.judgeCount}</td>
-        <td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry('${e.id}','${e.title.replace(/'/g,"\\'")}')">删除</button></td>
+        <td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry('${e.id}')">删除</button></td>
       </tr>`;
     }).join('');
 
@@ -1136,9 +1142,9 @@ async function adminExportCSV() {
   window.open('/api/admin/export/csv?adminToken=' + encodeURIComponent(adminToken), '_blank');
 }
 
-async function deleteEntry(id, title) {
+async function deleteEntry(id) {
   if (!adminToken) return showToast('请先登录管理后台', 'error');
-  if (!confirm(`确定删除作品「${title}」吗？\n\n此操作将同时删除该作品的投票和评委打分记录，不可恢复。`)) return;
+  if (!confirm('确定删除该作品吗？\n\n此操作将同时删除该作品的投票和评委打分记录，不可恢复。')) return;
   try {
     const resp = await api(`/api/admin/entries/${id}`, {
       method: 'DELETE',

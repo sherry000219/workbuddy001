@@ -296,6 +296,19 @@ app.post('/api/judge/scores/:entryId', (req, res) => {
   res.json({ success: true, total: p + c + s + r });
 });
 
+// GET /api/judge/my-scores — return this judge's existing scores
+app.get('/api/judge/my-scores', (req, res) => {
+  const { judgeName, judgePassword } = req.query;
+  if (!judgeName) return res.status(400).json({ error: '缺少评委姓名' });
+  if (judgePassword !== (db.settings.judgePassword || 'judge2026')) {
+    return res.status(403).json({ error: '评委密码错误' });
+  }
+  const scores = db.judgeScores
+    .filter(s => s.judgeName === judgeName)
+    .map(s => ({ entryId: s.entryId, practicality: s.practicality, innovation: s.innovation, scalability: s.scalability, presentation: s.presentation, total: s.practicality + s.innovation + s.scalability + s.presentation }));
+  res.json({ scores });
+});
+
 // ========== API: RANKING ==========
 app.get('/api/ranking', (req, res) => {
   const { track } = req.query;
