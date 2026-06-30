@@ -74,40 +74,46 @@ async function exchangeDingTalkCode(code) {
   });
   console.log('[dd] token resp:', JSON.stringify(tokenResp));
 
-  if (tokenResp.code && tokenResp.code !== '0') {
-    throw new Error(tokenResp.message || tokenResp.msg || '获取钉钉授权失败');
-  }
   if (!tokenResp.accessToken) {
+    console.log('[dd] ERROR: no accessToken in response');
     throw new Error('获取accessToken失败，响应中没有accessToken');
   }
 
-  // Step 2: Try to get user info via contact/users/me (needs "个人手机号信息" or similar permission)
+  // Step 2: 先尝试从 token 响应直接提取用户信息
   let openId = tokenResp.openId || '';
   let unionId = tokenResp.unionId || '';
   let nick = tokenResp.nick || tokenResp.nickname || '';
   let avatarUrl = tokenResp.avatarUrl || tokenResp.avatar || '';
 
-  if (!nick || !openId) {
-    try {
-      const userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
-      console.log('[dd] user resp:', JSON.stringify(userResp));
-      openId = openId || userResp.openId || '';
-      unionId = unionId || userResp.unionId || '';
-      nick = nick || userResp.nick || '';
-      avatarUrl = avatarUrl || userResp.avatarUrl || '';
-    } catch (e) {
-      console.log('[dd] contact/users/me failed (expected if no permission):', e.message);
+  // Step 3: 使用「获取通讯录个人信息」权限调用 contact/users/me 获取真实姓名
+  try {
+    const userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
+    console.log('[dd] contact/users/me resp:', JSON.stringify(userResp));
+
+    if (userResp.nick) {
+      nick = userResp.nick;
+      console.log('[dd] Got nick from contact/users/me:', nick);
     }
+    if (userResp.openId) openId = userResp.openId;
+    if (userResp.unionId) unionId = userResp.unionId;
+    if (userResp.avatarUrl) avatarUrl = userResp.avatarUrl;
+    if (userResp.email) console.log('[dd] Got email:', userResp.email);
+    if (userResp.mobile) console.log('[dd] Got mobile:', userResp.mobile);
+  } catch (e) {
+    console.log('[dd] contact/users/me call failed:', e.message);
   }
 
-  // Step 3: Fallback — if still no nick, use a display name
+  // Step 4: 如果仍然没有 openId 或 nick，用兜底
   if (!openId) {
+    console.log('[dd] ERROR: no openId available');
     throw new Error('授权失败：未能获取用户身份');
   }
   if (!nick) {
     nick = '钉钉用户_' + openId.slice(-6);
+    console.log('[dd] Using fallback nick:', nick);
   }
 
+  console.log('[dd] Login success — openId:', openId, 'nick:', nick);
   return { openId, unionId, nick, avatarUrl };
 }
 
