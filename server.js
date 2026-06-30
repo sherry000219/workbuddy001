@@ -450,7 +450,7 @@ app.get('/api/settings', verifyAdminToken, (req, res) => {
   res.json({ settings: db.settings });
 });
 
-app.post('/api/settings', verifyAdminToken, (req, res) => {
+app.post('/api/settings', verifyAdminToken, async (req, res) => {
   if (req.body.judgePassword !== undefined) {
     db.settings.judgePassword = req.body.judgePassword;
   }
@@ -458,6 +458,9 @@ app.post('/api/settings', verifyAdminToken, (req, res) => {
     db.settings.adminPassword = req.body.adminPassword;
   }
   saveDB();
+  // Force immediate push to GitHub — don't wait for 30s debounce
+  // so the new password survives a redeploy
+  ghPush().catch(e => console.error('[settings] GitHub push failed:', e.message));
   res.json({ success: true });
 });
 
