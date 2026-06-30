@@ -7,6 +7,7 @@ const https = require('https');
 
 // ========== CONFIG ==========
 const PORT = process.env.PORT || 3000;
+const DEPLOY_VERSION = 'v3'; // force redeploy
 
 // DingTalk OAuth config
 const DINGTALK = {
