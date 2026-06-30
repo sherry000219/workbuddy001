@@ -20,6 +20,10 @@ const DINGTALK = {
 
 // Session store: token → { openId, nick, avatarUrl, createdAt }
 // Use a Map for in-memory cache, but persist to disk so sessions survive server restarts.
+const DB_DIR = path.join(__dirname, 'data');
+const UPLOAD_DIR = path.join(__dirname, 'uploads');
+if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 const SESSION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
 const SESSION_FILE = path.join(DB_DIR, 'sessions.json');
 const sessions = loadSessions();
@@ -158,11 +162,7 @@ async function exchangeDingTalkCode(code) {
 }
 
 // ========== JSON FILE STORAGE ==========
-const DB_DIR = path.join(__dirname, 'data');
-const UPLOAD_DIR = path.join(__dirname, 'uploads');
 const DB_FILE = path.join(DB_DIR, 'contest.json');
-if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 const DEFAULT_DB = {
   entries: [],
