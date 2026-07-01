@@ -197,7 +197,8 @@ function isVotingStage(stage) {
 // Entries eligible for voting in a given stage
 function getVotableEntries(stage) {
   if (stage === 'preliminary') {
-    return db.entries.filter(e => e.status === 'approved' && (e.roundStatus === 'approved' || !e.roundStatus));
+    // 展示所有已过审作品，不过滤 roundStatus（保证晋级后初赛视图不变空）
+    return db.entries.filter(e => e.status === 'approved');
   }
   if (stage === 'semi_final') {
     return db.entries.filter(e => e.roundStatus === 'semi_finalist');
@@ -208,6 +209,7 @@ function getVotableEntries(stage) {
 // Entries eligible for judging in a given stage
 function getJudgableEntries(stage) {
   if (stage === 'preliminary') {
+    // 展示所有已过审作品，不过滤 roundStatus（保证晋级后初赛视图不变空）
     return db.entries.filter(e => e.status === 'approved');
   }
   if (stage === 'semi_final') {
@@ -898,6 +900,46 @@ app.post('/api/admin/settle', verifyAdminToken, (req, res) => {
 
   const awardedCount = db.entries.filter(e => e.award).length;
   res.json({ success: true, currentStage: 'awarded', awardedCount });
+});
+
+// ========== API: ADMIN RESET (重置数据) ==========
+// POST /api/admin/reset
+// body: { mode: 'stage' | 'full' }
+//   'stage': 重置阶段回初赛，清空 roundStatus/award，保留投票和打分
+//   'full':  以上全部 + 清空所有投票和评委打分
+app.post('/api/admin/reset', verifyAdminToken, (req, res) => {
+  const { mode } = req.body;
+  let cleared = {};
+
+  if (mode === 'stage') {
+    // 重置阶段：清空晋级标记和获奖标记，回退到初赛
+    db.entries.forEach(e => {
+      e.roundStatus = 'approved';
+      e.award = null;
+    });
+    db.settings.currentStage = 'preliminary';
+    db.settings.votingEnabled = false;
+    cleared = { entries: db.entries.length, stage: true };
+  } else if (mode === 'full') {
+    // 完全重置：清空晋级标记 + 清空所有投票和打分
+    db.entries.forEach(e => {
+      e.roundStatus = 'approved';
+      e.award = null;
+    });
+    db.settings.currentStage = 'preliminary';
+    db.settings.votingEnabled = false;
+    const voteCount = db.votes.length;
+    const scoreCount = db.judgeScores.length;
+    db.votes = [];
+    db.judgeScores = [];
+    cleared = { entries: db.entries.length, votes: voteCount, scores: scoreCount, stage: true };
+  } else {
+    return res.status(400).json({ error: 'mode 必须是 stage 或 full' });
+  }
+
+  saveDB();
+  ghPush().catch(e => console.error('[reset] GitHub push failed:', e.message));
+  res.json({ success: true, currentStage: 'preliminary', cleared });
 });
 
 // ========== START ==========

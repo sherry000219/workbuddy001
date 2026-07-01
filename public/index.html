@@ -457,6 +457,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     <details style="margin-bottom:20px;">
       <summary style="cursor:pointer;font-size:15px;font-weight:600;padding:8px 0;color:#666;">⚙️ 系统设置 & 危险操作</summary>
       <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-top:12px;">
+        <!-- Stage selector -->
+        <div style="margin-bottom:16px;">
+          <label style="font-weight:500;display:block;margin-bottom:6px;">📌 当前阶段</label>
+          <select id="adminStageSelect" onchange="saveStageSelect()" style="width:100%;max-width:240px;padding:8px 12px;border:1px solid #d9d9d9;border-radius:8px;font-size:14px;">
+            <option value="preliminary">初赛</option>
+            <option value="semi_final">复赛</option>
+            <option value="final">决赛</option>
+            <option value="awarded">已结算</option>
+          </select>
+          <p style="color:#ff9800;font-size:12px;margin:6px 0 0 0;">⚠️ 手动切回初赛后，晋级标记依然存在；如需彻底回退请用下方「重置阶段」</p>
+        </div>
+        <!-- Voting toggle -->
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0;">
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500;">
             <span>🔓 开启全员投票</span>
@@ -464,10 +476,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
           </label>
           <p style="color:#999;font-size:12px;margin:4px 0 0 28px;">开启后，已登录的钉钉用户即可投票（当前阶段有效）</p>
         </div>
+        <!-- Reset operations -->
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0;">
-          <p style="color:#ff4d4f;font-size:13px;margin-bottom:10px;">⚠️ 以下操作不可恢复</p>
+          <p style="color:#666;font-size:13px;margin-bottom:10px;">🔄 重置数据</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-sm" style="background:#faad14;color:#fff;" onclick="adminReset('stage')">🔄 重置阶段</button>
+            <button class="btn btn-sm" style="background:#ff7a45;color:#fff;" onclick="adminReset('full')">⚠️ 完全重置</button>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#999;line-height:1.6;">
+            <p style="margin:2px 0;">🔄 <b>重置阶段</b>：清空晋级标记和获奖标记，回到初赛。保留投票记录和评委打分。</p>
+            <p style="margin:2px 0;">⚠️ <b>完全重置</b>：以上全部 + 清空所有投票和评委打分。保留作品投稿。</p>
+          </div>
+        </div>
+        <!-- Dangerous operations -->
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0;">
+          <p style="color:#ff4d4f;font-size:13px;margin-bottom:10px;">💣 危险操作</p>
           <div style="display:flex;gap:10px;">
-            <button class="btn btn-danger btn-sm" onclick="if(confirm('确定要清空所有数据吗？'))clearAllData('all')">清空所有数据</button>
+            <button class="btn btn-danger btn-sm" onclick="if(confirm('确定要清空所有数据吗？（包括作品、投票、打分）'))clearAllData('all')">清空所有数据</button>
             <button class="btn btn-danger btn-sm" onclick="if(confirm('确定要清空评委打分吗？'))clearAllData('scores')">清空评委打分</button>
           </div>
         </div>
@@ -1266,6 +1291,8 @@ async function adminLogin() {
     currentStage = sdata.settings.currentStage || 'preliminary';
     isVotingStage = isStageVoting(currentStage);
     document.getElementById('adminVotingToggle').checked = !!sdata.settings.votingEnabled;
+    const stageSel = document.getElementById('adminStageSelect');
+    if (stageSel) stageSel.value = currentStage;
     updateStageUI();
     updateAdminStageLabel();
   } catch(e) {
@@ -1558,6 +1585,49 @@ async function saveVotingToggle() {
     votingEnabled = on;
     updateVotingUI();
     showToast(on ? '✅ 投票已开启' : '⏸️ 投票已暂停', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function saveStageSelect() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  const newStage = document.getElementById('adminStageSelect').value;
+  try {
+    const data = await api('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ currentStage: newStage })
+    });
+    currentStage = data.currentStage || newStage;
+    isVotingStage = isStageVoting(currentStage);
+    updateStageBar();
+    renderAdminDashboard();
+    showToast(`已切换到${STAGE_LABELS[currentStage]}`, 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function adminReset(mode) {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  const label = mode === 'stage' ? '重置阶段' : '完全重置';
+  const desc = mode === 'stage'
+    ? '将清空晋级标记和获奖标记，回到初赛阶段。\n投票记录和评委打分将保留。'
+    : '将清空晋级标记和获奖标记，并清空所有投票和评委打分。\n仅保留作品投稿。';
+  if (!confirm(`确认执行「${label}」？\n\n${desc}\n\n此操作不可撤销，确定继续？`)) return;
+  try {
+    const data = await api('/api/admin/reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ mode })
+    });
+    currentStage = 'preliminary';
+    isVotingStage = true;
+    votingEnabled = false;
+    document.getElementById('adminVotingToggle').checked = false;
+    document.getElementById('adminStageSelect').value = 'preliminary';
+    updateStageBar();
+    updateVotingUI();
+    loadStats();
+    renderAdminDashboard();
+    showToast(`「${label}」完成，已回到初赛`, 'success');
   } catch(e) { showToast(e.message, 'error'); }
 }
 
