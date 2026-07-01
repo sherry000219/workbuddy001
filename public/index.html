@@ -45,6 +45,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .stat-card .num { font-size: 32px; font-weight: 700; color: #1677ff; }
 .stat-card .label { font-size: 13px; color: #999; margin-top: 4px; }
 
+/* ===== Judge gap cards ===== */
+.judge-gap-card { background: #fff; border-radius: 8px; padding: 10px 14px; min-width: 140px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: relative; cursor: default; }
+.judge-gap-card .gap-judge { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.judge-gap-card .gap-bar { height: 4px; background: #f0f0f0; border-radius: 2px; margin-bottom: 4px; }
+.judge-gap-card .gap-fill { height: 100%; border-radius: 2px; background: #52c41a; transition: width 0.3s; }
+.judge-gap-card.gap-half .gap-fill { background: #faad14; }
+.judge-gap-card.gap-low .gap-fill { background: #ff4d4f; }
+.judge-gap-card .gap-nums { font-size: 11px; color: #999; }
+.judge-gap-card .gap-missing { font-size: 11px; color: #ff4d4f; cursor: pointer; margin-top: 2px; text-decoration: underline; border: none; background: none; padding: 0; }
+.judge-gap-card .gap-ok { font-size: 14px; color: #52c41a; font-weight: 700; margin-top: 2px; }
+.judge-gap-card.gap-done { border: 1px solid #b7eb8f; }
+.judge-gap-card.gap-half { border: 1px solid #ffe58f; }
+.judge-gap-card.gap-low { border: 1px solid #ffa39e; }
+
 /* ===== Section ===== */
 .section-title { font-size: 18px; font-weight: 700; margin: 28px 0 16px; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
 .section-title::before { content: ''; width: 4px; height: 20px; background: #1677ff; border-radius: 2px; }
@@ -449,6 +463,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 
     <!-- Summary stats -->
     <div class="stats-bar" id="adminStatsBar"></div>
+
+    <!-- Judge completion gap summary -->
+    <div id="judgeGapSummary" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;"></div>
 
     <!-- Stage Management Panel -->
     <div id="stageManagePanel"></div>
@@ -1338,6 +1355,36 @@ async function renderAdminDashboard() {
     // Render stage management panel
     renderStageManagePanel(entryScores);
 
+    // Judge completion summary
+    const unscoredMap = {}; // judge -> [entry titles]
+    if (allJudges.length > 0 && entryScores.length > 0) {
+      allJudges.forEach(judge => { unscoredMap[judge] = []; });
+      entryScores.forEach(e => {
+        allJudges.forEach(judge => {
+          if (!e.scores.find(sc => sc.judgeName === judge)) {
+            unscoredMap[judge].push(e.title.substring(0, 12));
+          }
+        });
+      });
+    }
+    const judgeGapCards = allJudges.map(judge => {
+      const missing = unscoredMap[judge] || [];
+      const done = (entryScores.length || 1) - missing.length;
+      const pct = Math.round(done / Math.max(1, entryScores.length) * 100);
+      const doneClass = pct === 100 ? 'gap-done' : (pct >= 50 ? 'gap-half' : 'gap-low');
+      const titleList = missing.length > 0 ? missing.join('、') : '全部完成 ✓';
+      return `<div class="judge-gap-card ${doneClass}" title="${judge}: ${titleList}">
+        <div class="gap-judge">${judge}</div>
+        <div class="gap-bar"><div class="gap-fill" style="width:${pct}%"></div></div>
+        <div class="gap-nums">${done}/${entryScores.length} 完成</div>
+        ${missing.length > 0 ? `<div class="gap-missing" onclick="event.stopPropagation();showToast('${judge} 未评: ${titleList}', 'info')">${missing.length}个待评</div>` : '<div class="gap-ok">✓</div>'}
+      </div>`;
+    }).join('');
+
+    document.getElementById('judgeGapSummary').innerHTML = allJudges.length > 0
+      ? judgeGapCards
+      : '<div style="color:#999;font-size:13px;">暂无评委数据</div>';
+
     // Build table header - one th per judge to match tbody columns
     const headerRow = document.getElementById('adminScoreHeaderRow');
     const judgeHeaders = allJudges.length > 0
@@ -1368,7 +1415,7 @@ async function renderAdminDashboard() {
         if (s) {
           return `<td style="background:#f6ffed;font-weight:500;">${s.total}<br><small style="color:#999;font-weight:400;">实${s.practicality} 创${s.innovation} 推${s.scalability} 效${s.presentation}</small></td>`;
         }
-        return '<td style="color:#ccc;">—</td>';
+        return '<td style="background:#fff2f0;color:#ff4d4f;font-weight:500;text-align:center;" title="' + judge + ' 未评分">未评</td>';
       }).join('');
 
       const hasScores = e.scores.length > 0;
