@@ -7,7 +7,7 @@ const https = require('https');
 
 // ========== CONFIG ==========
 const PORT = process.env.PORT || 3000;
-const DEPLOY_VERSION = 'v3'; // force redeploy
+const DEPLOY_VERSION = 'v4-stage';
 
 // DingTalk OAuth config
 const DINGTALK = {
@@ -18,13 +18,12 @@ const DINGTALK = {
   userInfoUrl: 'https://api.dingtalk.com/v1.0/contact/users/me',
 };
 
-// Session store: token → { openId, nick, avatarUrl, createdAt }
-// Use a Map for in-memory cache, but persist to disk so sessions survive server restarts.
+// Session store
 const DB_DIR = path.join(__dirname, 'data');
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
 if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-const SESSION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+const SESSION_MAX_AGE = 24 * 60 * 60 * 1000;
 const SESSION_FILE = path.join(DB_DIR, 'sessions.json');
 const sessions = loadSessions();
 
@@ -80,7 +79,7 @@ function getSession(req) {
   return session;
 }
 
-// DingTalk API helper: call REST API
+// DingTalk API helper
 function ddApi(method, url, body, accessToken) {
   return new Promise((resolve, reject) => {
     const urlObj = new URL(url);
@@ -109,7 +108,6 @@ function ddApi(method, url, body, accessToken) {
 
 // Exchange DingTalk auth code for user info
 async function exchangeDingTalkCode(code) {
-  // Step 1: Exchange code for access token
   const tokenResp = await ddApi('POST', DINGTALK.tokenUrl, {
     clientId: DINGTALK.appKey,
     clientSecret: DINGTALK.appSecret,
@@ -117,47 +115,24 @@ async function exchangeDingTalkCode(code) {
     grantType: 'authorization_code',
   });
   console.log('[dd] token resp:', JSON.stringify(tokenResp));
-
   if (!tokenResp.accessToken) {
-    console.log('[dd] ERROR: no accessToken in response');
-    throw new Error('获取accessToken失败，响应中没有accessToken');
+    throw new Error('获取accessToken失败');
   }
-
-  // Step 2: 先尝试从 token 响应直接提取用户信息
   let openId = tokenResp.openId || '';
   let unionId = tokenResp.unionId || '';
   let nick = tokenResp.nick || tokenResp.nickname || '';
   let avatarUrl = tokenResp.avatarUrl || tokenResp.avatar || '';
-
-  // Step 3: 使用「获取通讯录个人信息」权限调用 contact/users/me 获取真实姓名
   try {
     const userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
-    console.log('[dd] contact/users/me resp:', JSON.stringify(userResp));
-
-    if (userResp.nick) {
-      nick = userResp.nick;
-      console.log('[dd] Got nick from contact/users/me:', nick);
-    }
+    if (userResp.nick) nick = userResp.nick;
     if (userResp.openId) openId = userResp.openId;
     if (userResp.unionId) unionId = userResp.unionId;
     if (userResp.avatarUrl) avatarUrl = userResp.avatarUrl;
-    if (userResp.email) console.log('[dd] Got email:', userResp.email);
-    if (userResp.mobile) console.log('[dd] Got mobile:', userResp.mobile);
   } catch (e) {
     console.log('[dd] contact/users/me call failed:', e.message);
   }
-
-  // Step 4: 如果仍然没有 openId 或 nick，用兜底
-  if (!openId) {
-    console.log('[dd] ERROR: no openId available');
-    throw new Error('授权失败：未能获取用户身份');
-  }
-  if (!nick) {
-    nick = '钉钉用户_' + openId.slice(-6);
-    console.log('[dd] Using fallback nick:', nick);
-  }
-
-  console.log('[dd] Login success — openId:', openId, 'nick:', nick);
+  if (!openId) throw new Error('授权失败：未能获取用户身份');
+  if (!nick) nick = '钉钉用户_' + openId.slice(-6);
   return { openId, unionId, nick, avatarUrl };
 }
 
@@ -165,21 +140,33 @@ async function exchangeDingTalkCode(code) {
 const DB_FILE = path.join(DB_DIR, 'contest.json');
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const GITHUB_REPO = 'sherry000219/workbuddy001';
-const GITHUB_DATA_BRANCH = 'data'; // separate branch so auto-push doesn't trigger Render redeploy
+const GITHUB_DATA_BRANCH = 'data';
 const GITHUB_API_BASE = 'https://api.github.com';
 
 const DEFAULT_DB = {
   entries: [],
   votes: [],
   judgeScores: [],
-  settings: { judgePassword: 'wb2026', adminPassword: 'yzfwb2016', votingEnabled: false }
+  settings: { judgePassword: 'wb2026', adminPassword: 'yzfwb2016', votingEnabled: false, currentStage: 'preliminary' }
 };
 
 function loadDB() {
   try {
     const raw = fs.readFileSync(DB_FILE, 'utf8');
     const data = JSON.parse(raw);
-    return { ...DEFAULT_DB, ...data, settings: { ...DEFAULT_DB.settings, ...(data.settings || {}) } };
+    const merged = { ...DEFAULT_DB, ...data, settings: { ...DEFAULT_DB.settings, ...(data.settings || {}) } };
+    // Auto-migrate: ensure stage fields exist
+    (merged.entries || []).forEach(e => {
+      if (!e.roundStatus) e.roundStatus = 'approved';
+      if (!e.award) e.award = null;
+    });
+    (merged.votes || []).forEach(v => {
+      if (!v.stage) v.stage = 'preliminary';
+    });
+    (merged.judgeScores || []).forEach(s => {
+      if (!s.stage) s.stage = 'preliminary';
+    });
+    return merged;
   } catch (e) {
     return JSON.parse(JSON.stringify(DEFAULT_DB));
   }
@@ -191,7 +178,79 @@ function saveDB() {
 
 const db = loadDB();
 
-// ========== GITHUB SYNC — persist data across Render free-tier redeploys ==========
+// ========== STAGE SYSTEM ==========
+const STAGE_LABELS = {
+  preliminary: '初赛',
+  semi_final: '复赛',
+  final: '决赛',
+  awarded: '已结算'
+};
+
+function getCurrentStage() {
+  return db.settings.currentStage || 'preliminary';
+}
+
+function isVotingStage(stage) {
+  return stage === 'preliminary' || stage === 'semi_final';
+}
+
+// Entries eligible for voting in a given stage
+function getVotableEntries(stage) {
+  if (stage === 'preliminary') {
+    return db.entries.filter(e => e.status === 'approved' && (e.roundStatus === 'approved' || !e.roundStatus));
+  }
+  if (stage === 'semi_final') {
+    return db.entries.filter(e => e.roundStatus === 'semi_finalist');
+  }
+  return [];
+}
+
+// Entries eligible for judging in a given stage
+function getJudgableEntries(stage) {
+  if (stage === 'preliminary') {
+    return db.entries.filter(e => e.status === 'approved');
+  }
+  if (stage === 'semi_final') {
+    return db.entries.filter(e => e.roundStatus === 'semi_finalist');
+  }
+  if (stage === 'final') {
+    return db.entries.filter(e => e.roundStatus === 'finalist');
+  }
+  return [];
+}
+
+// Calculate stage-specific scores for an entry
+function getEntryStageScores(entryId, stage) {
+  const scores = db.judgeScores.filter(s => s.entryId === entryId && (s.stage || 'preliminary') === stage);
+  const voteCount = db.votes.filter(v => v.entryId === entryId && (v.stage || 'preliminary') === stage).length;
+  const avgScore = scores.length > 0
+    ? Math.round(scores.reduce((sum, s) => sum + s.practicality + s.innovation + s.scalability + s.presentation, 0) / scores.length)
+    : 0;
+  return { scores, voteCount, avgScore, judgeCount: scores.length };
+}
+
+// Calculate composite score for an entry in a specific stage
+function getCompositeScore(entryId, stage) {
+  const { avgScore, voteCount } = getEntryStageScores(entryId, stage);
+  if (stage === 'final') {
+    return avgScore; // 100% judge score, no voting
+  }
+  // For preliminary and semi_final: 80% judge + 20% votes
+  const votable = getVotableEntries(stage);
+  const allVoteCounts = votable.map(e => getEntryStageScores(e.id, stage).voteCount);
+  const maxVotes = Math.max(1, ...allVoteCounts, voteCount);
+  const voteScore = Math.round((voteCount / maxVotes) * 100);
+  return Math.round(avgScore * 0.8 + voteScore * 0.2);
+}
+
+// Count user's votes in current stage
+function getUserStageVoteCount(userId, stage) {
+  return db.votes.filter(v => v.voterId === userId && (v.stage || 'preliminary') === stage).length;
+}
+
+const VOTE_LIMIT_PER_STAGE = 5;
+
+// ========== GITHUB SYNC ==========
 let _ghSha = null;
 let _ghTimer = null;
 
@@ -257,12 +316,20 @@ async function ghPush() {
   } catch (e) { console.error('[gh] Push failed:', e.message); }
 }
 
-// Hook saveDB into GitHub sync
 const _realSaveDB = saveDB;
 saveDB = function() {
   _realSaveDB();
   ghPushSchedule();
 };
+
+// ========== PASSWORD HELPERS ==========
+function getJudgePassword() {
+  return process.env.JUDGE_PASSWORD || 'wb2026';
+}
+
+function getAdminPassword() {
+  return process.env.ADMIN_PASSWORD || 'yzfwb2026';
+}
 
 // ========== EXPRESS ==========
 const app = express();
@@ -287,6 +354,7 @@ function requireAuth(req, res, next) {
 // ========== API: ENTRIES ==========
 app.get('/api/entries', (req, res) => {
   const { track, dept, search, sort } = req.query;
+  const stage = getCurrentStage();
   let entries = db.entries.filter(e => e.status === 'approved');
   if (track) entries = entries.filter(e => e.track === track);
   if (dept) entries = entries.filter(e => e.dept === dept);
@@ -295,15 +363,14 @@ app.get('/api/entries', (req, res) => {
     entries = entries.filter(e => e.title.toLowerCase().includes(kw) || e.name.includes(search) || e.dept.includes(search) || (e.subdept || '').includes(search));
   }
   entries = entries.map(e => {
-    const voteCount = db.votes.filter(v => v.entryId === e.id).length;
-    const scores = db.judgeScores.filter(s => s.entryId === e.id);
-    const avgScore = scores.length > 0 ? Math.round(scores.reduce((s, sc) => s + sc.practicality + sc.innovation + sc.scalability + sc.presentation, 0) / scores.length) : 0;
-    return { ...e, voteCount, avgScore, judgeCount: scores.length };
+    const sd = getEntryStageScores(e.id, stage);
+    const composite = getCompositeScore(e.id, stage);
+    return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, avgScore: sd.avgScore, judgeCount: sd.judgeCount, composite };
   });
-  if (sort === 'score') entries.sort((a, b) => b.avgScore - a.avgScore);
+  if (sort === 'score') entries.sort((a, b) => b.composite - a.composite);
   else if (sort === 'votes') entries.sort((a, b) => b.voteCount - a.voteCount);
   else entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  res.json({ entries });
+  res.json({ entries, currentStage: stage });
 });
 
 app.post('/api/entries', upload.single('attachment'), (req, res) => {
@@ -318,6 +385,8 @@ app.post('/api/entries', upload.single('attachment'), (req, res) => {
     attachmentName: req.file ? req.file.originalname : null,
     attachmentPath: req.file ? req.file.filename : null,
     status: 'approved',
+    roundStatus: 'approved',
+    award: null,
     createdAt: new Date().toISOString()
   };
   db.entries.unshift(entry);
@@ -328,49 +397,60 @@ app.post('/api/entries', upload.single('attachment'), (req, res) => {
 app.get('/api/entries/:id', (req, res) => {
   const entry = db.entries.find(e => e.id === req.params.id);
   if (!entry) return res.status(404).json({ error: '作品不存在' });
-  const votes = db.votes.filter(v => v.entryId === entry.id);
-  const scores = db.judgeScores.filter(s => s.entryId === entry.id);
-  const avgScore = scores.length > 0 ? Math.round(scores.reduce((s, sc) => s + sc.practicality + sc.innovation + sc.scalability + sc.presentation, 0) / scores.length) : 0;
-  res.json({ entry: { ...entry, votes, scores, avgScore, voteCount: votes.length, judgeCount: scores.length } });
+  const stage = getCurrentStage();
+  const sd = getEntryStageScores(entry.id, stage);
+  // Also include all-stage data for reference
+  const allVotes = db.votes.filter(v => v.entryId === entry.id);
+  const allScores = db.judgeScores.filter(s => s.entryId === entry.id);
+  res.json({
+    entry: {
+      ...entry,
+      roundStatus: entry.roundStatus || 'approved',
+      award: entry.award || null,
+      votes: allVotes,
+      scores: allScores,
+      avgScore: sd.avgScore,
+      voteCount: sd.voteCount,
+      judgeCount: sd.judgeCount,
+      composite: getCompositeScore(entry.id, stage),
+      currentStage: stage
+    }
+  });
 });
 
 // ========== API: VOTES ==========
-// Public — check if voting is enabled
 app.get('/api/voting/status', (req, res) => {
-  res.json({ votingEnabled: !!db.settings.votingEnabled });
+  res.json({ votingEnabled: !!db.settings.votingEnabled, currentStage: getCurrentStage() });
 });
 
 app.post('/api/votes/:entryId', requireAuth, (req, res) => {
+  const stage = getCurrentStage();
+  if (!isVotingStage(stage)) {
+    return res.status(403).json({ error: '当前阶段不支持投票' });
+  }
   if (!db.settings.votingEnabled) return res.status(403).json({ error: '投票暂未开启，请等待管理员开启后再投票' });
   const userId = req.ddUser.openId;
-  const entry = db.entries.find(e => e.id === req.params.entryId && e.status === 'approved');
-  if (!entry) return res.status(404).json({ error: '作品不存在' });
-  if (db.votes.some(v => v.entryId === req.params.entryId && v.voterId === userId)) {
-    return res.status(400).json({ error: '你已经投过票了' });
+  // Check entry is votable in current stage
+  const votable = getVotableEntries(stage);
+  const entry = votable.find(e => e.id === req.params.entryId);
+  if (!entry) return res.status(404).json({ error: '该作品在当前阶段不可投票' });
+  // Check duplicate vote in this stage
+  if (db.votes.some(v => v.entryId === req.params.entryId && v.voterId === userId && (v.stage || 'preliminary') === stage)) {
+    return res.status(400).json({ error: '你在本阶段已经投过这个作品了' });
   }
-  const userVoteCount = db.votes.filter(v => v.voterId === userId).length;
-  if (userVoteCount >= 5) return res.status(400).json({ error: '每人最多投5个作品' });
+  const userVoteCount = getUserStageVoteCount(userId, stage);
+  if (userVoteCount >= VOTE_LIMIT_PER_STAGE) return res.status(400).json({ error: '本阶段每人最多投5个作品' });
   db.votes.push({
     entryId: req.params.entryId,
     voterId: userId,
     voterName: req.ddUser.nick,
+    stage,
     createdAt: new Date().toISOString()
   });
   saveDB();
-  const remaining = 5 - userVoteCount - 1;
-  res.json({ success: true, voteCount: db.votes.filter(v => v.entryId === req.params.entryId).length, remaining });
+  const remaining = VOTE_LIMIT_PER_STAGE - userVoteCount - 1;
+  res.json({ success: true, voteCount: db.votes.filter(v => v.entryId === req.params.entryId && (v.stage || 'preliminary') === stage).length, remaining });
 });
-
-// Judge password: env > db.settings > hardcoded default
-function getJudgePassword() {
-  // 忽略 db.settings，防止 GitHub data 同步覆盖
-  return process.env.JUDGE_PASSWORD || 'wb2026';
-}
-
-function getAdminPassword() {
-  // 忽略 db.settings，防止 GitHub data 同步覆盖
-  return process.env.ADMIN_PASSWORD || 'yzfwb2026';
-}
 
 // ========== API: JUDGE ==========
 app.post('/api/judge/scores/:entryId', (req, res) => {
@@ -379,59 +459,75 @@ app.post('/api/judge/scores/:entryId', (req, res) => {
   if (judgePassword !== getJudgePassword()) {
     return res.status(403).json({ error: '评委密码错误' });
   }
-  const entry = db.entries.find(e => e.id === req.params.entryId);
-  if (!entry) return res.status(404).json({ error: '作品不存在' });
+  const stage = getCurrentStage();
+  // Check entry is judgable in current stage
+  const judgable = getJudgableEntries(stage);
+  const entry = judgable.find(e => e.id === req.params.entryId);
+  if (!entry) return res.status(404).json({ error: '该作品在当前阶段不可打分' });
   const p = parseInt(practicality) || 0, c = parseInt(innovation) || 0, s = parseInt(scalability) || 0, r = parseInt(presentation) || 0;
   if (p > 30 || c > 25 || s > 25 || r > 20) return res.status(400).json({ error: '分数超出上限' });
-  const idx = db.judgeScores.findIndex(sc => sc.entryId === req.params.entryId && sc.judgeName === judgeName);
-  const scoreData = { entryId: req.params.entryId, judgeName, practicality: p, innovation: c, scalability: s, presentation: r, updatedAt: new Date().toISOString() };
+  const idx = db.judgeScores.findIndex(sc => sc.entryId === req.params.entryId && sc.judgeName === judgeName && (sc.stage || 'preliminary') === stage);
+  const scoreData = { entryId: req.params.entryId, judgeName, practicality: p, innovation: c, scalability: s, presentation: r, stage, updatedAt: new Date().toISOString() };
   if (idx >= 0) db.judgeScores[idx] = scoreData;
   else db.judgeScores.push(scoreData);
   saveDB();
-  res.json({ success: true, total: p + c + s + r });
+  res.json({ success: true, total: p + c + s + r, stage });
 });
 
-// GET /api/judge/my-scores — return this judge's existing scores
+// GET /api/judge/my-scores — return this judge's existing scores for current stage
 app.get('/api/judge/my-scores', (req, res) => {
   const { judgeName, judgePassword } = req.query;
   if (!judgeName) return res.status(400).json({ error: '缺少评委姓名' });
   if (judgePassword !== getJudgePassword()) {
     return res.status(403).json({ error: '评委密码错误' });
   }
+  const stage = getCurrentStage();
   const scores = db.judgeScores
-    .filter(s => s.judgeName === judgeName)
+    .filter(s => s.judgeName === judgeName && (s.stage || 'preliminary') === stage)
     .map(s => ({ entryId: s.entryId, practicality: s.practicality, innovation: s.innovation, scalability: s.scalability, presentation: s.presentation, total: s.practicality + s.innovation + s.scalability + s.presentation }));
-  res.json({ scores });
+  res.json({ scores, stage });
 });
 
 // ========== API: RANKING ==========
 app.get('/api/ranking', (req, res) => {
   const { track } = req.query;
-  let entries = db.entries.filter(e => e.status === 'approved');
+  const stage = getCurrentStage();
+  // Determine which entries to rank based on stage
+  let entries;
+  if (stage === 'preliminary') {
+    entries = db.entries.filter(e => e.status === 'approved');
+  } else if (stage === 'semi_final') {
+    entries = db.entries.filter(e => e.roundStatus === 'semi_finalist');
+  } else if (stage === 'final' || stage === 'awarded') {
+    entries = db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
+  } else {
+    entries = db.entries.filter(e => e.status === 'approved');
+  }
   if (track) entries = entries.filter(e => e.track === track);
-  const maxVotes = Math.max(1, ...entries.map(e => db.votes.filter(v => v.entryId === e.id).length));
   const enriched = entries.map(e => {
-    const voteCount = db.votes.filter(v => v.entryId === e.id).length;
-    const scores = db.judgeScores.filter(s => s.entryId === e.id);
-    const judgeAvg = scores.length > 0 ? Math.round(scores.reduce((s, sc) => s + sc.practicality + sc.innovation + sc.scalability + sc.presentation, 0) / scores.length) : 0;
-    const voteScore = Math.round((voteCount / maxVotes) * 100);
-    const composite = Math.round(judgeAvg * 0.8 + voteScore * 0.2);
-    return { ...e, voteCount, judgeAvg, composite };
+    const sd = getEntryStageScores(e.id, stage);
+    const composite = getCompositeScore(e.id, stage);
+    return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, judgeAvg: sd.avgScore, composite };
   });
   enriched.sort((a, b) => b.composite - a.composite);
-  res.json({ ranking: enriched.slice(0, 20) });
+  res.json({ ranking: enriched.slice(0, 30), currentStage: stage });
 });
 
 // ========== API: STATS ==========
 app.get('/api/stats', (req, res) => {
+  const stage = getCurrentStage();
   const totalEntries = db.entries.length;
   const approvedEntries = db.entries.filter(e => e.status === 'approved').length;
-  const totalVotes = db.votes.length;
-  const judgeCount = new Set(db.judgeScores.map(s => s.judgeName)).size;
+  const stageVotes = db.votes.filter(v => (v.stage || 'preliminary') === stage).length;
+  const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
+  const judgeCount = new Set(stageScores.map(s => s.judgeName)).size;
+  const semiFinalists = db.entries.filter(e => e.roundStatus === 'semi_finalist').length;
+  const finalists = db.entries.filter(e => e.roundStatus === 'finalist').length;
+  const awarded = db.entries.filter(e => e.award).length;
   const deptCounts = {};
   db.entries.forEach(e => { deptCounts[e.dept] = (deptCounts[e.dept] || 0) + 1; });
   const topDept = Object.entries(deptCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
-  res.json({ totalEntries, approvedEntries, totalVotes, judgeCount, topDept, deptStats: Object.entries(deptCounts).map(([dept, c]) => ({ dept, c })) });
+  res.json({ totalEntries, approvedEntries, totalVotes: stageVotes, judgeCount, topDept, currentStage: stage, semiFinalists, finalists, awarded, deptStats: Object.entries(deptCounts).map(([dept, c]) => ({ dept, c })) });
 });
 
 // ========== API: EXPORT ==========
@@ -441,19 +537,21 @@ app.get('/api/export/json', verifyAdminToken, (req, res) => {
 
 app.get('/api/export/csv', verifyAdminToken, (req, res) => {
   const trackLabel = { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' };
-  let csv = '\uFEFFID,状态,姓名,部门,子部门,赛道,标题,场景描述,使用过程,效果呈现,作品链接/附加信息,附件名称,提交时间,投票数,评委均分,综合分\n';
-  const maxVotes = Math.max(1, ...db.entries.map(e => db.votes.filter(v => v.entryId === e.id).length));
+  const stage = getCurrentStage();
+  let csv = '\uFEFFID,状态,轮次状态,姓名,部门,子部门,赛道,标题,场景描述,使用过程,效果呈现,作品链接,附件名称,提交时间,当前阶段投票数,当前阶段评委均分,当前阶段综合分\n';
+  const votable = getVotableEntries(stage);
+  const allVoteCounts = votable.map(e => getEntryStageScores(e.id, stage).voteCount);
+  const maxVotes = Math.max(1, ...allVoteCounts);
   db.entries.forEach(e => {
-    const voteCount = db.votes.filter(v => v.entryId === e.id).length;
-    const scores = db.judgeScores.filter(s => s.entryId === e.id);
-    const avgScore = scores.length > 0 ? Math.round(scores.reduce((s, sc) => s + sc.practicality + sc.innovation + sc.scalability + sc.presentation, 0) / scores.length) : 0;
-    const voteScore = Math.round((voteCount / maxVotes) * 100);
-    const composite = Math.round(avgScore * 0.8 + voteScore * 0.2);
-    const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`
-    csv += `${esc(e.id)},${esc(e.status === 'approved' ? '已收录' : '待审核')},${esc(e.name)},${esc(e.dept)},${esc(e.subdept)},${esc(trackLabel[e.track] || e.track)},${esc(e.title)},${esc(e.scene)},${esc(e.process_text)},${esc(e.result_text)},${esc(e.extra)},${esc(e.attachmentName)},${esc(e.createdAt)},${voteCount},${avgScore},${composite}\n`;
+    const sd = getEntryStageScores(e.id, stage);
+    const voteScore = Math.round((sd.voteCount / maxVotes) * 100);
+    const composite = stage === 'final' ? sd.avgScore : Math.round(sd.avgScore * 0.8 + voteScore * 0.2);
+    const roundLabel = { approved: '初赛', semi_finalist: '复赛晋级', eliminated_semi: '复赛淘汰', finalist: '决赛晋级', eliminated_final: '决赛淘汰', awarded: '已获奖' }[e.roundStatus] || '初赛';
+    const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
+    csv += `${esc(e.id)},${esc(e.status === 'approved' ? '已收录' : '待审核')},${esc(roundLabel)},${esc(e.name)},${esc(e.dept)},${esc(e.subdept)},${esc(trackLabel[e.track] || e.track)},${esc(e.title)},${esc(e.scene)},${esc(e.process_text)},${esc(e.result_text)},${esc(e.extra)},${esc(e.attachmentName)},${esc(e.createdAt)},${sd.voteCount},${sd.avgScore},${composite}\n`;
   });
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="WorkBuddy-entries.csv"; filename*=UTF-8\'\'WorkBuddy%E5%A4%A7%E8%B5%9B%E4%BD%9C%E5%93%81.csv');
+  res.setHeader('Content-Disposition', 'attachment; filename="WorkBuddy-entries.csv"');
   res.send(csv);
 });
 
@@ -463,27 +561,33 @@ app.get('/api/settings', verifyAdminToken, (req, res) => {
 });
 
 app.post('/api/settings', verifyAdminToken, async (req, res) => {
+  if (req.body.votingEnabled !== undefined) {
+    db.settings.votingEnabled = Boolean(req.body.votingEnabled);
+  }
+  if (req.body.currentStage !== undefined) {
+    const validStages = ['preliminary', 'semi_final', 'final', 'awarded'];
+    if (validStages.includes(req.body.currentStage)) {
+      db.settings.currentStage = req.body.currentStage;
+    }
+  }
+  // Password changes (still saved to db but getJudgePassword/getAdminPassword ignore it)
   if (req.body.judgePassword !== undefined) {
     db.settings.judgePassword = req.body.judgePassword;
   }
   if (req.body.adminPassword !== undefined) {
     db.settings.adminPassword = req.body.adminPassword;
   }
-  if (req.body.votingEnabled !== undefined) {
-    db.settings.votingEnabled = Boolean(req.body.votingEnabled);
-  }
   saveDB();
   ghPush().catch(e => console.error('[settings] GitHub push failed:', e.message));
-  res.json({ success: true });
+  res.json({ success: true, currentStage: getCurrentStage() });
 });
 
-// ========== ADMIN TOKEN STORE (in-memory, cleared on server restart) ==========
-const adminTokens = new Map(); // token -> expiry timestamp
+// ========== ADMIN TOKEN STORE ==========
+const adminTokens = new Map();
 
 function generateAdminToken() {
   const token = 'adm_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
-  adminTokens.set(token, Date.now() + 2 * 60 * 60 * 1000); // 2-hour expiry
-  // Clean expired tokens
+  adminTokens.set(token, Date.now() + 2 * 60 * 60 * 1000);
   for (const [t, exp] of adminTokens) { if (Date.now() > exp) adminTokens.delete(t); }
   return token;
 }
@@ -494,13 +598,11 @@ function verifyAdminToken(req, res, next) {
     if (token) adminTokens.delete(token);
     return res.status(401).json({ error: '未授权，请先登录管理后台' });
   }
-  // Extend session on use
   adminTokens.set(token, Date.now() + 2 * 60 * 60 * 1000);
   next();
 }
 
 // ========== API: DINGTALK AUTH ==========
-// POST /api/auth/dd-code — exchange DingTalk JSAPI auth code for session
 app.post('/api/auth/dd-code', async (req, res) => {
   const { code } = req.body;
   if (!code) return res.status(400).json({ error: '缺少授权码' });
@@ -521,19 +623,17 @@ app.post('/api/auth/dd-code', async (req, res) => {
       secure: true,
       path: '/',
     });
-    console.log('[dd] set session cookie for JSAPI login, openId:', userInfo.openId);
-    const voteCount = db.votes.filter(v => v.voterId === userInfo.openId).length;
-    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, 5 - voteCount) });
+    const stage = getCurrentStage();
+    const voteCount = getUserStageVoteCount(userInfo.openId, stage);
+    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, VOTE_LIMIT_PER_STAGE - voteCount), currentStage: stage });
   } catch (e) {
     console.error('DingTalk auth error:', e.message);
     res.status(400).json({ error: e.message || '钉钉授权失败' });
   }
 });
 
-// GET /auth/dingtalk/callback — OAuth redirect callback (for regular browser)
 app.get('/auth/dingtalk/callback', async (req, res) => {
-  const { code, state } = req.query;
-  console.log('[dd] OAuth callback received, code present:', !!code);
+  const { code } = req.query;
   if (!code) return res.status(400).send('Missing authorization code');
   try {
     const userInfo = await exchangeDingTalkCode(code);
@@ -552,7 +652,6 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
       secure: true,
       path: '/',
     });
-    console.log('[dd] OAuth callback success, redirecting to /, openId:', userInfo.openId);
     res.redirect('/');
   } catch (e) {
     console.error('DingTalk callback error:', e.message);
@@ -560,7 +659,6 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
   }
 });
 
-// GET /api/auth/dd-url — get OAuth redirect URL (for regular browser fallback)
 app.get('/api/auth/dd-url', (req, res) => {
   const redirectUri = `https://${req.hostname}/auth/dingtalk/callback`;
   const state = Math.random().toString(36).slice(2, 12);
@@ -568,24 +666,22 @@ app.get('/api/auth/dd-url', (req, res) => {
   res.json({ url: authUrl, state });
 });
 
-// GET /api/auth/me — get current logged-in user (or null)
 app.get('/api/auth/me', (req, res) => {
-  console.log('[dd] /api/auth/me — cookies:', req.cookies ? Object.keys(req.cookies) : 'none', 'dd_session:', req.cookies && req.cookies.dd_session ? 'present' : 'missing');
   const session = getSession(req);
   if (!session) {
-    console.log('[dd] /api/auth/me — no session found');
     return res.json({ user: null });
   }
-  // Count votes for this user
-  const voteCount = db.votes.filter(v => v.voterId === session.openId).length;
+  const stage = getCurrentStage();
+  const voteCount = getUserStageVoteCount(session.openId, stage);
   res.json({
     user: { nick: session.nick, openId: session.openId, avatarUrl: session.avatarUrl },
-    remainingVotes: Math.max(0, 5 - voteCount),
-    totalVotes: 5,
+    remainingVotes: Math.max(0, VOTE_LIMIT_PER_STAGE - voteCount),
+    totalVotes: VOTE_LIMIT_PER_STAGE,
+    currentStage: stage,
+    isVotingStage: isVotingStage(stage),
   });
 });
 
-// POST /api/auth/logout
 app.post('/api/auth/logout', (req, res) => {
   const token = req.cookies && req.cookies.dd_session;
   if (token) deleteSession(token);
@@ -596,8 +692,7 @@ app.post('/api/auth/logout', (req, res) => {
 // ========== API: ADMIN ==========
 app.post('/api/admin/auth', (req, res) => {
   const { password } = req.body;
-  const adminPw = getAdminPassword();
-  if (!password || password !== adminPw) {
+  if (!password || password !== getAdminPassword()) {
     return res.status(403).json({ error: '管理员密码错误' });
   }
   const token = generateAdminToken();
@@ -605,12 +700,13 @@ app.post('/api/admin/auth', (req, res) => {
 });
 
 app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
-  // Build a per-entry view with all judge scores
-  const entries = db.entries.filter(e => e.status === 'approved');
-  const allJudges = [...new Set(db.judgeScores.map(s => s.judgeName))].sort();
-  
+  const stage = getCurrentStage();
+  const entries = getJudgableEntries(stage);
+  const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
+  const allJudges = [...new Set(stageScores.map(s => s.judgeName))].sort();
+
   const entryScores = entries.map(e => {
-    const scores = db.judgeScores
+    const scores = stageScores
       .filter(s => s.entryId === e.id)
       .map(s => ({
         judgeName: s.judgeName,
@@ -624,7 +720,8 @@ app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
     const avg = scores.length > 0
       ? Math.round(scores.reduce((sum, s) => sum + s.total, 0) / scores.length)
       : 0;
-    
+    const sd = getEntryStageScores(e.id, stage);
+    const composite = getCompositeScore(e.id, stage);
     return {
       id: e.id,
       title: e.title,
@@ -633,70 +730,77 @@ app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
       subdept: e.subdept || '',
       track: e.track,
       createdAt: e.createdAt,
+      roundStatus: e.roundStatus || 'approved',
+      award: e.award || null,
       scores,
       avgScore: avg,
-      judgeCount: scores.length
+      judgeCount: scores.length,
+      voteCount: sd.voteCount,
+      composite
     };
   });
 
   const summary = {
     totalEntries: entries.length,
     totalJudges: allJudges.length,
-    totalScores: db.judgeScores.length,
+    totalScores: stageScores.length,
     scoredEntries: entryScores.filter(e => e.scores.length > 0).length,
     unscoredEntries: entryScores.filter(e => e.scores.length === 0).length,
-    judges: allJudges
+    judges: allJudges,
+    currentStage: stage
   };
 
   res.json({ entryScores, allJudges, summary });
 });
 
 app.get('/api/admin/export/csv', verifyAdminToken, (req, res) => {
-  const entries = db.entries.filter(e => e.status === 'approved');
-  const allJudges = [...new Set(db.judgeScores.map(s => s.judgeName))].sort();
+  const stage = getCurrentStage();
+  const entries = getJudgableEntries(stage);
+  const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
+  const allJudges = [...new Set(stageScores.map(s => s.judgeName))].sort();
   const trackLabel = { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' };
   const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
 
-  // Build comprehensive CSV with all judge scores
-  // Headers: ID,标题,姓名,部门,子部门,赛道,提交时间,评委数,均分, | 评委A-总分,评委A-实用性,评委A-创新性,评委A-可推广性,评委A-效果呈现, 评委B-...
   let csv = '\uFEFF';
-  let headers = ['作品ID', '标题', '姓名', '部门', '子部门', '赛道', '提交时间', '投票数', '评委数', '评委均分'];
+  let headers = ['作品ID', '标题', '姓名', '部门', '子部门', '赛道', '轮次', '提交时间', '投票数', '评委数', '评委均分', '综合分'];
+  if (stage === 'awarded') headers.push('获奖等级');
   allJudges.forEach(j => {
     headers.push(`${j}-总分`, `${j}-实用性(/30)`, `${j}-创新性(/25)`, `${j}-可推广性(/25)`, `${j}-效果呈现(/20)`);
   });
   csv += headers.map(esc).join(',') + '\n';
 
   entries.forEach(e => {
-    const voteCount = db.votes.filter(v => v.entryId === e.id).length;
-    const scores = db.judgeScores.filter(s => s.entryId === e.id);
+    const scores = stageScores.filter(s => s.entryId === e.id);
     const avg = scores.length > 0
       ? Math.round(scores.reduce((sum, s) => sum + s.practicality + s.innovation + s.scalability + s.presentation, 0) / scores.length)
       : 0;
+    const sd = getEntryStageScores(e.id, stage);
+    const composite = getCompositeScore(e.id, stage);
+    const roundLabel = { approved: '初赛', semi_finalist: '复赛', finalist: '决赛', awarded: '获奖' }[e.roundStatus] || '初赛';
 
     let row = [
       e.id, e.title, e.name, e.dept, e.subdept || '',
-      trackLabel[e.track] || e.track, e.createdAt,
-      voteCount, scores.length, avg
+      trackLabel[e.track] || e.track, roundLabel, e.createdAt,
+      sd.voteCount, scores.length, avg, composite
     ];
-
-    // Add per-judge columns
+    if (stage === 'awarded') {
+      const awardLabel = { first: '一等奖', second: '二等奖', third: '三等奖', excellence: '优秀奖' }[e.award] || '';
+      row.push(awardLabel);
+    }
     allJudges.forEach(judge => {
       const s = scores.find(sc => sc.judgeName === judge);
       if (s) {
-        row.push(
-          s.practicality + s.innovation + s.scalability + s.presentation,
-          s.practicality, s.innovation, s.scalability, s.presentation
-        );
+        row.push(s.practicality + s.innovation + s.scalability + s.presentation, s.practicality, s.innovation, s.scalability, s.presentation);
       } else {
         row.push('', '', '', '', '');
       }
     });
-
     csv += row.map(esc).join(',') + '\n';
   });
 
+  const stageLabel = STAGE_LABELS[stage] || 'contest';
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="WorkBuddy-contest-scores.csv"; filename*=UTF-8\'\'WorkBuddy%E5%A4%A7%E8%B5%9B-%E8%AF%84%E5%A7%94%E6%89%93%E5%88%86%E6%B1%87%E6%80%BB.csv');
+  res.setHeader('Content-Disposition', `attachment; filename="WorkBuddy-${stageLabel}-scores.csv"`);
   res.send(csv);
 });
 
@@ -715,31 +819,103 @@ app.delete('/api/admin/entries/:id', verifyAdminToken, (req, res) => {
   if (idx === -1) return res.status(404).json({ error: '作品不存在' });
   const entry = db.entries[idx];
   db.entries.splice(idx, 1);
-  // Also remove associated votes and judge scores
   db.votes = db.votes.filter(v => v.entryId !== id);
   db.judgeScores = db.judgeScores.filter(s => s.entryId !== id);
   saveDB();
-  console.log('[admin] deleted entry:', entry.title, '| Also removed', db.votes.filter(v => v.entryId === id).length, 'votes and judged scores');
   res.json({ success: true, title: entry.title });
+});
+
+// ========== API: ADMIN PROMOTE (晋级管理) ==========
+// POST /api/admin/promote
+// body: { stage: 'semi_final' | 'final', entryIds: ['id1', 'id2', ...] }
+// Promotes selected entries to next stage, marks others as eliminated
+app.post('/api/admin/promote', verifyAdminToken, (req, res) => {
+  const { stage, entryIds } = req.body;
+  if (!stage || !Array.isArray(entryIds)) {
+    return res.status(400).json({ error: '参数错误' });
+  }
+
+  if (stage === 'semi_final') {
+    // Promote to semi_final: all approved entries, selected ones become semi_finalist
+    db.entries.forEach(e => {
+      if (e.status === 'approved' && (e.roundStatus === 'approved' || !e.roundStatus)) {
+        if (entryIds.includes(e.id)) {
+          e.roundStatus = 'semi_finalist';
+        } else {
+          e.roundStatus = 'eliminated_semi';
+        }
+      }
+    });
+    db.settings.currentStage = 'semi_final';
+    db.settings.votingEnabled = false; // Reset voting, admin must re-enable
+  } else if (stage === 'final') {
+    // Promote to final: only semi_finalists, selected ones become finalist
+    db.entries.forEach(e => {
+      if (e.roundStatus === 'semi_finalist') {
+        if (entryIds.includes(e.id)) {
+          e.roundStatus = 'finalist';
+        } else {
+          e.roundStatus = 'eliminated_final';
+        }
+      }
+    });
+    db.settings.currentStage = 'final';
+    db.settings.votingEnabled = false;
+  } else {
+    return res.status(400).json({ error: '无效的阶段' });
+  }
+
+  saveDB();
+  ghPush().catch(e => console.error('[promote] GitHub push failed:', e.message));
+  const promoted = db.entries.filter(e => entryIds.includes(e.id)).length;
+  res.json({ success: true, currentStage: db.settings.currentStage, promoted });
+});
+
+// ========== API: ADMIN SETTLE (结算获奖) ==========
+// POST /api/admin/settle
+// body: { awards: { 'entry_id': 'first'|'second'|'third'|'excellence', ... } }
+app.post('/api/admin/settle', verifyAdminToken, (req, res) => {
+  const { awards } = req.body;
+  if (!awards || typeof awards !== 'object') {
+    return res.status(400).json({ error: '参数错误' });
+  }
+
+  // Mark awards on finalists
+  db.entries.forEach(e => {
+    if (e.roundStatus === 'finalist') {
+      if (awards[e.id]) {
+        e.award = awards[e.id];
+        e.roundStatus = 'awarded';
+      } else {
+        e.award = null;
+      }
+    }
+  });
+
+  db.settings.currentStage = 'awarded';
+  saveDB();
+  ghPush().catch(e => console.error('[settle] GitHub push failed:', e.message));
+
+  const awardedCount = db.entries.filter(e => e.award).length;
+  res.json({ success: true, currentStage: 'awarded', awardedCount });
 });
 
 // ========== START ==========
 (async () => {
   await ghPull();
-  // Reload after github data written to disk
   const refreshed = loadDB();
   db.entries = refreshed.entries;
   db.votes = refreshed.votes;
   db.judgeScores = refreshed.judgeScores;
   db.settings = refreshed.settings;
-  console.log('[db] Loaded — entries:', db.entries.length, 'votes:', db.votes.length, 'scores:', db.judgeScores.length);
+  console.log('[db] Loaded — entries:', db.entries.length, 'votes:', db.votes.length, 'scores:', db.judgeScores.length, 'stage:', getCurrentStage());
 
   app.listen(PORT, () => {
     console.log(`\n========================================`);
-    console.log(`  WorkBuddy Contest Platform running!`);
+    console.log(`  WorkBuddy Contest Platform v2.0!`);
     console.log(`  http://localhost:${PORT}`);
-    console.log(`  Database: ${DB_FILE}`);
-    console.log(`  GitHub sync: ${GITHUB_TOKEN ? 'ENABLED → ' + GITHUB_DATA_BRANCH + ' branch' : 'DISABLED'}`);
+    console.log(`  Stage: ${getCurrentStage()}`);
+    console.log(`  GitHub sync: ${GITHUB_TOKEN ? 'ENABLED' : 'DISABLED'}`);
     console.log(`========================================\n`);
   });
 })().catch(e => { console.error('[fatal]', e); process.exit(1); });

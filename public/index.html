@@ -16,6 +16,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .header-right { display: flex; align-items: center; gap: 12px; }
 .header-right .status-badge { background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 20px; font-size: 13px; }
 
+/* ===== Stage Bar ===== */
+.stage-bar { background: linear-gradient(90deg, #e6f0ff, #f0f5ff); border-bottom: 2px solid #1677ff; padding: 10px 32px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.stage-bar .stage-label { font-size: 15px; font-weight: 700; color: #1677ff; }
+.stage-bar .stage-progress { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; }
+.stage-bar .stage-dot { width: 10px; height: 10px; border-radius: 50%; background: #d9d9d9; }
+.stage-bar .stage-dot.active { background: #1677ff; box-shadow: 0 0 0 3px rgba(22,119,255,0.2); }
+.stage-bar .stage-dot.done { background: #52c41a; }
+
 /* ===== Voting Banner ===== */
 #voting-banner { transition: all 0.3s ease; }
 
@@ -54,6 +62,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .btn-danger { background: #ff4d4f; color: #fff; }
 .btn-ghost { background: transparent; color: #666; }
 .btn-ghost:hover { background: #f5f5f5; }
+.btn-gold { background: linear-gradient(135deg, #ffd700, #ffa500); color: #fff; }
 
 /* ===== Form ===== */
 .form-card { background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
@@ -80,8 +89,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .gallery-toolbar input[type="text"] { padding: 8px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; flex: 1; min-width: 200px; }
 .gallery-toolbar select { padding: 8px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; background: #fff; }
 .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
-.entry-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: all 0.25s; border: 1px solid #f0f0f0; position: relative; cursor: pointer; }
+.entry-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: all 0.25s; border: 1px solid #f0f0f0; border-left: 4px solid transparent; position: relative; cursor: pointer; }
 .entry-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); transform: translateY(-2px); }
+
+/* Round status styles */
+.entry-card.rs-approved { border-left-color: #d9d9d9; }
+.entry-card.rs-semi_finalist { border-left-color: #52c41a; }
+.entry-card.rs-finalist { border-left-color: #1677ff; }
+.entry-card.rs-awarded { border-left-color: #ffd700; background: linear-gradient(135deg, #fffbe6, #fff); }
+.entry-card.rs-eliminated_semi, .entry-card.rs-eliminated_final { opacity: 0.5; border-left-color: #d9d9d9; filter: grayscale(0.6); }
+.entry-card.rs-eliminated_semi:hover, .entry-card.rs-eliminated_final:hover { opacity: 0.8; filter: grayscale(0.3); }
+
+.round-badge { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 6px; vertical-align: middle; }
+.badge-semi { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+.badge-final { background: #e6f7ff; color: #1677ff; border: 1px solid #91d5ff; }
+.badge-awarded { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
+.badge-eliminated { background: #f5f5f5; color: #999; border: 1px solid #d9d9d9; }
+
 .track-tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
 .track-efficiency { background: #e6f7ff; color: #1677ff; }
 .track-creative { background: #fff7e6; color: #fa8c16; }
@@ -137,6 +161,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .rank-info .rdept { font-size: 12px; color: #999; }
 .rank-score { font-size: 22px; font-weight: 700; color: #1677ff; flex-shrink: 0; }
 
+/* ===== Promote Panel ===== */
+.promote-panel { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.promote-panel h3 { font-size: 16px; margin-bottom: 8px; }
+.promote-entry { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-bottom: 1px solid #f5f5f5; }
+.promote-entry:hover { background: #fafbff; }
+.promote-entry input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+.promote-entry .pe-title { font-weight: 500; font-size: 14px; flex: 1; }
+.promote-entry .pe-score { font-size: 13px; color: #999; }
+.award-select { padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; }
+
 /* ===== Toast ===== */
 .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 28px; border-radius: 8px; font-size: 14px; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
 .toast.show { opacity: 1; }
@@ -154,6 +188,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   .form-row { grid-template-columns: 1fr; }
   .stats-bar { grid-template-columns: repeat(2, 1fr); }
   .score-table { overflow-x: auto; }
+  .stage-bar { padding: 10px 16px; }
 }
 </style>
 </head>
@@ -175,6 +210,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     <span id="dd-login-area">
       <button id="dd-login-btn" onclick="ddLogin()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:6px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;">钉钉登录</button>
     </span>
+  </div>
+</div>
+
+<!-- Stage indicator bar -->
+<div class="stage-bar" id="stageBar">
+  <span class="stage-label" id="stageLabel">📍 初赛阶段</span>
+  <div class="stage-progress">
+    <span class="stage-dot" id="dot-preliminary"></span> 初赛
+    <span class="stage-dot" id="dot-semi_final"></span> 复赛
+    <span class="stage-dot" id="dot-final"></span> 决赛
+    <span class="stage-dot" id="dot-awarded"></span> 结算
   </div>
 </div>
 
@@ -309,8 +355,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 <!-- ===== PAGE: RANKING ===== -->
 <div class="page" id="page-ranking">
   <div class="stats-bar" id="rankingStats"></div>
-  <div class="section-title">综合排名 Top 20</div>
-  <p style="color:#999;font-size:14px;margin-bottom:16px;">按专家评审分（60%）+ 全员投票分（40%）合并计算</p>
+  <div class="section-title" id="rankingTitle">综合排名 Top 30</div>
+  <p style="color:#999;font-size:14px;margin-bottom:16px;" id="rankingDesc"></p>
   <div class="gallery-toolbar">
     <select id="rankTrack" onchange="renderRanking()">
       <option value="">全部赛道</option>
@@ -325,7 +371,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 <!-- ===== PAGE: JUDGE ===== -->
 <div class="page" id="page-judge">
   <div class="judge-login" id="judgeLogin">
-    <div style="font-size:48px;margin-bottom:16px;"></div>
+    <div style="font-size:48px;margin-bottom:16px;">⚖️</div>
     <h2>评委登录</h2>
     <p style="color:#999;margin-top:8px;">请输入评委姓名和评审密码</p>
     <div id="judge-auth-check" style="margin-top:20px;">
@@ -349,6 +395,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
         </select>
         <button class="btn btn-ghost btn-sm" onclick="logoutJudge()">退出</button>
       </div>
+    </div>
+    <div id="judgeStageNotice" style="background:#e6f7ff;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:#0958d9;border:1px solid #91d5ff;">
+      <b>📋 当前评审阶段：</b><span id="judgeStageLabel">初赛</span>
+      <span id="judgeStageHint" style="margin-left:8px;color:#666;">（本阶段打分独立计算，不影响其他阶段）</span>
     </div>
     <div style="background:#fff7e6;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:#8c6d00;">
       <b>打分维度参考：</b>
@@ -388,7 +438,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   <!-- Admin Dashboard -->
   <div class="judge-panel" id="adminPanel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-      <div class="section-title" style="margin:0;">管理后台 · 评委打分汇总</div>
+      <div class="section-title" style="margin:0;">管理后台 · <span id="adminStageLabel">初赛</span></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-outline btn-sm" onclick="adminExportCSV()">📥 下载打分汇总CSV</button>
         <button class="btn btn-outline btn-sm" onclick="exportData()">📦 导出全部数据JSON</button>
@@ -400,27 +450,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     <!-- Summary stats -->
     <div class="stats-bar" id="adminStatsBar"></div>
 
+    <!-- Stage Management Panel -->
+    <div id="stageManagePanel"></div>
+
     <!-- Settings section -->
     <details style="margin-bottom:20px;">
       <summary style="cursor:pointer;font-size:15px;font-weight:600;padding:8px 0;color:#666;">⚙️ 系统设置 & 危险操作</summary>
       <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-top:12px;">
-        <div class="form-row" style="margin-bottom:16px;">
-          <div class="form-group" style="margin-bottom:0;">
-            <label>评委密码</label>
-            <input type="text" id="adminJudgePassword" placeholder="评委登录密码">
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label>管理员密码</label>
-            <input type="text" id="adminAdminPassword" placeholder="管理后台密码">
-          </div>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="saveSettings()">保存密码设置</button>
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0;">
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500;">
             <span>🔓 开启全员投票</span>
             <input type="checkbox" id="adminVotingToggle" onchange="saveVotingToggle()" style="width:18px;height:18px;">
           </label>
-          <p style="color:#999;font-size:12px;margin:4px 0 0 28px;">开启后，已登录的钉钉用户即可投票</p>
+          <p style="color:#999;font-size:12px;margin:4px 0 0 28px;">开启后，已登录的钉钉用户即可投票（当前阶段有效）</p>
         </div>
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0;">
           <p style="color:#ff4d4f;font-size:13px;margin-bottom:10px;">⚠️ 以下操作不可恢复</p>
@@ -441,8 +483,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
             <th>姓名</th>
             <th>部门</th>
             <th>赛道</th>
+            <th>轮次</th>
             <th id="adminJudgeHeaders">评委评分</th>
             <th>均分</th>
+            <th>综合分</th>
             <th>评委数</th>
             <th>操作</th>
           </tr>
@@ -464,12 +508,38 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 </div>
 
 <script>
-// ========== DINGTALK AUTH ==========
+// ========== STATE ==========
 let ddAuthed = false;
 let ddUser = null;
 let ddRemaining = 5;
 let votingEnabled = false;
+let currentStage = 'preliminary';
+let isVotingStage = true;
 
+const STAGE_LABELS = {
+  preliminary: '初赛',
+  semi_final: '复赛',
+  final: '决赛',
+  awarded: '已结算'
+};
+
+const ROUND_LABELS = {
+  approved: '初赛',
+  semi_finalist: '复赛晋级',
+  eliminated_semi: '复赛淘汰',
+  finalist: '决赛晋级',
+  eliminated_final: '决赛淘汰',
+  awarded: '已获奖'
+};
+
+const AWARD_LABELS = {
+  first: '🥇 一等奖',
+  second: '🥈 二等奖',
+  third: '🥉 三等奖',
+  excellence: '🎖️ 优秀奖'
+};
+
+// ========== DINGTALK AUTH ==========
 function isInDingTalk() {
   try {
     return typeof dd !== 'undefined' && dd.env && dd.env.platform && dd.env.platform !== 'notInDingTalk';
@@ -479,7 +549,6 @@ function isInDingTalk() {
 }
 
 async function ddLogin() {
-  // Strategy 1: Inside DingTalk app → use JSAPI authCode
   if (isInDingTalk()) {
     dd.ready(function() {
       dd.runtime.permission.requestAuthCode({
@@ -494,8 +563,6 @@ async function ddLogin() {
     });
     return;
   }
-  
-  // Strategy 2: Regular browser → redirect to DingTalk OAuth
   try {
     const resp = await fetch('/api/auth/dd-url');
     const data = await resp.json();
@@ -518,9 +585,11 @@ async function exchangeCode(code) {
     ddAuthed = true;
     ddUser = data.user;
     ddRemaining = data.remainingVotes;
+    currentStage = data.currentStage || 'preliminary';
+    isVotingStage = isStageVoting(currentStage);
     updateUserUI();
+    updateStageUI();
     showToast('钉钉登录成功，欢迎 ' + ddUser.nick + '！', 'success');
-    // Refresh current page
     refreshCurrentPage();
   } catch(e) {
     showToast('登录失败：' + e.message, 'error');
@@ -535,7 +604,10 @@ async function checkAuth() {
       ddAuthed = true;
       ddUser = data.user;
       ddRemaining = data.remainingVotes;
+      currentStage = data.currentStage || 'preliminary';
+      isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage);
       updateUserUI();
+      updateStageUI();
     } else {
       ddAuthed = false;
       ddUser = null;
@@ -548,21 +620,61 @@ async function checkAuth() {
   }
 }
 
+function isStageVoting(stage) {
+  return stage === 'preliminary' || stage === 'semi_final';
+}
+
 function updateUserUI() {
   const userArea = document.getElementById('dd-user-area');
   const loginArea = document.getElementById('dd-login-area');
-  
   if (ddAuthed && ddUser) {
     userArea.style.display = 'inline-flex';
     userArea.style.alignItems = 'center';
     userArea.style.gap = '6px';
     loginArea.style.display = 'none';
     document.getElementById('dd-user-name').textContent = ddUser.nick;
-    document.getElementById('dd-remaining').textContent = '剩余 ' + ddRemaining + ' 票';
+    const stageLabel = isVotingStage ? `（${STAGE_LABELS[currentStage]}）` : '';
+    document.getElementById('dd-remaining').textContent = isVotingStage ? `剩余 ${ddRemaining} 票${stageLabel}` : STAGE_LABELS[currentStage];
   } else {
     userArea.style.display = 'none';
     loginArea.style.display = 'inline';
   }
+}
+
+function updateStageUI() {
+  const label = document.getElementById('stageLabel');
+  if (label) {
+    label.textContent = `📍 ${STAGE_LABELS[currentStage] || '初赛'}阶段`;
+  }
+  // Update stage dots
+  const stages = ['preliminary', 'semi_final', 'final', 'awarded'];
+  const currentIdx = stages.indexOf(currentStage);
+  stages.forEach((s, i) => {
+    const dot = document.getElementById('dot-' + s);
+    if (dot) {
+      dot.className = 'stage-dot';
+      if (i < currentIdx) dot.classList.add('done');
+      else if (i === currentIdx) dot.classList.add('active');
+    }
+  });
+  // Update ranking description
+  const desc = document.getElementById('rankingDesc');
+  if (desc) {
+    if (currentStage === 'final' || currentStage === 'awarded') {
+      desc.textContent = '决赛阶段：按评委打分（100%）排名';
+    } else {
+      desc.textContent = '按专家评审分（80%）+ 全员投票分（20%）合并计算';
+    }
+  }
+  // Update ranking title
+  const title = document.getElementById('rankingTitle');
+  if (title) {
+    const stageText = STAGE_LABELS[currentStage] || '初赛';
+    title.textContent = `${stageText} — 综合排名 Top 30`;
+  }
+  // Judge stage label
+  const jsl = document.getElementById('judgeStageLabel');
+  if (jsl) jsl.textContent = STAGE_LABELS[currentStage] || '初赛';
 }
 
 async function checkVotingStatus() {
@@ -570,18 +682,31 @@ async function checkVotingStatus() {
     const resp = await fetch('/api/voting/status');
     const data = await resp.json();
     votingEnabled = !!data.votingEnabled;
+    currentStage = data.currentStage || 'preliminary';
+    isVotingStage = isStageVoting(currentStage);
   } catch(e) {
     votingEnabled = false;
   }
   updateVotingUI();
+  updateStageUI();
 }
 
 function updateVotingUI() {
   const banner = document.getElementById('voting-banner');
-  if (votingEnabled) {
+  if (votingEnabled && isVotingStage) {
     banner.style.display = 'none';
+  } else if (!isVotingStage) {
+    banner.style.display = 'block';
+    banner.innerHTML = `📋 当前为<strong>${STAGE_LABELS[currentStage]}</strong>阶段，不支持投票`;
+    banner.style.background = '#f0f5ff';
+    banner.style.borderColor = '#adc6ff';
+    banner.style.color = '#2f54eb';
   } else {
     banner.style.display = 'block';
+    banner.innerHTML = `⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道`;
+    banner.style.background = '#fff7e6';
+    banner.style.borderColor = '#ffd591';
+    banner.style.color = '#ad6800';
   }
 }
 
@@ -595,19 +720,6 @@ async function ddLogout() {
   updateUserUI();
   refreshCurrentPage();
   showToast('已退出登录');
-}
-
-async function refreshAuthState() {
-  try {
-    const resp = await fetch('/api/auth/me', { credentials: 'include' });
-    const data = await resp.json();
-    if (data.user) {
-      ddAuthed = true;
-      ddUser = data.user;
-      ddRemaining = data.remainingVotes;
-      updateUserUI();
-    }
-  } catch(e) {}
 }
 
 function refreshCurrentPage() {
@@ -634,8 +746,26 @@ function showToast(msg, type='') {
 function trackLabel(t) {
   return { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' }[t] || t;
 }
+
 function trackClass(t) {
   return { efficiency: 'track-efficiency', creative: 'track-creative', business: 'track-business' }[t] || '';
+}
+
+function roundBadge(rs) {
+  if (!rs || rs === 'approved') return '';
+  const map = {
+    semi_finalist: '<span class="round-badge badge-semi">🟢 复赛</span>',
+    finalist: '<span class="round-badge badge-final">🔵 决赛</span>',
+    awarded: '<span class="round-badge badge-awarded">🏆 已获奖</span>',
+    eliminated_semi: '<span class="round-badge badge-eliminated">淘汰</span>',
+    eliminated_final: '<span class="round-badge badge-eliminated">淘汰</span>'
+  };
+  return map[rs] || '';
+}
+
+function awardBadge(award) {
+  if (!award) return '';
+  return `<span class="round-badge badge-awarded">${AWARD_LABELS[award] || award}</span>`;
 }
 
 function linkify(text) {
@@ -665,7 +795,6 @@ async function api(url, options = {}) {
   return data;
 }
 
-// ========== STATE ==========
 let allEntries = [];
 let judgePassword = '';
 
@@ -699,13 +828,22 @@ async function loadStats() {
 function renderStatsBar(containerId, stats) {
   const container = document.getElementById(containerId);
   if (!container || !stats) return;
-  container.innerHTML = `
+  let html = `
     <div class="stat-card"><div class="num">${stats.totalEntries || 0}</div><div class="label">总投稿数</div></div>
     <div class="stat-card"><div class="num">${stats.approvedEntries || 0}</div><div class="label">已收录作品</div></div>
-    <div class="stat-card"><div class="num">${stats.judgeCount || 0}</div><div class="label">评审评委</div></div>
-    <div class="stat-card"><div class="num">${stats.topDept || '-'}</div><div class="label">投稿最多部门</div></div>
-    <div class="stat-card"><div class="num">${stats.totalVotes || 0}</div><div class="label">总投票数</div></div>
+    <div class="stat-card"><div class="num">${stats.totalVotes || 0}</div><div class="label">${STAGE_LABELS[currentStage] || ''}投票数</div></div>
+    <div class="stat-card"><div class="num">${stats.judgeCount || 0}</div><div class="label">${STAGE_LABELS[currentStage] || ''}评委数</div></div>
   `;
+  if (stats.semiFinalists !== undefined) {
+    html += `<div class="stat-card"><div class="num" style="color:#52c41a;">${stats.semiFinalists}</div><div class="label">复赛晋级</div></div>`;
+  }
+  if (stats.finalists !== undefined) {
+    html += `<div class="stat-card"><div class="num" style="color:#1677ff;">${stats.finalists}</div><div class="label">决赛晋级</div></div>`;
+  }
+  if (stats.awarded !== undefined) {
+    html += `<div class="stat-card"><div class="num" style="color:#fa8c16;">${stats.awarded}</div><div class="label">已获奖</div></div>`;
+  }
+  container.innerHTML = html;
 }
 
 // ========== SUBMIT PAGE ==========
@@ -772,7 +910,6 @@ async function submitEntry() {
   if (!scene) return showToast('请填写场景描述', 'error');
   if (!process) return showToast('请填写使用过程', 'error');
   if (!result) return showToast('请填写效果呈现', 'error');
-  
   const formData = new FormData();
   formData.append('name', document.getElementById('f-name').value.trim());
   formData.append('dept', document.getElementById('f-dept').value);
@@ -784,7 +921,6 @@ async function submitEntry() {
   formData.append('result_text', result);
   formData.append('extra', document.getElementById('f-extra').value.trim());
   if (pendingFile) formData.append('attachment', pendingFile);
-  
   try {
     const resp = await fetch('/api/entries', {
       method: 'POST',
@@ -793,7 +929,6 @@ async function submitEntry() {
     });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || '提交失败');
-    
     showToast('作品提交成功！', 'success');
     document.getElementById('formCard').innerHTML = `
       <div class="success-page">
@@ -815,37 +950,47 @@ async function submitEntry() {
 async function renderGallery() {
   const stats = await loadStats();
   renderStatsBar('galleryStats', stats);
-  
   const search = document.getElementById('gallerySearch').value;
   const track = document.getElementById('galleryTrack').value;
   const dept = document.getElementById('galleryDept').value;
   const sort = document.getElementById('gallerySort').value;
-  
   let url = `/api/entries?sort=${sort}`;
   if (track) url += `&track=${track}`;
   if (dept) url += `&dept=${encodeURIComponent(dept)}`;
   if (search) url += `&search=${encodeURIComponent(search)}`;
-  
   try {
     const data = await api(url);
     allEntries = data.entries;
-    
-    // Populate dept filter
+    if (data.currentStage) {
+      currentStage = data.currentStage;
+      updateStageUI();
+    }
     const deptSelect = document.getElementById('galleryDept');
     const deptVal = deptSelect.value;
     const depts = [...new Set(data.entries.map(e => e.dept))];
     deptSelect.innerHTML = '<option value="">全部部门</option>' + depts.map(d => `<option value="${d}">${d}</option>`).join('');
     deptSelect.value = deptVal;
-    
     const grid = document.getElementById('galleryGrid');
     if (data.entries.length === 0) {
       grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">📭</div><p>暂无作品，快来投稿吧！</p></div>';
       return;
     }
-    
-    grid.innerHTML = data.entries.map(e => `
-      <div class="entry-card" onclick="openDetail('${e.id}')">
-        <span class="track-tag ${trackClass(e.track)}">${trackLabel(e.track)}${e.attachmentName ? ' 📎' : ''}</span>
+    grid.innerHTML = data.entries.map(e => {
+      const rs = e.roundStatus || 'approved';
+      const rsClass = 'rs-' + rs;
+      const badge = awardBadge(e.award) || roundBadge(rs);
+      const isEliminated = rs === 'eliminated_semi' || rs === 'eliminated_final';
+      // Show vote button only for votable entries in voting stages
+      const canVote = isVotingStage && !isEliminated && rs !== 'awarded' && rs !== 'finalist';
+      let voteBtn = '';
+      if (isVotingStage && canVote) {
+        voteBtn = `<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();voteEntry('${e.id}')">👍 投票</button>`;
+      } else if (!isVotingStage) {
+        voteBtn = `<span style="font-size:12px;color:#ccc;">${STAGE_LABELS[currentStage]}阶段</span>`;
+      }
+      return `
+      <div class="entry-card ${rsClass}" onclick="openDetail('${e.id}')">
+        <span class="track-tag ${trackClass(e.track)}">${trackLabel(e.track)}${e.attachmentName ? ' 📎' : ''}</span>${badge}
         <h3>${e.title}</h3>
         <div class="meta">${e.name} · ${e.dept}${e.subdept ? ' / ' + e.subdept : ''} · ${new Date(e.createdAt).toLocaleDateString('zh-CN')}</div>
         <div class="desc">${e.scene}</div>
@@ -855,9 +1000,10 @@ async function renderGallery() {
             <span class="score-display">${e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分'}</span>
             <span class="votes">👍 ${e.voteCount} 票</span>
           </div>
-          <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();voteEntry('${e.id}')">👍 投票</button>
+          ${voteBtn}
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   } catch(e) {
     console.error('Gallery error:', e);
   }
@@ -872,8 +1018,12 @@ async function voteEntry(entryId) {
     showToast('投票暂未开启，请等待管理员开放投票通道', 'error');
     return;
   }
+  if (!isVotingStage) {
+    showToast('当前阶段不支持投票', 'error');
+    return;
+  }
   if (ddRemaining <= 0) {
-    showToast('你的5票已用完', 'error');
+    showToast(`你的${STAGE_LABELS[currentStage]}5票已用完`, 'error');
     return;
   }
   try {
@@ -899,11 +1049,16 @@ async function openDetail(entryId) {
   try {
     const data = await api(`/api/entries/${entryId}`);
     const e = data.entry;
-    
-    const compositeScore = Math.round((e.avgScore || 0) * 0.8 + (e.voteCount / Math.max(1, e.voteCount)) * 0.2 * 100 * 0.2);
-    
+    const rs = e.roundStatus || 'approved';
+    const badge = awardBadge(e.award) || roundBadge(rs);
+    const stageText = STAGE_LABELS[currentStage] || '初赛';
+    const canVote = isVotingStage && rs !== 'eliminated_semi' && rs !== 'eliminated_final' && rs !== 'awarded' && rs !== 'finalist';
+    let voteBtnHtml = '';
+    if (isVotingStage && canVote) {
+      voteBtnHtml = `<button class="btn btn-outline btn-sm" onclick="voteEntry('${e.id}')">👍 投票</button>`;
+    }
     document.getElementById('detailContent').innerHTML = `
-      <h2>${e.title}</h2>
+      <h2>${e.title} ${badge}</h2>
       <div style="margin-bottom:12px;">
         <span class="track-tag ${trackClass(e.track)}">${trackLabel(e.track)}</span>
         <span style="font-size:13px;color:#999;margin-left:8px;">${e.name} · ${e.dept}${e.subdept ? ' / ' + e.subdept : ''} · ${new Date(e.createdAt).toLocaleString('zh-CN')}</span>
@@ -913,13 +1068,14 @@ async function openDetail(entryId) {
       <div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">${e.result_text}</div></div>
       ${e.extra ? `<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">${linkify(e.extra)}</div></div>` : ''}
       ${e.attachmentName ? `<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/${e.attachmentPath}" download="${e.attachmentName}" style="color:#1677ff;">📥 下载 ${e.attachmentName}</a></div></div>` : ''}
-      <div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0;">
-        <div><span style="font-size:24px;font-weight:700;color:#1677ff;">${e.avgScore || '-'}</span><span style="font-size:12px;color:#999;"> 评委均分</span></div>
-        <div><span style="font-size:16px;font-weight:600;">👍 ${e.voteCount}</span><span style="font-size:12px;color:#999;"> 票</span></div>
+      <div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0;flex-wrap:wrap;">
+        <div><span style="font-size:24px;font-weight:700;color:#1677ff;">${e.avgScore || '-'}</span><span style="font-size:12px;color:#999;"> ${stageText}评委均分</span></div>
+        <div><span style="font-size:16px;font-weight:600;">👍 ${e.voteCount}</span><span style="font-size:12px;color:#999;"> ${stageText}票</span></div>
         <div><span style="font-size:16px;font-weight:600;color:#faad14;">${e.judgeCount}</span><span style="font-size:12px;color:#999;"> 位评委打分</span></div>
+        <div><span style="font-size:16px;font-weight:700;color:#52c41a;">${e.composite || '-'}</span><span style="font-size:12px;color:#999;"> 综合分</span></div>
       </div>
       <div class="modal-actions">
-        <button class="btn btn-outline btn-sm" onclick="voteEntry('${e.id}')">👍 投票</button>
+        ${voteBtnHtml}
         <button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button>
       </div>
     `;
@@ -935,27 +1091,30 @@ function closeDetail() { document.getElementById('detailModal').style.display = 
 async function renderRanking() {
   const stats = await loadStats();
   renderStatsBar('rankingStats', stats);
-  
+  updateStageUI();
   const track = document.getElementById('rankTrack').value;
   let url = '/api/ranking';
   if (track) url += `?track=${track}`;
-  
   try {
     const data = await api(url);
+    if (data.currentStage) {
+      currentStage = data.currentStage;
+      updateStageUI();
+    }
     const list = document.getElementById('rankingList');
     if (data.ranking.length === 0) {
       list.innerHTML = '<div class="empty-state"><div class="icon">🏆</div><p>暂无排名数据</p></div>';
       return;
     }
-    
     list.innerHTML = data.ranking.map((e, i) => {
       const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : 'normal';
       const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+      const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
       return `
       <div class="rank-item" onclick="openDetail('${e.id}')">
         <div class="rank-num ${rankClass}">${medal || (i+1)}</div>
         <div class="rank-info">
-          <div class="rname">${e.title}</div>
+          <div class="rname">${e.title} ${badge}</div>
           <div class="rdept">${e.name} · ${e.dept}${e.subdept ? ' / ' + e.subdept : ''} · ${trackLabel(e.track)}</div>
         </div>
         <div class="rank-score">${e.composite}</div>
@@ -972,6 +1131,7 @@ function renderJudgePage() {
   document.getElementById('judgePanel').classList.remove('active');
   document.getElementById('judgeNameInput').value = '';
   document.getElementById('judgePwInput').value = '';
+  updateStageUI();
 }
 
 function enterJudge() {
@@ -981,11 +1141,10 @@ function enterJudge() {
   if (!pw) return showToast('请输入评审密码', 'error');
   judgeName = name;
   judgePassword = pw;
-  
-  // Verify password by fetching entries (password check happens server-side on score save)
   document.getElementById('judgeLogin').style.display = 'none';
   document.getElementById('judgePanel').classList.add('active');
   document.getElementById('judgeNameDisplay').textContent = '当前评委：' + name;
+  updateStageUI();
   renderJudgePanel();
 }
 
@@ -997,36 +1156,47 @@ function logoutJudge() {
 
 async function renderJudgePanel() {
   if (!judgeName || !judgePassword) return;
-  
   const track = document.getElementById('judgeTrackFilter').value;
   let url = '/api/entries?sort=newest';
   if (track) url += `&track=${track}`;
-  
   try {
     const data = await api(url);
-    // Fetch existing scores to pre-fill
+    if (data.currentStage) {
+      currentStage = data.currentStage;
+      updateStageUI();
+    }
+    // Fetch existing scores for current stage
     let myScores = {};
     try {
       const resp = await fetch(`/api/judge/my-scores?judgeName=${encodeURIComponent(judgeName)}&judgePassword=${encodeURIComponent(judgePassword)}`);
       if (resp.ok) {
-        const data = await resp.json();
-        (data.scores || []).forEach(s => { myScores[s.entryId] = s; });
+        const sdata = await resp.json();
+        (sdata.scores || []).forEach(s => { myScores[s.entryId] = s; });
       }
     } catch(e) {}
-    
+
+    // Filter entries based on current stage
+    let judgableEntries = data.entries;
+    if (currentStage === 'semi_final') {
+      judgableEntries = data.entries.filter(e => e.roundStatus === 'semi_finalist');
+    } else if (currentStage === 'final' || currentStage === 'awarded') {
+      judgableEntries = data.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
+    }
+
     const tbody = document.getElementById('judgeTableBody');
-    if (data.entries.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">暂无作品</td></tr>';
+    if (judgableEntries.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">当前阶段（${STAGE_LABELS[currentStage]}）没有可评审的作品</td></tr>`;
       return;
     }
-    
-    tbody.innerHTML = data.entries.map(e => {
+
+    tbody.innerHTML = judgableEntries.map(e => {
       const s = myScores[e.id] || {};
       const total = (s.practicality||0) + (s.innovation||0) + (s.scalability||0) + (s.presentation||0);
       const hasScored = myScores[e.id] ? 'scored' : '';
+      const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
       return `
       <tr class="${hasScored}">
-        <td><a href="javascript:void(0)" onclick="openDetail('${e.id}')" style="color:#1677ff;">${e.title.substring(0,18)}${e.title.length>18?'...':''}</a></td>
+        <td><a href="javascript:void(0)" onclick="openDetail('${e.id}')" style="color:#1677ff;">${e.title.substring(0,18)}${e.title.length>18?'...':''}</a> ${badge}</td>
         <td>${e.name}</td>
         <td>${e.dept}${e.subdept ? '/'+e.subdept : ''}</td>
         <td>${trackLabel(e.track)}</td>
@@ -1046,18 +1216,16 @@ async function saveScore(entryId) {
   const c = parseInt(document.getElementById('j_c_' + entryId)?.value) || 0;
   const s = parseInt(document.getElementById('j_s_' + entryId)?.value) || 0;
   const r = parseInt(document.getElementById('j_r_' + entryId)?.value) || 0;
-  
   if (p > 30 || c > 25 || s > 25 || r > 20) {
     return showToast('分数超出上限，请检查！', 'error');
   }
-  
   try {
     const data = await api(`/api/judge/scores/${entryId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ judgeName, practicality: p, innovation: c, scalability: s, presentation: r, judgePassword })
     });
-    showToast('打分已保存！总分：' + data.total, 'success');
+    showToast(`打分已保存！总分：${data.total}（${STAGE_LABELS[data.stage] || ''}）`, 'success');
     renderJudgePanel();
   } catch(e) {
     showToast(e.message, 'error');
@@ -1092,16 +1260,22 @@ async function adminLogin() {
     document.getElementById('adminPanel').style.display = 'block';
     document.getElementById('adminPanel').classList.add('active');
     await renderAdminDashboard();
-    // Load settings
     const sdata = await api('/api/settings', {
       headers: { 'x-admin-token': adminToken }
     });
-    document.getElementById('adminJudgePassword').value = sdata.settings.judgePassword || '';
-    document.getElementById('adminAdminPassword').value = sdata.settings.adminPassword || '';
+    currentStage = sdata.settings.currentStage || 'preliminary';
+    isVotingStage = isStageVoting(currentStage);
     document.getElementById('adminVotingToggle').checked = !!sdata.settings.votingEnabled;
+    updateStageUI();
+    updateAdminStageLabel();
   } catch(e) {
     showToast(e.message, 'error');
   }
+}
+
+function updateAdminStageLabel() {
+  const el = document.getElementById('adminStageLabel');
+  if (el) el.textContent = STAGE_LABELS[currentStage] || '初赛';
 }
 
 function adminLogout() {
@@ -1112,24 +1286,32 @@ function adminLogout() {
 
 async function renderAdminDashboard() {
   if (!adminAuthed || !adminToken) return;
-  
   try {
     const data = await api('/api/admin/scores', {
       headers: { 'x-admin-token': adminToken }
     });
+    if (data.summary && data.summary.currentStage) {
+      currentStage = data.summary.currentStage;
+      isVotingStage = isStageVoting(currentStage);
+      updateStageUI();
+      updateAdminStageLabel();
+    }
     const { entryScores, allJudges, summary } = data;
 
     // Stats bar
     const statsBar = document.getElementById('adminStatsBar');
     statsBar.innerHTML = `
-      <div class="stat-card"><div class="num">${summary.totalEntries}</div><div class="label">作品总数</div></div>
+      <div class="stat-card"><div class="num">${summary.totalEntries}</div><div class="label">${STAGE_LABELS[currentStage]}作品</div></div>
       <div class="stat-card"><div class="num">${summary.totalJudges}</div><div class="label">评委人数</div></div>
       <div class="stat-card"><div class="num">${summary.totalScores}</div><div class="label">打分总数</div></div>
       <div class="stat-card"><div class="num">${summary.scoredEntries}</div><div class="label">已评作品</div></div>
       <div class="stat-card"><div class="num" style="color:#ff4d4f;">${summary.unscoredEntries}</div><div class="label">未评作品</div></div>
     `;
 
-    // Build table header dynamically
+    // Render stage management panel
+    renderStageManagePanel(entryScores);
+
+    // Build table
     const th = document.getElementById('adminJudgeHeaders');
     if (allJudges.length > 0) {
       th.colSpan = allJudges.length;
@@ -1139,16 +1321,14 @@ async function renderAdminDashboard() {
       th.innerHTML = '暂无评委评分';
     }
 
-    // Build table body
     const tbody = document.getElementById('adminScoreBody');
     if (entryScores.length === 0) {
-      const totalCols = 7 + Math.max(1, allJudges.length);
-      tbody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>`;
+      const totalCols = 8 + Math.max(1, allJudges.length);
+      tbody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align:center;padding:40px;color:#999;">当前阶段暂无可评审作品</td></tr>`;
       return;
     }
 
     tbody.innerHTML = entryScores.map(e => {
-      // Build per-judge cells
       const judgeCells = allJudges.map(judge => {
         const s = e.scores.find(sc => sc.judgeName === judge);
         if (s) {
@@ -1158,22 +1338,190 @@ async function renderAdminDashboard() {
       }).join('');
 
       const hasScores = e.scores.length > 0;
+      const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
       return `
       <tr>
-        <td style="position:sticky;left:0;background:#fff;z-index:1;"><a href="javascript:void(0)" onclick="openDetail('${e.id}')" style="color:#1677ff;font-weight:500;">${e.title.substring(0,16)}${e.title.length>16?'...':''}</a></td>
+        <td style="position:sticky;left:0;background:#fff;z-index:1;"><a href="javascript:void(0)" onclick="openDetail('${e.id}')" style="color:#1677ff;font-weight:500;">${e.title.substring(0,16)}${e.title.length>16?'...':''}</a> ${badge}</td>
         <td>${e.name}</td>
         <td>${e.dept}${e.subdept ? '/'+e.subdept : ''}</td>
         <td>${trackLabel(e.track)}</td>
+        <td style="font-size:12px;">${ROUND_LABELS[e.roundStatus] || '初赛'}</td>
         ${judgeCells}
         <td style="font-weight:700;color:${hasScores ? '#1677ff' : '#ccc'};">${hasScores ? e.avgScore : '—'}</td>
+        <td style="font-weight:700;color:#52c41a;">${e.composite || '—'}</td>
         <td>${e.judgeCount}</td>
         <td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry('${e.id}')">删除</button></td>
       </tr>`;
     }).join('');
-
   } catch(e) {
     console.error('Admin dashboard error:', e);
     showToast('加载失败', 'error');
+  }
+}
+
+// ========== STAGE MANAGEMENT PANEL ==========
+function renderStageManagePanel(entryScores) {
+  const panel = document.getElementById('stageManagePanel');
+  if (!panel) return;
+
+  if (currentStage === 'preliminary') {
+    // Show promote to semi_final panel
+    const sorted = [...entryScores].sort((a, b) => (b.composite || 0) - (a.composite || 0));
+    panel.innerHTML = `
+      <div class="promote-panel">
+        <h3>🔄 晋级复赛管理</h3>
+        <p style="color:#666;font-size:13px;margin-bottom:16px;">勾选需要晋级复赛的作品，未勾选的将标记为淘汰。点击"确认晋级复赛"后阶段将切换到复赛。</p>
+        <div style="max-height:400px;overflow-y:auto;border:1px solid #f0f0f0;border-radius:8px;">
+          ${sorted.map(e => `
+            <div class="promote-entry">
+              <input type="checkbox" id="promote_${e.id}" ${e.roundStatus === 'semi_finalist' ? 'checked' : ''}>
+              <span class="pe-title">${e.title}</span>
+              <span class="pe-score">综合分: ${e.composite || '—'} | 均分: ${e.avgScore || '—'} | ${e.name}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-success btn-sm" onclick="adminPromote('semi_final')">✅ 确认晋级复赛</button>
+          <span style="font-size:12px;color:#999;">已勾选 <strong id="promoteCount">0</strong> 个作品</span>
+        </div>
+      </div>
+    `;
+    // Update count on change
+    document.querySelectorAll('input[id^="promote_"]').forEach(cb => {
+      cb.addEventListener('change', updatePromoteCount);
+    });
+    updatePromoteCount();
+  } else if (currentStage === 'semi_final') {
+    // Show promote to final panel
+    const semiEntries = entryScores.filter(e => e.roundStatus === 'semi_finalist');
+    const sorted = [...semiEntries].sort((a, b) => (b.composite || 0) - (a.composite || 0));
+    panel.innerHTML = `
+      <div class="promote-panel">
+        <h3>🏆 晋级决赛管理</h3>
+        <p style="color:#666;font-size:13px;margin-bottom:16px;">勾选需要晋级决赛的作品，未勾选的将标记为淘汰。点击"确认晋级决赛"后阶段将切换到决赛。</p>
+        <div style="max-height:400px;overflow-y:auto;border:1px solid #f0f0f0;border-radius:8px;">
+          ${sorted.map(e => `
+            <div class="promote-entry">
+              <input type="checkbox" id="promote_${e.id}" ${e.roundStatus === 'finalist' ? 'checked' : ''}>
+              <span class="pe-title">${e.title}</span>
+              <span class="pe-score">综合分: ${e.composite || '—'} | 均分: ${e.avgScore || '—'} | ${e.name}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-primary btn-sm" onclick="adminPromote('final')">✅ 确认晋级决赛</button>
+          <span style="font-size:12px;color:#999;">已勾选 <strong id="promoteCount">0</strong> 个作品</span>
+        </div>
+      </div>
+    `;
+    document.querySelectorAll('input[id^="promote_"]').forEach(cb => {
+      cb.addEventListener('change', updatePromoteCount);
+    });
+    updatePromoteCount();
+  } else if (currentStage === 'final') {
+    // Show settle panel
+    const finalEntries = entryScores.filter(e => e.roundStatus === 'finalist');
+    const sorted = [...finalEntries].sort((a, b) => (b.composite || 0) - (a.composite || 0));
+    panel.innerHTML = `
+      <div class="promote-panel">
+        <h3>🏆 结算获奖</h3>
+        <p style="color:#666;font-size:13px;margin-bottom:16px;">为决赛作品设置获奖等级，点击"确认结算"后阶段将切换到已结算。</p>
+        <div style="max-height:400px;overflow-y:auto;border:1px solid #f0f0f0;border-radius:8px;">
+          ${sorted.map(e => `
+            <div class="promote-entry">
+              <select class="award-select" id="award_${e.id}">
+                <option value="">未获奖</option>
+                <option value="first" ${e.award === 'first' ? 'selected' : ''}>🥇 一等奖</option>
+                <option value="second" ${e.award === 'second' ? 'selected' : ''}>🥈 二等奖</option>
+                <option value="third" ${e.award === 'third' ? 'selected' : ''}>🥉 三等奖</option>
+                <option value="excellence" ${e.award === 'excellence' ? 'selected' : ''}>🎖️ 优秀奖</option>
+              </select>
+              <span class="pe-title">${e.title}</span>
+              <span class="pe-score">评委均分: ${e.avgScore || '—'} | ${e.name}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn btn-gold btn-sm" onclick="adminSettle()">🏆 确认结算</button>
+        </div>
+      </div>
+    `;
+  } else if (currentStage === 'awarded') {
+    panel.innerHTML = `
+      <div class="promote-panel" style="background:linear-gradient(135deg,#fffbe6,#fff);border:1px solid #ffd591;">
+        <h3>🏆 比赛已结算</h3>
+        <p style="color:#666;font-size:13px;">获奖结果已公布。如需重新管理，请联系技术人员。</p>
+      </div>
+    `;
+  } else {
+    panel.innerHTML = '';
+  }
+}
+
+function updatePromoteCount() {
+  let count = 0;
+  document.querySelectorAll('input[id^="promote_"]:checked').forEach(cb => {
+    if (cb.id.replace('promote_', '').startsWith('entry_')) count++;
+  });
+  const el = document.getElementById('promoteCount');
+  if (el) el.textContent = count;
+}
+
+async function adminPromote(stage) {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  const entryIds = [];
+  document.querySelectorAll('input[id^="promote_"]:checked').forEach(cb => {
+    const id = cb.id.replace('promote_', '');
+    if (id.startsWith('entry_')) entryIds.push(id);
+  });
+
+  const stageName = stage === 'semi_final' ? '复赛' : '决赛';
+  if (!confirm(`确认将选中的 ${entryIds.length} 个作品晋级${stageName}？\n\n未选中的作品将被标记为淘汰。此操作不可撤销。`)) return;
+
+  try {
+    const data = await api('/api/admin/promote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ stage, entryIds })
+    });
+    showToast(`✅ 已晋级 ${data.promoted} 个作品到${stageName}！`, 'success');
+    currentStage = data.currentStage;
+    isVotingStage = isStageVoting(currentStage);
+    updateStageUI();
+    updateAdminStageLabel();
+    renderAdminDashboard();
+  } catch(e) {
+    showToast(e.message, 'error');
+  }
+}
+
+async function adminSettle() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  const awards = {};
+  document.querySelectorAll('select[id^="award_"]').forEach(sel => {
+    if (sel.value) {
+      const id = sel.id.replace('award_', '');
+      awards[id] = sel.value;
+    }
+  });
+
+  const awardCount = Object.keys(awards).length;
+  if (!confirm(`确认结算？\n\n将标记 ${awardCount} 个作品获奖，比赛阶段将切换到"已结算"。此操作不可撤销。`)) return;
+
+  try {
+    const data = await api('/api/admin/settle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ awards })
+    });
+    showToast(`🏆 结算完成！${data.awardedCount} 个作品获奖`, 'success');
+    currentStage = 'awarded';
+    isVotingStage = false;
+    updateStageUI();
+    updateAdminStageLabel();
+    renderAdminDashboard();
+  } catch(e) {
+    showToast(e.message, 'error');
   }
 }
 
@@ -1196,21 +1544,6 @@ async function deleteEntry(id) {
   } catch(e) {
     showToast('删除失败：' + e.message, 'error');
   }
-}
-
-// Settings (keep existing)
-async function saveSettings() {
-  if (!adminToken) return showToast('请先登录管理后台', 'error');
-  const judgePw = document.getElementById('adminJudgePassword').value.trim();
-  const adminPw = document.getElementById('adminAdminPassword').value.trim();
-  try {
-    await api('/api/settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
-      body: JSON.stringify({ judgePassword: judgePw, adminPassword: adminPw })
-    });
-    showToast('设置已保存！', 'success');
-  } catch(e) { showToast(e.message, 'error'); }
 }
 
 async function saveVotingToggle() {
@@ -1251,6 +1584,7 @@ async function clearAllData(type) {
     if (adminAuthed) renderAdminDashboard();
   } catch(e) { showToast(e.message, 'error'); }
 }
+
 function switchTab(tabName) {
   const tab = document.querySelector(`.tab[data-tab="${tabName}"]`);
   if (tab) tab.click();
