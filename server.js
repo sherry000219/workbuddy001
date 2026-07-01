@@ -954,7 +954,7 @@ app.post('/api/admin/reset', verifyAdminToken, (req, res) => {
 
   app.listen(PORT, () => {
     console.log(`\n========================================`);
-    console.log(`  WorkBuddy Contest Platform v2.0!`);
+    console.log(`  云帐房头号玩家第二季 — WorkBuddy 实战应用大赛`);
     console.log(`  http://localhost:${PORT}`);
     console.log(`  Stage: ${getCurrentStage()}`);
     console.log(`  GitHub sync: ${GITHUB_TOKEN ? 'ENABLED' : 'DISABLED'}`);

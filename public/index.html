@@ -10,34 +10,35 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
   --bg: #080d24; --bg-card: rgba(255,255,255,0.06); --bg-card-hover: rgba(255,255,255,0.1);
-  --text: #e0e6f0; --text-dim: #8890b0; --accent: #00d4ff; --accent2: #ff6ec7;
-  --green: #00e676; --gold: #ffd740; --red: #ff5252; --blue: #448aff;
+  --text: #e0e6f0; --text-dim: #8890b0; --accent: #ff6b35; --accent2: #5b8ff9;
+  --green: #00c853; --gold: #ffc107; --red: #ff5252; --blue: #5b8ff9;
+  --brand-deep: #2b3a67; --brand-orange: #ff6b35; --brand-blue: #5b8ff9;
   --radius: 16px; --radius-sm: 10px;
 }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
 /* ===== HERO BANNER ===== */
-.hero { position: relative; width: 100%; min-height: 520px; background: linear-gradient(160deg, #080d24 0%, #0d1440 30%, #1a1050 60%, #0d1440 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, rgba(0,212,255,0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 70%, rgba(255,110,199,0.1) 0%, transparent 50%); z-index: 0; }
-.hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,212,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.06) 1px, transparent 1px); background-size: 40px 40px; z-index: 0; animation: gridMove 8s linear infinite; }
+.hero { position: relative; width: 100%; min-height: 520px; background: linear-gradient(160deg, #080d24 0%, #0f1a3a 30%, #1a2548 60%, #0f1a3a 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, rgba(255,107,53,0.12) 0%, transparent 55%), radial-gradient(ellipse at 80% 70%, rgba(91,143,249,0.12) 0%, transparent 50%); z-index: 0; }
+.hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(91,143,249,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(91,143,249,0.05) 1px, transparent 1px); background-size: 40px 40px; z-index: 0; animation: gridMove 8s linear infinite; }
 @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
 /* Code rain */
 .code-rain { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-.code-drop { position: absolute; color: rgba(0,212,255,0.3); font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; white-space: nowrap; animation: fall linear infinite; }
+.code-drop { position: absolute; color: rgba(255,107,53,0.28); font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; white-space: nowrap; animation: fall linear infinite; }
 @keyframes fall { 0% { transform: translateY(-10%); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110%); opacity: 0; } }
 /* Hero content */
 .hero-content { position: relative; z-index: 2; text-align: center; padding: 60px 24px; max-width: 800px; }
-.hero-badge { display: inline-block; background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.3); color: var(--accent); padding: 6px 20px; border-radius: 20px; font-size: 13px; letter-spacing: 2px; margin-bottom: 20px; }
-.hero-title { font-size: clamp(28px, 5vw, 48px); font-weight: 800; background: linear-gradient(135deg, #fff 20%, var(--accent) 50%, var(--accent2) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; line-height: 1.3; }
+.hero-badge { display: inline-block; background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.3); color: var(--accent); padding: 6px 20px; border-radius: 20px; font-size: 13px; letter-spacing: 2px; margin-bottom: 20px; }
+.hero-title { font-size: clamp(28px, 5vw, 48px); font-weight: 800; background: linear-gradient(135deg, #fff 20%, var(--accent) 55%, var(--accent2) 90%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; line-height: 1.3; }
 .hero-sub { font-size: clamp(16px, 3vw, 22px); color: rgba(255,255,255,0.7); font-weight: 300; letter-spacing: 1px; margin-bottom: 30px; }
-/* Cat mascot */
-.cat-container { position: relative; width: 120px; height: 120px; margin: 0 auto 24px; }
-.cat-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 20px rgba(0,212,255,0.4)); animation: catFloat 3s ease-in-out infinite; }
-@keyframes catFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+/* Logo mascot */
+.logo-container { position: relative; width: 150px; height: 150px; margin: 0 auto 24px; background: #000; border: 1px solid rgba(255,255,255,0.12); border-radius: 28px; padding: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(255,107,53,0.15); animation: logoFloat 3s ease-in-out infinite; }
+.logo-container img { width: 100%; height: 100%; object-fit: cover; }
+@keyframes logoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 /* Keyboard */
 .kb-container { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; gap: 6px; }
 .kb-key { width: 28px; height: 34px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; color: rgba(255,255,255,0.5); font-size: 10px; display: flex; align-items: center; justify-content: center; font-family: monospace; transition: all 0.3s; animation: keyGlow 2s ease-in-out infinite; }
-@keyframes keyGlow { 0%, 100% { border-color: rgba(255,255,255,0.12); box-shadow: none; } 50% { border-color: rgba(0,212,255,0.4); box-shadow: 0 0 8px rgba(0,212,255,0.2); } }
+@keyframes keyGlow { 0%, 100% { border-color: rgba(255,255,255,0.12); box-shadow: none; } 50% { border-color: rgba(255,107,53,0.4); box-shadow: 0 0 8px rgba(255,107,53,0.2); } }
 
 /* ===== NAVIGATION CARDS ===== */
 .nav-section { max-width: 1100px; margin: -30px auto 0; padding: 0 24px; position: relative; z-index: 10; }
@@ -46,16 +47,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .nav-card::before { content: ''; position: absolute; inset: 0; border-radius: var(--radius); opacity: 0; transition: opacity 0.3s; }
 .nav-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.2); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
 .nav-card:hover::before { opacity: 1; }
-.nav-card.card-submit { border-top: 3px solid #ff9800; }
-.nav-card.card-submit:hover { box-shadow: 0 12px 40px rgba(255,152,0,0.2); }
+.nav-card.card-submit { border-top: 3px solid #ff6b35; }
+.nav-card.card-submit:hover { box-shadow: 0 12px 40px rgba(255,107,53,0.2); }
 .nav-card.card-gallery { border-top: 3px solid var(--green); }
 .nav-card.card-gallery:hover { box-shadow: 0 12px 40px rgba(0,230,118,0.2); }
 .nav-card.card-ranking { border-top: 3px solid var(--gold); }
 .nav-card.card-ranking:hover { box-shadow: 0 12px 40px rgba(255,215,64,0.2); }
 .nav-card.card-judge { border-top: 3px solid var(--blue); }
-.nav-card.card-judge:hover { box-shadow: 0 12px 40px rgba(68,138,255,0.2); }
-.nav-card.card-admin { border-top: 3px solid var(--accent2); }
-.nav-card.card-admin:hover { box-shadow: 0 12px 40px rgba(255,110,199,0.2); }
+.nav-card.card-judge:hover { box-shadow: 0 12px 40px rgba(91,143,249,0.2); }
+.nav-card.card-admin { border-top: 3px solid var(--brand-deep); }
+.nav-card.card-admin:hover { box-shadow: 0 12px 40px rgba(43,58,103,0.3); }
 .nav-card .nc-icon { font-size: 44px; margin-bottom: 10px; display: block; filter: grayscale(0); transition: transform 0.3s; }
 .nav-card:hover .nc-icon { transform: scale(1.15); }
 .nav-card .nc-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
@@ -66,7 +67,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .stage-bar .stage-label { font-size: 14px; font-weight: 700; color: var(--accent); }
 .stage-bar .stage-progress { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim); }
 .stage-bar .stage-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.15); }
-.stage-bar .stage-dot.active { background: var(--accent); box-shadow: 0 0 8px rgba(0,212,255,0.5); }
+.stage-bar .stage-dot.active { background: var(--accent); box-shadow: 0 0 8px rgba(255,107,53,0.5); }
 .stage-bar .stage-dot.done { background: var(--green); }
 
 /* ===== VOTING BANNER ===== */
@@ -93,12 +94,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 /* ===== BUTTONS ===== */
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; font-family: inherit; }
 .btn-primary { background: var(--accent); color: #080d24; font-weight: 600; }
-.btn-primary:hover { background: #33def8; }
+.btn-primary:hover { background: #ff8c5a; }
 .btn-success { background: var(--green); color: #080d24; font-weight: 600; }
 .btn-success:hover { opacity: 0.85; }
 .btn-warning { background: #faad14; color: #080d24; }
-.btn-outline { background: transparent; color: var(--accent); border: 1px solid rgba(0,212,255,0.4); }
-.btn-outline:hover { background: rgba(0,212,255,0.1); border-color: var(--accent); }
+.btn-outline { background: transparent; color: var(--accent); border: 1px solid rgba(255,107,53,0.4); }
+.btn-outline:hover { background: rgba(255,107,53,0.1); border-color: var(--accent); }
 .btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 6px; }
 .btn-danger { background: var(--red); color: #fff; }
 .btn-ghost { background: transparent; color: var(--text-dim); }
@@ -113,7 +114,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
 .form-group label .required { color: var(--red); margin-left: 2px; }
 .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-size: 14px; transition: border 0.2s; font-family: inherit; background: rgba(255,255,255,0.04); color: var(--text); }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,212,255,0.15); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(255,107,53,0.15); }
 .form-group textarea { min-height: 100px; resize: vertical; }
 .form-group select option { background: #1a1f3a; color: #fff; }
 .form-hint { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
@@ -149,8 +150,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .badge-eliminated { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); }
 /* Track tags */
 .track-tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
-.track-efficiency { background: rgba(0,212,255,0.1); color: var(--accent); }
-.track-creative { background: rgba(255,152,0,0.1); color: #ffa726; }
+.track-efficiency { background: rgba(91,143,249,0.1); color: var(--blue); }
+.track-creative { background: rgba(255,107,53,0.1); color: #ff7a4d; }
 .track-business { background: rgba(0,230,118,0.1); color: var(--green); }
 .entry-card h3 { font-size: 17px; margin-bottom: 6px; color: #fff; }
 .entry-card .meta { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; }
@@ -263,45 +264,8 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
   <div class="hero-grid"></div>
   <div class="code-rain" id="codeRain"></div>
   <div class="hero-content">
-    <div class="cat-container">
-      <svg class="cat-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-        <!-- Cat head -->
-        <ellipse cx="60" cy="55" rx="35" ry="30" fill="#2a2a4a" stroke="rgba(0,212,255,0.6)" stroke-width="2"/>
-        <!-- Ears -->
-        <polygon points="28,35 18,10 42,28" fill="#2a2a4a" stroke="rgba(0,212,255,0.5)" stroke-width="1.5"/>
-        <polygon points="92,35 102,10 78,28" fill="#2a2a4a" stroke="rgba(0,212,255,0.5)" stroke-width="1.5"/>
-        <polygon points="30,33 22,16 40,28" fill="rgba(255,110,199,0.15)"/>
-        <polygon points="90,33 98,16 80,28" fill="rgba(255,110,199,0.15)"/>
-        <!-- Eyes -->
-        <ellipse cx="48" cy="52" rx="10" ry="11" fill="#0a0a1a" stroke="rgba(0,212,255,0.7)" stroke-width="1.5"/>
-        <ellipse cx="72" cy="52" rx="10" ry="11" fill="#0a0a1a" stroke="rgba(0,212,255,0.7)" stroke-width="1.5"/>
-        <ellipse cx="48" cy="52" rx="6" ry="7" fill="#00d4ff"/>
-        <ellipse cx="72" cy="52" rx="6" ry="7" fill="#00d4ff"/>
-        <circle cx="50" cy="49" r="2.5" fill="#fff"/>
-        <circle cx="74" cy="49" r="2.5" fill="#fff"/>
-        <!-- Nose -->
-        <polygon points="60,63 57,68 63,68" fill="rgba(255,110,199,0.6)"/>
-        <!-- Mouth -->
-        <path d="M57 70 Q60 74 63 70" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
-        <path d="M53 70 Q56 75 60 70" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
-        <path d="M67 70 Q64 75 60 70" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
-        <!-- Whiskers -->
-        <line x1="25" y1="55" x2="42" y2="58" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
-        <line x1="25" y1="63" x2="42" y2="62" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
-        <line x1="95" y1="55" x2="78" y2="58" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
-        <line x1="95" y1="63" x2="78" y2="62" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
-        <!-- Body/hands typing -->
-        <ellipse cx="60" cy="90" rx="28" ry="18" fill="#2a2a4a" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
-        <rect x="35" y="78" width="18" height="12" rx="3" fill="#2a2a4a" stroke="rgba(0,212,255,0.25)" stroke-width="1"/>
-        <rect x="67" y="78" width="18" height="12" rx="3" fill="#2a2a4a" stroke="rgba(0,212,255,0.25)" stroke-width="1"/>
-        <!-- Code symbols on keyboard -->
-        <text x="38" y="87" font-size="7" fill="rgba(0,212,255,0.5)" font-family="monospace">&lt;/&gt;</text>
-        <text x="70" y="87" font-size="7" fill="rgba(0,212,255,0.5)" font-family="monospace">{}</text>
-        <!-- Glasses/code visor -->
-        <rect x="36" y="46" width="24" height="8" rx="3" fill="none" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
-        <rect x="60" y="46" width="24" height="8" rx="3" fill="none" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
-        <line x1="60" y1="50" x2="60" y2="50" stroke="rgba(0,212,255,0.4)" stroke-width="2"/>
-      </svg>
+    <div class="logo-container">
+      <img src="/logo-yzf-dark.png" alt="云帐房" onerror="this.style.display='none'">
     </div>
     <div class="hero-badge">YUNZHANGFANG · SEASON 2</div>
     <h1 class="hero-title">云帐房头号玩家第二季</h1>
@@ -309,8 +273,8 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
   </div>
   <div class="kb-container">
     <div class="kb-key" style="animation-delay:0s">Q</div><div class="kb-key" style="animation-delay:0.1s">W</div><div class="kb-key" style="animation-delay:0.2s">E</div><div class="kb-key" style="animation-delay:0.3s">R</div><div class="kb-key" style="animation-delay:0.4s">T</div><div class="kb-key" style="animation-delay:0.5s">Y</div>
-    <div class="kb-key" style="animation-delay:0.15s;background:rgba(0,212,255,0.12)">A</div><div class="kb-key" style="animation-delay:0.25s;background:rgba(0,212,255,0.12)">S</div><div class="kb-key" style="animation-delay:0.35s;background:rgba(0,212,255,0.12)">D</div><div class="kb-key" style="animation-delay:0.45s;background:rgba(0,212,255,0.12)">F</div>
-    <div class="kb-key" style="animation-delay:0.3s;background:rgba(255,110,199,0.12)">Z</div><div class="kb-key" style="animation-delay:0.4s;background:rgba(255,110,199,0.12)">X</div><div class="kb-key" style="animation-delay:0.5s;background:rgba(255,110,199,0.12)">C</div>
+    <div class="kb-key" style="animation-delay:0.15s;background:rgba(255,107,53,0.12)">A</div><div class="kb-key" style="animation-delay:0.25s;background:rgba(255,107,53,0.12)">S</div><div class="kb-key" style="animation-delay:0.35s;background:rgba(255,107,53,0.12)">D</div><div class="kb-key" style="animation-delay:0.45s;background:rgba(255,107,53,0.12)">F</div>
+    <div class="kb-key" style="animation-delay:0.3s;background:rgba(91,143,249,0.12)">Z</div><div class="kb-key" style="animation-delay:0.4s;background:rgba(91,143,249,0.12)">X</div><div class="kb-key" style="animation-delay:0.5s;background:rgba(91,143,249,0.12)">C</div>
   </div>
 </div>
 
@@ -351,11 +315,11 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
   <span style="display:flex;align-items:center;gap:6px;">
     <span id="dd-user-area" style="display:none;">
       <span id="dd-user-name" style="font-size:13px;font-weight:500;margin-right:6px;"></span>
-      <span id="dd-remaining" style="background:rgba(0,212,255,0.15);padding:2px 10px;border-radius:12px;font-size:11px;"></span>
+      <span id="dd-remaining" style="background:rgba(255,107,53,0.15);padding:2px 10px;border-radius:12px;font-size:11px;"></span>
       <button onclick="ddLogout()" style="background:rgba(255,255,255,0.06);border:none;color:var(--text-dim);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:4px;">退出</button>
     </span>
     <span id="dd-login-area">
-      <button id="dd-login-btn" onclick="ddLogin()" style="background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.3);color:var(--accent);padding:5px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;">钉钉登录</button>
+      <button id="dd-login-btn" onclick="ddLogin()" style="background:rgba(255,107,53,0.15);border:1px solid rgba(255,107,53,0.3);color:var(--accent);padding:5px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;">钉钉登录</button>
     </span>
   </span>
   <div class="stage-progress" style="margin-left:auto;">
@@ -533,7 +497,7 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
         <button class="btn btn-ghost btn-sm" onclick="logoutJudge()">退出</button>
       </div>
     </div>
-    <div id="judgeStageNotice" style="background:rgba(0,212,255,0.08);padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:var(--accent);border:1px solid rgba(0,212,255,0.15);">
+    <div id="judgeStageNotice" style="background:rgba(255,107,53,0.08);padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:var(--accent);border:1px solid rgba(255,107,53,0.15);">
       <b>📋 当前评审阶段：</b><span id="judgeStageLabel">初赛</span>
       <span id="judgeStageHint" style="margin-left:8px;color:var(--text-dim);">（本阶段打分独立计算，不影响其他阶段）</span>
     </div>
@@ -851,7 +815,7 @@ function updateVotingUI() {
     banner.innerHTML = '📋 当前为<strong>' + STAGE_LABELS[currentStage] + '</strong>阶段，不支持投票';
     banner.style.background = 'rgba(68,138,255,0.08)';
     banner.style.borderColor = 'rgba(68,138,255,0.2)';
-    banner.style.color = '#448aff';
+    banner.style.color = '#5b8ff9';
   } else {
     banner.style.display = 'block';
     banner.innerHTML = '⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道';
@@ -925,7 +889,7 @@ function linkify(text) {
   const urlRegex = /(https?:\/\/[^\s<]+)/gi;
   return text.replace(/\n/g, '<br>').replace(urlRegex, function(url) {
     let cleanUrl = url.replace(/[.,;:!?)\]]+$/, '');
-    return '<a href="' + cleanUrl + '" target="_blank" rel="noopener" style="color:#00d4ff;word-break:break-all;">' + cleanUrl + '</a>';
+    return '<a href="' + cleanUrl + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + cleanUrl + '</a>';
   });
 }
 
@@ -991,7 +955,7 @@ function renderStatsBar(containerId, stats) {
     html += '<div class="stat-card"><div class="num" style="color:#00e676;">' + stats.semiFinalists + '</div><div class="label">复赛晋级</div></div>';
   }
   if (stats.finalists !== undefined) {
-    html += '<div class="stat-card"><div class="num" style="color:#448aff;">' + stats.finalists + '</div><div class="label">决赛晋级</div></div>';
+    html += '<div class="stat-card"><div class="num" style="color:#5b8ff9;">' + stats.finalists + '</div><div class="label">决赛晋级</div></div>';
   }
   if (stats.awarded !== undefined) {
     html += '<div class="stat-card"><div class="num" style="color:#ffa726;">' + stats.awarded + '</div><div class="label">已获奖</div></div>';
@@ -1197,9 +1161,9 @@ async function openDetail(entryId) {
     }
     var attachHtml = '';
     if (e.attachmentName) {
-      attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/' + e.attachmentPath + '" download="' + e.attachmentName + '" style="color:#00d4ff;">📥 下载 ' + e.attachmentName + '</a></div></div>';
+      attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/' + e.attachmentPath + '" download="' + e.attachmentName + '" style="color:#ff6b35;">📥 下载 ' + e.attachmentName + '</a></div></div>';
     }
-    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + '</span><span style="font-size:13px;color:var(--text-dim);margin-left:8px;">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div><div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + e.scene + '</div></div><div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + e.process_text + '</div></div><div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + e.result_text + '</div></div>' + extraHtml + attachHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#00d4ff;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#00e676;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions">' + voteBtnHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + '</span><span style="font-size:13px;color:var(--text-dim);margin-left:8px;">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div><div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + e.scene + '</div></div><div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + e.process_text + '</div></div><div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + e.result_text + '</div></div>' + extraHtml + attachHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#00e676;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions">' + voteBtnHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
     document.getElementById('detailModal').style.display = 'flex';
   } catch(e) {
     showToast('加载失败：' + e.message, 'error');
@@ -1305,7 +1269,7 @@ async function renderJudgePanel() {
       const total = (s.practicality||0) + (s.innovation||0) + (s.scalability||0) + (s.presentation||0);
       const hasScored = myScores[e.id] ? 'scored' : '';
       const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
-      return '<tr class="' + hasScored + '"><td><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#00d4ff;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + e.dept + (e.subdept ? '/'+e.subdept : '') + '</td><td>' + trackLabel(e.track) + '</td><td><input type="number" min="0" max="30" value="' + (s.practicality||'') + '" id="j_p_' + e.id + '" placeholder="0-30"></td><td><input type="number" min="0" max="25" value="' + (s.innovation||'') + '" id="j_c_' + e.id + '" placeholder="0-25"></td><td><input type="number" min="0" max="25" value="' + (s.scalability||'') + '" id="j_s_' + e.id + '" placeholder="0-25"></td><td><input type="number" min="0" max="20" value="' + (s.presentation||'') + '" id="j_r_' + e.id + '" placeholder="0-20"></td><td><strong>' + total + '</strong></td><td><button class="btn btn-sm ' + (hasScored ? 'btn-success' : 'btn-primary') + '" onclick="saveScore(\'' + e.id + '\')">' + (hasScored ? '更新' : '打分') + '</button></td></tr>';
+      return '<tr class="' + hasScored + '"><td><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#ff6b35;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + e.dept + (e.subdept ? '/'+e.subdept : '') + '</td><td>' + trackLabel(e.track) + '</td><td><input type="number" min="0" max="30" value="' + (s.practicality||'') + '" id="j_p_' + e.id + '" placeholder="0-30"></td><td><input type="number" min="0" max="25" value="' + (s.innovation||'') + '" id="j_c_' + e.id + '" placeholder="0-25"></td><td><input type="number" min="0" max="25" value="' + (s.scalability||'') + '" id="j_s_' + e.id + '" placeholder="0-25"></td><td><input type="number" min="0" max="20" value="' + (s.presentation||'') + '" id="j_r_' + e.id + '" placeholder="0-20"></td><td><strong>' + total + '</strong></td><td><button class="btn btn-sm ' + (hasScored ? 'btn-success' : 'btn-primary') + '" onclick="saveScore(\'' + e.id + '\')">' + (hasScored ? '更新' : '打分') + '</button></td></tr>';
     }).join('');
   } catch(e) { console.error('Judge panel error:', e); }
 }
@@ -1453,7 +1417,7 @@ async function renderAdminDashboard() {
 
       var hasScores = e.scores.length > 0;
       var badge = awardBadge(e.award) || roundBadge(e.roundStatus);
-      return '<tr><td style="position:sticky;left:0;background:#080d24;z-index:1;"><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#00d4ff;font-weight:500;">' + e.title.substring(0,16) + (e.title.length>16?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + e.dept + (e.subdept ? '/'+e.subdept : '') + '</td><td>' + trackLabel(e.track) + '</td><td style="font-size:12px;">' + (ROUND_LABELS[e.roundStatus] || '初赛') + '</td>' + judgeCells + '<td style="font-weight:700;color:' + (hasScores ? '#00d4ff' : 'var(--text-dim)') + ';">' + (hasScores ? e.avgScore : '—') + '</td><td style="font-weight:700;color:#00e676;">' + (e.composite || '—') + '</td><td>' + (e.judgeCount||0) + '</td><td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry(\'' + e.id + '\')">删除</button></td></tr>';
+      return '<tr><td style="position:sticky;left:0;background:#080d24;z-index:1;"><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#ff6b35;font-weight:500;">' + e.title.substring(0,16) + (e.title.length>16?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + e.dept + (e.subdept ? '/'+e.subdept : '') + '</td><td>' + trackLabel(e.track) + '</td><td style="font-size:12px;">' + (ROUND_LABELS[e.roundStatus] || '初赛') + '</td>' + judgeCells + '<td style="font-weight:700;color:' + (hasScores ? '#ff6b35' : 'var(--text-dim)') + ';">' + (hasScores ? e.avgScore : '—') + '</td><td style="font-weight:700;color:#00e676;">' + (e.composite || '—') + '</td><td>' + (e.judgeCount||0) + '</td><td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry(\'' + e.id + '\')">删除</button></td></tr>';
     }).join('');
   } catch(e) {
     console.error('Admin dashboard error:', e);
