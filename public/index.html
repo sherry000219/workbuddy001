@@ -3,235 +3,363 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI赋能·全员进化 — WorkBuddy实战应用大赛</title>
+<title>云帐房头号玩家第二季 — WorkBuddy实战应用大赛</title>
 <script src="https://g.alicdn.com/dingding/dingtalk-jsapi/3.1.0/dingtalk.open.js"></script>
 <style>
+/* ===== RESET & BASE ===== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #333; min-height: 100vh; }
+:root {
+  --bg: #080d24; --bg-card: rgba(255,255,255,0.06); --bg-card-hover: rgba(255,255,255,0.1);
+  --text: #e0e6f0; --text-dim: #8890b0; --accent: #00d4ff; --accent2: #ff6ec7;
+  --green: #00e676; --gold: #ffd740; --red: #ff5252; --blue: #448aff;
+  --radius: 16px; --radius-sm: 10px;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-/* ===== Header ===== */
-.header { background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%); color: #fff; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-.header-left h1 { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
-.header-left p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
-.header-right { display: flex; align-items: center; gap: 12px; }
-.header-right .status-badge { background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 20px; font-size: 13px; }
+/* ===== HERO BANNER ===== */
+.hero { position: relative; width: 100%; min-height: 520px; background: linear-gradient(160deg, #080d24 0%, #0d1440 30%, #1a1050 60%, #0d1440 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, rgba(0,212,255,0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 70%, rgba(255,110,199,0.1) 0%, transparent 50%); z-index: 0; }
+.hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,212,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.06) 1px, transparent 1px); background-size: 40px 40px; z-index: 0; animation: gridMove 8s linear infinite; }
+@keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
+/* Code rain */
+.code-rain { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.code-drop { position: absolute; color: rgba(0,212,255,0.3); font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; white-space: nowrap; animation: fall linear infinite; }
+@keyframes fall { 0% { transform: translateY(-10%); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110%); opacity: 0; } }
+/* Hero content */
+.hero-content { position: relative; z-index: 2; text-align: center; padding: 60px 24px; max-width: 800px; }
+.hero-badge { display: inline-block; background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.3); color: var(--accent); padding: 6px 20px; border-radius: 20px; font-size: 13px; letter-spacing: 2px; margin-bottom: 20px; }
+.hero-title { font-size: clamp(28px, 5vw, 48px); font-weight: 800; background: linear-gradient(135deg, #fff 20%, var(--accent) 50%, var(--accent2) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; line-height: 1.3; }
+.hero-sub { font-size: clamp(16px, 3vw, 22px); color: rgba(255,255,255,0.7); font-weight: 300; letter-spacing: 1px; margin-bottom: 30px; }
+/* Cat mascot */
+.cat-container { position: relative; width: 120px; height: 120px; margin: 0 auto 24px; }
+.cat-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 20px rgba(0,212,255,0.4)); animation: catFloat 3s ease-in-out infinite; }
+@keyframes catFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+/* Keyboard */
+.kb-container { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; gap: 6px; }
+.kb-key { width: 28px; height: 34px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; color: rgba(255,255,255,0.5); font-size: 10px; display: flex; align-items: center; justify-content: center; font-family: monospace; transition: all 0.3s; animation: keyGlow 2s ease-in-out infinite; }
+@keyframes keyGlow { 0%, 100% { border-color: rgba(255,255,255,0.12); box-shadow: none; } 50% { border-color: rgba(0,212,255,0.4); box-shadow: 0 0 8px rgba(0,212,255,0.2); } }
 
-/* ===== Stage Bar ===== */
-.stage-bar { background: linear-gradient(90deg, #e6f0ff, #f0f5ff); border-bottom: 2px solid #1677ff; padding: 10px 32px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.stage-bar .stage-label { font-size: 15px; font-weight: 700; color: #1677ff; }
-.stage-bar .stage-progress { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; }
-.stage-bar .stage-dot { width: 10px; height: 10px; border-radius: 50%; background: #d9d9d9; }
-.stage-bar .stage-dot.active { background: #1677ff; box-shadow: 0 0 0 3px rgba(22,119,255,0.2); }
-.stage-bar .stage-dot.done { background: #52c41a; }
+/* ===== NAVIGATION CARDS ===== */
+.nav-section { max-width: 1100px; margin: -30px auto 0; padding: 0 24px; position: relative; z-index: 10; }
+.nav-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.nav-card { background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius); padding: 28px 16px 24px; cursor: pointer; text-align: center; transition: all 0.3s; position: relative; overflow: hidden; }
+.nav-card::before { content: ''; position: absolute; inset: 0; border-radius: var(--radius); opacity: 0; transition: opacity 0.3s; }
+.nav-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.2); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+.nav-card:hover::before { opacity: 1; }
+.nav-card.card-submit { border-top: 3px solid #ff9800; }
+.nav-card.card-submit:hover { box-shadow: 0 12px 40px rgba(255,152,0,0.2); }
+.nav-card.card-gallery { border-top: 3px solid var(--green); }
+.nav-card.card-gallery:hover { box-shadow: 0 12px 40px rgba(0,230,118,0.2); }
+.nav-card.card-ranking { border-top: 3px solid var(--gold); }
+.nav-card.card-ranking:hover { box-shadow: 0 12px 40px rgba(255,215,64,0.2); }
+.nav-card.card-judge { border-top: 3px solid var(--blue); }
+.nav-card.card-judge:hover { box-shadow: 0 12px 40px rgba(68,138,255,0.2); }
+.nav-card.card-admin { border-top: 3px solid var(--accent2); }
+.nav-card.card-admin:hover { box-shadow: 0 12px 40px rgba(255,110,199,0.2); }
+.nav-card .nc-icon { font-size: 44px; margin-bottom: 10px; display: block; filter: grayscale(0); transition: transform 0.3s; }
+.nav-card:hover .nc-icon { transform: scale(1.15); }
+.nav-card .nc-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.nav-card .nc-sub { font-size: 11px; color: var(--text-dim); }
 
-/* ===== Voting Banner ===== */
+/* ===== STAGE BAR ===== */
+.stage-bar { background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 10px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.stage-bar .stage-label { font-size: 14px; font-weight: 700; color: var(--accent); }
+.stage-bar .stage-progress { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim); }
+.stage-bar .stage-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+.stage-bar .stage-dot.active { background: var(--accent); box-shadow: 0 0 8px rgba(0,212,255,0.5); }
+.stage-bar .stage-dot.done { background: var(--green); }
+
+/* ===== VOTING BANNER ===== */
 #voting-banner { transition: all 0.3s ease; }
 
-/* ===== Tabs ===== */
-.tabs { background: #fff; display: flex; border-bottom: 1px solid #e8e8e8; padding: 0 32px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.tab { padding: 14px 24px; cursor: pointer; font-size: 15px; color: #666; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; font-weight: 500; }
-.tab:hover { color: #1677ff; }
-.tab.active { color: #1677ff; border-bottom-color: #1677ff; font-weight: 600; }
-.tab .badge { display: inline-block; background: #1677ff; color: #fff; font-size: 11px; padding: 1px 7px; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
-
-/* ===== Main ===== */
-.main { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
-.page { display: none; }
+/* ===== MAIN CONTENT ===== */
+.main-container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+/* Hidden tabs (kept for JS) */
+.tabs { display: none; }
+.page { display: none; animation: fadeIn 0.3s ease; }
 .page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ===== Stats ===== */
-.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.stat-card { background: #fff; border-radius: 10px; padding: 18px 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-.stat-card .num { font-size: 32px; font-weight: 700; color: #1677ff; }
-.stat-card .label { font-size: 13px; color: #999; margin-top: 4px; }
+/* ===== SECTION TITLES ===== */
+.section-title { font-size: 18px; font-weight: 700; margin: 28px 0 16px; color: #fff; display: flex; align-items: center; gap: 8px; }
+.section-title::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; }
 
-/* ===== Judge gap cards ===== */
-.judge-gap-card { background: #fff; border-radius: 8px; padding: 10px 14px; min-width: 140px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: relative; cursor: default; }
-.judge-gap-card .gap-judge { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.judge-gap-card .gap-bar { height: 4px; background: #f0f0f0; border-radius: 2px; margin-bottom: 4px; }
-.judge-gap-card .gap-fill { height: 100%; border-radius: 2px; background: #52c41a; transition: width 0.3s; }
-.judge-gap-card.gap-half .gap-fill { background: #faad14; }
-.judge-gap-card.gap-low .gap-fill { background: #ff4d4f; }
-.judge-gap-card .gap-nums { font-size: 11px; color: #999; }
-.judge-gap-card .gap-missing { font-size: 11px; color: #ff4d4f; cursor: pointer; margin-top: 2px; text-decoration: underline; border: none; background: none; padding: 0; }
-.judge-gap-card .gap-ok { font-size: 14px; color: #52c41a; font-weight: 700; margin-top: 2px; }
-.judge-gap-card.gap-done { border: 1px solid #b7eb8f; }
-.judge-gap-card.gap-half { border: 1px solid #ffe58f; }
-.judge-gap-card.gap-low { border: 1px solid #ffa39e; }
+/* ===== STATS ===== */
+.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-sm); padding: 18px 20px; text-align: center; }
+.stat-card .num { font-size: 30px; font-weight: 700; color: var(--accent); }
+.stat-card .label { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
 
-/* ===== Section ===== */
-.section-title { font-size: 18px; font-weight: 700; margin: 28px 0 16px; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
-.section-title::before { content: ''; width: 4px; height: 20px; background: #1677ff; border-radius: 2px; }
-
-/* ===== Buttons ===== */
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
-.btn-primary { background: #1677ff; color: #fff; }
-.btn-primary:hover { background: #0958d9; }
-.btn-success { background: #52c41a; color: #fff; }
-.btn-success:hover { background: #49ad17; }
-.btn-warning { background: #faad14; color: #fff; }
-.btn-outline { background: #fff; color: #1677ff; border: 1px solid #1677ff; }
-.btn-outline:hover { background: #e6f0ff; }
+/* ===== BUTTONS ===== */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; font-family: inherit; }
+.btn-primary { background: var(--accent); color: #080d24; font-weight: 600; }
+.btn-primary:hover { background: #33def8; }
+.btn-success { background: var(--green); color: #080d24; font-weight: 600; }
+.btn-success:hover { opacity: 0.85; }
+.btn-warning { background: #faad14; color: #080d24; }
+.btn-outline { background: transparent; color: var(--accent); border: 1px solid rgba(0,212,255,0.4); }
+.btn-outline:hover { background: rgba(0,212,255,0.1); border-color: var(--accent); }
 .btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 6px; }
-.btn-danger { background: #ff4d4f; color: #fff; }
-.btn-ghost { background: transparent; color: #666; }
-.btn-ghost:hover { background: #f5f5f5; }
-.btn-gold { background: linear-gradient(135deg, #ffd700, #ffa500); color: #fff; }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-ghost { background: transparent; color: var(--text-dim); }
+.btn-ghost:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.btn-gold { background: linear-gradient(135deg, #ffd740, #ff9800); color: #080d24; font-weight: 600; }
 
-/* ===== Form ===== */
-.form-card { background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+/* ===== FORM ===== */
+.form-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 28px; }
 .form-step { display: none; }
 .form-step.active { display: block; }
-.form-group { margin-bottom: 20px; }
-.form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #333; }
-.form-group label .required { color: #ff4d4f; margin-left: 2px; }
-.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; transition: border 0.2s; font-family: inherit; }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.15); }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.form-group label .required { color: var(--red); margin-left: 2px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-size: 14px; transition: border 0.2s; font-family: inherit; background: rgba(255,255,255,0.04); color: var(--text); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,212,255,0.15); }
 .form-group textarea { min-height: 100px; resize: vertical; }
-.form-hint { font-size: 12px; color: #999; margin-top: 4px; }
+.form-group select option { background: #1a1f3a; color: #fff; }
+.form-hint { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #f0f0f0; }
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
 
-/* ===== Success ===== */
+/* ===== SUCCESS ===== */
 .success-page { text-align: center; padding: 60px 20px; }
 .success-page .icon { font-size: 64px; margin-bottom: 20px; }
-.success-page h2 { font-size: 22px; color: #52c41a; margin-bottom: 8px; }
-.success-page p { color: #666; margin-bottom: 24px; }
+.success-page h2 { font-size: 22px; color: var(--green); margin-bottom: 8px; }
+.success-page p { color: var(--text-dim); margin-bottom: 24px; }
 
-/* ===== Gallery ===== */
-.gallery-toolbar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-.gallery-toolbar input[type="text"] { padding: 8px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; flex: 1; min-width: 200px; }
-.gallery-toolbar select { padding: 8px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; background: #fff; }
-.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
-.entry-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); transition: all 0.25s; border: 1px solid #f0f0f0; border-left: 4px solid transparent; position: relative; cursor: pointer; }
-.entry-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); transform: translateY(-2px); }
-
-/* Round status styles */
-.entry-card.rs-approved { border-left-color: #d9d9d9; }
-.entry-card.rs-semi_finalist { border-left-color: #52c41a; }
-.entry-card.rs-finalist { border-left-color: #1677ff; }
-.entry-card.rs-awarded { border-left-color: #ffd700; background: linear-gradient(135deg, #fffbe6, #fff); }
-.entry-card.rs-eliminated_semi, .entry-card.rs-eliminated_final { opacity: 0.5; border-left-color: #d9d9d9; filter: grayscale(0.6); }
-.entry-card.rs-eliminated_semi:hover, .entry-card.rs-eliminated_final:hover { opacity: 0.8; filter: grayscale(0.3); }
-
+/* ===== GALLERY ===== */
+.gallery-toolbar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.gallery-toolbar input[type="text"] { padding: 8px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-size: 14px; flex: 1; min-width: 200px; background: rgba(255,255,255,0.04); color: var(--text); }
+.gallery-toolbar select { padding: 8px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-size: 14px; background: rgba(255,255,255,0.06); color: var(--text); }
+.gallery-toolbar select option { background: #1a1f3a; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.entry-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 20px; transition: all 0.25s; border-left: 4px solid transparent; position: relative; cursor: pointer; }
+.entry-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+/* Round status */
+.entry-card.rs-approved { border-left-color: rgba(255,255,255,0.2); }
+.entry-card.rs-semi_finalist { border-left-color: var(--green); }
+.entry-card.rs-finalist { border-left-color: var(--blue); }
+.entry-card.rs-awarded { border-left-color: var(--gold); background: linear-gradient(135deg, rgba(255,215,64,0.08), transparent); }
+.entry-card.rs-eliminated_semi, .entry-card.rs-eliminated_final { opacity: 0.4; border-left-color: rgba(255,255,255,0.08); filter: grayscale(0.6); }
+.entry-card.rs-eliminated_semi:hover, .entry-card.rs-eliminated_final:hover { opacity: 0.75; filter: grayscale(0.3); }
+/* Badges */
 .round-badge { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 6px; vertical-align: middle; }
-.badge-semi { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
-.badge-final { background: #e6f7ff; color: #1677ff; border: 1px solid #91d5ff; }
-.badge-awarded { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
-.badge-eliminated { background: #f5f5f5; color: #999; border: 1px solid #d9d9d9; }
-
+.badge-semi { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+.badge-final { background: rgba(68,138,255,0.15); color: var(--blue); border: 1px solid rgba(68,138,255,0.3); }
+.badge-awarded { background: rgba(255,215,64,0.15); color: var(--gold); border: 1px solid rgba(255,215,64,0.3); }
+.badge-eliminated { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); }
+/* Track tags */
 .track-tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
-.track-efficiency { background: #e6f7ff; color: #1677ff; }
-.track-creative { background: #fff7e6; color: #fa8c16; }
-.track-business { background: #f6ffed; color: #52c41a; }
-.entry-card h3 { font-size: 17px; margin-bottom: 6px; color: #1a1a1a; }
-.entry-card .meta { font-size: 13px; color: #999; margin-bottom: 10px; }
-.entry-card .desc { font-size: 14px; color: #555; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.entry-card .card-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
-.score-display { font-size: 20px; font-weight: 700; color: #faad14; }
-.votes { font-size: 12px; color: #999; }
-.empty-state { text-align: center; padding: 60px 20px; color: #999; }
+.track-efficiency { background: rgba(0,212,255,0.1); color: var(--accent); }
+.track-creative { background: rgba(255,152,0,0.1); color: #ffa726; }
+.track-business { background: rgba(0,230,118,0.1); color: var(--green); }
+.entry-card h3 { font-size: 17px; margin-bottom: 6px; color: #fff; }
+.entry-card .meta { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; }
+.entry-card .desc { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.entry-card .card-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
+.score-display { font-size: 18px; font-weight: 700; color: var(--gold); }
+.votes { font-size: 12px; color: var(--text-dim); }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
 .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
 
-/* ===== Modal ===== */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal { background: #fff; border-radius: 16px; max-width: 700px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 32px; }
+/* ===== MODAL ===== */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+.modal { background: #1a1f3a; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius); max-width: 700px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 32px; }
 .modal h2 { font-size: 20px; margin-bottom: 16px; }
 .modal .detail-row { margin-bottom: 14px; }
-.modal .detail-row .dlabel { font-size: 12px; color: #999; margin-bottom: 2px; }
-.modal .detail-row .dvalue { font-size: 15px; color: #333; line-height: 1.6; white-space: pre-wrap; }
+.modal .detail-row .dlabel { font-size: 12px; color: var(--text-dim); margin-bottom: 2px; }
+.modal .detail-row .dvalue { font-size: 15px; color: var(--text); line-height: 1.6; white-space: pre-wrap; }
 .modal .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
 
-/* ===== Judge ===== */
-.judge-login { background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); text-align: center; max-width: 400px; margin: 40px auto; }
-.judge-login input { width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; margin: 10px 0; }
+/* ===== JUDGE ===== */
+.judge-login { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 40px; text-align: center; max-width: 400px; margin: 40px auto; }
+.judge-login input { width: 100%; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-size: 14px; margin: 10px 0; background: rgba(255,255,255,0.04); color: var(--text); }
 .judge-panel { display: none; }
 .judge-panel.active { display: block; }
-.score-table { width: 100%; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.score-table { width: 100%; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); overflow: hidden; }
 .score-table table { width: 100%; border-collapse: collapse; }
-.score-table th { background: #fafafa; padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #666; border-bottom: 1px solid #f0f0f0; }
-.score-table td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid #f5f5f5; }
-.score-table tr:hover td { background: #fafbff; }
-.score-table .scored td { background: #f6ffed; }
-.score-table input[type="number"] { width: 60px; padding: 6px 8px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; text-align: center; }
-.judge-name-display { font-size: 14px; color: #666; margin-bottom: 16px; }
+.score-table th { background: rgba(255,255,255,0.03); padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-dim); border-bottom: 1px solid rgba(255,255,255,0.06); }
+.score-table td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.score-table tr:hover td { background: rgba(255,255,255,0.03); }
+.score-table .scored td { background: rgba(0,230,118,0.05); }
+.score-table input[type="number"] { width: 60px; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; font-size: 14px; text-align: center; background: rgba(255,255,255,0.04); color: var(--text); }
+.judge-name-display { font-size: 14px; color: var(--text-dim); margin-bottom: 16px; }
 
-/* ===== Data Mgmt ===== */
-.data-card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; }
+/* ===== DATA MGMT ===== */
+.data-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
 .data-card h3 { font-size: 16px; margin-bottom: 12px; }
-.data-card p { font-size: 14px; color: #666; line-height: 1.8; }
+.data-card p { font-size: 14px; color: var(--text-dim); line-height: 1.8; }
 
-/* ===== Ranking ===== */
-.ranking-list { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-.rank-item { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f5f5f5; gap: 16px; cursor: pointer; }
+/* ===== RANKING ===== */
+.ranking-list { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); overflow: hidden; }
+.rank-item { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 16px; cursor: pointer; transition: background 0.2s; }
+.rank-item:hover { background: rgba(255,255,255,0.03); }
 .rank-item:last-child { border-bottom: none; }
 .rank-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
-.rank-num.top1 { background: #ffd700; color: #fff; }
-.rank-num.top2 { background: #c0c0c0; color: #fff; }
-.rank-num.top3 { background: #cd7f32; color: #fff; }
-.rank-num.normal { background: #f0f0f0; color: #666; }
+.rank-num.top1 { background: var(--gold); color: #080d24; }
+.rank-num.top2 { background: #c0c0c0; color: #080d24; }
+.rank-num.top3 { background: #cd7f32; color: #080d24; }
+.rank-num.normal { background: rgba(255,255,255,0.06); color: var(--text-dim); }
 .rank-info { flex: 1; min-width: 0; }
-.rank-info .rname { font-weight: 600; font-size: 15px; }
-.rank-info .rdept { font-size: 12px; color: #999; }
-.rank-score { font-size: 22px; font-weight: 700; color: #1677ff; flex-shrink: 0; }
+.rank-info .rname { font-weight: 600; font-size: 15px; color: #fff; }
+.rank-info .rdept { font-size: 12px; color: var(--text-dim); }
+.rank-score { font-size: 22px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
 
-/* ===== Promote Panel ===== */
-.promote-panel { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; }
+/* ===== PROMOTE PANEL ===== */
+.promote-panel { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
 .promote-panel h3 { font-size: 16px; margin-bottom: 8px; }
-.promote-entry { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-bottom: 1px solid #f5f5f5; }
-.promote-entry:hover { background: #fafbff; }
-.promote-entry input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+.promote-entry { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.promote-entry:hover { background: rgba(255,255,255,0.03); }
+.promote-entry input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
 .promote-entry .pe-title { font-weight: 500; font-size: 14px; flex: 1; }
-.promote-entry .pe-score { font-size: 13px; color: #999; }
-.award-select { padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; }
+.promote-entry .pe-score { font-size: 13px; color: var(--text-dim); }
+.award-select { padding: 4px 10px; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; font-size: 13px; background: rgba(255,255,255,0.06); color: var(--text); }
 
-/* ===== Toast ===== */
-.toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 28px; border-radius: 8px; font-size: 14px; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+/* ===== JUDGE GAP ===== */
+.judge-gap-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px 14px; min-width: 140px; cursor: default; }
+.judge-gap-card .gap-judge { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.judge-gap-card .gap-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 4px; }
+.judge-gap-card .gap-fill { height: 100%; border-radius: 2px; background: var(--green); transition: width 0.3s; }
+.judge-gap-card.gap-half .gap-fill { background: #faad14; }
+.judge-gap-card.gap-low .gap-fill { background: var(--red); }
+.judge-gap-card .gap-nums { font-size: 11px; color: var(--text-dim); }
+.judge-gap-card .gap-missing { font-size: 11px; color: var(--red); cursor: pointer; margin-top: 2px; }
+.judge-gap-card .gap-ok { font-size: 14px; color: var(--green); font-weight: 700; margin-top: 2px; }
+.judge-gap-card.gap-done { border-color: rgba(0,230,118,0.3); }
+.judge-gap-card.gap-half { border-color: rgba(250,173,20,0.3); }
+.judge-gap-card.gap-low { border-color: rgba(255,82,82,0.3); }
+
+/* ===== TOAST ===== */
+.toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: rgba(30,35,60,0.95); color: #fff; padding: 12px 28px; border-radius: 8px; font-size: 14px; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
 .toast.show { opacity: 1; }
-.toast.success { background: #52c41a; }
-.toast.error { background: #ff4d4f; }
+.toast.success { border-color: rgba(0,230,118,0.3); }
+.toast.error { border-color: rgba(255,82,82,0.3); }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .header { padding: 16px; }
-  .header-left h1 { font-size: 18px; }
-  .tabs { padding: 0 8px; }
-  .tab { padding: 12px 14px; font-size: 13px; }
-  .main { padding: 16px; }
+/* ===== DETAILS (settings) ===== */
+details summary { cursor: pointer; font-size: 15px; font-weight: 600; padding: 8px 0; color: var(--text-dim); }
+details summary:hover { color: #fff; }
+details select, details input[type="checkbox"] { accent-color: var(--accent); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .nav-grid { grid-template-columns: repeat(3, 1fr); }
+  .nav-card:last-child { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  .hero { min-height: 420px; }
+  .nav-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .nav-card { padding: 20px 12px 16px; }
   .gallery-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
   .stats-bar { grid-template-columns: repeat(2, 1fr); }
   .score-table { overflow-x: auto; }
-  .stage-bar { padding: 10px 16px; }
+  .main-container { padding: 0 12px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
-<div class="header">
-  <div class="header-left">
-    <h1>AI赋能·全员进化</h1>
-    <p>WorkBuddy 实战应用大赛 — 报名 · 展示 · 评审一站式平台</p>
+<!-- ===== HERO BANNER ===== -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="code-rain" id="codeRain"></div>
+  <div class="hero-content">
+    <div class="cat-container">
+      <svg class="cat-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <!-- Cat head -->
+        <ellipse cx="60" cy="55" rx="35" ry="30" fill="#2a2a4a" stroke="rgba(0,212,255,0.6)" stroke-width="2"/>
+        <!-- Ears -->
+        <polygon points="28,35 18,10 42,28" fill="#2a2a4a" stroke="rgba(0,212,255,0.5)" stroke-width="1.5"/>
+        <polygon points="92,35 102,10 78,28" fill="#2a2a4a" stroke="rgba(0,212,255,0.5)" stroke-width="1.5"/>
+        <polygon points="30,33 22,16 40,28" fill="rgba(255,110,199,0.15)"/>
+        <polygon points="90,33 98,16 80,28" fill="rgba(255,110,199,0.15)"/>
+        <!-- Eyes -->
+        <ellipse cx="48" cy="52" rx="10" ry="11" fill="#0a0a1a" stroke="rgba(0,212,255,0.7)" stroke-width="1.5"/>
+        <ellipse cx="72" cy="52" rx="10" ry="11" fill="#0a0a1a" stroke="rgba(0,212,255,0.7)" stroke-width="1.5"/>
+        <ellipse cx="48" cy="52" rx="6" ry="7" fill="#00d4ff"/>
+        <ellipse cx="72" cy="52" rx="6" ry="7" fill="#00d4ff"/>
+        <circle cx="50" cy="49" r="2.5" fill="#fff"/>
+        <circle cx="74" cy="49" r="2.5" fill="#fff"/>
+        <!-- Nose -->
+        <polygon points="60,63 57,68 63,68" fill="rgba(255,110,199,0.6)"/>
+        <!-- Mouth -->
+        <path d="M57 70 Q60 74 63 70" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+        <path d="M53 70 Q56 75 60 70" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+        <path d="M67 70 Q64 75 60 70" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+        <!-- Whiskers -->
+        <line x1="25" y1="55" x2="42" y2="58" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+        <line x1="25" y1="63" x2="42" y2="62" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+        <line x1="95" y1="55" x2="78" y2="58" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+        <line x1="95" y1="63" x2="78" y2="62" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+        <!-- Body/hands typing -->
+        <ellipse cx="60" cy="90" rx="28" ry="18" fill="#2a2a4a" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
+        <rect x="35" y="78" width="18" height="12" rx="3" fill="#2a2a4a" stroke="rgba(0,212,255,0.25)" stroke-width="1"/>
+        <rect x="67" y="78" width="18" height="12" rx="3" fill="#2a2a4a" stroke="rgba(0,212,255,0.25)" stroke-width="1"/>
+        <!-- Code symbols on keyboard -->
+        <text x="38" y="87" font-size="7" fill="rgba(0,212,255,0.5)" font-family="monospace">&lt;/&gt;</text>
+        <text x="70" y="87" font-size="7" fill="rgba(0,212,255,0.5)" font-family="monospace">{}</text>
+        <!-- Glasses/code visor -->
+        <rect x="36" y="46" width="24" height="8" rx="3" fill="none" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
+        <rect x="60" y="46" width="24" height="8" rx="3" fill="none" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
+        <line x1="60" y1="50" x2="60" y2="50" stroke="rgba(0,212,255,0.4)" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="hero-badge">YUNZHANGFANG · SEASON 2</div>
+    <h1 class="hero-title">云帐房头号玩家第二季</h1>
+    <p class="hero-sub">WorkBuddy 实战应用大赛</p>
   </div>
-  <div class="header-right">
-    <span class="status-badge">2026年7月–8月</span>
-    <span id="dd-user-area" style="display:none;">
-      <span id="dd-user-name" style="font-size:14px;font-weight:500;"></span>
-      <span id="dd-remaining" style="background:rgba(255,255,255,0.25);padding:2px 10px;border-radius:12px;font-size:12px;margin:0 8px;"></span>
-      <button onclick="ddLogout()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;">退出</button>
-    </span>
-    <span id="dd-login-area">
-      <button id="dd-login-btn" onclick="ddLogin()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:6px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;">钉钉登录</button>
-    </span>
+  <div class="kb-container">
+    <div class="kb-key" style="animation-delay:0s">Q</div><div class="kb-key" style="animation-delay:0.1s">W</div><div class="kb-key" style="animation-delay:0.2s">E</div><div class="kb-key" style="animation-delay:0.3s">R</div><div class="kb-key" style="animation-delay:0.4s">T</div><div class="kb-key" style="animation-delay:0.5s">Y</div>
+    <div class="kb-key" style="animation-delay:0.15s;background:rgba(0,212,255,0.12)">A</div><div class="kb-key" style="animation-delay:0.25s;background:rgba(0,212,255,0.12)">S</div><div class="kb-key" style="animation-delay:0.35s;background:rgba(0,212,255,0.12)">D</div><div class="kb-key" style="animation-delay:0.45s;background:rgba(0,212,255,0.12)">F</div>
+    <div class="kb-key" style="animation-delay:0.3s;background:rgba(255,110,199,0.12)">Z</div><div class="kb-key" style="animation-delay:0.4s;background:rgba(255,110,199,0.12)">X</div><div class="kb-key" style="animation-delay:0.5s;background:rgba(255,110,199,0.12)">C</div>
+  </div>
+</div>
+
+<!-- ===== NAVIGATION CARDS ===== -->
+<div class="nav-section">
+  <div class="nav-grid">
+    <div class="nav-card card-submit" onclick="switchTab('submit')">
+      <span class="nc-icon">✍️</span>
+      <div class="nc-title">报名投稿</div>
+      <div class="nc-sub">提交你的参赛作品</div>
+    </div>
+    <div class="nav-card card-gallery" onclick="switchTab('gallery')">
+      <span class="nc-icon">🎨</span>
+      <div class="nc-title">作品展示</div>
+      <div class="nc-sub">浏览所有参赛作品</div>
+    </div>
+    <div class="nav-card card-ranking" onclick="switchTab('ranking')">
+      <span class="nc-icon">🏆</span>
+      <div class="nc-title">实时排行</div>
+      <div class="nc-sub">查看综合得分排名</div>
+    </div>
+    <div class="nav-card card-judge" onclick="switchTab('judge')">
+      <span class="nc-icon">⚖️</span>
+      <div class="nc-title">评委入口</div>
+      <div class="nc-sub">评委打分评审</div>
+    </div>
+    <div class="nav-card card-admin" onclick="switchTab('admin')">
+      <span class="nc-icon">⚙️</span>
+      <div class="nc-title">管理员入口</div>
+      <div class="nc-sub">后台数据管理</div>
+    </div>
   </div>
 </div>
 
 <!-- Stage indicator bar -->
 <div class="stage-bar" id="stageBar">
   <span class="stage-label" id="stageLabel">📍 初赛阶段</span>
-  <div class="stage-progress">
-    <span class="stage-dot" id="dot-preliminary"></span> 初赛
+  <span style="display:flex;align-items:center;gap:6px;">
+    <span id="dd-user-area" style="display:none;">
+      <span id="dd-user-name" style="font-size:13px;font-weight:500;margin-right:6px;"></span>
+      <span id="dd-remaining" style="background:rgba(0,212,255,0.15);padding:2px 10px;border-radius:12px;font-size:11px;"></span>
+      <button onclick="ddLogout()" style="background:rgba(255,255,255,0.06);border:none;color:var(--text-dim);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:4px;">退出</button>
+    </span>
+    <span id="dd-login-area">
+      <button id="dd-login-btn" onclick="ddLogin()" style="background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.3);color:var(--accent);padding:5px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;">钉钉登录</button>
+    </span>
+  </span>
+  <div class="stage-progress" style="margin-left:auto;">
+    <span class="stage-dot active" id="dot-preliminary"></span> 初赛
     <span class="stage-dot" id="dot-semi_final"></span> 复赛
     <span class="stage-dot" id="dot-final"></span> 决赛
     <span class="stage-dot" id="dot-awarded"></span> 结算
@@ -239,11 +367,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 </div>
 
 <!-- Voting status banner -->
-<div id="voting-banner" style="display:none;background:#fff7e6;border:1px solid #ffd591;border-radius:8px;padding:12px 24px;margin:12px 16px;text-align:center;color:#ad6800;font-size:14px;">
+<div id="voting-banner" style="display:none;background:rgba(255,215,64,0.08);border:1px solid rgba(255,215,64,0.2);border-radius:8px;padding:12px 24px;margin:12px 16px;text-align:center;color:#ffd740;font-size:14px;">
   ⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道
 </div>
 
-<!-- ===== TABS ===== -->
+<!-- ===== HIDDEN TABS (for JS compatibility) ===== -->
 <div class="tabs" id="tabNav">
   <div class="tab active" data-tab="submit">报名投稿<span class="badge" id="badge-submit">0</span></div>
   <div class="tab" data-tab="gallery">作品展示<span class="badge" id="badge-gallery">0</span></div>
@@ -252,18 +380,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   <div class="tab" data-tab="admin">数据管理</div>
 </div>
 
-<!-- ===== MAIN ===== -->
-<div class="main">
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-container">
 
-<!-- ===== PAGE: SUBMIT ===== -->
+<!-- PAGE: SUBMIT -->
 <div class="page active" id="page-submit">
+  <div class="section-title">📝 报名投稿</div>
   <div class="stats-bar" id="submitStats"></div>
   <div class="form-card" id="formCard">
-    <div class="section-title">作品投稿</div>
-    <p style="color:#999;margin-bottom:20px;font-size:14px;">不限次数，每个场景可独立提交一个作品</p>
-
     <div class="form-step active" id="step1">
-      <div style="font-size:14px;color:#1677ff;margin-bottom:20px;font-weight:600;">第1步：基本信息</div>
+      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第1步：基本信息</div>
       <div class="form-row">
         <div class="form-group">
           <label>姓名 <span class="required">*</span></label>
@@ -301,12 +427,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
         <input type="text" id="f-title" placeholder="给你的作品起个吸引人的名字">
       </div>
       <div class="form-actions">
-        <button class="btn btn-primary" onclick="nextStep(2)">下一步</button>
+        <button class="btn btn-primary" onclick="nextStep(2)">下一步 →</button>
       </div>
     </div>
-
     <div class="form-step" id="step2">
-      <div style="font-size:14px;color:#1677ff;margin-bottom:20px;font-weight:600;">第2步：作品详情</div>
+      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第2步：作品详情</div>
       <div class="form-group">
         <label>场景描述 <span class="required">*</span></label>
         <textarea id="f-scene" rows="3" placeholder="描述你解决的是什么工作场景/问题？"></textarea>
@@ -320,7 +445,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
         <textarea id="f-result" rows="3" placeholder="使用WorkBuddy后的效果如何？推荐用量化数据"></textarea>
       </div>
       <div class="form-group">
-        <label>作品链接 / 附加信息（选填）<br><small style="font-weight:400;color:#1677ff;">建议上传钉钉文档链接或网页链接展示作品，评委可直接点击查看</small></label>
+        <label>作品链接 / 附加信息（选填）<br><small style="font-weight:400;color:var(--accent);">建议上传钉钉文档链接或网页链接展示作品，评委可直接点击查看</small></label>
         <textarea id="f-extra" rows="2" placeholder="粘贴钉钉文档链接、网页链接，或补充其他说明"></textarea>
         <div class="form-hint">链接提交后可在作品详情中直接点击跳转</div>
       </div>
@@ -329,25 +454,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <input type="file" id="f-attachment" style="display:none;" onchange="handleAttachmentSelect(event)">
           <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('f-attachment').click()">选择文件</button>
-          <span id="attachment-name" style="font-size:13px;color:#999;">未选择文件</span>
+          <span id="attachment-name" style="font-size:13px;color:var(--text-dim);">未选择文件</span>
           <button type="button" id="attachment-clear" class="btn btn-ghost btn-sm" style="display:none;" onclick="clearAttachment()">清除</button>
         </div>
         <div class="form-hint">支持图片、PDF、Word、Excel、压缩包等格式</div>
       </div>
       <div class="form-actions">
-        <button class="btn btn-outline" onclick="prevStep(1)">上一步</button>
+        <button class="btn btn-outline" onclick="prevStep(1)">← 上一步</button>
         <button class="btn btn-success" onclick="submitEntry()">提交作品</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===== PAGE: GALLERY ===== -->
+<!-- PAGE: GALLERY -->
 <div class="page" id="page-gallery">
+  <div class="section-title">🎨 作品展示</div>
   <div class="stats-bar" id="galleryStats"></div>
-  <div class="section-title">全部作品</div>
   <div class="gallery-toolbar">
-    <input type="text" id="gallerySearch" placeholder="搜索作品标题、姓名、部门..." oninput="renderGallery()">
+    <input type="text" id="gallerySearch" placeholder="🔍 搜索作品标题、作者..." oninput="renderGallery()">
     <select id="galleryTrack" onchange="renderGallery()">
       <option value="">全部赛道</option>
       <option value="efficiency">效率提升</option>
@@ -358,20 +483,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
       <option value="">全部部门</option>
     </select>
     <select id="gallerySort" onchange="renderGallery()">
-      <option value="newest">最新提交</option>
-      <option value="score">得分最高</option>
-      <option value="votes">投票最多</option>
+      <option value="votes">按票数排序</option>
+      <option value="score">按评分排序</option>
+      <option value="composite">按综合分排序</option>
+      <option value="newest">按发布时间</option>
     </select>
   </div>
   <div class="gallery-grid" id="galleryGrid"></div>
 </div>
 
-<!-- ===== PAGE: RANKING ===== -->
+<!-- PAGE: RANKING -->
 <div class="page" id="page-ranking">
+  <div class="section-title">🏆 <span id="rankingTitle">初赛 — 综合排名 Top 30</span></div>
   <div class="stats-bar" id="rankingStats"></div>
-  <div class="section-title" id="rankingTitle">综合排名 Top 30</div>
-  <p style="color:#999;font-size:14px;margin-bottom:16px;" id="rankingDesc"></p>
-  <div class="gallery-toolbar">
+  <p id="rankingDesc" style="color:var(--text-dim);margin-bottom:16px;font-size:13px;">按专家评审分（80%）+ 全员投票分（20%）合并计算</p>
+  <div class="gallery-toolbar" style="margin-bottom:16px;">
     <select id="rankTrack" onchange="renderRanking()">
       <option value="">全部赛道</option>
       <option value="efficiency">效率提升</option>
@@ -382,26 +508,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   <div class="ranking-list" id="rankingList"></div>
 </div>
 
-<!-- ===== PAGE: JUDGE ===== -->
+<!-- PAGE: JUDGE -->
 <div class="page" id="page-judge">
+  <div class="section-title">⚖️ 评委评审</div>
   <div class="judge-login" id="judgeLogin">
-    <div style="font-size:48px;margin-bottom:16px;">⚖️</div>
-    <h2>评委登录</h2>
-    <p style="color:#999;margin-top:8px;">请输入评委姓名和评审密码</p>
-    <div id="judge-auth-check" style="margin-top:20px;">
-      <input type="text" id="judgeNameInput" placeholder="评委姓名" style="width:100%;padding:10px 14px;border:1px solid #d9d9d9;border-radius:8px;font-size:14px;margin-bottom:10px;">
-      <input type="password" id="judgePwInput" placeholder="评审密码" onkeydown="if(event.key==='Enter')enterJudge()">
-      <button class="btn btn-primary" style="margin-top:8px;width:100%;" onclick="enterJudge()">进入评审</button>
-    </div>
+    <div style="font-size:48px;margin-bottom:16px;">🔐</div>
+    <h2 style="margin-bottom:8px;">评委登录</h2>
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:20px;">请输入评委姓名和评审密码</p>
+    <div id="judge-auth-check"></div>
+    <input type="text" id="judgeNameInput" placeholder="评委姓名" autocomplete="off">
+    <input type="password" id="judgePwInput" placeholder="评审密码" autocomplete="off">
+    <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="enterJudge()">进入评审</button>
   </div>
   <div class="judge-panel" id="judgePanel">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-      <div>
-        <div class="section-title" style="margin:0;">评委评审面板</div>
-        <div class="judge-name-display" id="judgeNameDisplay"></div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <select id="judgeTrackFilter" onchange="renderJudgePanel()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+      <span class="judge-name-display" id="judgeNameDisplay">当前评委：</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select id="judgeTrackFilter" onchange="renderJudgePanel()" style="padding:6px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;background:rgba(255,255,255,0.04);color:var(--text);">
           <option value="">全部赛道</option>
           <option value="efficiency">效率提升</option>
           <option value="creative">创意应用</option>
@@ -410,11 +533,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
         <button class="btn btn-ghost btn-sm" onclick="logoutJudge()">退出</button>
       </div>
     </div>
-    <div id="judgeStageNotice" style="background:#e6f7ff;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:#0958d9;border:1px solid #91d5ff;">
+    <div id="judgeStageNotice" style="background:rgba(0,212,255,0.08);padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:var(--accent);border:1px solid rgba(0,212,255,0.15);">
       <b>📋 当前评审阶段：</b><span id="judgeStageLabel">初赛</span>
-      <span id="judgeStageHint" style="margin-left:8px;color:#666;">（本阶段打分独立计算，不影响其他阶段）</span>
+      <span id="judgeStageHint" style="margin-left:8px;color:var(--text-dim);">（本阶段打分独立计算，不影响其他阶段）</span>
     </div>
-    <div style="background:#fff7e6;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:#8c6d00;">
+    <div style="background:rgba(255,215,64,0.06);padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:rgba(255,215,64,0.7);">
       <b>打分维度参考：</b>
       实用性(30%)：解决了真实工作问题 |
       创新性(25%)：场景/用法新颖有启发性 |
@@ -436,92 +559,65 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   </div>
 </div>
 
-<!-- ===== PAGE: ADMIN ===== -->
+<!-- PAGE: ADMIN -->
 <div class="page" id="page-admin">
-  <!-- Admin Login -->
+  <div class="section-title">⚙️ 数据管理</div>
   <div class="judge-login" id="adminLogin">
-    <div style="font-size:48px;margin-bottom:16px;">🔐</div>
-    <h2>管理后台</h2>
-    <p style="color:#999;margin-top:8px;">请输入管理员密码</p>
-    <div style="margin-top:20px;">
-      <input type="password" id="adminPwInput" placeholder="管理员密码" onkeydown="if(event.key==='Enter')adminLogin()" style="width:100%;padding:10px 14px;border:1px solid #d9d9d9;border-radius:8px;font-size:14px;">
-      <button class="btn btn-primary" style="margin-top:8px;width:100%;" onclick="adminLogin()">进入后台</button>
-    </div>
+    <div style="font-size:48px;margin-bottom:16px;">🛡️</div>
+    <h2 style="margin-bottom:8px;">管理员登录</h2>
+    <input type="password" id="adminPwInput" placeholder="管理员密码" autocomplete="off">
+    <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="adminLogin()">登录管理后台</button>
   </div>
-
-  <!-- Admin Dashboard -->
   <div class="judge-panel" id="adminPanel">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-      <div class="section-title" style="margin:0;">管理后台 · <span id="adminStageLabel">初赛</span></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-outline btn-sm" onclick="adminExportCSV()">📥 下载打分汇总CSV</button>
-        <button class="btn btn-outline btn-sm" onclick="exportData()">📦 导出全部数据JSON</button>
-        <button class="btn btn-outline btn-sm" onclick="exportCSV()">📊 导出作品CSV</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+      <span style="font-weight:600;color:var(--accent);">📊 当前阶段：<span id="adminStageLabel">初赛</span></span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm" onclick="adminExportCSV()">📥 导出CSV</button>
         <button class="btn btn-ghost btn-sm" onclick="adminLogout()">退出</button>
       </div>
     </div>
-
-    <!-- Summary stats -->
     <div class="stats-bar" id="adminStatsBar"></div>
-
-    <!-- Judge completion gap summary -->
     <div id="judgeGapSummary" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;"></div>
-
-    <!-- Stage Management Panel -->
     <div id="stageManagePanel"></div>
-
-    <!-- Settings section -->
     <details style="margin-bottom:20px;">
-      <summary style="cursor:pointer;font-size:15px;font-weight:600;padding:8px 0;color:#666;">⚙️ 系统设置 & 危险操作</summary>
-      <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-top:12px;">
-        <!-- Stage selector -->
+      <summary style="cursor:pointer;font-size:15px;font-weight:600;padding:8px 0;color:var(--text-dim);">⚙️ 系统设置 & 危险操作</summary>
+      <div style="background:var(--bg-card);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius);padding:24px;margin-top:12px;">
         <div style="margin-bottom:16px;">
           <label style="font-weight:500;display:block;margin-bottom:6px;">📌 当前阶段</label>
-          <select id="adminStageSelect" onchange="saveStageSelect()" style="width:100%;max-width:240px;padding:8px 12px;border:1px solid #d9d9d9;border-radius:8px;font-size:14px;">
+          <select id="adminStageSelect" onchange="saveStageSelect()" style="width:100%;max-width:240px;padding:8px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:14px;background:rgba(255,255,255,0.04);color:var(--text);">
             <option value="preliminary">初赛</option>
             <option value="semi_final">复赛</option>
             <option value="final">决赛</option>
-            <option value="awarded">已结算</option>
           </select>
-          <p style="color:#ff9800;font-size:12px;margin:6px 0 0 0;">⚠️ 手动切回初赛后，晋级标记依然存在；如需彻底回退请用下方「重置阶段」</p>
         </div>
-        <!-- Voting toggle -->
-        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0;">
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500;">
             <span>🔓 开启全员投票</span>
             <input type="checkbox" id="adminVotingToggle" onchange="saveVotingToggle()" style="width:18px;height:18px;">
           </label>
-          <p style="color:#999;font-size:12px;margin:4px 0 0 28px;">开启后，已登录的钉钉用户即可投票（当前阶段有效）</p>
+          <p style="color:var(--text-dim);font-size:12px;margin:4px 0 0 28px;">开启后，已登录的钉钉用户即可投票（当前阶段有效）</p>
         </div>
-        <!-- Reset operations -->
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0;">
-          <p style="color:#666;font-size:13px;margin-bottom:10px;">🔄 重置数据</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-sm" style="background:#faad14;color:#fff;" onclick="adminReset('stage')">🔄 重置阶段</button>
-            <button class="btn btn-sm" style="background:#ff7a45;color:#fff;" onclick="adminReset('full')">⚠️ 完全重置</button>
-          </div>
-          <div style="margin-top:8px;font-size:11px;color:#999;line-height:1.6;">
-            <p style="margin:2px 0;">🔄 <b>重置阶段</b>：清空晋级标记和获奖标记，回到初赛。保留投票记录和评委打分。</p>
-            <p style="margin:2px 0;">⚠️ <b>完全重置</b>：以上全部 + 清空所有投票和评委打分。保留作品投稿。</p>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
+          <p style="color:var(--text-dim);font-size:13px;margin-bottom:4px;">🔄 重置操作（保留作品投稿）</p>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="btn btn-outline btn-sm" onclick="adminReset('stage')">🔄 重置阶段</button>
+            <button class="btn btn-outline btn-sm" onclick="adminReset('full')">⚠️ 完全重置</button>
           </div>
         </div>
-        <!-- Dangerous operations -->
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0;">
-          <p style="color:#ff4d4f;font-size:13px;margin-bottom:10px;">💣 危险操作</p>
-          <div style="display:flex;gap:10px;">
-            <button class="btn btn-danger btn-sm" onclick="if(confirm('确定要清空所有数据吗？（包括作品、投票、打分）'))clearAllData('all')">清空所有数据</button>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,82,82,0.2);">
+          <p style="color:var(--red);font-size:13px;margin-bottom:4px;">⚠️ 清空数据（不可恢复）</p>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="btn btn-danger btn-sm" onclick="if(confirm('确定要清空所有数据吗？'))clearAllData('all')">清空所有数据</button>
             <button class="btn btn-danger btn-sm" onclick="if(confirm('确定要清空评委打分吗？'))clearAllData('scores')">清空评委打分</button>
           </div>
         </div>
       </div>
     </details>
-
-    <!-- Judge scores summary table -->
     <div class="score-table" style="overflow-x:auto;">
       <table style="min-width:900px;">
         <thead>
           <tr id="adminScoreHeaderRow">
-            <th style="position:sticky;left:0;background:#fafafa;z-index:1;">作品</th>
+            <th style="position:sticky;left:0;background:rgba(255,255,255,0.03);z-index:1;">作品</th>
             <th>姓名</th>
             <th>部门</th>
             <th>赛道</th>
@@ -539,7 +635,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   </div>
 </div>
 
-</div>
+</div><!-- .main-container -->
 
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
@@ -550,6 +646,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 </div>
 
 <script>
+// ========== CODE RAIN INIT ==========
+(function(){
+  var r = document.getElementById('codeRain');
+  if (!r) return;
+  var snippets = ['AI()', '{...}', 'api/', 'npm i', 'def ', 'async', 'await', 'class', 'const', 'let ', 'map()', 'JSON', '</>', '#tag', '1+1=2', 'var ', 'new ', 'this', '...s', '=>{}', 'log()', 'null', 'true', 'git '];
+  for (var i = 0; i < 25; i++) {
+    var d = document.createElement('div');
+    d.className = 'code-drop';
+    d.style.left = Math.random() * 100 + '%';
+    d.style.animationDuration = (6 + Math.random() * 8) + 's';
+    d.style.animationDelay = Math.random() * 8 + 's';
+    d.style.fontSize = (10 + Math.random() * 6) + 'px';
+    d.textContent = snippets[Math.floor(Math.random() * snippets.length)];
+    r.appendChild(d);
+  }
+})();
+
 // ========== STATE ==========
 let ddAuthed = false;
 let ddUser = null;
@@ -675,8 +788,8 @@ function updateUserUI() {
     userArea.style.gap = '6px';
     loginArea.style.display = 'none';
     document.getElementById('dd-user-name').textContent = ddUser.nick;
-    const stageLabel = isVotingStage ? `（${STAGE_LABELS[currentStage]}）` : '';
-    document.getElementById('dd-remaining').textContent = isVotingStage ? `剩余 ${ddRemaining} 票${stageLabel}` : STAGE_LABELS[currentStage];
+    const stageLabel = isVotingStage ? '（' + STAGE_LABELS[currentStage] + '）' : '';
+    document.getElementById('dd-remaining').textContent = isVotingStage ? '剩余 ' + ddRemaining + ' 票' + stageLabel : STAGE_LABELS[currentStage];
   } else {
     userArea.style.display = 'none';
     loginArea.style.display = 'inline';
@@ -686,9 +799,8 @@ function updateUserUI() {
 function updateStageUI() {
   const label = document.getElementById('stageLabel');
   if (label) {
-    label.textContent = `📍 ${STAGE_LABELS[currentStage] || '初赛'}阶段`;
+    label.textContent = '📍 ' + (STAGE_LABELS[currentStage] || '初赛') + '阶段';
   }
-  // Update stage dots
   const stages = ['preliminary', 'semi_final', 'final', 'awarded'];
   const currentIdx = stages.indexOf(currentStage);
   stages.forEach((s, i) => {
@@ -699,7 +811,6 @@ function updateStageUI() {
       else if (i === currentIdx) dot.classList.add('active');
     }
   });
-  // Update ranking description
   const desc = document.getElementById('rankingDesc');
   if (desc) {
     if (currentStage === 'final' || currentStage === 'awarded') {
@@ -708,13 +819,11 @@ function updateStageUI() {
       desc.textContent = '按专家评审分（80%）+ 全员投票分（20%）合并计算';
     }
   }
-  // Update ranking title
   const title = document.getElementById('rankingTitle');
   if (title) {
     const stageText = STAGE_LABELS[currentStage] || '初赛';
-    title.textContent = `${stageText} — 综合排名 Top 30`;
+    title.textContent = stageText + ' — 综合排名 Top 30';
   }
-  // Judge stage label
   const jsl = document.getElementById('judgeStageLabel');
   if (jsl) jsl.textContent = STAGE_LABELS[currentStage] || '初赛';
 }
@@ -739,16 +848,16 @@ function updateVotingUI() {
     banner.style.display = 'none';
   } else if (!isVotingStage) {
     banner.style.display = 'block';
-    banner.innerHTML = `📋 当前为<strong>${STAGE_LABELS[currentStage]}</strong>阶段，不支持投票`;
-    banner.style.background = '#f0f5ff';
-    banner.style.borderColor = '#adc6ff';
-    banner.style.color = '#2f54eb';
+    banner.innerHTML = '📋 当前为<strong>' + STAGE_LABELS[currentStage] + '</strong>阶段，不支持投票';
+    banner.style.background = 'rgba(68,138,255,0.08)';
+    banner.style.borderColor = 'rgba(68,138,255,0.2)';
+    banner.style.color = '#448aff';
   } else {
     banner.style.display = 'block';
-    banner.innerHTML = `⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道`;
-    banner.style.background = '#fff7e6';
-    banner.style.borderColor = '#ffd591';
-    banner.style.color = '#ad6800';
+    banner.innerHTML = '⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道';
+    banner.style.background = 'rgba(255,215,64,0.08)';
+    banner.style.borderColor = 'rgba(255,215,64,0.2)';
+    banner.style.color = '#ffd740';
   }
 }
 
@@ -778,11 +887,12 @@ function refreshCurrentPage() {
 }
 
 // ========== HELPERS ==========
-function showToast(msg, type='') {
+function showToast(msg, type) {
+  type = type || '';
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast ' + type + ' show';
-  setTimeout(() => t.className = 'toast', 2800);
+  setTimeout(function() { t.className = 'toast'; }, 2800);
 }
 
 function trackLabel(t) {
@@ -807,7 +917,7 @@ function roundBadge(rs) {
 
 function awardBadge(award) {
   if (!award) return '';
-  return `<span class="round-badge badge-awarded">${AWARD_LABELS[award] || award}</span>`;
+  return '<span class="round-badge badge-awarded">' + (AWARD_LABELS[award] || award) + '</span>';
 }
 
 function linkify(text) {
@@ -815,7 +925,7 @@ function linkify(text) {
   const urlRegex = /(https?:\/\/[^\s<]+)/gi;
   return text.replace(/\n/g, '<br>').replace(urlRegex, function(url) {
     let cleanUrl = url.replace(/[.,;:!?)\]]+$/, '');
-    return '<a href="' + cleanUrl + '" target="_blank" rel="noopener" style="color:#1677ff;word-break:break-all;">' + cleanUrl + '</a>';
+    return '<a href="' + cleanUrl + '" target="_blank" rel="noopener" style="color:#00d4ff;word-break:break-all;">' + cleanUrl + '</a>';
   });
 }
 
@@ -826,10 +936,12 @@ function formatFileSize(bytes) {
 }
 
 // ========== API CALLS ==========
-async function api(url, options = {}) {
+async function api(url, options) {
+  options = options || {};
   const resp = await fetch(url, {
-    ...options,
-    headers: { ...options.headers },
+    method: options.method || 'GET',
+    headers: options.headers || {},
+    body: options.body,
     credentials: 'include'
   });
   const data = await resp.json();
@@ -841,10 +953,10 @@ let allEntries = [];
 let judgePassword = '';
 
 // ========== TAB SWITCHING ==========
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
     tab.classList.add('active');
     document.getElementById('page-' + tab.dataset.tab).classList.add('active');
     switch(tab.dataset.tab) {
@@ -870,31 +982,30 @@ async function loadStats() {
 function renderStatsBar(containerId, stats) {
   const container = document.getElementById(containerId);
   if (!container || !stats) return;
-  let html = `
-    <div class="stat-card"><div class="num">${stats.totalEntries || 0}</div><div class="label">总投稿数</div></div>
-    <div class="stat-card"><div class="num">${stats.approvedEntries || 0}</div><div class="label">已收录作品</div></div>
-    <div class="stat-card"><div class="num">${stats.totalVotes || 0}</div><div class="label">${STAGE_LABELS[currentStage] || ''}投票数</div></div>
-    <div class="stat-card"><div class="num">${stats.judgeCount || 0}</div><div class="label">${STAGE_LABELS[currentStage] || ''}评委数</div></div>
-  `;
+  let html = '';
+  html += '<div class="stat-card"><div class="num">' + (stats.totalEntries || 0) + '</div><div class="label">总投稿数</div></div>';
+  html += '<div class="stat-card"><div class="num">' + (stats.approvedEntries || 0) + '</div><div class="label">已收录作品</div></div>';
+  html += '<div class="stat-card"><div class="num">' + (stats.totalVotes || 0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '投票数</div></div>';
+  html += '<div class="stat-card"><div class="num">' + (stats.judgeCount || 0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '评委数</div></div>';
   if (stats.semiFinalists !== undefined) {
-    html += `<div class="stat-card"><div class="num" style="color:#52c41a;">${stats.semiFinalists}</div><div class="label">复赛晋级</div></div>`;
+    html += '<div class="stat-card"><div class="num" style="color:#00e676;">' + stats.semiFinalists + '</div><div class="label">复赛晋级</div></div>';
   }
   if (stats.finalists !== undefined) {
-    html += `<div class="stat-card"><div class="num" style="color:#1677ff;">${stats.finalists}</div><div class="label">决赛晋级</div></div>`;
+    html += '<div class="stat-card"><div class="num" style="color:#448aff;">' + stats.finalists + '</div><div class="label">决赛晋级</div></div>';
   }
   if (stats.awarded !== undefined) {
-    html += `<div class="stat-card"><div class="num" style="color:#fa8c16;">${stats.awarded}</div><div class="label">已获奖</div></div>`;
+    html += '<div class="stat-card"><div class="num" style="color:#ffa726;">' + stats.awarded + '</div><div class="label">已获奖</div></div>';
   }
   container.innerHTML = html;
 }
 
 // ========== SUBMIT PAGE ==========
 function renderSubmitPage() {
-  loadStats().then(stats => renderStatsBar('submitStats', stats));
+  loadStats().then(function(stats) { renderStatsBar('submitStats', stats); });
   document.getElementById('formCard').style.display = 'block';
   document.getElementById('step1').classList.add('active');
   document.getElementById('step2').classList.remove('active');
-  ['f-name','f-subdept','f-title','f-scene','f-process','f-result','f-extra'].forEach(id => document.getElementById(id).value = '');
+  ['f-name','f-subdept','f-title','f-scene','f-process','f-result','f-extra'].forEach(function(id) { document.getElementById(id).value = ''; });
   document.getElementById('f-dept').value = '';
   document.getElementById('f-track').value = '';
   clearAttachment();
@@ -911,12 +1022,12 @@ function nextStep(n) {
   if (!subdept) return showToast('请填写子部门名称', 'error');
   if (!track) return showToast('请选择赛道', 'error');
   if (!title) return showToast('请填写作品标题', 'error');
-  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.form-step').forEach(function(s) { s.classList.remove('active'); });
   document.getElementById('step' + n).classList.add('active');
 }
 
 function prevStep(n) {
-  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.form-step').forEach(function(s) { s.classList.remove('active'); });
   document.getElementById('step' + n).classList.add('active');
 }
 
@@ -972,16 +1083,7 @@ async function submitEntry() {
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || '提交失败');
     showToast('作品提交成功！', 'success');
-    document.getElementById('formCard').innerHTML = `
-      <div class="success-page">
-        <div class="icon">🎉</div>
-        <h2>作品提交成功！</h2>
-        <p>你的作品已收录，可以在「作品展示」中查看。</p>
-        <p style="font-size:13px;color:#999;">每人可多次提交，欢迎继续投稿！</p>
-        <button class="btn btn-primary" onclick="location.reload()">继续投稿</button>
-        <button class="btn btn-outline" style="margin-left:8px;" onclick="switchTab('gallery')">查看全部作品</button>
-      </div>
-    `;
+    document.getElementById('formCard').innerHTML = '<div class="success-page"><div class="icon">🎉</div><h2>作品提交成功！</h2><p>你的作品已收录，可以在「作品展示」中查看。</p><p style="font-size:13px;color:var(--text-dim);">每人可多次提交，欢迎继续投稿！</p><button class="btn btn-primary" onclick="location.reload()">继续投稿</button><button class="btn btn-outline" style="margin-left:8px;" onclick="switchTab(\'gallery\')">查看全部作品</button></div>';
     loadStats();
   } catch(e) {
     showToast('提交失败：' + e.message, 'error');
@@ -996,10 +1098,10 @@ async function renderGallery() {
   const track = document.getElementById('galleryTrack').value;
   const dept = document.getElementById('galleryDept').value;
   const sort = document.getElementById('gallerySort').value;
-  let url = `/api/entries?sort=${sort}`;
-  if (track) url += `&track=${track}`;
-  if (dept) url += `&dept=${encodeURIComponent(dept)}`;
-  if (search) url += `&search=${encodeURIComponent(search)}`;
+  let url = '/api/entries?sort=' + sort;
+  if (track) url += '&track=' + track;
+  if (dept) url += '&dept=' + encodeURIComponent(dept);
+  if (search) url += '&search=' + encodeURIComponent(search);
   try {
     const data = await api(url);
     allEntries = data.entries;
@@ -1009,42 +1111,32 @@ async function renderGallery() {
     }
     const deptSelect = document.getElementById('galleryDept');
     const deptVal = deptSelect.value;
-    const depts = [...new Set(data.entries.map(e => e.dept))];
-    deptSelect.innerHTML = '<option value="">全部部门</option>' + depts.map(d => `<option value="${d}">${d}</option>`).join('');
+    const depts = [];
+    data.entries.forEach(function(e) { if (depts.indexOf(e.dept) === -1) depts.push(e.dept); });
+    deptSelect.innerHTML = '<option value="">全部部门</option>' + depts.map(function(d) { return '<option value="' + d + '">' + d + '</option>'; }).join('');
     deptSelect.value = deptVal;
     const grid = document.getElementById('galleryGrid');
     if (data.entries.length === 0) {
       grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">📭</div><p>暂无作品，快来投稿吧！</p></div>';
       return;
     }
-    grid.innerHTML = data.entries.map(e => {
+    grid.innerHTML = data.entries.map(function(e) {
       const rs = e.roundStatus || 'approved';
       const rsClass = 'rs-' + rs;
       const badge = awardBadge(e.award) || roundBadge(rs);
       const isEliminated = rs === 'eliminated_semi' || rs === 'eliminated_final';
-      // Show vote button only for votable entries in voting stages
       const canVote = isVotingStage && !isEliminated && rs !== 'awarded' && rs !== 'finalist';
       let voteBtn = '';
       if (isVotingStage && canVote) {
-        voteBtn = `<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();voteEntry('${e.id}')">👍 投票</button>`;
+        voteBtn = '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();voteEntry(\'' + e.id + '\')">👍 投票</button>';
       } else if (!isVotingStage) {
-        voteBtn = `<span style="font-size:12px;color:#ccc;">${STAGE_LABELS[currentStage]}阶段</span>`;
+        voteBtn = '<span style="font-size:12px;color:var(--text-dim);">' + (STAGE_LABELS[currentStage] || '') + '阶段</span>';
       }
-      return `
-      <div class="entry-card ${rsClass}" onclick="openDetail('${e.id}')">
-        <span class="track-tag ${trackClass(e.track)}">${trackLabel(e.track)}${e.attachmentName ? ' 📎' : ''}</span>${badge}
-        <h3>${e.title}</h3>
-        <div class="meta">${e.name} · ${e.dept}${e.subdept ? ' / ' + e.subdept : ''} · ${new Date(e.createdAt).toLocaleDateString('zh-CN')}</div>
-        <div class="desc">${e.scene}</div>
-        ${e.extra ? `<div style="font-size:13px;color:#1677ff;margin-top:8px;word-break:break-all;">${linkify(e.extra.substring(0,100))}${e.extra.length>100?'...':''}</div>` : ''}
-        <div class="card-footer">
-          <div style="display:flex;align-items:center;gap:16px;">
-            <span class="score-display">${e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分'}</span>
-            <span class="votes">👍 ${e.voteCount} 票</span>
-          </div>
-          ${voteBtn}
-        </div>
-      </div>`;
+      var extraHtml = '';
+      if (e.extra) {
+        extraHtml = '<div style="font-size:13px;color:var(--accent);margin-top:8px;word-break:break-all;">' + linkify(e.extra.substring(0,100)) + (e.extra.length>100?'...':'') + '</div>';
+      }
+      return '<div class="entry-card ' + rsClass + '" onclick="openDetail(\'' + e.id + '\')"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + (e.attachmentName ? ' 📎' : '') + '</span>' + badge + '<h3>' + e.title + '</h3><div class="meta">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + new Date(e.createdAt).toLocaleDateString('zh-CN') + '</div><div class="desc">' + e.scene + '</div>' + extraHtml + '<div class="card-footer"><div style="display:flex;align-items:center;gap:16px;"><span class="score-display">' + (e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分') + '</span><span class="votes">👍 ' + (e.voteCount||0) + ' 票</span></div>' + voteBtn + '</div></div>';
     }).join('');
   } catch(e) {
     console.error('Gallery error:', e);
@@ -1065,11 +1157,11 @@ async function voteEntry(entryId) {
     return;
   }
   if (ddRemaining <= 0) {
-    showToast(`你的${STAGE_LABELS[currentStage]}5票已用完`, 'error');
+    showToast('你的' + (STAGE_LABELS[currentStage] || '') + '5票已用完', 'error');
     return;
   }
   try {
-    const resp = await fetch(`/api/votes/${entryId}`, {
+    const resp = await fetch('/api/votes/' + entryId, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
@@ -1089,7 +1181,7 @@ async function voteEntry(entryId) {
 // ========== DETAIL MODAL ==========
 async function openDetail(entryId) {
   try {
-    const data = await api(`/api/entries/${entryId}`);
+    const data = await api('/api/entries/' + entryId);
     const e = data.entry;
     const rs = e.roundStatus || 'approved';
     const badge = awardBadge(e.award) || roundBadge(rs);
@@ -1097,30 +1189,17 @@ async function openDetail(entryId) {
     const canVote = isVotingStage && rs !== 'eliminated_semi' && rs !== 'eliminated_final' && rs !== 'awarded' && rs !== 'finalist';
     let voteBtnHtml = '';
     if (isVotingStage && canVote) {
-      voteBtnHtml = `<button class="btn btn-outline btn-sm" onclick="voteEntry('${e.id}')">👍 投票</button>`;
+      voteBtnHtml = '<button class="btn btn-outline btn-sm" onclick="voteEntry(\'' + e.id + '\')">👍 投票</button>';
     }
-    document.getElementById('detailContent').innerHTML = `
-      <h2>${e.title} ${badge}</h2>
-      <div style="margin-bottom:12px;">
-        <span class="track-tag ${trackClass(e.track)}">${trackLabel(e.track)}</span>
-        <span style="font-size:13px;color:#999;margin-left:8px;">${e.name} · ${e.dept}${e.subdept ? ' / ' + e.subdept : ''} · ${new Date(e.createdAt).toLocaleString('zh-CN')}</span>
-      </div>
-      <div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">${e.scene}</div></div>
-      <div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">${e.process_text}</div></div>
-      <div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">${e.result_text}</div></div>
-      ${e.extra ? `<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">${linkify(e.extra)}</div></div>` : ''}
-      ${e.attachmentName ? `<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/${e.attachmentPath}" download="${e.attachmentName}" style="color:#1677ff;">📥 下载 ${e.attachmentName}</a></div></div>` : ''}
-      <div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0;flex-wrap:wrap;">
-        <div><span style="font-size:24px;font-weight:700;color:#1677ff;">${e.avgScore || '-'}</span><span style="font-size:12px;color:#999;"> ${stageText}评委均分</span></div>
-        <div><span style="font-size:16px;font-weight:600;">👍 ${e.voteCount}</span><span style="font-size:12px;color:#999;"> ${stageText}票</span></div>
-        <div><span style="font-size:16px;font-weight:600;color:#faad14;">${e.judgeCount}</span><span style="font-size:12px;color:#999;"> 位评委打分</span></div>
-        <div><span style="font-size:16px;font-weight:700;color:#52c41a;">${e.composite || '-'}</span><span style="font-size:12px;color:#999;"> 综合分</span></div>
-      </div>
-      <div class="modal-actions">
-        ${voteBtnHtml}
-        <button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button>
-      </div>
-    `;
+    var extraHtml = '';
+    if (e.extra) {
+      extraHtml = '<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">' + linkify(e.extra) + '</div></div>';
+    }
+    var attachHtml = '';
+    if (e.attachmentName) {
+      attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/' + e.attachmentPath + '" download="' + e.attachmentName + '" style="color:#00d4ff;">📥 下载 ' + e.attachmentName + '</a></div></div>';
+    }
+    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + '</span><span style="font-size:13px;color:var(--text-dim);margin-left:8px;">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div><div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + e.scene + '</div></div><div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + e.process_text + '</div></div><div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + e.result_text + '</div></div>' + extraHtml + attachHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#00d4ff;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#00e676;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions">' + voteBtnHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
     document.getElementById('detailModal').style.display = 'flex';
   } catch(e) {
     showToast('加载失败：' + e.message, 'error');
@@ -1136,7 +1215,7 @@ async function renderRanking() {
   updateStageUI();
   const track = document.getElementById('rankTrack').value;
   let url = '/api/ranking';
-  if (track) url += `?track=${track}`;
+  if (track) url += '?track=' + track;
   try {
     const data = await api(url);
     if (data.currentStage) {
@@ -1148,19 +1227,11 @@ async function renderRanking() {
       list.innerHTML = '<div class="empty-state"><div class="icon">🏆</div><p>暂无排名数据</p></div>';
       return;
     }
-    list.innerHTML = data.ranking.map((e, i) => {
+    list.innerHTML = data.ranking.map(function(e, i) {
       const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : 'normal';
       const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
       const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
-      return `
-      <div class="rank-item" onclick="openDetail('${e.id}')">
-        <div class="rank-num ${rankClass}">${medal || (i+1)}</div>
-        <div class="rank-info">
-          <div class="rname">${e.title} ${badge}</div>
-          <div class="rdept">${e.name} · ${e.dept}${e.subdept ? ' / ' + e.subdept : ''} · ${trackLabel(e.track)}</div>
-        </div>
-        <div class="rank-score">${e.composite}</div>
-      </div>`;
+      return '<div class="rank-item" onclick="openDetail(\'' + e.id + '\')"><div class="rank-num ' + rankClass + '">' + (medal || (i+1)) + '</div><div class="rank-info"><div class="rname">' + e.title + ' ' + badge + '</div><div class="rdept">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + trackLabel(e.track) + '</div></div><div class="rank-score">' + (e.composite||0) + '</div></div>';
     }).join('');
   } catch(e) { console.error('Ranking error:', e); }
 }
@@ -1200,74 +1271,60 @@ async function renderJudgePanel() {
   if (!judgeName || !judgePassword) return;
   const track = document.getElementById('judgeTrackFilter').value;
   let url = '/api/entries?sort=newest';
-  if (track) url += `&track=${track}`;
+  if (track) url += '&track=' + track;
   try {
     const data = await api(url);
     if (data.currentStage) {
       currentStage = data.currentStage;
       updateStageUI();
     }
-    // Fetch existing scores for current stage
     let myScores = {};
     try {
-      const resp = await fetch(`/api/judge/my-scores?judgeName=${encodeURIComponent(judgeName)}&judgePassword=${encodeURIComponent(judgePassword)}`);
+      const resp = await fetch('/api/judge/my-scores?judgeName=' + encodeURIComponent(judgeName) + '&judgePassword=' + encodeURIComponent(judgePassword));
       if (resp.ok) {
         const sdata = await resp.json();
-        (sdata.scores || []).forEach(s => { myScores[s.entryId] = s; });
+        (sdata.scores || []).forEach(function(s) { myScores[s.entryId] = s; });
       }
     } catch(e) {}
 
-    // Filter entries based on current stage
     let judgableEntries = data.entries;
     if (currentStage === 'semi_final') {
-      judgableEntries = data.entries.filter(e => e.roundStatus === 'semi_finalist');
+      judgableEntries = data.entries.filter(function(e) { return e.roundStatus === 'semi_finalist'; });
     } else if (currentStage === 'final' || currentStage === 'awarded') {
-      judgableEntries = data.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
+      judgableEntries = data.entries.filter(function(e) { return e.roundStatus === 'finalist' || e.roundStatus === 'awarded'; });
     }
 
     const tbody = document.getElementById('judgeTableBody');
     if (judgableEntries.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">当前阶段（${STAGE_LABELS[currentStage]}）没有可评审的作品</td></tr>`;
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-dim);">当前阶段（' + (STAGE_LABELS[currentStage] || '初赛') + '）没有可评审的作品</td></tr>';
       return;
     }
 
-    tbody.innerHTML = judgableEntries.map(e => {
+    tbody.innerHTML = judgableEntries.map(function(e) {
       const s = myScores[e.id] || {};
       const total = (s.practicality||0) + (s.innovation||0) + (s.scalability||0) + (s.presentation||0);
       const hasScored = myScores[e.id] ? 'scored' : '';
       const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
-      return `
-      <tr class="${hasScored}">
-        <td><a href="javascript:void(0)" onclick="openDetail('${e.id}')" style="color:#1677ff;">${e.title.substring(0,18)}${e.title.length>18?'...':''}</a> ${badge}</td>
-        <td>${e.name}</td>
-        <td>${e.dept}${e.subdept ? '/'+e.subdept : ''}</td>
-        <td>${trackLabel(e.track)}</td>
-        <td><input type="number" min="0" max="30" value="${s.practicality||''}" id="j_p_${e.id}" placeholder="0-30"></td>
-        <td><input type="number" min="0" max="25" value="${s.innovation||''}" id="j_c_${e.id}" placeholder="0-25"></td>
-        <td><input type="number" min="0" max="25" value="${s.scalability||''}" id="j_s_${e.id}" placeholder="0-25"></td>
-        <td><input type="number" min="0" max="20" value="${s.presentation||''}" id="j_r_${e.id}" placeholder="0-20"></td>
-        <td><strong>${total}</strong></td>
-        <td><button class="btn btn-sm ${hasScored ? 'btn-success' : 'btn-primary'}" onclick="saveScore('${e.id}')">${hasScored ? '更新' : '打分'}</button></td>
-      </tr>`;
+      return '<tr class="' + hasScored + '"><td><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#00d4ff;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + e.dept + (e.subdept ? '/'+e.subdept : '') + '</td><td>' + trackLabel(e.track) + '</td><td><input type="number" min="0" max="30" value="' + (s.practicality||'') + '" id="j_p_' + e.id + '" placeholder="0-30"></td><td><input type="number" min="0" max="25" value="' + (s.innovation||'') + '" id="j_c_' + e.id + '" placeholder="0-25"></td><td><input type="number" min="0" max="25" value="' + (s.scalability||'') + '" id="j_s_' + e.id + '" placeholder="0-25"></td><td><input type="number" min="0" max="20" value="' + (s.presentation||'') + '" id="j_r_' + e.id + '" placeholder="0-20"></td><td><strong>' + total + '</strong></td><td><button class="btn btn-sm ' + (hasScored ? 'btn-success' : 'btn-primary') + '" onclick="saveScore(\'' + e.id + '\')">' + (hasScored ? '更新' : '打分') + '</button></td></tr>';
     }).join('');
   } catch(e) { console.error('Judge panel error:', e); }
 }
 
 async function saveScore(entryId) {
-  const p = parseInt(document.getElementById('j_p_' + entryId)?.value) || 0;
-  const c = parseInt(document.getElementById('j_c_' + entryId)?.value) || 0;
-  const s = parseInt(document.getElementById('j_s_' + entryId)?.value) || 0;
-  const r = parseInt(document.getElementById('j_r_' + entryId)?.value) || 0;
+  const p = parseInt(document.getElementById('j_p_' + entryId).value) || 0;
+  const c = parseInt(document.getElementById('j_c_' + entryId).value) || 0;
+  const s = parseInt(document.getElementById('j_s_' + entryId).value) || 0;
+  const r = parseInt(document.getElementById('j_r_' + entryId).value) || 0;
   if (p > 30 || c > 25 || s > 25 || r > 20) {
     return showToast('分数超出上限，请检查！', 'error');
   }
   try {
-    const data = await api(`/api/judge/scores/${entryId}`, {
+    const data = await api('/api/judge/scores/' + entryId, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ judgeName, practicality: p, innovation: c, scalability: s, presentation: r, judgePassword })
+      body: JSON.stringify({ judgeName: judgeName, practicality: p, innovation: c, scalability: s, presentation: r, judgePassword: judgePassword })
     });
-    showToast(`打分已保存！总分：${data.total}（${STAGE_LABELS[data.stage] || ''}）`, 'success');
+    showToast('打分已保存！总分：' + data.total + '（' + (STAGE_LABELS[data.stage] || '') + '）', 'success');
     renderJudgePanel();
   } catch(e) {
     showToast(e.message, 'error');
@@ -1340,99 +1397,63 @@ async function renderAdminDashboard() {
       updateStageUI();
       updateAdminStageLabel();
     }
-    const { entryScores, allJudges, summary } = data;
+    const entryScores = data.entryScores;
+    const allJudges = data.allJudges;
+    const summary = data.summary;
 
-    // Stats bar
     const statsBar = document.getElementById('adminStatsBar');
-    statsBar.innerHTML = `
-      <div class="stat-card"><div class="num">${summary.totalEntries}</div><div class="label">${STAGE_LABELS[currentStage]}作品</div></div>
-      <div class="stat-card"><div class="num">${summary.totalJudges}</div><div class="label">评委人数</div></div>
-      <div class="stat-card"><div class="num">${summary.totalScores}</div><div class="label">打分总数</div></div>
-      <div class="stat-card"><div class="num">${summary.scoredEntries}</div><div class="label">已评作品</div></div>
-      <div class="stat-card"><div class="num" style="color:#ff4d4f;">${summary.unscoredEntries}</div><div class="label">未评作品</div></div>
-    `;
+    statsBar.innerHTML = '<div class="stat-card"><div class="num">' + (summary.totalEntries||0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '作品</div></div><div class="stat-card"><div class="num">' + (summary.totalJudges||0) + '</div><div class="label">评委人数</div></div><div class="stat-card"><div class="num">' + (summary.totalScores||0) + '</div><div class="label">打分总数</div></div><div class="stat-card"><div class="num">' + (summary.scoredEntries||0) + '</div><div class="label">已评作品</div></div><div class="stat-card"><div class="num" style="color:#ff5252;">' + (summary.unscoredEntries||0) + '</div><div class="label">未评作品</div></div>';
 
-    // Render stage management panel
     renderStageManagePanel(entryScores);
 
-    // Judge completion summary
-    const unscoredMap = {}; // judge -> [entry titles]
+    var unscoredMap = {};
     if (allJudges.length > 0 && entryScores.length > 0) {
-      allJudges.forEach(judge => { unscoredMap[judge] = []; });
-      entryScores.forEach(e => {
-        allJudges.forEach(judge => {
-          if (!e.scores.find(sc => sc.judgeName === judge)) {
+      allJudges.forEach(function(judge) { unscoredMap[judge] = []; });
+      entryScores.forEach(function(e) {
+        allJudges.forEach(function(judge) {
+          if (!e.scores.find(function(sc) { return sc.judgeName === judge; })) {
             unscoredMap[judge].push(e.title.substring(0, 12));
           }
         });
       });
     }
-    const judgeGapCards = allJudges.map(judge => {
-      const missing = unscoredMap[judge] || [];
-      const done = (entryScores.length || 1) - missing.length;
-      const pct = Math.round(done / Math.max(1, entryScores.length) * 100);
-      const doneClass = pct === 100 ? 'gap-done' : (pct >= 50 ? 'gap-half' : 'gap-low');
-      const titleList = missing.length > 0 ? missing.join('、') : '全部完成 ✓';
-      return `<div class="judge-gap-card ${doneClass}" title="${judge}: ${titleList}">
-        <div class="gap-judge">${judge}</div>
-        <div class="gap-bar"><div class="gap-fill" style="width:${pct}%"></div></div>
-        <div class="gap-nums">${done}/${entryScores.length} 完成</div>
-        ${missing.length > 0 ? `<div class="gap-missing" onclick="event.stopPropagation();showToast('${judge} 未评: ${titleList}', 'info')">${missing.length}个待评</div>` : '<div class="gap-ok">✓</div>'}
-      </div>`;
+    var judgeGapCards = allJudges.map(function(judge) {
+      var missing = unscoredMap[judge] || [];
+      var done = (entryScores.length || 1) - missing.length;
+      var pct = Math.round(done / Math.max(1, entryScores.length) * 100);
+      var doneClass = pct === 100 ? 'gap-done' : (pct >= 50 ? 'gap-half' : 'gap-low');
+      var titleList = missing.length > 0 ? missing.join('、') : '全部完成 ✓';
+      var missingHtml = missing.length > 0 ? '<div class="gap-missing" onclick="event.stopPropagation();showToast(\'' + judge + ' 未评: ' + titleList + '\', \'info\')">' + missing.length + '个待评</div>' : '<div class="gap-ok">✓</div>';
+      return '<div class="judge-gap-card ' + doneClass + '" title="' + judge + ': ' + titleList + '"><div class="gap-judge">' + judge + '</div><div class="gap-bar"><div class="gap-fill" style="width:' + pct + '%"></div></div><div class="gap-nums">' + done + '/' + entryScores.length + ' 完成</div>' + missingHtml + '</div>';
     }).join('');
 
-    document.getElementById('judgeGapSummary').innerHTML = allJudges.length > 0
-      ? judgeGapCards
-      : '<div style="color:#999;font-size:13px;">暂无评委数据</div>';
+    document.getElementById('judgeGapSummary').innerHTML = allJudges.length > 0 ? judgeGapCards : '<div style="color:var(--text-dim);font-size:13px;">暂无评委数据</div>';
 
-    // Build table header - one th per judge to match tbody columns
-    const headerRow = document.getElementById('adminScoreHeaderRow');
-    const judgeHeaders = allJudges.length > 0
-      ? allJudges.map(j => `<th>${j}<br><small>总分</small></th>`).join('')
+    var headerRow = document.getElementById('adminScoreHeaderRow');
+    var judgeHeaders = allJudges.length > 0
+      ? allJudges.map(function(j) { return '<th>' + j + '<br><small>总分</small></th>'; }).join('')
       : '<th>暂无评委评分</th>';
-    headerRow.innerHTML = `
-      <th style="position:sticky;left:0;background:#fafafa;z-index:1;">作品</th>
-      <th>姓名</th>
-      <th>部门</th>
-      <th>赛道</th>
-      <th>轮次</th>
-      ${judgeHeaders}
-      <th>均分</th>
-      <th>综合分</th>
-      <th>评委数</th>
-      <th>操作</th>`;
+    headerRow.innerHTML = '<th style="position:sticky;left:0;background:rgba(255,255,255,0.03);z-index:1;">作品</th><th>姓名</th><th>部门</th><th>赛道</th><th>轮次</th>' + judgeHeaders + '<th>均分</th><th>综合分</th><th>评委数</th><th>操作</th>';
 
-    const tbody = document.getElementById('adminScoreBody');
+    var tbody = document.getElementById('adminScoreBody');
     if (entryScores.length === 0) {
-      const totalCols = 9 + Math.max(1, allJudges.length);
-      tbody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align:center;padding:40px;color:#999;">当前阶段暂无可评审作品</td></tr>`;
+      var totalCols = 9 + Math.max(1, allJudges.length);
+      tbody.innerHTML = '<tr><td colspan="' + totalCols + '" style="text-align:center;padding:40px;color:var(--text-dim);">当前阶段暂无可评审作品</td></tr>';
       return;
     }
 
-    tbody.innerHTML = entryScores.map(e => {
-      const judgeCells = allJudges.map(judge => {
-        const s = e.scores.find(sc => sc.judgeName === judge);
+    tbody.innerHTML = entryScores.map(function(e) {
+      var judgeCells = allJudges.map(function(judge) {
+        var s = e.scores.find(function(sc) { return sc.judgeName === judge; });
         if (s) {
-          return `<td style="background:#f6ffed;font-weight:500;">${s.total}<br><small style="color:#999;font-weight:400;">实${s.practicality} 创${s.innovation} 推${s.scalability} 效${s.presentation}</small></td>`;
+          return '<td style="background:rgba(0,230,118,0.08);font-weight:500;">' + s.total + '<br><small style="color:var(--text-dim);font-weight:400;">实' + s.practicality + ' 创' + s.innovation + ' 推' + s.scalability + ' 效' + s.presentation + '</small></td>';
         }
-        return '<td style="background:#fff2f0;color:#ff4d4f;font-weight:500;text-align:center;" title="' + judge + ' 未评分">未评</td>';
+        return '<td style="background:rgba(255,82,82,0.08);color:#ff5252;font-weight:500;text-align:center;" title="' + judge + ' 未评分">未评</td>';
       }).join('');
 
-      const hasScores = e.scores.length > 0;
-      const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
-      return `
-      <tr>
-        <td style="position:sticky;left:0;background:#fff;z-index:1;"><a href="javascript:void(0)" onclick="openDetail('${e.id}')" style="color:#1677ff;font-weight:500;">${e.title.substring(0,16)}${e.title.length>16?'...':''}</a> ${badge}</td>
-        <td>${e.name}</td>
-        <td>${e.dept}${e.subdept ? '/'+e.subdept : ''}</td>
-        <td>${trackLabel(e.track)}</td>
-        <td style="font-size:12px;">${ROUND_LABELS[e.roundStatus] || '初赛'}</td>
-        ${judgeCells}
-        <td style="font-weight:700;color:${hasScores ? '#1677ff' : '#ccc'};">${hasScores ? e.avgScore : '—'}</td>
-        <td style="font-weight:700;color:#52c41a;">${e.composite || '—'}</td>
-        <td>${e.judgeCount}</td>
-        <td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry('${e.id}')">删除</button></td>
-      </tr>`;
+      var hasScores = e.scores.length > 0;
+      var badge = awardBadge(e.award) || roundBadge(e.roundStatus);
+      return '<tr><td style="position:sticky;left:0;background:#080d24;z-index:1;"><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#00d4ff;font-weight:500;">' + e.title.substring(0,16) + (e.title.length>16?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + e.dept + (e.subdept ? '/'+e.subdept : '') + '</td><td>' + trackLabel(e.track) + '</td><td style="font-size:12px;">' + (ROUND_LABELS[e.roundStatus] || '初赛') + '</td>' + judgeCells + '<td style="font-weight:700;color:' + (hasScores ? '#00d4ff' : 'var(--text-dim)') + ';">' + (hasScores ? e.avgScore : '—') + '</td><td style="font-weight:700;color:#00e676;">' + (e.composite || '—') + '</td><td>' + (e.judgeCount||0) + '</td><td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry(\'' + e.id + '\')">删除</button></td></tr>';
     }).join('');
   } catch(e) {
     console.error('Admin dashboard error:', e);
@@ -1440,170 +1461,89 @@ async function renderAdminDashboard() {
   }
 }
 
-// ========== STAGE MANAGEMENT PANEL ==========
 function renderStageManagePanel(entryScores) {
-  const panel = document.getElementById('stageManagePanel');
+  var panel = document.getElementById('stageManagePanel');
   if (!panel) return;
 
   if (currentStage === 'preliminary') {
-    // Show promote to semi_final panel
-    const sorted = [...entryScores].sort((a, b) => (b.composite || 0) - (a.composite || 0));
-    panel.innerHTML = `
-      <div class="promote-panel">
-        <h3>🔄 晋级复赛管理</h3>
-        <p style="color:#666;font-size:13px;margin-bottom:16px;">勾选需要晋级复赛的作品，未勾选的将标记为淘汰。点击"确认晋级复赛"后阶段将切换到复赛。</p>
-        <div style="max-height:400px;overflow-y:auto;border:1px solid #f0f0f0;border-radius:8px;">
-          ${sorted.map(e => `
-            <div class="promote-entry">
-              <input type="checkbox" id="promote_${e.id}" ${e.roundStatus === 'semi_finalist' ? 'checked' : ''}>
-              <span class="pe-title">${e.title}</span>
-              <span class="pe-score">综合分: ${e.composite || '—'} | 均分: ${e.avgScore || '—'} | ${e.name}</span>
-            </div>
-          `).join('')}
-        </div>
-        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
-          <button class="btn btn-success btn-sm" onclick="adminPromote('semi_final')">✅ 确认晋级复赛</button>
-          <span style="font-size:12px;color:#999;">已勾选 <strong id="promoteCount">0</strong> 个作品</span>
-        </div>
-      </div>
-    `;
-    // Update count on change
-    document.querySelectorAll('input[id^="promote_"]').forEach(cb => {
-      cb.addEventListener('change', updatePromoteCount);
-    });
+    var sorted = entryScores.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
+    panel.innerHTML = '<div class="promote-panel"><h3>🔄 晋级复赛管理</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">勾选需要晋级复赛的作品，未勾选的将标记为淘汰。点击"确认晋级复赛"后阶段将切换到复赛。</p><div style="max-height:400px;overflow-y:auto;border:1px solid rgba(255,255,255,0.06);border-radius:8px;">' + sorted.map(function(e) { return '<div class="promote-entry"><input type="checkbox" id="promote_' + e.id + '" ' + (e.roundStatus === 'semi_finalist' ? 'checked' : '') + '><span class="pe-title">' + e.title + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center;"><button class="btn btn-success btn-sm" onclick="adminPromote(\'semi_final\')">✅ 确认晋级复赛</button><span style="font-size:12px;color:var(--text-dim);">已勾选 <strong id="promoteCount">0</strong> 个作品</span></div></div>';
+    document.querySelectorAll('input[id^="promote_"]').forEach(function(cb) { cb.addEventListener('change', updatePromoteCount); });
     updatePromoteCount();
   } else if (currentStage === 'semi_final') {
-    // Show promote to final panel
-    const semiEntries = entryScores.filter(e => e.roundStatus === 'semi_finalist');
-    const sorted = [...semiEntries].sort((a, b) => (b.composite || 0) - (a.composite || 0));
-    panel.innerHTML = `
-      <div class="promote-panel">
-        <h3>🏆 晋级决赛管理</h3>
-        <p style="color:#666;font-size:13px;margin-bottom:16px;">勾选需要晋级决赛的作品，未勾选的将标记为淘汰。点击"确认晋级决赛"后阶段将切换到决赛。</p>
-        <div style="max-height:400px;overflow-y:auto;border:1px solid #f0f0f0;border-radius:8px;">
-          ${sorted.map(e => `
-            <div class="promote-entry">
-              <input type="checkbox" id="promote_${e.id}" ${e.roundStatus === 'finalist' ? 'checked' : ''}>
-              <span class="pe-title">${e.title}</span>
-              <span class="pe-score">综合分: ${e.composite || '—'} | 均分: ${e.avgScore || '—'} | ${e.name}</span>
-            </div>
-          `).join('')}
-        </div>
-        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
-          <button class="btn btn-primary btn-sm" onclick="adminPromote('final')">✅ 确认晋级决赛</button>
-          <span style="font-size:12px;color:#999;">已勾选 <strong id="promoteCount">0</strong> 个作品</span>
-        </div>
-      </div>
-    `;
-    document.querySelectorAll('input[id^="promote_"]').forEach(cb => {
-      cb.addEventListener('change', updatePromoteCount);
-    });
+    var semiEntries = entryScores.filter(function(e) { return e.roundStatus === 'semi_finalist'; });
+    var sorted2 = semiEntries.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
+    panel.innerHTML = '<div class="promote-panel"><h3>🏆 晋级决赛管理</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">勾选需要晋级决赛的作品，未勾选的将标记为淘汰。</p><div style="max-height:400px;overflow-y:auto;border:1px solid rgba(255,255,255,0.06);border-radius:8px;">' + sorted2.map(function(e) { return '<div class="promote-entry"><input type="checkbox" id="promote_' + e.id + '" ' + (e.roundStatus === 'finalist' ? 'checked' : '') + '><span class="pe-title">' + e.title + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center;"><button class="btn btn-primary btn-sm" onclick="adminPromote(\'final\')">✅ 确认晋级决赛</button><span style="font-size:12px;color:var(--text-dim);">已勾选 <strong id="promoteCount">0</strong> 个作品</span></div></div>';
+    document.querySelectorAll('input[id^="promote_"]').forEach(function(cb) { cb.addEventListener('change', updatePromoteCount); });
     updatePromoteCount();
   } else if (currentStage === 'final') {
-    // Show settle panel
-    const finalEntries = entryScores.filter(e => e.roundStatus === 'finalist');
-    const sorted = [...finalEntries].sort((a, b) => (b.composite || 0) - (a.composite || 0));
-    panel.innerHTML = `
-      <div class="promote-panel">
-        <h3>🏆 结算获奖</h3>
-        <p style="color:#666;font-size:13px;margin-bottom:16px;">为决赛作品设置获奖等级，点击"确认结算"后阶段将切换到已结算。</p>
-        <div style="max-height:400px;overflow-y:auto;border:1px solid #f0f0f0;border-radius:8px;">
-          ${sorted.map(e => `
-            <div class="promote-entry">
-              <select class="award-select" id="award_${e.id}">
-                <option value="">未获奖</option>
-                <option value="first" ${e.award === 'first' ? 'selected' : ''}>🥇 一等奖</option>
-                <option value="second" ${e.award === 'second' ? 'selected' : ''}>🥈 二等奖</option>
-                <option value="third" ${e.award === 'third' ? 'selected' : ''}>🥉 三等奖</option>
-                <option value="excellence" ${e.award === 'excellence' ? 'selected' : ''}>🎖️ 优秀奖</option>
-              </select>
-              <span class="pe-title">${e.title}</span>
-              <span class="pe-score">评委均分: ${e.avgScore || '—'} | ${e.name}</span>
-            </div>
-          `).join('')}
-        </div>
-        <div style="margin-top:12px;">
-          <button class="btn btn-gold btn-sm" onclick="adminSettle()">🏆 确认结算</button>
-        </div>
-      </div>
-    `;
+    var finalEntries = entryScores.filter(function(e) { return e.roundStatus === 'finalist'; });
+    var sorted3 = finalEntries.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
+    panel.innerHTML = '<div class="promote-panel"><h3>🏆 结算获奖</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">为决赛作品设置获奖等级。</p><div style="max-height:400px;overflow-y:auto;border:1px solid rgba(255,255,255,0.06);border-radius:8px;">' + sorted3.map(function(e) { return '<div class="promote-entry"><select class="award-select" id="award_' + e.id + '"><option value="">未获奖</option><option value="first" ' + (e.award === 'first' ? 'selected' : '') + '>🥇 一等奖</option><option value="second" ' + (e.award === 'second' ? 'selected' : '') + '>🥈 二等奖</option><option value="third" ' + (e.award === 'third' ? 'selected' : '') + '>🥉 三等奖</option><option value="excellence" ' + (e.award === 'excellence' ? 'selected' : '') + '>🎖️ 优秀奖</option></select><span class="pe-title">' + e.title + '</span><span class="pe-score">评委均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;"><button class="btn btn-gold btn-sm" onclick="adminSettle()">🏆 确认结算</button></div></div>';
   } else if (currentStage === 'awarded') {
-    panel.innerHTML = `
-      <div class="promote-panel" style="background:linear-gradient(135deg,#fffbe6,#fff);border:1px solid #ffd591;">
-        <h3>🏆 比赛已结算</h3>
-        <p style="color:#666;font-size:13px;">获奖结果已公布。如需重新管理，请联系技术人员。</p>
-      </div>
-    `;
+    panel.innerHTML = '<div class="promote-panel" style="background:linear-gradient(135deg,rgba(255,215,64,0.08),transparent);border:1px solid rgba(255,215,64,0.2);"><h3>🏆 比赛已结算</h3><p style="color:var(--text-dim);font-size:13px;">获奖结果已公布。</p></div>';
   } else {
     panel.innerHTML = '';
   }
 }
 
 function updatePromoteCount() {
-  let count = 0;
-  document.querySelectorAll('input[id^="promote_"]:checked').forEach(cb => {
+  var count = 0;
+  document.querySelectorAll('input[id^="promote_"]:checked').forEach(function(cb) {
     if (cb.id.replace('promote_', '').startsWith('entry_')) count++;
   });
-  const el = document.getElementById('promoteCount');
+  var el = document.getElementById('promoteCount');
   if (el) el.textContent = count;
 }
 
 async function adminPromote(stage) {
   if (!adminToken) return showToast('请先登录管理后台', 'error');
-  const entryIds = [];
-  document.querySelectorAll('input[id^="promote_"]:checked').forEach(cb => {
-    const id = cb.id.replace('promote_', '');
+  var entryIds = [];
+  document.querySelectorAll('input[id^="promote_"]:checked').forEach(function(cb) {
+    var id = cb.id.replace('promote_', '');
     if (id.startsWith('entry_')) entryIds.push(id);
   });
-
-  const stageName = stage === 'semi_final' ? '复赛' : '决赛';
-  if (!confirm(`确认将选中的 ${entryIds.length} 个作品晋级${stageName}？\n\n未选中的作品将被标记为淘汰。此操作不可撤销。`)) return;
-
+  var stageName = stage === 'semi_final' ? '复赛' : '决赛';
+  if (!confirm('确认将选中的 ' + entryIds.length + ' 个作品晋级' + stageName + '？\n\n未选中的作品将被标记为淘汰。此操作不可撤销。')) return;
   try {
-    const data = await api('/api/admin/promote', {
+    var data = await api('/api/admin/promote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
-      body: JSON.stringify({ stage, entryIds })
+      body: JSON.stringify({ stage: stage, entryIds: entryIds })
     });
-    showToast(`✅ 已晋级 ${data.promoted} 个作品到${stageName}！`, 'success');
+    showToast('✅ 已晋级 ' + data.promoted + ' 个作品到' + stageName + '！', 'success');
     currentStage = data.currentStage;
     isVotingStage = isStageVoting(currentStage);
     updateStageUI();
     updateAdminStageLabel();
     renderAdminDashboard();
-  } catch(e) {
-    showToast(e.message, 'error');
-  }
+  } catch(e) { showToast(e.message, 'error'); }
 }
 
 async function adminSettle() {
   if (!adminToken) return showToast('请先登录管理后台', 'error');
-  const awards = {};
-  document.querySelectorAll('select[id^="award_"]').forEach(sel => {
+  var awards = {};
+  document.querySelectorAll('select[id^="award_"]').forEach(function(sel) {
     if (sel.value) {
-      const id = sel.id.replace('award_', '');
+      var id = sel.id.replace('award_', '');
       awards[id] = sel.value;
     }
   });
-
-  const awardCount = Object.keys(awards).length;
-  if (!confirm(`确认结算？\n\n将标记 ${awardCount} 个作品获奖，比赛阶段将切换到"已结算"。此操作不可撤销。`)) return;
-
+  var awardCount = Object.keys(awards).length;
+  if (!confirm('确认结算？\n\n将标记 ' + awardCount + ' 个作品获奖，比赛阶段将切换到"已结算"。此操作不可撤销。')) return;
   try {
-    const data = await api('/api/admin/settle', {
+    var data = await api('/api/admin/settle', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
-      body: JSON.stringify({ awards })
+      body: JSON.stringify({ awards: awards })
     });
-    showToast(`🏆 结算完成！${data.awardedCount} 个作品获奖`, 'success');
+    showToast('🏆 结算完成！' + data.awardedCount + ' 个作品获奖', 'success');
     currentStage = 'awarded';
     isVotingStage = false;
     updateStageUI();
     updateAdminStageLabel();
     renderAdminDashboard();
-  } catch(e) {
-    showToast(e.message, 'error');
-  }
+  } catch(e) { showToast(e.message, 'error'); }
 }
 
 async function adminExportCSV() {
@@ -1615,21 +1555,19 @@ async function deleteEntry(id) {
   if (!adminToken) return showToast('请先登录管理后台', 'error');
   if (!confirm('确定删除该作品吗？\n\n此操作将同时删除该作品的投票和评委打分记录，不可恢复。')) return;
   try {
-    const resp = await api(`/api/admin/entries/${id}`, {
+    var resp = await api('/api/admin/entries/' + id, {
       method: 'DELETE',
       headers: { 'x-admin-token': adminToken }
     });
-    showToast(`已删除「${resp.title}」`, 'success');
+    showToast('已删除「' + resp.title + '」', 'success');
     loadStats();
     renderAdminDashboard();
-  } catch(e) {
-    showToast('删除失败：' + e.message, 'error');
-  }
+  } catch(e) { showToast('删除失败：' + e.message, 'error'); }
 }
 
 async function saveVotingToggle() {
   if (!adminToken) return showToast('请先登录管理后台', 'error');
-  const on = document.getElementById('adminVotingToggle').checked;
+  var on = document.getElementById('adminVotingToggle').checked;
   try {
     await api('/api/settings', {
       method: 'POST',
@@ -1644,44 +1582,42 @@ async function saveVotingToggle() {
 
 async function saveStageSelect() {
   if (!adminToken) return showToast('请先登录管理后台', 'error');
-  const newStage = document.getElementById('adminStageSelect').value;
+  var newStage = document.getElementById('adminStageSelect').value;
   try {
-    const data = await api('/api/settings', {
+    var data = await api('/api/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
       body: JSON.stringify({ currentStage: newStage })
     });
     currentStage = data.currentStage || newStage;
     isVotingStage = isStageVoting(currentStage);
-    updateStageBar();
+    updateStageUI();
     renderAdminDashboard();
-    showToast(`已切换到${STAGE_LABELS[currentStage]}`, 'success');
+    showToast('已切换到' + (STAGE_LABELS[currentStage] || ''), 'success');
   } catch(e) { showToast(e.message, 'error'); }
 }
 
 async function adminReset(mode) {
   if (!adminToken) return showToast('请先登录管理后台', 'error');
-  const label = mode === 'stage' ? '重置阶段' : '完全重置';
-  const desc = mode === 'stage'
-    ? '将清空晋级标记和获奖标记，回到初赛阶段。\n投票记录和评委打分将保留。'
-    : '将清空晋级标记和获奖标记，并清空所有投票和评委打分。\n仅保留作品投稿。';
-  if (!confirm(`确认执行「${label}」？\n\n${desc}\n\n此操作不可撤销，确定继续？`)) return;
+  var label = mode === 'stage' ? '重置阶段' : '完全重置';
+  var desc = mode === 'stage' ? '将清空晋级标记和获奖标记，回到初赛阶段。\n投票记录和评委打分将保留。' : '将清空晋级标记和获奖标记，并清空所有投票和评委打分。\n仅保留作品投稿。';
+  if (!confirm('确认执行「' + label + '」？\n\n' + desc + '\n\n此操作不可撤销，确定继续？')) return;
   try {
-    const data = await api('/api/admin/reset', {
+    var data = await api('/api/admin/reset', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
-      body: JSON.stringify({ mode })
+      body: JSON.stringify({ mode: mode })
     });
     currentStage = 'preliminary';
     isVotingStage = true;
     votingEnabled = false;
     document.getElementById('adminVotingToggle').checked = false;
     document.getElementById('adminStageSelect').value = 'preliminary';
-    updateStageBar();
+    updateStageUI();
     updateVotingUI();
     loadStats();
     renderAdminDashboard();
-    showToast(`「${label}」完成，已回到初赛`, 'success');
+    showToast('「' + label + '」完成，已回到初赛', 'success');
   } catch(e) { showToast(e.message, 'error'); }
 }
 
@@ -1701,7 +1637,7 @@ async function clearAllData(type) {
     await api('/api/admin/clear', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
-      body: JSON.stringify({ type })
+      body: JSON.stringify({ type: type })
     });
     showToast('操作完成', 'success');
     loadStats();
@@ -1710,7 +1646,7 @@ async function clearAllData(type) {
 }
 
 function switchTab(tabName) {
-  const tab = document.querySelector(`.tab[data-tab="${tabName}"]`);
+  var tab = document.querySelector('.tab[data-tab="' + tabName + '"]');
   if (tab) tab.click();
 }
 
@@ -1720,7 +1656,7 @@ async function init() {
   await checkVotingStatus();
   await loadStats();
   renderSubmitPage();
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') { closeDetail(); }
   });
 }
