@@ -503,7 +503,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     <div class="score-table" style="overflow-x:auto;">
       <table style="min-width:900px;">
         <thead>
-          <tr>
+          <tr id="adminScoreHeaderRow">
             <th style="position:sticky;left:0;background:#fafafa;z-index:1;">作品</th>
             <th>姓名</th>
             <th>部门</th>
@@ -1338,19 +1338,26 @@ async function renderAdminDashboard() {
     // Render stage management panel
     renderStageManagePanel(entryScores);
 
-    // Build table
-    const th = document.getElementById('adminJudgeHeaders');
-    if (allJudges.length > 0) {
-      th.colSpan = allJudges.length;
-      th.innerHTML = allJudges.map(j => `${j}<br><small>总分</small>`).join(' | ');
-    } else {
-      th.colSpan = 1;
-      th.innerHTML = '暂无评委评分';
-    }
+    // Build table header - one th per judge to match tbody columns
+    const headerRow = document.getElementById('adminScoreHeaderRow');
+    const judgeHeaders = allJudges.length > 0
+      ? allJudges.map(j => `<th>${j}<br><small>总分</small></th>`).join('')
+      : '<th>暂无评委评分</th>';
+    headerRow.innerHTML = `
+      <th style="position:sticky;left:0;background:#fafafa;z-index:1;">作品</th>
+      <th>姓名</th>
+      <th>部门</th>
+      <th>赛道</th>
+      <th>轮次</th>
+      ${judgeHeaders}
+      <th>均分</th>
+      <th>综合分</th>
+      <th>评委数</th>
+      <th>操作</th>`;
 
     const tbody = document.getElementById('adminScoreBody');
     if (entryScores.length === 0) {
-      const totalCols = 8 + Math.max(1, allJudges.length);
+      const totalCols = 9 + Math.max(1, allJudges.length);
       tbody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align:center;padding:40px;color:#999;">当前阶段暂无可评审作品</td></tr>`;
       return;
     }
