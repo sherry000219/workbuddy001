@@ -426,15 +426,16 @@ async function ghPull() {
   _syncStatus.lastStatus = status;
   _syncStatus.lastResponse = data && data.message ? data.message : null;
   if (status === 404) {
-    // File doesn't exist yet — create initial empty file on data branch
-    console.log('[gh] data/contest.json not found, creating initial empty file...');
-    const initial = JSON.stringify(DEFAULT_DB, null, 2);
-    const body = { message: 'auto: init data file', content: Buffer.from(initial).toString('base64'), branch: GITHUB_DATA_BRANCH };
+    // File doesn't exist yet — use current in-memory data (not empty DEFAULT_DB)
+    // 这样即使 Render 重启，内存中的 db（已 loadDB）也不会被空数据覆盖
+    console.log('[gh] data/contest.json not found, creating with current data...');
+    const currentData = JSON.stringify(db, null, 2);
+    const body = { message: 'auto: init data file', content: Buffer.from(currentData).toString('base64'), branch: GITHUB_DATA_BRANCH };
     const createResp = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest.json`, body);
     if (createResp.status >= 400) throw new Error(createResp.data.message || 'Failed to create data file');
     _ghSha = createResp.data.content.sha;
-    fs.writeFileSync(DB_FILE, initial, 'utf8');
-    console.log('[gh] Created initial data file — sha:', _ghSha.slice(0, 7));
+    // 不覆盖本地文件！本地已经是正确的数据（loadDB 加载的）
+    console.log('[gh] Created remote data file from current memory — entries:', (db.entries||[]).length, 'sha:', _ghSha.slice(0, 7));
     return;
   }
   if (status >= 400) throw new Error(data.message || `GitHub API error ${status}`);
