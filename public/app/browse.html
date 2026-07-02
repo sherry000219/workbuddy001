@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作品展示 — 云帐房头号玩家第二季</title>
+<script src="https://g.alicdn.com/dingding/dingtalk-jsapi/3.1.0/dingtalk.open.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #f8f9fc; --bg-card: #ffffff;
+  --text: #1f2937; --text-dim: #6b7280; --accent: #ff6b35; --accent2: #2563eb;
+  --green: #ff6b35; --gold: #f59e0b; --red: #ef4444; --blue: #2563eb;
+  --brand-deep: #1f2937;
+  --radius: 16px; --radius-sm: 10px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.06); --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ===== BACK HEADER ===== */
+.back-header { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 16px 24px; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.back-header a { color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 600; transition: opacity .2s; }
+.back-header a:hover { opacity: .7; }
+.back-header .page-title { font-size: 18px; font-weight: 700; color: var(--text); }
+
+/* ===== STAGE BAR ===== */
+.stage-bar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.stage-bar .stage-label { font-size: 14px; font-weight: 700; color: var(--accent); }
+.stage-bar .stage-progress { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim); }
+.stage-bar .stage-dot { width: 10px; height: 10px; border-radius: 50%; background: #e5e7eb; }
+.stage-bar .stage-dot.active { background: var(--accent); box-shadow: 0 0 0 3px rgba(255,107,53,0.15); }
+.stage-bar .stage-dot.done { background: var(--green); }
+
+/* ===== VOTING BANNER ===== */
+#voting-banner { transition: all 0.3s ease; }
+
+/* ===== MAIN ===== */
+.main-container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+/* ===== SECTION TITLE ===== */
+.section-title { font-size: 20px; font-weight: 700; margin: 20px 0 18px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.section-title::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; }
+
+/* ===== STATS ===== */
+.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius-sm); padding: 18px 20px; text-align: center; box-shadow: var(--shadow); }
+.stat-card .num { font-size: 30px; font-weight: 700; color: var(--accent); }
+.stat-card .label { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+/* ===== BUTTONS ===== */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; font-family: inherit; }
+.btn-primary { background: var(--accent); color: #fff; font-weight: 600; }
+.btn-primary:hover { background: #e55d2b; }
+.btn-outline { background: transparent; color: var(--accent); border: 1px solid rgba(255,107,53,0.4); }
+.btn-outline:hover { background: rgba(255,107,53,0.08); border-color: var(--accent); }
+.btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
+.btn-ghost { background: transparent; color: var(--text-dim); }
+.btn-ghost:hover { background: rgba(0,0,0,0.04); color: var(--text); }
+
+/* ===== GALLERY ===== */
+.gallery-toolbar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.gallery-toolbar input[type="text"] { padding: 8px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; flex: 1; min-width: 200px; background: #fff; color: var(--text); }
+.gallery-toolbar select { padding: 8px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; background: #fff; color: var(--text); }
+.gallery-toolbar select option { background: #fff; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.entry-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 20px; transition: all 0.25s; border-left: 4px solid transparent; position: relative; cursor: pointer; box-shadow: var(--shadow); }
+.entry-card:hover { border-color: #d1d5db; transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.entry-card.rs-approved { border-left-color: #d1d5db; }
+.entry-card.rs-semi_finalist { border-left-color: var(--green); }
+.entry-card.rs-finalist { border-left-color: var(--blue); }
+.entry-card.rs-awarded { border-left-color: var(--gold); background: linear-gradient(135deg, rgba(245,158,11,0.06), transparent); }
+.entry-card.rs-eliminated_semi, .entry-card.rs-eliminated_final { opacity: 0.55; border-left-color: #e5e7eb; filter: grayscale(0.6); }
+.entry-card.rs-eliminated_semi:hover, .entry-card.rs-eliminated_final:hover { opacity: 0.85; filter: grayscale(0.3); }
+.round-badge { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 6px; vertical-align: middle; }
+.badge-semi { background: rgba(255,107,53,0.1); color: var(--accent); border: 1px solid rgba(255,107,53,0.25); }
+.badge-final { background: rgba(37,99,235,0.1); color: var(--blue); border: 1px solid rgba(37,99,235,0.25); }
+.badge-awarded { background: rgba(245,158,11,0.1); color: var(--gold); border: 1px solid rgba(245,158,11,0.25); }
+.badge-eliminated { background: #f3f4f6; color: var(--text-dim); border: 1px solid #e5e7eb; }
+.track-tag { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+.track-efficiency { background: rgba(37,99,235,0.08); color: var(--blue); }
+.track-creative { background: rgba(236,72,153,0.08); color: #ec4899; }
+.track-business { background: rgba(255,107,53,0.08); color: var(--green); }
+.entry-card h3 { font-size: 17px; margin-bottom: 6px; color: var(--text); }
+.entry-card .meta { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; }
+.entry-card .desc { font-size: 14px; color: #4b5563; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.entry-card .card-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+.score-display { font-size: 18px; font-weight: 700; color: var(--gold); }
+.votes { font-size: 12px; color: var(--text-dim); }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+/* ===== MODAL ===== */
+.modal-overlay { position: fixed; inset: 0; background: rgba(17,24,39,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+.modal { background: #fff; border: 1px solid #e5e7eb; border-radius: var(--radius); max-width: 700px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 32px; box-shadow: 0 25px 80px rgba(0,0,0,0.15); }
+.modal h2 { font-size: 20px; margin-bottom: 16px; color: var(--text); }
+.modal .detail-row { margin-bottom: 14px; }
+.modal .detail-row .dlabel { font-size: 12px; color: var(--text-dim); margin-bottom: 2px; }
+.modal .detail-row .dvalue { font-size: 15px; color: var(--text); line-height: 1.6; white-space: pre-wrap; }
+.modal .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ===== TOAST ===== */
+.toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #fff; color: var(--text); padding: 12px 28px; border-radius: 10px; font-size: 14px; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; border: 1px solid #e5e7eb; box-shadow: var(--shadow-lg); }
+.toast.show { opacity: 1; }
+.toast.success { border-color: rgba(255,107,53,0.3); color: #ff6b35; }
+.toast.error { border-color: rgba(239,68,68,0.3); color: #dc2626; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .gallery-grid { grid-template-columns: 1fr; }
+  .main-container { padding: 0 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== BACK HEADER ===== -->
+<div class="back-header">
+  <a href="/app/">← 返回竞赛大厅</a>
+  <span class="page-title">🎨 作品展示</span>
+</div>
+
+<!-- Stage indicator bar -->
+<div class="stage-bar" id="stageBar">
+  <span class="stage-label" id="stageLabel">📍 初赛阶段</span>
+  <span style="display:flex;align-items:center;gap:6px;">
+    <span id="dd-user-area" style="display:none;">
+      <span id="dd-user-name" style="font-size:13px;font-weight:500;margin-right:6px;"></span>
+      <span id="dd-remaining" style="background:rgba(255,107,53,0.1);padding:2px 10px;border-radius:12px;font-size:11px;"></span>
+      <button onclick="ddLogout()" style="background:#f3f4f6;border:none;color:var(--text-dim);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:4px;">退出</button>
+    </span>
+    <span id="dd-login-area">
+      <button id="dd-login-btn" onclick="ddLogin()" style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);color:var(--accent);padding:5px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;">钉钉登录</button>
+    </span>
+  </span>
+  <div class="stage-progress" style="margin-left:auto;">
+    <span class="stage-dot active" id="dot-preliminary"></span> 初赛
+    <span class="stage-dot" id="dot-semi_final"></span> 复赛
+    <span class="stage-dot" id="dot-final"></span> 决赛
+    <span class="stage-dot" id="dot-awarded"></span> 结算
+  </div>
+</div>
+
+<!-- Voting status banner -->
+<div id="voting-banner" style="display:none;background:rgba(255,215,64,0.08);border:1px solid rgba(255,215,64,0.2);border-radius:8px;padding:12px 24px;margin:12px 16px;text-align:center;color:#ffd740;font-size:14px;">
+  ⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-container">
+  <div class="section-title">🎨 作品展示</div>
+  <div class="stats-bar" id="galleryStats"></div>
+  <div class="gallery-toolbar">
+    <input type="text" id="gallerySearch" placeholder="🔍 搜索作品标题、作者..." oninput="renderGallery()">
+    <select id="galleryTrack" onchange="renderGallery()">
+      <option value="">全部赛道</option>
+      <option value="efficiency">效率提升</option>
+      <option value="creative">创意应用</option>
+      <option value="business">业务赋能</option>
+    </select>
+    <select id="galleryDept" onchange="renderGallery()">
+      <option value="">全部部门</option>
+    </select>
+    <select id="gallerySort" onchange="renderGallery()">
+      <option value="votes">按票数排序</option>
+      <option value="score">按评分排序</option>
+      <option value="composite">按综合分排序</option>
+      <option value="newest">按发布时间</option>
+    </select>
+  </div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== DETAIL MODAL ===== -->
+<div class="modal-overlay" id="detailModal" style="display:none;" onclick="if(event.target===this)closeDetail()">
+  <div class="modal" id="detailContent"></div>
+</div>
+
+<script>
+// ========== STATE ==========
+let ddAuthed = false;
+let ddUser = null;
+let ddRemaining = 5;
+let votingEnabled = false;
+let currentStage = 'preliminary';
+let isVotingStage = true;
+let allEntries = [];
+
+const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
+const AWARD_LABELS = { first: '🥇 一等奖', second: '🥈 二等奖', third: '🥉 三等奖', excellence: '🎖️ 优秀奖' };
+
+// ========== DINGTALK AUTH ==========
+function isInDingTalk() {
+  try { return typeof dd !== 'undefined' && dd.env && dd.env.platform && dd.env.platform !== 'notInDingTalk'; } catch(e) { return false; }
+}
+
+async function ddLogin() {
+  if (isInDingTalk()) {
+    dd.ready(function() {
+      dd.runtime.permission.requestAuthCode({
+        corpId: '',
+        onSuccess: function(result) { exchangeCode(result.code); },
+        onFail: function(err) { showToast('获取钉钉授权失败，请重试', 'error'); }
+      });
+    });
+    return;
+  }
+  try {
+    const resp = await fetch('/api/auth/dd-url');
+    const data = await resp.json();
+    window.location.href = data.url;
+  } catch(e) { showToast('无法发起钉钉登录，请重试', 'error'); }
+}
+
+async function exchangeCode(code) {
+  try {
+    const resp = await fetch('/api/auth/dd-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }), credentials: 'include' });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '登录失败');
+    ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes;
+    currentStage = data.currentStage || 'preliminary'; isVotingStage = isStageVoting(currentStage);
+    updateUserUI(); updateStageUI();
+    showToast('钉钉登录成功，欢迎 ' + ddUser.nick + '！', 'success');
+    renderGallery();
+  } catch(e) { showToast('登录失败：' + e.message, 'error'); }
+}
+
+async function checkAuth() {
+  try {
+    const resp = await fetch('/api/auth/me', { credentials: 'include' });
+    const data = await resp.json();
+    if (data.user) { ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; currentStage = data.currentStage || 'preliminary'; isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage); updateUserUI(); updateStageUI(); }
+    else { ddAuthed = false; ddUser = null; ddRemaining = 5; updateUserUI(); }
+  } catch(e) { ddAuthed = false; updateUserUI(); }
+}
+
+function isStageVoting(stage) { return stage === 'preliminary' || stage === 'semi_final'; }
+
+function updateUserUI() {
+  const userArea = document.getElementById('dd-user-area');
+  const loginArea = document.getElementById('dd-login-area');
+  if (ddAuthed && ddUser) {
+    userArea.style.display = 'inline-flex'; userArea.style.alignItems = 'center'; userArea.style.gap = '6px'; loginArea.style.display = 'none';
+    document.getElementById('dd-user-name').textContent = ddUser.nick;
+    const stageLabel = isVotingStage ? '（' + STAGE_LABELS[currentStage] + '）' : '';
+    document.getElementById('dd-remaining').textContent = isVotingStage ? '剩余 ' + ddRemaining + ' 票' + stageLabel : STAGE_LABELS[currentStage];
+  } else { userArea.style.display = 'none'; loginArea.style.display = 'inline'; }
+}
+
+function updateStageUI() {
+  const label = document.getElementById('stageLabel');
+  if (label) label.textContent = '📍 ' + (STAGE_LABELS[currentStage] || '初赛') + '阶段';
+  const stages = ['preliminary', 'semi_final', 'final', 'awarded'];
+  const currentIdx = stages.indexOf(currentStage);
+  stages.forEach(function(s, i) {
+    const dot = document.getElementById('dot-' + s);
+    if (dot) { dot.className = 'stage-dot'; if (i < currentIdx) dot.classList.add('done'); else if (i === currentIdx) dot.classList.add('active'); }
+  });
+}
+
+async function checkVotingStatus() {
+  try {
+    const resp = await fetch('/api/voting/status'); const data = await resp.json();
+    votingEnabled = !!data.votingEnabled; currentStage = data.currentStage || 'preliminary'; isVotingStage = isStageVoting(currentStage);
+  } catch(e) { votingEnabled = false; }
+  updateVotingUI(); updateStageUI();
+}
+
+function updateVotingUI() {
+  const banner = document.getElementById('voting-banner');
+  if (votingEnabled && isVotingStage) { banner.style.display = 'none'; }
+  else if (!isVotingStage) { banner.style.display = 'block'; banner.innerHTML = '📋 当前为<strong>' + STAGE_LABELS[currentStage] + '</strong>阶段，不支持投票'; banner.style.background = 'rgba(37,99,235,0.06)'; banner.style.borderColor = 'rgba(37,99,235,0.15)'; banner.style.color = '#2563eb'; }
+  else { banner.style.display = 'block'; banner.innerHTML = '⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道'; banner.style.background = 'rgba(255,215,64,0.08)'; banner.style.borderColor = 'rgba(255,215,64,0.2)'; banner.style.color = '#ffd740'; }
+}
+
+async function ddLogout() {
+  try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch(e) {}
+  ddAuthed = false; ddUser = null; ddRemaining = 5; updateUserUI(); renderGallery(); showToast('已退出登录');
+}
+
+// ========== HELPERS ==========
+function showToast(msg, type) { type = type || ''; const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + type + ' show'; setTimeout(function() { t.className = 'toast'; }, 2800); }
+function trackLabel(t) { return { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' }[t] || t; }
+function trackClass(t) { return { efficiency: 'track-efficiency', creative: 'track-creative', business: 'track-business' }[t] || ''; }
+function roundBadge(rs) { if (!rs || rs === 'approved') return ''; const map = { semi_finalist: '<span class="round-badge badge-semi">🟢 复赛</span>', finalist: '<span class="round-badge badge-final">🔵 决赛</span>', awarded: '<span class="round-badge badge-awarded">🏆 已获奖</span>', eliminated_semi: '<span class="round-badge badge-eliminated">淘汰</span>', eliminated_final: '<span class="round-badge badge-eliminated">淘汰</span>' }; return map[rs] || ''; }
+function awardBadge(award) { if (!award) return ''; return '<span class="round-badge badge-awarded">' + (AWARD_LABELS[award] || award) + '</span>'; }
+function linkify(text) { if (!text) return ''; const urlRegex = /(https?:\/\/[^\s<]+)/gi; return text.replace(/\n/g, '<br>').replace(urlRegex, function(url) { let cleanUrl = url.replace(/[.,;:!?)\]]+$/, ''); return '<a href="' + cleanUrl + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + cleanUrl + '</a>'; }); }
+
+// ========== API ==========
+async function api(url, options) { options = options || {}; const resp = await fetch(url, { method: options.method || 'GET', headers: options.headers || {}, body: options.body, credentials: 'include' }); const data = await resp.json(); if (!resp.ok) throw new Error(data.error || 'Request failed'); return data; }
+
+// ========== STATS ==========
+async function loadStats() { try { return await api('/api/stats'); } catch(e) { return {}; } }
+
+function renderStatsBar(containerId, stats) {
+  const container = document.getElementById(containerId); if (!container || !stats) return;
+  let html = '';
+  html += '<div class="stat-card"><div class="num">' + (stats.totalEntries || 0) + '</div><div class="label">总投稿数</div></div>';
+  html += '<div class="stat-card"><div class="num">' + (stats.approvedEntries || 0) + '</div><div class="label">已收录作品</div></div>';
+  html += '<div class="stat-card"><div class="num">' + (stats.totalVotes || 0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '投票数</div></div>';
+  html += '<div class="stat-card"><div class="num">' + (stats.judgeCount || 0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '评委数</div></div>';
+  container.innerHTML = html;
+}
+
+// ========== GALLERY ==========
+async function renderGallery() {
+  const stats = await loadStats();
+  renderStatsBar('galleryStats', stats);
+  const search = document.getElementById('gallerySearch').value;
+  const track = document.getElementById('galleryTrack').value;
+  const dept = document.getElementById('galleryDept').value;
+  const sort = document.getElementById('gallerySort').value;
+  let url = '/api/entries?sort=' + sort;
+  if (track) url += '&track=' + track;
+  if (dept) url += '&dept=' + encodeURIComponent(dept);
+  if (search) url += '&search=' + encodeURIComponent(search);
+  try {
+    const data = await api(url);
+    allEntries = data.entries;
+    if (data.currentStage) { currentStage = data.currentStage; updateStageUI(); }
+    const deptSelect = document.getElementById('galleryDept');
+    const deptVal = deptSelect.value;
+    const depts = [];
+    data.entries.forEach(function(e) { if (depts.indexOf(e.dept) === -1) depts.push(e.dept); });
+    deptSelect.innerHTML = '<option value="">全部部门</option>' + depts.map(function(d) { return '<option value="' + d + '">' + d + '</option>'; }).join('');
+    deptSelect.value = deptVal;
+    const grid = document.getElementById('galleryGrid');
+    if (data.entries.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">📭</div><p>暂无作品，快来投稿吧！</p></div>';
+      return;
+    }
+    grid.innerHTML = data.entries.map(function(e) {
+      const rs = e.roundStatus || 'approved';
+      const rsClass = 'rs-' + rs;
+      const badge = awardBadge(e.award) || roundBadge(rs);
+      const isEliminated = rs === 'eliminated_semi' || rs === 'eliminated_final';
+      const canVote = isVotingStage && !isEliminated && rs !== 'awarded' && rs !== 'finalist';
+      let voteBtn = '';
+      if (isVotingStage && canVote) {
+        voteBtn = '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();voteEntry(\'' + e.id + '\')">👍 投票</button>';
+      } else if (!isVotingStage) {
+        voteBtn = '<span style="font-size:12px;color:var(--text-dim);">' + (STAGE_LABELS[currentStage] || '') + '阶段</span>';
+      }
+      var extraHtml = '';
+      if (e.extra) {
+        extraHtml = '<div style="font-size:13px;color:var(--accent);margin-top:8px;word-break:break-all;">' + linkify(e.extra.substring(0,100)) + (e.extra.length>100?'...':'') + '</div>';
+      }
+      return '<div class="entry-card ' + rsClass + '" onclick="openDetail(\'' + e.id + '\')"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + (e.attachmentName ? ' 📎' : '') + '</span>' + badge + '<h3>' + e.title + '</h3><div class="meta">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + new Date(e.createdAt).toLocaleDateString('zh-CN') + '</div><div class="desc">' + e.scene + '</div>' + extraHtml + '<div class="card-footer"><div style="display:flex;align-items:center;gap:16px;"><span class="score-display">' + (e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分') + '</span><span class="votes">👍 ' + (e.voteCount||0) + ' 票</span></div>' + voteBtn + '</div></div>';
+    }).join('');
+  } catch(e) { console.error('Gallery error:', e); }
+}
+
+async function voteEntry(entryId) {
+  if (!ddAuthed) return showToast('请先通过钉钉登录后再投票', 'error');
+  if (!votingEnabled) return showToast('投票暂未开启，请等待管理员开放投票通道', 'error');
+  if (!isVotingStage) return showToast('当前阶段不支持投票', 'error');
+  if (ddRemaining <= 0) return showToast('你的' + (STAGE_LABELS[currentStage] || '') + '5票已用完', 'error');
+  try {
+    const resp = await fetch('/api/votes/' + entryId, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), credentials: 'include' });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '投票失败');
+    ddRemaining = data.remaining; updateUserUI();
+    showToast('👍 投票成功！剩余 ' + ddRemaining + ' 票', 'success');
+    renderGallery();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ========== DETAIL MODAL ==========
+async function openDetail(entryId) {
+  try {
+    const data = await api('/api/entries/' + entryId);
+    const e = data.entry;
+    const rs = e.roundStatus || 'approved';
+    const badge = awardBadge(e.award) || roundBadge(rs);
+    const stageText = STAGE_LABELS[currentStage] || '初赛';
+    const canVote = isVotingStage && rs !== 'eliminated_semi' && rs !== 'eliminated_final' && rs !== 'awarded' && rs !== 'finalist';
+    let voteBtnHtml = '';
+    if (isVotingStage && canVote) voteBtnHtml = '<button class="btn btn-outline btn-sm" onclick="voteEntry(\'' + e.id + '\')">👍 投票</button>';
+    var extraHtml = '';
+    if (e.extra) extraHtml = '<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">' + linkify(e.extra) + '</div></div>';
+    var attachHtml = '';
+    if (e.attachmentName) attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/' + e.attachmentPath + '" download="' + e.attachmentName + '" style="color:#ff6b35;">📥 下载 ' + e.attachmentName + '</a></div></div>';
+    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div><div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + e.scene + '</div></div><div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + e.process_text + '</div></div><div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + e.result_text + '</div></div>' + extraHtml + attachHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions">' + voteBtnHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+    document.getElementById('detailModal').style.display = 'flex';
+  } catch(e) { showToast('加载失败：' + e.message, 'error'); }
+}
+
+function closeDetail() { document.getElementById('detailModal').style.display = 'none'; }
+
+// ========== INIT ==========
+async function init() {
+  await checkAuth();
+  await checkVotingStatus();
+  await renderGallery();
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDetail(); });
+}
+
+init();
+</script>
+</body>
+</html>

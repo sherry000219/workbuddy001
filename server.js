@@ -339,10 +339,12 @@ app.use(express.json({ limit: '60mb' }));
 app.use(express.urlencoded({ extended: true, limit: '60mb' }));
 app.use(cookieParser());
 
-// Serve app.html at /app route
-app.get('/app', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'app.html'));
-});
+// Explicit routes for app pages (no trailing-slash redirect)
+app.get(['/app', '/app/'], (req, res) => res.sendFile(path.join(__dirname, 'public', 'app', 'index.html')));
+app.get('/app/submit.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'app', 'submit.html')));
+app.get('/app/browse.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'app', 'browse.html')));
+app.get('/app/judge.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'app', 'judge.html')));
+app.get('/app/admin.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'app', 'admin.html')));
 
 app.use(express.static('public'));
 app.use('/uploads', express.static(UPLOAD_DIR));

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>报名投稿 — 云帐房头号玩家第二季</title>
+<script src="https://g.alicdn.com/dingding/dingtalk-jsapi/3.1.0/dingtalk.open.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #f8f9fc; --bg-card: #ffffff;
+  --text: #1f2937; --text-dim: #6b7280; --accent: #ff6b35; --accent2: #2563eb;
+  --green: #ff6b35; --gold: #f59e0b; --red: #ef4444; --blue: #2563eb;
+  --radius: 16px; --radius-sm: 10px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.06); --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ===== BACK HEADER ===== */
+.back-header { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 16px 24px; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.back-header a { color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 600; transition: opacity .2s; }
+.back-header a:hover { opacity: .7; }
+.back-header .page-title { font-size: 18px; font-weight: 700; color: var(--text); }
+
+/* ===== MAIN ===== */
+.main-container { max-width: 800px; margin: 0 auto; padding: 24px; }
+
+/* ===== SECTION TITLE ===== */
+.section-title { font-size: 20px; font-weight: 700; margin: 20px 0 18px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.section-title::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; }
+
+/* ===== STATS ===== */
+.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius-sm); padding: 18px 20px; text-align: center; box-shadow: var(--shadow); }
+.stat-card .num { font-size: 30px; font-weight: 700; color: var(--accent); }
+.stat-card .label { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+/* ===== BUTTONS ===== */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; font-family: inherit; }
+.btn-primary { background: var(--accent); color: #fff; font-weight: 600; }
+.btn-primary:hover { background: #e55d2b; }
+.btn-success { background: var(--green); color: #fff; font-weight: 600; }
+.btn-success:hover { background: #e55d2b; }
+.btn-outline { background: transparent; color: var(--accent); border: 1px solid rgba(255,107,53,0.4); }
+.btn-outline:hover { background: rgba(255,107,53,0.08); border-color: var(--accent); }
+.btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
+
+/* ===== FORM ===== */
+.form-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+.form-step { display: none; }
+.form-step.active { display: block; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.form-group label .required { color: var(--red); margin-left: 2px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; transition: border 0.2s, box-shadow 0.2s; font-family: inherit; background: #fff; color: var(--text); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,107,53,0.12); }
+.form-group textarea { min-height: 100px; resize: vertical; }
+.form-group select option { background: #fff; color: var(--text); }
+.form-hint { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+
+/* ===== SUCCESS ===== */
+.success-page { text-align: center; padding: 60px 20px; }
+.success-page .icon { font-size: 64px; margin-bottom: 20px; }
+.success-page h2 { font-size: 22px; color: var(--green); margin-bottom: 8px; }
+.success-page p { color: var(--text-dim); margin-bottom: 24px; }
+
+/* ===== TOAST ===== */
+.toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #fff; color: var(--text); padding: 12px 28px; border-radius: 10px; font-size: 14px; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; border: 1px solid #e5e7eb; box-shadow: var(--shadow-lg); }
+.toast.show { opacity: 1; }
+.toast.success { border-color: rgba(255,107,53,0.3); color: #ff6b35; }
+.toast.error { border-color: rgba(239,68,68,0.3); color: #dc2626; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .form-row { grid-template-columns: 1fr; }
+  .main-container { padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== BACK HEADER ===== -->
+<div class="back-header">
+  <a href="/app/">← 返回竞赛大厅</a>
+  <span class="page-title">📝 报名投稿</span>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-container">
+  <div class="stats-bar" id="submitStats"></div>
+  <div class="form-card" id="formCard">
+    <div class="form-step active" id="step1">
+      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第1步：基本信息</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>姓名 <span class="required">*</span></label>
+          <input type="text" id="f-name" placeholder="请输入你的姓名">
+        </div>
+        <div class="form-group">
+          <label>部门 <span class="required">*</span></label>
+          <select id="f-dept">
+            <option value="">请选择部门</option>
+            <option value="中小微-总部">中小微-总部</option>
+            <option value="中小微-区域团队">中小微-区域团队</option>
+            <option value="产研中心">产研中心</option>
+            <option value="职能中台">职能中台</option>
+            <option value="有度税智">有度税智</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>子部门名称 <span class="required">*</span></label>
+        <input type="text" id="f-subdept" placeholder="请填写你所在的子部门/团队名称">
+      </div>
+      <div class="form-group">
+        <label>参赛赛道 <span class="required">*</span></label>
+        <select id="f-track">
+          <option value="">请选择赛道</option>
+          <option value="efficiency">效率提升</option>
+          <option value="creative">创意应用</option>
+          <option value="business">业务赋能</option>
+        </select>
+        <div class="form-hint">鼓励方向，不强制归入；选最贴近的即可</div>
+      </div>
+      <div class="form-group">
+        <label>作品标题 <span class="required">*</span></label>
+        <input type="text" id="f-title" placeholder="给你的作品起个吸引人的名字">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="nextStep(2)">下一步 →</button>
+      </div>
+    </div>
+    <div class="form-step" id="step2">
+      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第2步：作品详情</div>
+      <div class="form-group">
+        <label>场景描述 <span class="required">*</span></label>
+        <textarea id="f-scene" rows="3" placeholder="描述你解决的是什么工作场景/问题？"></textarea>
+      </div>
+      <div class="form-group">
+        <label>使用过程 <span class="required">*</span></label>
+        <textarea id="f-process" rows="4" placeholder="描述你如何使用WorkBuddy完成这个任务？包括关键步骤、用到的功能等"></textarea>
+      </div>
+      <div class="form-group">
+        <label>效果呈现 <span class="required">*</span></label>
+        <textarea id="f-result" rows="3" placeholder="使用WorkBuddy后的效果如何？推荐用量化数据"></textarea>
+      </div>
+      <div class="form-group">
+        <label>作品链接 / 附加信息（选填）<br><small style="font-weight:400;color:var(--accent);">建议上传钉钉文档链接或网页链接展示作品，评委可直接点击查看</small></label>
+        <textarea id="f-extra" rows="2" placeholder="粘贴钉钉文档链接、网页链接，或补充其他说明"></textarea>
+        <div class="form-hint">链接提交后可在作品详情中直接点击跳转</div>
+      </div>
+      <div class="form-group">
+        <label>上传附件（选填，单文件 50MB 以内）</label>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <input type="file" id="f-attachment" style="display:none;" onchange="handleAttachmentSelect(event)">
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('f-attachment').click()">选择文件</button>
+          <span id="attachment-name" style="font-size:13px;color:var(--text-dim);">未选择文件</span>
+          <button type="button" id="attachment-clear" class="btn btn-sm" style="display:none;background:#f3f4f6;border:none;color:var(--text-dim);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;" onclick="clearAttachment()">清除</button>
+        </div>
+        <div class="form-hint">支持图片、PDF、Word、Excel、压缩包等格式</div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="prevStep(1)">← 上一步</button>
+        <button class="btn btn-success" onclick="submitEntry()">提交作品</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== STATE ==========
+let ddAuthed = false;
+let ddUser = null;
+const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
+let currentStage = 'preliminary';
+
+// ========== HELPERS ==========
+function showToast(msg, type) {
+  type = type || '';
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 2800);
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+// ========== DINGTALK AUTH (check only) ==========
+async function checkAuth() {
+  try {
+    const resp = await fetch('/api/auth/me', { credentials: 'include' });
+    const data = await resp.json();
+    if (data.user) {
+      ddAuthed = true;
+      ddUser = data.user;
+      currentStage = data.currentStage || 'preliminary';
+    }
+  } catch(e) {
+    ddAuthed = false;
+  }
+}
+
+// ========== API ==========
+async function api(url, options) {
+  options = options || {};
+  const resp = await fetch(url, {
+    method: options.method || 'GET',
+    headers: options.headers || {},
+    body: options.body,
+    credentials: 'include'
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+// ========== STATS ==========
+async function loadStats() {
+  try {
+    const stats = await api('/api/stats');
+    return stats;
+  } catch(e) { return {}; }
+}
+
+function renderStatsBar(containerId, stats) {
+  const container = document.getElementById(containerId);
+  if (!container || !stats) return;
+  let html = '';
+  html += '<div class="stat-card"><div class="num">' + (stats.totalEntries || 0) + '</div><div class="label">总投稿数</div></div>';
+  html += '<div class="stat-card"><div class="num">' + (stats.approvedEntries || 0) + '</div><div class="label">已收录作品</div></div>';
+  container.innerHTML = html;
+}
+
+// ========== SUBMIT PAGE ==========
+function renderSubmitPage() {
+  loadStats().then(function(stats) { renderStatsBar('submitStats', stats); });
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('step1').classList.add('active');
+  document.getElementById('step2').classList.remove('active');
+  ['f-name','f-subdept','f-title','f-scene','f-process','f-result','f-extra'].forEach(function(id) { document.getElementById(id).value = ''; });
+  document.getElementById('f-dept').value = '';
+  document.getElementById('f-track').value = '';
+  clearAttachment();
+}
+
+function nextStep(n) {
+  const name = document.getElementById('f-name').value.trim();
+  const dept = document.getElementById('f-dept').value;
+  const subdept = document.getElementById('f-subdept').value.trim();
+  const track = document.getElementById('f-track').value;
+  const title = document.getElementById('f-title').value.trim();
+  if (!name) return showToast('请填写姓名', 'error');
+  if (!dept) return showToast('请选择部门', 'error');
+  if (!subdept) return showToast('请填写子部门名称', 'error');
+  if (!track) return showToast('请选择赛道', 'error');
+  if (!title) return showToast('请填写作品标题', 'error');
+  document.querySelectorAll('.form-step').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('step' + n).classList.add('active');
+}
+
+function prevStep(n) {
+  document.querySelectorAll('.form-step').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('step' + n).classList.add('active');
+}
+
+// ========== ATTACHMENT ==========
+let pendingFile = null;
+
+function handleAttachmentSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 50 * 1024 * 1024) {
+    showToast('文件大小不能超过 50MB！', 'error');
+    event.target.value = '';
+    return;
+  }
+  pendingFile = file;
+  document.getElementById('attachment-name').textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+  document.getElementById('attachment-clear').style.display = 'inline-flex';
+}
+
+function clearAttachment() {
+  pendingFile = null;
+  document.getElementById('attachment-name').textContent = '未选择文件';
+  document.getElementById('attachment-clear').style.display = 'none';
+  const fileInput = document.getElementById('f-attachment');
+  if (fileInput) fileInput.value = '';
+}
+
+// ========== SUBMIT ENTRY ==========
+async function submitEntry() {
+  const scene = document.getElementById('f-scene').value.trim();
+  const process = document.getElementById('f-process').value.trim();
+  const result = document.getElementById('f-result').value.trim();
+  if (!scene) return showToast('请填写场景描述', 'error');
+  if (!process) return showToast('请填写使用过程', 'error');
+  if (!result) return showToast('请填写效果呈现', 'error');
+  const formData = new FormData();
+  formData.append('name', document.getElementById('f-name').value.trim());
+  formData.append('dept', document.getElementById('f-dept').value);
+  formData.append('subdept', document.getElementById('f-subdept').value.trim());
+  formData.append('track', document.getElementById('f-track').value);
+  formData.append('title', document.getElementById('f-title').value.trim());
+  formData.append('scene', scene);
+  formData.append('process_text', process);
+  formData.append('result_text', result);
+  formData.append('extra', document.getElementById('f-extra').value.trim());
+  if (pendingFile) formData.append('attachment', pendingFile);
+  try {
+    const resp = await fetch('/api/entries', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '提交失败');
+    showToast('作品提交成功！', 'success');
+    document.getElementById('formCard').innerHTML = '<div class="success-page"><div class="icon">🎉</div><h2>作品提交成功！</h2><p>你的作品已收录，可以在「作品展示」中查看。</p><p style="font-size:13px;color:var(--text-dim);">每人可多次提交，欢迎继续投稿！</p><button class="btn btn-primary" onclick="location.reload()">继续投稿</button><a href="/app/browse.html" class="btn btn-outline" style="margin-left:8px;">查看全部作品</a></div>';
+    loadStats();
+  } catch(e) {
+    showToast('提交失败：' + e.message, 'error');
+  }
+}
+
+// ========== INIT ==========
+async function init() {
+  await checkAuth();
+  renderSubmitPage();
+}
+
+init();
+</script>
+</body>
+</html>
