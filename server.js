@@ -973,6 +973,49 @@ app.post('/api/admin/reset', verifyAdminToken, (req, res) => {
 });
 
 // ========== START ==========
+let _syncStatus = { pulling: false, pulled: false, error: null, lastAttempt: null, githubEntries: 0 };
+
+async function tryPullWithRetry(maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    _syncStatus.pulling = true;
+    _syncStatus.lastAttempt = new Date().toISOString();
+    try {
+      await ghPull();
+      _syncStatus.pulled = true;
+      _syncStatus.error = null;
+      _syncStatus.pulling = false;
+      return true;
+    } catch (e) {
+      _syncStatus.error = e.message;
+      console.error(`[gh] Pull attempt ${i + 1}/${maxRetries} failed:`, e.message);
+      if (i < maxRetries - 1) {
+        const delay = Math.pow(2, i) * 3000; // 3s, 6s, 12s backoff
+        console.log(`[gh] Retrying in ${delay/1000}s...`);
+        await new Promise(r => setTimeout(r, delay));
+      }
+    }
+  }
+  _syncStatus.pulling = false;
+  console.error('[gh] All pull attempts failed. Using local data only.');
+  return false;
+}
+
+app.get('/api/sync-status', (req, res) => {
+  const localExists = fs.existsSync(DB_FILE);
+  let localCount = 0;
+  if (localExists) {
+    try { localCount = JSON.parse(fs.readFileSync(DB_FILE, 'utf8')).entries?.length || 0; } catch {}
+  }
+  res.json({
+    githubToken: GITHUB_TOKEN ? `ghp_...${GITHUB_TOKEN.slice(-4)}` : 'NOT SET',
+    syncStatus: _syncStatus,
+    localFile: localExists ? `exists (${localCount} entries)` : 'not found',
+    dbEntries: db.entries.length,
+    dbVotes: db.votes.length,
+    dbScores: db.judgeScores.length
+  });
+});
+
 (async () => {
   // Start server immediately, don't wait for GitHub sync
   app.listen(PORT, () => {
@@ -984,12 +1027,20 @@ app.post('/api/admin/reset', verifyAdminToken, (req, res) => {
     console.log(`========================================\n`);
   });
 
-  // GitHub sync in background (non-blocking)
-  await ghPull();
+  // Try GitHub sync with retries
+  if (GITHUB_TOKEN) {
+    console.log('[gh] Starting GitHub sync with retry...');
+    await tryPullWithRetry(3);
+  } else {
+    console.log('[gh] No GITHUB_TOKEN — using local file only');
+  }
+
+  // Load DB (either from GitHub sync or local file)
   const refreshed = loadDB();
   db.entries = refreshed.entries;
   db.votes = refreshed.votes;
   db.judgeScores = refreshed.judgeScores;
   db.settings = refreshed.settings;
+  _syncStatus.githubEntries = db.entries.length;
   console.log('[db] Loaded — entries:', db.entries.length, 'votes:', db.votes.length, 'scores:', db.judgeScores.length, 'stage:', getCurrentStage());
 })().catch(e => { console.error('[fatal]', e); process.exit(1); });
