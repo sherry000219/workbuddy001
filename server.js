@@ -139,7 +139,8 @@ async function exchangeDingTalkCode(code) {
   } catch (e) {
     console.log('[dd] contact/users/me call failed:', e.message);
   }
-  // Get real name and department info from full user detail
+  // Get real name and department chain (up to 3 levels) from full user detail
+  let dept1 = '', dept2 = '', dept3 = '';
   if (unionId) {
     try {
       const deptResp = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/users/${unionId}`, null, tokenResp.accessToken);
@@ -149,14 +150,30 @@ async function exchangeDingTalkCode(code) {
       // deptIdList = 所属部门ID列表
       if (deptResp.deptIdList && deptResp.deptIdList.length > 0) {
         const primaryDeptId = deptResp.deptIdList[0];
-        try {
-          const deptNameResp = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/depts/${primaryDeptId}`, null, tokenResp.accessToken);
-          console.log('[dd] dept name resp:', JSON.stringify(deptNameResp).substring(0, 300));
-          if (deptNameResp.name) {
-            dept = deptNameResp.name;
-            console.log('[dd] Got dept name:', dept);
+        // Trace department chain from leaf to root
+        const chain = [];
+        let currentId = primaryDeptId;
+        for (let i = 0; i < 5 && currentId && currentId !== 1; i++) {
+          try {
+            const d = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/depts/${currentId}`, null, tokenResp.accessToken);
+            console.log(`[dd] dept chain [${i}] id=${currentId} name=${d.name} parentId=${d.parentId}`);
+            if (d.name) chain.unshift({ id: currentId, name: d.name });
+            currentId = d.parentId;
+          } catch (e) {
+            console.log(`[dd] Failed to trace dept ${currentId}:`, e.message);
+            break;
           }
-        } catch (de) { console.log('[dd] Failed to get dept name:', de.message); }
+        }
+        console.log('[dd] Dept chain:', chain.map(c => c.name).join(' → '));
+        // Map to 3 levels: chain is root→leaf order
+        dept1 = chain[0] ? chain[0].name : '';
+        dept2 = chain[1] ? chain[1].name : '';
+        dept3 = chain[2] ? chain[2].name : '';
+        // If chain has more than 3, merge extra into dept3
+        if (chain.length > 3) {
+          dept3 = chain.slice(2).map(c => c.name).join('/');
+        }
+        console.log(`[dd] Dept 3-level: L1="${dept1}" L2="${dept2}" L3="${dept3}"`);
       }
     } catch (e) {
       console.log('[dd] Failed to fetch department/name info:', e.message);
@@ -166,13 +183,13 @@ async function exchangeDingTalkCode(code) {
   const displayName = name || nick;
   if (!openId) throw new Error('授权失败：未能获取用户身份');
   if (!displayName) throw new Error('授权失败：未能获取用户姓名');
-  // Map known department names to our options
+  // Map dept1 to known top-level departments for dropdown compatibility
   const knownDepts = ['产研中心', '职能中台', '中小微-总部', '中小微-区域团队', '有度税智', '人力运营与发展', '其他'];
-  let matchedDept = '';
+  let matchedDept1 = dept1;
   for (const kd of knownDepts) {
-    if (dept.includes(kd)) { matchedDept = kd; break; }
+    if (dept1.includes(kd)) { matchedDept1 = kd; break; }
   }
-  return { openId, unionId, nick: displayName, name, avatarUrl, dept: matchedDept || dept, email };
+  return { openId, unionId, nick: displayName, name, avatarUrl, dept: matchedDept1 || dept1, dept1: matchedDept1 || dept1, dept2, dept3, email };
 }
 
 // ========== JSON FILE STORAGE ==========
@@ -198,6 +215,10 @@ function loadDB() {
     (merged.entries || []).forEach(e => {
       if (!e.roundStatus) e.roundStatus = 'approved';
       if (!e.award) e.award = null;
+      // Migrate old dept/subdept to dept1/dept2/dept3
+      if (!e.dept1) e.dept1 = e.dept || '';
+      if (!e.dept2) e.dept2 = e.subdept || '';
+      if (!e.dept3) e.dept3 = '';
     });
     (merged.votes || []).forEach(v => {
       if (!v.stage) v.stage = 'preliminary';
@@ -444,16 +465,26 @@ app.get('/api/entries', (req, res) => {
 });
 
 app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) => {
-  let { name, dept, subdept, track, title, scene, process_text, result_text, extra } = req.body;
+  let { name, dept, dept1, dept2, dept3, subdept, track, title, scene, process_text, result_text, extra } = req.body;
   // Auto-fill from DingTalk session if not provided
   if (!name && req.ddUser.nick) name = req.ddUser.nick;
-  if (!dept && req.ddUser.dept) dept = req.ddUser.dept;
-  if (!name || !dept || !subdept || !track || !title || !scene || !process_text || !result_text) {
+  if (!dept1 && req.ddUser.dept1) dept1 = req.ddUser.dept1;
+  if (!dept2 && req.ddUser.dept2) dept2 = req.ddUser.dept2;
+  if (!dept3 && req.ddUser.dept3) dept3 = req.ddUser.dept3;
+  // Backward compat: map old dept/subdept to dept1/dept2 if new fields missing
+  if (!dept1 && dept) dept1 = dept;
+  if (!dept2 && subdept) dept2 = subdept;
+  // dept for backward compat
+  if (!dept && dept1) dept = dept1;
+  if (!dept1) return res.status(400).json({ error: '未获取到一级部门信息，请重新登录钉钉' });
+  if (!name || !track || !title || !scene || !process_text || !result_text) {
     return res.status(400).json({ error: '请填写所有必填字段' });
   }
   const id = 'entry_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
   const entry = {
-    id, name, dept, subdept, track, title, scene,
+    id, name, dept: dept1, dept1, dept2: dept2 || '', dept3: dept3 || '',
+    subdept: subdept || dept2 || '', // backward compat
+    track, title, scene,
     process_text, result_text, extra: extra || '',
     attachmentName: req.file ? req.file.originalname : null,
     attachmentPath: req.file ? req.file.filename : null,
@@ -688,6 +719,9 @@ app.post('/api/auth/dd-code', async (req, res) => {
       nick: userInfo.nick,
       avatarUrl: userInfo.avatarUrl,
       dept: userInfo.dept || '',
+      dept1: userInfo.dept1 || '',
+      dept2: userInfo.dept2 || '',
+      dept3: userInfo.dept3 || '',
       email: userInfo.email || '',
       createdAt: Date.now(),
     });
@@ -700,7 +734,7 @@ app.post('/api/auth/dd-code', async (req, res) => {
     });
     const stage = getCurrentStage();
     const voteCount = getUserStageVoteCount(userInfo.openId, stage);
-    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, dept: userInfo.dept, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, VOTE_LIMIT_PER_STAGE - voteCount), currentStage: stage });
+    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, dept: userInfo.dept, dept1: userInfo.dept1, dept2: userInfo.dept2, dept3: userInfo.dept3, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, VOTE_LIMIT_PER_STAGE - voteCount), currentStage: stage });
   } catch (e) {
     console.error('DingTalk auth error:', e.message);
     res.status(400).json({ error: e.message || '钉钉授权失败' });
@@ -719,6 +753,9 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
       nick: userInfo.nick,
       avatarUrl: userInfo.avatarUrl,
       dept: userInfo.dept || '',
+      dept1: userInfo.dept1 || '',
+      dept2: userInfo.dept2 || '',
+      dept3: userInfo.dept3 || '',
       email: userInfo.email || '',
       createdAt: Date.now(),
     });
@@ -751,7 +788,7 @@ app.get('/api/auth/me', (req, res) => {
   const stage = getCurrentStage();
   const voteCount = getUserStageVoteCount(session.openId, stage);
   res.json({
-    user: { nick: session.nick, openId: session.openId, dept: session.dept || '', avatarUrl: session.avatarUrl },
+    user: { nick: session.nick, openId: session.openId, dept: session.dept || '', dept1: session.dept1 || '', dept2: session.dept2 || '', dept3: session.dept3 || '', avatarUrl: session.avatarUrl },
     remainingVotes: Math.max(0, VOTE_LIMIT_PER_STAGE - voteCount),
     totalVotes: VOTE_LIMIT_PER_STAGE,
     currentStage: stage,
@@ -803,8 +840,11 @@ app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
       id: e.id,
       title: e.title,
       name: e.name,
-      dept: e.dept,
-      subdept: e.subdept || '',
+      dept: e.dept || e.dept1 || '',
+      dept1: e.dept1 || e.dept || '',
+      dept2: e.dept2 || e.subdept || '',
+      dept3: e.dept3 || '',
+      subdept: e.subdept || e.dept2 || '',
       track: e.track,
       createdAt: e.createdAt,
       roundStatus: e.roundStatus || 'approved',

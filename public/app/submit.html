@@ -95,7 +95,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   <div id="loginGate" style="display:none; text-align:center; padding:60px 20px; background:var(--bg-card); border:1px solid #e5e7eb; border-radius:var(--radius); box-shadow:var(--shadow);">
     <div style="font-size:64px; margin-bottom:16px;">🔐</div>
     <h3 style="margin-bottom:8px; color:var(--text);">请先登录钉钉</h3>
-    <p style="color:var(--text-dim); font-size:14px; margin-bottom:24px;">参赛需通过钉钉认证，以便自动代入你的姓名和部门信息</p>
+    <p style="color:var(--text-dim); font-size:14px; margin-bottom:24px;">参赛需通过钉钉认证，以便自动代入你的姓名和三级部门信息</p>
     <button class="btn btn-primary" onclick="startLogin()" id="loginBtn" style="padding:12px 40px; font-size:16px;">钉钉扫码登录</button>
     <p id="loginStatus" style="margin-top:12px; font-size:13px; color:var(--text-dim);"></p>
   </div>
@@ -109,13 +109,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
           <input type="text" id="f-name" readonly placeholder="通过钉钉自动获取" style="background:#f9fafb; cursor:not-allowed;">
         </div>
         <div class="form-group">
-          <label>部门 <span class="required">*</span> <small style="font-weight:400;color:var(--accent);">（已自动代入）</small></label>
-          <input type="text" id="f-dept" readonly placeholder="通过钉钉自动获取" style="background:#f9fafb; cursor:not-allowed;">
+          <label>一级部门 <span class="required">*</span> <small style="font-weight:400;color:var(--accent);">（已自动代入）</small></label>
+          <input type="text" id="f-dept1" readonly placeholder="通过钉钉自动获取" style="background:#f9fafb; cursor:not-allowed;">
         </div>
       </div>
-      <div class="form-group">
-        <label>子部门名称 <span class="required">*</span></label>
-        <input type="text" id="f-subdept" placeholder="请填写你所在的子部门/团队名称">
+      <div class="form-row">
+        <div class="form-group">
+          <label>二级部门 <small style="font-weight:400;color:var(--text-dim);">（自动代入，可为空）</small></label>
+          <input type="text" id="f-dept2" readonly placeholder="—" style="background:#f9fafb; cursor:not-allowed;">
+        </div>
+        <div class="form-group">
+          <label>三级部门 <small style="font-weight:400;color:var(--text-dim);">（自动代入，可为空）</small></label>
+          <input type="text" id="f-dept3" readonly placeholder="—" style="background:#f9fafb; cursor:not-allowed;">
+        </div>
       </div>
       <div class="form-group">
         <label>参赛赛道 <span class="required">*</span></label>
@@ -270,7 +276,7 @@ function renderSubmitPage() {
   loadStats().then(function(stats) { renderStatsBar('submitStats', stats); });
   document.getElementById('step1').classList.add('active');
   document.getElementById('step2').classList.remove('active');
-  ['f-subdept','f-title','f-scene','f-process','f-result','f-extra'].forEach(function(id) { document.getElementById(id).value = ''; });
+  ['f-title','f-scene','f-process','f-result','f-extra'].forEach(function(id) { document.getElementById(id).value = ''; });
   document.getElementById('f-track').value = '';
   clearAttachment();
 
@@ -280,7 +286,9 @@ function renderSubmitPage() {
     document.getElementById('formCard').style.display = 'block';
     // Auto-fill name and department from DingTalk
     document.getElementById('f-name').value = ddUser.nick || '';
-    document.getElementById('f-dept').value = ddUser.dept || '未获取到部门信息';
+    document.getElementById('f-dept1').value = ddUser.dept1 || ddUser.dept || '未获取到部门信息';
+    document.getElementById('f-dept2').value = ddUser.dept2 || '';
+    document.getElementById('f-dept3').value = ddUser.dept3 || '';
   } else {
     // Show login gate
     document.getElementById('loginGate').style.display = 'block';
@@ -290,13 +298,11 @@ function renderSubmitPage() {
 
 function nextStep(n) {
   const name = document.getElementById('f-name').value.trim();
-  const dept = document.getElementById('f-dept').value.trim();
-  const subdept = document.getElementById('f-subdept').value.trim();
+  const dept1 = document.getElementById('f-dept1').value.trim();
   const track = document.getElementById('f-track').value;
   const title = document.getElementById('f-title').value.trim();
   if (!name) return showToast('姓名尚未获取，请先完成钉钉登录', 'error');
-  if (!dept || dept === '未获取到部门信息') return showToast('部门信息尚未获取，请重新登录钉钉', 'error');
-  if (!subdept) return showToast('请填写子部门名称', 'error');
+  if (!dept1 || dept1 === '未获取到部门信息') return showToast('一级部门信息尚未获取，请重新登录钉钉', 'error');
   if (!track) return showToast('请选择赛道', 'error');
   if (!title) return showToast('请填写作品标题', 'error');
   document.querySelectorAll('.form-step').forEach(function(s) { s.classList.remove('active'); });
@@ -350,8 +356,12 @@ async function submitEntry() {
 
   const formData = new FormData();
   formData.append('name', document.getElementById('f-name').value.trim());
-  formData.append('dept', document.getElementById('f-dept').value.trim());
-  formData.append('subdept', document.getElementById('f-subdept').value.trim());
+  formData.append('dept1', document.getElementById('f-dept1').value.trim());
+  formData.append('dept2', document.getElementById('f-dept2').value.trim());
+  formData.append('dept3', document.getElementById('f-dept3').value.trim());
+  // backward compat
+  formData.append('dept', document.getElementById('f-dept1').value.trim());
+  formData.append('subdept', document.getElementById('f-dept2').value.trim());
   formData.append('track', document.getElementById('f-track').value);
   formData.append('title', document.getElementById('f-title').value.trim());
   formData.append('scene', scene);
@@ -361,7 +371,7 @@ async function submitEntry() {
   if (pendingFile) formData.append('attachment', pendingFile);
 
   try {
-    console.log('[submit] Sending entry...', { name: formData.get('name'), dept: formData.get('dept'), title: formData.get('title') });
+    console.log('[submit] Sending entry...', { name: formData.get('name'), dept1: formData.get('dept1'), dept2: formData.get('dept2'), dept3: formData.get('dept3'), title: formData.get('title') });
     const controller = new AbortController();
     const timeout = setTimeout(function() { controller.abort(); }, 30000);
     const resp = await fetch('/api/entries', {
