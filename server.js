@@ -106,20 +106,7 @@ function ddApi(method, url, body, accessToken) {
   });
 }
 
-// 企业 access_token 缓存（topapi 端点必须用企业 token，不能用用户 token）
-let _corpToken = '';
-let _corpTokenExpire = 0;
-async function getCorpAccessToken() {
-  if (_corpToken && Date.now() < _corpTokenExpire - 60000) return _corpToken;
-  const resp = await ddApi('GET', `https://oapi.dingtalk.com/gettoken?appkey=${DINGTALK.appKey}&appsecret=${encodeURIComponent(DINGTALK.appSecret)}`, null, null);
-  console.log('[dd] gettoken resp:', JSON.stringify(resp).substring(0, 200));
-  if (resp.errcode !== 0) throw new Error('获取企业token失败: ' + (resp.errmsg || ''));
-  _corpToken = resp.access_token;
-  _corpTokenExpire = Date.now() + (resp.expires_in || 7200) * 1000;
-  return _corpToken;
-}
-
-// Exchange DingTalk auth code for user info
+// Exchange DingTalk auth code for basic user info
 async function exchangeDingTalkCode(code) {
   const tokenResp = await ddApi('POST', DINGTALK.tokenUrl, {
     clientId: DINGTALK.appKey,
@@ -131,122 +118,24 @@ async function exchangeDingTalkCode(code) {
   if (!tokenResp.accessToken) {
     throw new Error('获取accessToken失败');
   }
-  let openId = tokenResp.openId || '';
-  let unionId = tokenResp.unionId || '';
-  let nick = tokenResp.nick || tokenResp.nickname || '';
-  let name = '';  // 真实姓名（来自 contact/users API）
-  let avatarUrl = tokenResp.avatarUrl || tokenResp.avatar || '';
-  let dept = '';
-  let email = tokenResp.email || '';
-  let mobile = '';
-  let corpToken = '';  // 提到外层，部门追溯时需要
-  let userResp = null;  // 提到外层，避免 try 块外引用报错
-  try {
-    userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
-    console.log('[dd] users/me full resp:', JSON.stringify(userResp).substring(0, 600));
-    if (userResp.nick) nick = userResp.nick;
-    if (userResp.name) name = userResp.name;  // 真实姓名
-    if (userResp.openId) openId = userResp.openId;
-    if (userResp.unionId) unionId = userResp.unionId;
-    if (userResp.avatarUrl) avatarUrl = userResp.avatarUrl;
-    if (userResp.email) email = userResp.email;
-    if (userResp.mobile) mobile = userResp.mobile;
-  } catch (e) {
-    console.log('[dd] contact/users/me call failed:', e.message);
-  }
-  // Get real name and department chain (up to 3 levels)
-  // 使用 topapi/v2 端点（企业内部应用标准接口，token 在 URL 查询参数）
-  let dept1 = '', dept2 = '', dept3 = '';
-  let deptIdList = [];
 
-  if (unionId) {
-    try { corpToken = await getCorpAccessToken(); } catch (e) { console.log('[dd] getCorpAccessToken failed:', e.message); }
+  // 仅获取用户通讯录个人信息（昵称、头像、手机号、openId、unionId、邮箱）
+  // GET https://api.dingtalk.com/v1.0/contact/users/me
+  // Header: x-acs-dingtalk-access-token
+  const userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
+  console.log('[dd] users/me resp:', JSON.stringify(userResp).substring(0, 400));
 
-    if (corpToken) {
-      // Step 1: unionId -> staffId
-      // POST oapi.dingtalk.com/topapi/v2/user/getbyunionid?access_token=xxx
-      // Body: { unionid: "xxx" }
-      // Response: { errcode: 0, result: { userid: "xxx" } }
-      let staffId = '';
-      try {
-        const byUnion = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/getbyunionid?access_token=${corpToken}`, { unionid: unionId });
-        console.log('[dd] v2/user/getbyunionid resp:', JSON.stringify(byUnion).substring(0, 300));
-        if (byUnion.errcode === 0 && byUnion.result) {
-          staffId = byUnion.result.userid || '';
-          console.log('[dd] got staffId:', staffId);
-        } else {
-          console.log('[dd] v2/user/getbyunionid errcode:', byUnion.errcode, byUnion.errmsg);
-        }
-      } catch (e) { console.log('[dd] v2/user/getbyunionid failed:', e.message); }
+  const openId = userResp.openId || '';
+  const unionId = userResp.unionId || '';
+  const nick = userResp.nick || '';
+  const mobile = userResp.mobile || '';
+  const avatarUrl = userResp.avatarUrl || '';
+  const email = userResp.email || '';
 
-      // Step 2: staffId -> 用户详情（含 name 真实姓名 + dept_id_list 部门列表）
-      // POST oapi.dingtalk.com/topapi/v2/user/get?access_token=xxx
-      // Body: { userid: "xxx" }
-      // Response: { errcode: 0, result: { name, dept_id_list, ... } }
-      if (staffId) {
-        try {
-          const detail = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/get?access_token=${corpToken}`, { userid: staffId });
-          console.log('[dd] v2/user/get resp:', JSON.stringify(detail).substring(0, 500));
-          if (detail.errcode === 0 && detail.result) {
-            const r = detail.result;
-            if (r.name) name = r.name;
-            deptIdList = r.dept_id_list || [];
-            console.log('[dd] name:', name, 'dept_id_list:', JSON.stringify(deptIdList));
-          } else {
-            console.log('[dd] v2/user/get errcode:', detail.errcode, detail.errmsg);
-          }
-        } catch (e) { console.log('[dd] v2/user/get failed:', e.message); }
-      }
-
-      // Step 3: 逐级追溯部门链路（叶子 → 根，最多 5 层，取前 3 级）
-      // POST oapi.dingtalk.com/topapi/v2/department/get?access_token=xxx
-      // Body: { dept_id: 123 }
-      // Response: { errcode: 0, result: { name, parent_id, ... } }
-      if (deptIdList.length > 0) {
-        const primaryDeptId = deptIdList[0];
-        const chain = [];
-        let currentId = primaryDeptId;
-        for (let i = 0; i < 5 && currentId && currentId !== 1; i++) {
-          try {
-            const dResp = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/department/get?access_token=${corpToken}`, { dept_id: currentId });
-            if (dResp.errcode === 0 && dResp.result) {
-              const d = dResp.result;
-              console.log(`[dd] dept [${i}] id=${currentId} name=${d.name} parent=${d.parent_id}`);
-              if (d.name) chain.unshift({ id: currentId, name: d.name });
-              currentId = d.parent_id;
-            } else {
-              console.log(`[dd] dept get errcode:`, dResp.errcode, dResp.errmsg);
-              break;
-            }
-          } catch (e) {
-            console.log(`[dd] dept trace ${currentId} failed:`, e.message);
-            break;
-          }
-        }
-        console.log('[dd] Dept chain:', chain.map(c => c.name).join(' → '));
-        dept1 = chain[0] ? chain[0].name : '';
-        dept2 = chain[1] ? chain[1].name : '';
-        dept3 = chain[2] ? chain[2].name : '';
-        if (chain.length > 3) dept3 = chain.slice(2).map(c => c.name).join('/');
-        console.log(`[dd] Dept 3-level: L1="${dept1}" L2="${dept2}" L3="${dept3}"`);
-      } else {
-        console.log('[dd] dept_id_list is empty');
-      }
-    }
-  } else {
-    console.log('[dd] no unionId, skip dept fetch');
-  }
-  // Fallback: if no real name, use nick
-  const displayName = name || nick;
   if (!openId) throw new Error('授权失败：未能获取用户身份');
-  if (!displayName) throw new Error('授权失败：未能获取用户姓名');
-  // Map dept1 to known top-level departments for dropdown compatibility
-  const knownDepts = ['产研中心', '职能中台', '中小微-总部', '中小微-区域团队', '有度税智', '人力运营与发展', '其他'];
-  let matchedDept1 = dept1;
-  for (const kd of knownDepts) {
-    if (dept1.includes(kd)) { matchedDept1 = kd; break; }
-  }
-  return { openId, unionId, nick: displayName, name, avatarUrl, dept: matchedDept1 || dept1, dept1: matchedDept1 || dept1, dept2, dept3, email };
+  if (!nick) throw new Error('授权失败：未能获取用户姓名');
+
+  return { openId, unionId, nick, name: nick, mobile, avatarUrl, email };
 }
 
 // ========== JSON FILE STORAGE ==========
@@ -276,6 +165,7 @@ function loadDB() {
       if (!e.dept1) e.dept1 = e.dept || '';
       if (!e.dept2) e.dept2 = e.subdept || '';
       if (!e.dept3) e.dept3 = '';
+      if (!e.mobile) e.mobile = '';
     });
     (merged.votes || []).forEach(v => {
       if (!v.stage) v.stage = 'preliminary';
@@ -557,24 +447,28 @@ app.get('/api/entries', (req, res) => {
 });
 
 app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) => {
-  let { name, dept, dept1, dept2, dept3, subdept, track, title, scene, process_text, result_text, extra } = req.body;
-  // Auto-fill from DingTalk session if not provided
+  let { name, mobile, dept, dept1, dept2, dept3, subdept, track, title, scene, process_text, result_text, extra } = req.body;
+  // Auto-fill name and mobile from DingTalk session if not provided
   if (!name && req.ddUser.nick) name = req.ddUser.nick;
-  if (!dept1 && req.ddUser.dept1) dept1 = req.ddUser.dept1;
-  if (!dept2 && req.ddUser.dept2) dept2 = req.ddUser.dept2;
-  if (!dept3 && req.ddUser.dept3) dept3 = req.ddUser.dept3;
+  if (!mobile && req.ddUser.mobile) mobile = req.ddUser.mobile;
   // Backward compat: map old dept/subdept to dept1/dept2 if new fields missing
   if (!dept1 && dept) dept1 = dept;
   if (!dept2 && subdept) dept2 = subdept;
   // dept for backward compat
   if (!dept && dept1) dept = dept1;
-  if (!dept1) return res.status(400).json({ error: '未获取到一级部门信息，请重新登录钉钉' });
-  if (!name || !track || !title || !scene || !process_text || !result_text) {
+  if (!name) return res.status(400).json({ error: '未获取到姓名，请重新登录钉钉' });
+  if (!mobile) return res.status(400).json({ error: '未获取到手机号，请重新登录钉钉' });
+  if (!dept1) return res.status(400).json({ error: '请选择一级部门' });
+  // 参赛范围限制：非研发序列人员可参赛
+  if (dept1 === '产研中心' || dept2 === '研发部') {
+    return res.status(403).json({ error: '本次参赛范围仅限云帐房非研发序列人员，研发序列同事欢迎参与投票' });
+  }
+  if (!track || !title || !scene || !process_text || !result_text) {
     return res.status(400).json({ error: '请填写所有必填字段' });
   }
   const id = 'entry_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
   const entry = {
-    id, name, dept: dept1, dept1, dept2: dept2 || '', dept3: dept3 || '',
+    id, name, mobile: mobile || '', dept: dept1, dept1, dept2: dept2 || '', dept3: dept3 || '',
     subdept: subdept || dept2 || '', // backward compat
     track, title, scene,
     process_text, result_text, extra: extra || '',
@@ -809,12 +703,8 @@ app.post('/api/auth/dd-code', async (req, res) => {
       openId: userInfo.openId,
       unionId: userInfo.unionId,
       nick: userInfo.nick,
+      mobile: userInfo.mobile || '',
       avatarUrl: userInfo.avatarUrl,
-      dept: userInfo.dept || '',
-      dept1: userInfo.dept1 || '',
-      dept2: userInfo.dept2 || '',
-      dept3: userInfo.dept3 || '',
-      email: userInfo.email || '',
       createdAt: Date.now(),
     });
     res.cookie('dd_session', token, {
@@ -826,7 +716,7 @@ app.post('/api/auth/dd-code', async (req, res) => {
     });
     const stage = getCurrentStage();
     const voteCount = getUserStageVoteCount(userInfo.openId, stage);
-    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, dept: userInfo.dept, dept1: userInfo.dept1, dept2: userInfo.dept2, dept3: userInfo.dept3, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, VOTE_LIMIT_PER_STAGE - voteCount), currentStage: stage });
+    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, mobile: userInfo.mobile, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, VOTE_LIMIT_PER_STAGE - voteCount), currentStage: stage });
   } catch (e) {
     console.error('DingTalk auth error:', e.message);
     res.status(400).json({ error: e.message || '钉钉授权失败' });
@@ -843,12 +733,8 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
       openId: userInfo.openId,
       unionId: userInfo.unionId,
       nick: userInfo.nick,
+      mobile: userInfo.mobile || '',
       avatarUrl: userInfo.avatarUrl,
-      dept: userInfo.dept || '',
-      dept1: userInfo.dept1 || '',
-      dept2: userInfo.dept2 || '',
-      dept3: userInfo.dept3 || '',
-      email: userInfo.email || '',
       createdAt: Date.now(),
     });
     res.cookie('dd_session', token, {
@@ -880,7 +766,7 @@ app.get('/api/auth/me', (req, res) => {
   const stage = getCurrentStage();
   const voteCount = getUserStageVoteCount(session.openId, stage);
   res.json({
-    user: { nick: session.nick, openId: session.openId, dept: session.dept || '', dept1: session.dept1 || '', dept2: session.dept2 || '', dept3: session.dept3 || '', avatarUrl: session.avatarUrl },
+    user: { nick: session.nick, openId: session.openId, mobile: session.mobile || '', avatarUrl: session.avatarUrl },
     remainingVotes: Math.max(0, VOTE_LIMIT_PER_STAGE - voteCount),
     totalVotes: VOTE_LIMIT_PER_STAGE,
     currentStage: stage,
