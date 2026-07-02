@@ -141,24 +141,56 @@ async function exchangeDingTalkCode(code) {
   }
   // Get real name and department chain (up to 3 levels) from full user detail
   let dept1 = '', dept2 = '', dept3 = '';
-  if (unionId) {
+  // 优先用 unionId 调新版 contact API；如果失败，fallback 用 oldAPI（v1.0 old）+staffId
+  const userId = unionId; // 钉钉 openapi v1.0 contact/users/{userId} 接 unionId/staffId
+  if (userId) {
+    let detailResp = null;
+    let detailSource = '';
+    // 方案1: 新版 v1.0 contact API (unionId)
     try {
-      const deptResp = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/users/${unionId}`, null, tokenResp.accessToken);
-      console.log('[dd] users/{unionId} full resp:', JSON.stringify(deptResp).substring(0, 500));
+      detailResp = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/users/${userId}`, null, tokenResp.accessToken);
+      detailSource = 'v1.0/contact/users/{unionId}';
+      console.log('[dd] users/{unionId} resp:', JSON.stringify(detailResp).substring(0, 500));
+    } catch (e1) {
+      console.log('[dd] v1.0/contact/users/{unionId} failed:', e1.message);
+      // 方案2: 旧版 oldAPI topapi/v2/user/get (by unionid)
+      try {
+        const oldResp = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/get?access_token=${tokenResp.accessToken}`, { unionid: userId });
+        if (oldResp && oldResp.result) {
+          detailResp = oldResp.result;
+          detailSource = 'topapi/v2/user/get';
+          console.log('[dd] topapi/v2/user/get resp:', JSON.stringify(detailResp).substring(0, 500));
+        }
+      } catch (e2) {
+        console.log('[dd] topapi/v2/user/get also failed:', e2.message);
+      }
+    }
+    if (detailResp) {
       // name = 真实姓名（企业管理员设置，员工无法修改）
-      if (deptResp.name) name = deptResp.name;
-      // deptIdList = 所属部门ID列表
-      if (deptResp.deptIdList && deptResp.deptIdList.length > 0) {
-        const primaryDeptId = deptResp.deptIdList[0];
+      if (detailResp.name) name = detailResp.name;
+      // 部门ID列表字段名兼容: dept_id_list / deptIdList
+      const deptIdList = detailResp.dept_id_list || detailResp.deptIdList || [];
+      console.log(`[dd] dept id list (${detailSource}):`, JSON.stringify(deptIdList));
+      if (deptIdList.length > 0) {
+        const primaryDeptId = deptIdList[0];
         // Trace department chain from leaf to root
         const chain = [];
         let currentId = primaryDeptId;
         for (let i = 0; i < 5 && currentId && currentId !== 1; i++) {
           try {
-            const d = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/depts/${currentId}`, null, tokenResp.accessToken);
-            console.log(`[dd] dept chain [${i}] id=${currentId} name=${d.name} parentId=${d.parentId}`);
+            // 部门信息优先用旧版 topapi/v2/department/get（最稳定）
+            let d = null;
+            try {
+              d = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/department/get?access_token=${tokenResp.accessToken}`, { dept_id: currentId });
+              if (d && d.result) d = d.result;
+            } catch (de) {
+              console.log(`[dd] topapi/v2/department/get ${currentId} failed:`, de.message);
+              // fallback 新版
+              d = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/depts/${currentId}`, null, tokenResp.accessToken);
+            }
+            console.log(`[dd] dept chain [${i}] id=${currentId} name=${d.name} parentId=${d.parent_id || d.parentId}`);
             if (d.name) chain.unshift({ id: currentId, name: d.name });
-            currentId = d.parentId;
+            currentId = d.parent_id || d.parentId;
           } catch (e) {
             console.log(`[dd] Failed to trace dept ${currentId}:`, e.message);
             break;
@@ -169,14 +201,13 @@ async function exchangeDingTalkCode(code) {
         dept1 = chain[0] ? chain[0].name : '';
         dept2 = chain[1] ? chain[1].name : '';
         dept3 = chain[2] ? chain[2].name : '';
-        // If chain has more than 3, merge extra into dept3
         if (chain.length > 3) {
           dept3 = chain.slice(2).map(c => c.name).join('/');
         }
         console.log(`[dd] Dept 3-level: L1="${dept1}" L2="${dept2}" L3="${dept3}"`);
+      } else {
+        console.log('[dd] deptIdList is empty for user, source:', detailSource);
       }
-    } catch (e) {
-      console.log('[dd] Failed to fetch department/name info:', e.message);
     }
   }
   // Fallback: if no real name, use nick
