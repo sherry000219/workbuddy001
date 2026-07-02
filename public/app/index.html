@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云帐房头号玩家第二季 — WorkBuddy实战应用大赛</title>
+<script src="https://g.alicdn.com/dingding/dingtalk-jsapi/3.1.0/dingtalk.open.js"></script>
+<style>
+/* ===== RESET & BASE ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #f8f9fc; --bg-card: #ffffff; --bg-card-hover: #ffffff;
+  --text: #111827; --text-dim: #6b7280; --accent: #00b578; --accent2: #2563eb;
+  --green: #00b578; --gold: #f59e0b; --red: #ef4444; --blue: #2563eb;
+  --brand-deep: #111827; --brand-pink: #ec4899; --brand-purple: #8b5cf6;
+  --radius: 16px; --radius-sm: 10px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.06); --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+/* ===== HERO BANNER ===== */
+.hero { position: relative; width: 100%; min-height: 560px; background: linear-gradient(180deg, #ffffff 0%, #f8f9fc 60%, #f0f4ff 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 85% 20%, rgba(0,181,120,0.08) 0%, transparent 45%), radial-gradient(ellipse at 15% 80%, rgba(37,99,235,0.06) 0%, transparent 45%); z-index: 0; }
+.hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 48px 48px; z-index: 0; opacity: 0.5; }
+@keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 48px 48px; } }
+/* Code rain */
+.code-rain { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.code-drop { position: absolute; color: rgba(0,181,120,0.18); font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; white-space: nowrap; animation: fall linear infinite; }
+@keyframes fall { 0% { transform: translateY(-10%); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110%); opacity: 0; } }
+/* Hero content */
+.hero-content { position: relative; z-index: 2; text-align: center; padding: 80px 24px 100px; max-width: 880px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(0,181,120,0.08); border: 1px solid rgba(0,181,120,0.2); color: var(--accent); padding: 8px 20px; border-radius: 24px; font-size: 13px; font-weight: 600; letter-spacing: 1px; margin-bottom: 24px; }
+.hero-title { font-size: clamp(36px, 6vw, 64px); font-weight: 800; color: #111827; margin-bottom: 16px; line-height: 1.15; letter-spacing: -0.02em; }
+.hero-sub { font-size: clamp(16px, 2.4vw, 22px); color: #4b5563; font-weight: 400; letter-spacing: 0; margin-bottom: 36px; line-height: 1.6; }
+.hero-cta { display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: #fff; font-weight: 600; font-size: 16px; padding: 14px 32px; border-radius: 12px; text-decoration: none; box-shadow: 0 8px 24px rgba(0,181,120,0.25); transition: all 0.2s; cursor: pointer; border: none; }
+.hero-cta:hover { background: #009e65; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,181,120,0.3); }
+/* Logo mascot */
+.logo-container { position: relative; width: 220px; height: 220px; margin: 0 auto 28px; background: linear-gradient(135deg, #1f2937, #111827); border: 1px solid rgba(0,0,0,0.08); border-radius: 32px; padding: 24px; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg), 0 0 60px rgba(0,181,120,0.12); animation: logoFloat 3s ease-in-out infinite; }
+.logo-container img { width: 100%; height: 100%; object-fit: contain; }
+@keyframes logoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+/* IP mascots */
+.ip-mascot { position: absolute; z-index: 2; pointer-events: none; animation: mascotFloat 4s ease-in-out infinite; }
+.ip-mascot.left { left: 6%; bottom: 12%; width: min(180px, 18vw); }
+.ip-mascot.right { right: 6%; bottom: 14%; width: min(160px, 16vw); animation-delay: -2s; }
+.ip-mascot img { width: 100%; height: auto; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12)); }
+@keyframes mascotFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-14px) rotate(2deg); } }
+/* Keyboard */
+.kb-container { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; gap: 6px; }
+.kb-key { width: 28px; height: 34px; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06); border-radius: 6px; color: rgba(0,0,0,0.35); font-size: 10px; display: flex; align-items: center; justify-content: center; font-family: monospace; transition: all 0.3s; animation: keyGlow 2s ease-in-out infinite; }
+@keyframes keyGlow { 0%, 100% { border-color: rgba(0,0,0,0.06); box-shadow: none; } 50% { border-color: rgba(0,181,120,0.35); box-shadow: 0 0 8px rgba(0,181,120,0.12); } }
+
+/* ===== NAVIGATION CARDS ===== */
+.nav-section { max-width: 1100px; margin: -40px auto 0; padding: 0 24px; position: relative; z-index: 10; }
+.nav-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.nav-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 28px 16px 24px; cursor: pointer; text-align: center; transition: all 0.3s; position: relative; overflow: hidden; box-shadow: var(--shadow); }
+.nav-card:hover { transform: translateY(-6px); border-color: #d1d5db; box-shadow: var(--shadow-lg); }
+.nav-card.card-submit { border-top: 3px solid var(--accent); }
+.nav-card.card-gallery { border-top: 3px solid var(--green); }
+.nav-card.card-ranking { border-top: 3px solid var(--gold); }
+.nav-card.card-judge { border-top: 3px solid var(--accent2); }
+.nav-card.card-admin { border-top: 3px solid var(--brand-deep); }
+.nav-card .nc-icon { font-size: 44px; margin-bottom: 10px; display: block; filter: grayscale(0); transition: transform 0.3s; }
+.nav-card:hover .nc-icon { transform: scale(1.15); }
+.nav-card .nc-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.nav-card .nc-sub { font-size: 11px; color: var(--text-dim); }
+
+/* ===== STAGE BAR ===== */
+.stage-bar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.stage-bar .stage-label { font-size: 14px; font-weight: 700; color: var(--accent); }
+.stage-bar .stage-progress { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim); }
+.stage-bar .stage-dot { width: 10px; height: 10px; border-radius: 50%; background: #e5e7eb; }
+.stage-bar .stage-dot.active { background: var(--accent); box-shadow: 0 0 0 3px rgba(0,181,120,0.15); }
+.stage-bar .stage-dot.done { background: var(--green); }
+
+/* ===== VOTING BANNER ===== */
+#voting-banner { transition: all 0.3s ease; }
+
+/* ===== MAIN CONTENT ===== */
+.main-container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+/* Hidden tabs (kept for JS) */
+.tabs { display: none; }
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== SECTION TITLES ===== */
+.section-title { font-size: 20px; font-weight: 700; margin: 32px 0 18px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.section-title::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; }
+
+/* ===== STATS ===== */
+.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius-sm); padding: 18px 20px; text-align: center; box-shadow: var(--shadow); }
+.stat-card .num { font-size: 30px; font-weight: 700; color: var(--accent); }
+.stat-card .label { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+/* ===== BUTTONS ===== */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; font-family: inherit; }
+.btn-primary { background: var(--accent); color: #fff; font-weight: 600; }
+.btn-primary:hover { background: #009e65; }
+.btn-success { background: var(--green); color: #fff; font-weight: 600; }
+.btn-success:hover { background: #009e65; }
+.btn-warning { background: #faad14; color: #fff; }
+.btn-outline { background: transparent; color: var(--accent); border: 1px solid rgba(0,181,120,0.4); }
+.btn-outline:hover { background: rgba(0,181,120,0.08); border-color: var(--accent); }
+.btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-ghost { background: transparent; color: var(--text-dim); }
+.btn-ghost:hover { background: rgba(0,0,0,0.04); color: var(--text); }
+.btn-gold { background: linear-gradient(135deg, #ffd740, #ff9800); color: #111827; font-weight: 600; }
+
+/* ===== FORM ===== */
+.form-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+.form-step { display: none; }
+.form-step.active { display: block; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.form-group label .required { color: var(--red); margin-left: 2px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; transition: border 0.2s, box-shadow 0.2s; font-family: inherit; background: #fff; color: var(--text); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,181,120,0.12); }
+.form-group textarea { min-height: 100px; resize: vertical; }
+.form-group select option { background: #fff; color: var(--text); }
+.form-hint { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+
+/* ===== SUCCESS ===== */
+.success-page { text-align: center; padding: 60px 20px; }
+.success-page .icon { font-size: 64px; margin-bottom: 20px; }
+.success-page h2 { font-size: 22px; color: var(--green); margin-bottom: 8px; }
+.success-page p { color: var(--text-dim); margin-bottom: 24px; }
+
+/* ===== GALLERY ===== */
+.gallery-toolbar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.gallery-toolbar input[type="text"] { padding: 8px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; flex: 1; min-width: 200px; background: #fff; color: var(--text); }
+.gallery-toolbar select { padding: 8px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; background: #fff; color: var(--text); }
+.gallery-toolbar select option { background: #fff; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.entry-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 20px; transition: all 0.25s; border-left: 4px solid transparent; position: relative; cursor: pointer; box-shadow: var(--shadow); }
+.entry-card:hover { border-color: #d1d5db; transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+/* Round status */
+.entry-card.rs-approved { border-left-color: #d1d5db; }
+.entry-card.rs-semi_finalist { border-left-color: var(--green); }
+.entry-card.rs-finalist { border-left-color: var(--blue); }
+.entry-card.rs-awarded { border-left-color: var(--gold); background: linear-gradient(135deg, rgba(245,158,11,0.06), transparent); }
+.entry-card.rs-eliminated_semi, .entry-card.rs-eliminated_final { opacity: 0.55; border-left-color: #e5e7eb; filter: grayscale(0.6); }
+.entry-card.rs-eliminated_semi:hover, .entry-card.rs-eliminated_final:hover { opacity: 0.85; filter: grayscale(0.3); }
+/* Badges */
+.round-badge { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 6px; vertical-align: middle; }
+.badge-semi { background: rgba(0,181,120,0.1); color: var(--green); border: 1px solid rgba(0,181,120,0.25); }
+.badge-final { background: rgba(37,99,235,0.1); color: var(--blue); border: 1px solid rgba(37,99,235,0.25); }
+.badge-awarded { background: rgba(245,158,11,0.1); color: var(--gold); border: 1px solid rgba(245,158,11,0.25); }
+.badge-eliminated { background: #f3f4f6; color: var(--text-dim); border: 1px solid #e5e7eb; }
+/* Track tags */
+.track-tag { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+.track-efficiency { background: rgba(37,99,235,0.08); color: var(--blue); }
+.track-creative { background: rgba(236,72,153,0.08); color: #ec4899; }
+.track-business { background: rgba(0,181,120,0.08); color: var(--green); }
+.entry-card h3 { font-size: 17px; margin-bottom: 6px; color: var(--text); }
+.entry-card .meta { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; }
+.entry-card .desc { font-size: 14px; color: #4b5563; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.entry-card .card-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+.score-display { font-size: 18px; font-weight: 700; color: var(--gold); }
+.votes { font-size: 12px; color: var(--text-dim); }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+/* ===== MODAL ===== */
+.modal-overlay { position: fixed; inset: 0; background: rgba(17,24,39,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+.modal { background: #fff; border: 1px solid #e5e7eb; border-radius: var(--radius); max-width: 700px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 32px; box-shadow: 0 25px 80px rgba(0,0,0,0.15); }
+.modal h2 { font-size: 20px; margin-bottom: 16px; color: var(--text); }
+.modal .detail-row { margin-bottom: 14px; }
+.modal .detail-row .dlabel { font-size: 12px; color: var(--text-dim); margin-bottom: 2px; }
+.modal .detail-row .dvalue { font-size: 15px; color: var(--text); line-height: 1.6; white-space: pre-wrap; }
+.modal .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ===== JUDGE ===== */
+.judge-login { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 40px; text-align: center; max-width: 400px; margin: 40px auto; box-shadow: var(--shadow); }
+.judge-login input { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; margin: 10px 0; background: #fff; color: var(--text); }
+.judge-panel { display: none; }
+.judge-panel.active { display: block; }
+.score-table { width: 100%; background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.score-table table { width: 100%; border-collapse: collapse; }
+.score-table th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-dim); border-bottom: 1px solid #e5e7eb; }
+.score-table td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid #f3f4f6; color: var(--text); }
+.score-table tr:hover td { background: #f9fafb; }
+.score-table .scored td { background: rgba(0,181,120,0.05); }
+.score-table input[type="number"] { width: 60px; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; text-align: center; background: #fff; color: var(--text); }
+.judge-name-display { font-size: 14px; color: var(--text-dim); margin-bottom: 16px; }
+
+/* ===== DATA MGMT ===== */
+.data-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+.data-card h3 { font-size: 16px; margin-bottom: 12px; color: var(--text); }
+.data-card p { font-size: 14px; color: var(--text-dim); line-height: 1.8; }
+
+/* ===== RANKING ===== */
+.ranking-list { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.rank-item { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f3f4f6; gap: 16px; cursor: pointer; transition: background 0.2s; }
+.rank-item:hover { background: #f9fafb; }
+.rank-item:last-child { border-bottom: none; }
+.rank-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+.rank-num.top1 { background: var(--gold); color: #fff; }
+.rank-num.top2 { background: #9ca3af; color: #fff; }
+.rank-num.top3 { background: #b45309; color: #fff; }
+.rank-num.normal { background: #f3f4f6; color: var(--text-dim); }
+.rank-info { flex: 1; min-width: 0; }
+.rank-info .rname { font-weight: 600; font-size: 15px; color: var(--text); }
+.rank-info .rdept { font-size: 12px; color: var(--text-dim); }
+.rank-score { font-size: 22px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+
+/* ===== PROMOTE PANEL ===== */
+.promote-panel { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+.promote-panel h3 { font-size: 16px; margin-bottom: 8px; color: var(--text); }
+.promote-entry { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #f3f4f6; }
+.promote-entry:hover { background: #f9fafb; }
+.promote-entry input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
+.promote-entry .pe-title { font-weight: 500; font-size: 14px; flex: 1; color: var(--text); }
+.promote-entry .pe-score { font-size: 13px; color: var(--text-dim); }
+.award-select { padding: 4px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; background: #fff; color: var(--text); }
+
+/* ===== JUDGE GAP ===== */
+.judge-gap-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 14px; min-width: 140px; cursor: default; }
+.judge-gap-card .gap-judge { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.judge-gap-card .gap-bar { height: 4px; background: #e5e7eb; border-radius: 2px; margin-bottom: 4px; }
+.judge-gap-card .gap-fill { height: 100%; border-radius: 2px; background: var(--green); transition: width 0.3s; }
+.judge-gap-card.gap-half .gap-fill { background: #faad14; }
+.judge-gap-card.gap-low .gap-fill { background: var(--red); }
+.judge-gap-card .gap-nums { font-size: 11px; color: var(--text-dim); }
+.judge-gap-card .gap-missing { font-size: 11px; color: var(--red); cursor: pointer; margin-top: 2px; }
+.judge-gap-card .gap-ok { font-size: 14px; color: var(--green); font-weight: 700; margin-top: 2px; }
+.judge-gap-card.gap-done { border-color: rgba(0,181,120,0.3); }
+.judge-gap-card.gap-half { border-color: rgba(250,173,20,0.3); }
+.judge-gap-card.gap-low { border-color: rgba(239,68,68,0.3); }
+
+/* ===== TOAST ===== */
+.toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #fff; color: var(--text); padding: 12px 28px; border-radius: 10px; font-size: 14px; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; border: 1px solid #e5e7eb; box-shadow: var(--shadow-lg); }
+.toast.show { opacity: 1; }
+.toast.success { border-color: rgba(0,181,120,0.3); color: #059669; }
+.toast.error { border-color: rgba(239,68,68,0.3); color: #dc2626; }
+
+/* ===== DETAILS (settings) ===== */
+details summary { cursor: pointer; font-size: 15px; font-weight: 600; padding: 8px 0; color: var(--text-dim); }
+details summary:hover { color: var(--text); }
+details select, details input[type="checkbox"] { accent-color: var(--accent); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .nav-grid { grid-template-columns: repeat(3, 1fr); }
+  .nav-card:last-child { grid-column: span 1; }
+}
+@media (max-width: 900px) {
+  .ip-mascot { display: none; }
+}
+@media (max-width: 640px) {
+  .hero { min-height: 480px; }
+  .logo-container { width: 160px; height: 160px; padding: 18px; }
+  .hero-title { font-size: clamp(28px, 8vw, 40px); }
+  .nav-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .nav-card { padding: 20px 12px 16px; }
+  .gallery-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .score-table { overflow-x: auto; }
+  .main-container { padding: 0 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HERO BANNER ===== -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="code-rain" id="codeRain"></div>
+  <div class="ip-mascot left">
+    <img src="/ip-xiaor.png" alt="小R" onerror="this.style.display='none'">
+  </div>
+  <div class="ip-mascot right">
+    <img src="/ip-zhangsir.png" alt="帐Sir" onerror="this.style.display='none'">
+  </div>
+  <div class="hero-content">
+    <div class="logo-container">
+      <img src="/logo-yzf-white.png" alt="云帐房" onerror="this.style.display='none'">
+    </div>
+    <div class="hero-badge">YUNZHANGFANG · SEASON 2</div>
+    <a href="/" style="display:inline-block;margin-bottom:12px;color:#6b7280;font-size:13px;text-decoration:none;transition:color .2s;" onmouseenter="this.style.color='#ff6b35'" onmouseleave="this.style.color='#6b7280'">← 活动介绍</a>
+    <h1 class="hero-title">云帐房头号玩家第二季</h1>
+    <p class="hero-sub">WorkBuddy 实战应用大赛 — 做任务攒能量，开盲盒解锁你的专属 Buddy</p>
+    <button class="hero-cta" onclick="document.querySelector('.nav-card.card-submit').click()">立即投稿 <span style="font-size:18px;">→</span></button>
+  </div>
+  <div class="kb-container">
+    <div class="kb-key" style="animation-delay:0s">Q</div><div class="kb-key" style="animation-delay:0.1s">W</div><div class="kb-key" style="animation-delay:0.2s">E</div><div class="kb-key" style="animation-delay:0.3s">R</div><div class="kb-key" style="animation-delay:0.4s">T</div><div class="kb-key" style="animation-delay:0.5s">Y</div>
+    <div class="kb-key" style="animation-delay:0.15s;background:rgba(0,181,120,0.12)">A</div><div class="kb-key" style="animation-delay:0.25s;background:rgba(0,181,120,0.12)">S</div><div class="kb-key" style="animation-delay:0.35s;background:rgba(0,181,120,0.12)">D</div><div class="kb-key" style="animation-delay:0.45s;background:rgba(0,181,120,0.12)">F</div>
+    <div class="kb-key" style="animation-delay:0.3s;background:rgba(37,99,235,0.12)">Z</div><div class="kb-key" style="animation-delay:0.4s;background:rgba(37,99,235,0.12)">X</div><div class="kb-key" style="animation-delay:0.5s;background:rgba(37,99,235,0.12)">C</div>
+  </div>
+</div>
+
+<!-- ===== NAVIGATION CARDS ===== -->
+<div class="nav-section">
+  <div class="nav-grid">
+    <div class="nav-card card-submit" onclick="switchTab('submit')">
+      <span class="nc-icon">✍️</span>
+      <div class="nc-title">报名投稿</div>
+      <div class="nc-sub">提交你的参赛作品</div>
+    </div>
+    <div class="nav-card card-gallery" onclick="switchTab('gallery')">
+      <span class="nc-icon">🎨</span>
+      <div class="nc-title">作品展示</div>
+      <div class="nc-sub">浏览所有参赛作品</div>
+    </div>
+    <div class="nav-card card-ranking" onclick="switchTab('ranking')">
+      <span class="nc-icon">🏆</span>
+      <div class="nc-title">实时排行</div>
+      <div class="nc-sub">查看综合得分排名</div>
+    </div>
+    <div class="nav-card card-judge" onclick="switchTab('judge')">
+      <span class="nc-icon">⚖️</span>
+      <div class="nc-title">评委入口</div>
+      <div class="nc-sub">评委打分评审</div>
+    </div>
+    <div class="nav-card card-admin" onclick="switchTab('admin')">
+      <span class="nc-icon">⚙️</span>
+      <div class="nc-title">管理员入口</div>
+      <div class="nc-sub">后台数据管理</div>
+    </div>
+  </div>
+</div>
+
+<!-- Stage indicator bar -->
+<div class="stage-bar" id="stageBar">
+  <span class="stage-label" id="stageLabel">📍 初赛阶段</span>
+  <span style="display:flex;align-items:center;gap:6px;">
+    <span id="dd-user-area" style="display:none;">
+      <span id="dd-user-name" style="font-size:13px;font-weight:500;margin-right:6px;"></span>
+      <span id="dd-remaining" style="background:rgba(0,181,120,0.1);padding:2px 10px;border-radius:12px;font-size:11px;"></span>
+      <button onclick="ddLogout()" style="background:#f3f4f6;border:none;color:var(--text-dim);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:4px;">退出</button>
+    </span>
+    <span id="dd-login-area">
+      <button id="dd-login-btn" onclick="ddLogin()" style="background:rgba(0,181,120,0.1);border:1px solid rgba(0,181,120,0.25);color:var(--accent);padding:5px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;">钉钉登录</button>
+    </span>
+  </span>
+  <div class="stage-progress" style="margin-left:auto;">
+    <span class="stage-dot active" id="dot-preliminary"></span> 初赛
+    <span class="stage-dot" id="dot-semi_final"></span> 复赛
+    <span class="stage-dot" id="dot-final"></span> 决赛
+    <span class="stage-dot" id="dot-awarded"></span> 结算
+  </div>
+</div>
+
+<!-- Voting status banner -->
+<div id="voting-banner" style="display:none;background:rgba(255,215,64,0.08);border:1px solid rgba(255,215,64,0.2);border-radius:8px;padding:12px 24px;margin:12px 16px;text-align:center;color:#ffd740;font-size:14px;">
+  ⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道
+</div>
+
+<!-- ===== HIDDEN TABS (for JS compatibility) ===== -->
+<div class="tabs" id="tabNav">
+  <div class="tab active" data-tab="submit">报名投稿<span class="badge" id="badge-submit">0</span></div>
+  <div class="tab" data-tab="gallery">作品展示<span class="badge" id="badge-gallery">0</span></div>
+  <div class="tab" data-tab="ranking">实时排行</div>
+  <div class="tab" data-tab="judge">评委评审</div>
+  <div class="tab" data-tab="admin">数据管理</div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-container">
+
+<!-- PAGE: SUBMIT -->
+<div class="page active" id="page-submit">
+  <div class="section-title">📝 报名投稿</div>
+  <div class="stats-bar" id="submitStats"></div>
+  <div class="form-card" id="formCard">
+    <div class="form-step active" id="step1">
+      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第1步：基本信息</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>姓名 <span class="required">*</span></label>
+          <input type="text" id="f-name" placeholder="请输入你的姓名">
+        </div>
+        <div class="form-group">
+          <label>部门 <span class="required">*</span></label>
+          <select id="f-dept">
+            <option value="">请选择部门</option>
+            <option value="中小微-总部">中小微-总部</option>
+            <option value="中小微-区域团队">中小微-区域团队</option>
+            <option value="产研中心">产研中心</option>
+            <option value="职能中台">职能中台</option>
+            <option value="有度税智">有度税智</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>子部门名称 <span class="required">*</span></label>
+        <input type="text" id="f-subdept" placeholder="请填写你所在的子部门/团队名称">
+      </div>
+      <div class="form-group">
+        <label>参赛赛道 <span class="required">*</span></label>
+        <select id="f-track">
+          <option value="">请选择赛道</option>
+          <option value="efficiency">效率提升</option>
+          <option value="creative">创意应用</option>
+          <option value="business">业务赋能</option>
+        </select>
+        <div class="form-hint">鼓励方向，不强制归入；选最贴近的即可</div>
+      </div>
+      <div class="form-group">
+        <label>作品标题 <span class="required">*</span></label>
+        <input type="text" id="f-title" placeholder="给你的作品起个吸引人的名字">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="nextStep(2)">下一步 →</button>
+      </div>
+    </div>
+    <div class="form-step" id="step2">
+      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第2步：作品详情</div>
+      <div class="form-group">
+        <label>场景描述 <span class="required">*</span></label>
+        <textarea id="f-scene" rows="3" placeholder="描述你解决的是什么工作场景/问题？"></textarea>
+      </div>
+      <div class="form-group">
+        <label>使用过程 <span class="required">*</span></label>
+        <textarea id="f-process" rows="4" placeholder="描述你如何使用WorkBuddy完成这个任务？包括关键步骤、用到的功能等"></textarea>
+      </div>
+      <div class="form-group">
+        <label>效果呈现 <span class="required">*</span></label>
+        <textarea id="f-result" rows="3" placeholder="使用WorkBuddy后的效果如何？推荐用量化数据"></textarea>
+      </div>
+      <div class="form-group">
+        <label>作品链接 / 附加信息（选填）<br><small style="font-weight:400;color:var(--accent);">建议上传钉钉文档链接或网页链接展示作品，评委可直接点击查看</small></label>
+        <textarea id="f-extra" rows="2" placeholder="粘贴钉钉文档链接、网页链接，或补充其他说明"></textarea>
+        <div class="form-hint">链接提交后可在作品详情中直接点击跳转</div>
+      </div>
+      <div class="form-group">
+        <label>上传附件（选填，单文件 50MB 以内）</label>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <input type="file" id="f-attachment" style="display:none;" onchange="handleAttachmentSelect(event)">
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('f-attachment').click()">选择文件</button>
+          <span id="attachment-name" style="font-size:13px;color:var(--text-dim);">未选择文件</span>
+          <button type="button" id="attachment-clear" class="btn btn-ghost btn-sm" style="display:none;" onclick="clearAttachment()">清除</button>
+        </div>
+        <div class="form-hint">支持图片、PDF、Word、Excel、压缩包等格式</div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="prevStep(1)">← 上一步</button>
+        <button class="btn btn-success" onclick="submitEntry()">提交作品</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: GALLERY -->
+<div class="page" id="page-gallery">
+  <div class="section-title">🎨 作品展示</div>
+  <div class="stats-bar" id="galleryStats"></div>
+  <div class="gallery-toolbar">
+    <input type="text" id="gallerySearch" placeholder="🔍 搜索作品标题、作者..." oninput="renderGallery()">
+    <select id="galleryTrack" onchange="renderGallery()">
+      <option value="">全部赛道</option>
+      <option value="efficiency">效率提升</option>
+      <option value="creative">创意应用</option>
+      <option value="business">业务赋能</option>
+    </select>
+    <select id="galleryDept" onchange="renderGallery()">
+      <option value="">全部部门</option>
+    </select>
+    <select id="gallerySort" onchange="renderGallery()">
+      <option value="votes">按票数排序</option>
+      <option value="score">按评分排序</option>
+      <option value="composite">按综合分排序</option>
+      <option value="newest">按发布时间</option>
+    </select>
+  </div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+</div>
+
+<!-- PAGE: RANKING -->
+<div class="page" id="page-ranking">
+  <div class="section-title">🏆 <span id="rankingTitle">初赛 — 综合排名 Top 30</span></div>
+  <div class="stats-bar" id="rankingStats"></div>
+  <p id="rankingDesc" style="color:var(--text-dim);margin-bottom:16px;font-size:13px;">按专家评审分（80%）+ 全员投票分（20%）合并计算</p>
+  <div class="gallery-toolbar" style="margin-bottom:16px;">
+    <select id="rankTrack" onchange="renderRanking()">
+      <option value="">全部赛道</option>
+      <option value="efficiency">效率提升</option>
+      <option value="creative">创意应用</option>
+      <option value="business">业务赋能</option>
+    </select>
+  </div>
+  <div class="ranking-list" id="rankingList"></div>
+</div>
+
+<!-- PAGE: JUDGE -->
+<div class="page" id="page-judge">
+  <div class="section-title">⚖️ 评委评审</div>
+  <div class="judge-login" id="judgeLogin">
+    <div style="font-size:48px;margin-bottom:16px;">🔐</div>
+    <h2 style="margin-bottom:8px;">评委登录</h2>
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:20px;">请输入评委姓名和评审密码</p>
+    <div id="judge-auth-check"></div>
+    <input type="text" id="judgeNameInput" placeholder="评委姓名" autocomplete="off">
+    <input type="password" id="judgePwInput" placeholder="评审密码" autocomplete="off">
+    <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="enterJudge()">进入评审</button>
+  </div>
+  <div class="judge-panel" id="judgePanel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+      <span class="judge-name-display" id="judgeNameDisplay">当前评委：</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select id="judgeTrackFilter" onchange="renderJudgePanel()" style="padding:6px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;background:#fff;color:var(--text);">
+          <option value="">全部赛道</option>
+          <option value="efficiency">效率提升</option>
+          <option value="creative">创意应用</option>
+          <option value="business">业务赋能</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="logoutJudge()">退出</button>
+      </div>
+    </div>
+    <div id="judgeStageNotice" style="background:rgba(0,181,120,0.06);padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:var(--accent);border:1px solid rgba(0,181,120,0.15);">
+      <b>📋 当前评审阶段：</b><span id="judgeStageLabel">初赛</span>
+      <span id="judgeStageHint" style="margin-left:8px;color:var(--text-dim);">（本阶段打分独立计算，不影响其他阶段）</span>
+    </div>
+    <div style="background:rgba(255,215,64,0.06);padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:rgba(255,215,64,0.7);">
+      <b>打分维度参考：</b>
+      实用性(30%)：解决了真实工作问题 |
+      创新性(25%)：场景/用法新颖有启发性 |
+      可推广性(25%)：其他同事可复用 |
+      效果呈现(20%)：有量化数据支撑
+    </div>
+    <div class="score-table">
+      <table>
+        <thead>
+          <tr>
+            <th>作品</th><th>姓名</th><th>部门</th><th>赛道</th>
+            <th>实用性<br><small>/30</small></th><th>创新性<br><small>/25</small></th><th>可推广性<br><small>/25</small></th><th>效果呈现<br><small>/20</small></th>
+            <th>总分</th><th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="judgeTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: ADMIN -->
+<div class="page" id="page-admin">
+  <div class="section-title">⚙️ 数据管理</div>
+  <div class="judge-login" id="adminLogin">
+    <div style="font-size:48px;margin-bottom:16px;">🛡️</div>
+    <h2 style="margin-bottom:8px;">管理员登录</h2>
+    <input type="password" id="adminPwInput" placeholder="管理员密码" autocomplete="off">
+    <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="adminLogin()">登录管理后台</button>
+  </div>
+  <div class="judge-panel" id="adminPanel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+      <span style="font-weight:600;color:var(--accent);">📊 当前阶段：<span id="adminStageLabel">初赛</span></span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm" onclick="adminExportCSV()">📥 导出CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="adminLogout()">退出</button>
+      </div>
+    </div>
+    <div class="stats-bar" id="adminStatsBar"></div>
+    <div id="judgeGapSummary" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;"></div>
+    <div id="stageManagePanel"></div>
+    <details style="margin-bottom:20px;">
+      <summary style="cursor:pointer;font-size:15px;font-weight:600;padding:8px 0;color:var(--text-dim);">⚙️ 系统设置 & 危险操作</summary>
+      <div style="background:var(--bg-card);border:1px solid #e5e7eb;border-radius:var(--radius);padding:24px;margin-top:12px;box-shadow:var(--shadow);">
+        <div style="margin-bottom:16px;">
+          <label style="font-weight:500;display:block;margin-bottom:6px;">📌 当前阶段</label>
+          <select id="adminStageSelect" onchange="saveStageSelect()" style="width:100%;max-width:240px;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:#fff;color:var(--text);">
+            <option value="preliminary">初赛</option>
+            <option value="semi_final">复赛</option>
+            <option value="final">决赛</option>
+          </select>
+        </div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500;">
+            <span>🔓 开启全员投票</span>
+            <input type="checkbox" id="adminVotingToggle" onchange="saveVotingToggle()" style="width:18px;height:18px;">
+          </label>
+          <p style="color:var(--text-dim);font-size:12px;margin:4px 0 0 28px;">开启后，已登录的钉钉用户即可投票（当前阶段有效）</p>
+        </div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #e5e7eb;">
+          <p style="color:var(--text-dim);font-size:13px;margin-bottom:4px;">🔄 重置操作（保留作品投稿）</p>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="btn btn-outline btn-sm" onclick="adminReset('stage')">🔄 重置阶段</button>
+            <button class="btn btn-outline btn-sm" onclick="adminReset('full')">⚠️ 完全重置</button>
+          </div>
+        </div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,82,82,0.2);">
+          <p style="color:var(--red);font-size:13px;margin-bottom:4px;">⚠️ 清空数据（不可恢复）</p>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="btn btn-danger btn-sm" onclick="if(confirm('确定要清空所有数据吗？'))clearAllData('all')">清空所有数据</button>
+            <button class="btn btn-danger btn-sm" onclick="if(confirm('确定要清空评委打分吗？'))clearAllData('scores')">清空评委打分</button>
+          </div>
+        </div>
+      </div>
+    </details>
+    <div class="score-table" style="overflow-x:auto;">
+      <table style="min-width:900px;">
+        <thead>
+          <tr id="adminScoreHeaderRow">
+            <th style="position:sticky;left:0;background:#f9fafb;z-index:1;">作品</th>
+            <th>姓名</th>
+            <th>部门</th>
+            <th>赛道</th>
+            <th>轮次</th>
+            <th id="adminJudgeHeaders">评委评分</th>
+            <th>均分</th>
+            <th>综合分</th>
+            <th>评委数</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="adminScoreBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- .main-container -->
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== DETAIL MODAL ===== -->
+<div class="modal-overlay" id="detailModal" style="display:none;" onclick="if(event.target===this)closeDetail()">
+  <div class="modal" id="detailContent"></div>
+</div>
+
+<script>
+// ========== CODE RAIN INIT ==========
+(function(){
+  var r = document.getElementById('codeRain');
+  if (!r) return;
+  var snippets = ['AI()', '{...}', 'api/', 'npm i', 'def ', 'async', 'await', 'class', 'const', 'let ', 'map()', 'JSON', '</>', '#tag', '1+1=2', 'var ', 'new ', 'this', '...s', '=>{}', 'log()', 'null', 'true', 'git '];
+  for (var i = 0; i < 25; i++) {
+    var d = document.createElement('div');
+    d.className = 'code-drop';
+    d.style.left = Math.random() * 100 + '%';
+    d.style.animationDuration = (6 + Math.random() * 8) + 's';
+    d.style.animationDelay = Math.random() * 8 + 's';
+    d.style.fontSize = (10 + Math.random() * 6) + 'px';
+    d.textContent = snippets[Math.floor(Math.random() * snippets.length)];
+    r.appendChild(d);
+  }
+})();
+
+// ========== STATE ==========
+let ddAuthed = false;
+let ddUser = null;
+let ddRemaining = 5;
+let votingEnabled = false;
+let currentStage = 'preliminary';
+let isVotingStage = true;
+
+const STAGE_LABELS = {
+  preliminary: '初赛',
+  semi_final: '复赛',
+  final: '决赛',
+  awarded: '已结算'
+};
+
+const ROUND_LABELS = {
+  approved: '初赛',
+  semi_finalist: '复赛晋级',
+  eliminated_semi: '复赛淘汰',
+  finalist: '决赛晋级',
+  eliminated_final: '决赛淘汰',
+  awarded: '已获奖'
+};
+
+const AWARD_LABELS = {
+  first: '🥇 一等奖',
+  second: '🥈 二等奖',
+  third: '🥉 三等奖',
+  excellence: '🎖️ 优秀奖'
+};
+
+// ========== DINGTALK AUTH ==========
+function isInDingTalk() {
+  try {
+    return typeof dd !== 'undefined' && dd.env && dd.env.platform && dd.env.platform !== 'notInDingTalk';
+  } catch(e) {
+    return false;
+  }
+}
+
+async function ddLogin() {
+  if (isInDingTalk()) {
+    dd.ready(function() {
+      dd.runtime.permission.requestAuthCode({
+        corpId: '',
+        onSuccess: function(result) {
+          exchangeCode(result.code);
+        },
+        onFail: function(err) {
+          showToast('获取钉钉授权失败，请重试', 'error');
+        }
+      });
+    });
+    return;
+  }
+  try {
+    const resp = await fetch('/api/auth/dd-url');
+    const data = await resp.json();
+    window.location.href = data.url;
+  } catch(e) {
+    showToast('无法发起钉钉登录，请重试', 'error');
+  }
+}
+
+async function exchangeCode(code) {
+  try {
+    const resp = await fetch('/api/auth/dd-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+      credentials: 'include'
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '登录失败');
+    ddAuthed = true;
+    ddUser = data.user;
+    ddRemaining = data.remainingVotes;
+    currentStage = data.currentStage || 'preliminary';
+    isVotingStage = isStageVoting(currentStage);
+    updateUserUI();
+    updateStageUI();
+    showToast('钉钉登录成功，欢迎 ' + ddUser.nick + '！', 'success');
+    refreshCurrentPage();
+  } catch(e) {
+    showToast('登录失败：' + e.message, 'error');
+  }
+}
+
+async function checkAuth() {
+  try {
+    const resp = await fetch('/api/auth/me', { credentials: 'include' });
+    const data = await resp.json();
+    if (data.user) {
+      ddAuthed = true;
+      ddUser = data.user;
+      ddRemaining = data.remainingVotes;
+      currentStage = data.currentStage || 'preliminary';
+      isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage);
+      updateUserUI();
+      updateStageUI();
+    } else {
+      ddAuthed = false;
+      ddUser = null;
+      ddRemaining = 5;
+      updateUserUI();
+    }
+  } catch(e) {
+    ddAuthed = false;
+    updateUserUI();
+  }
+}
+
+function isStageVoting(stage) {
+  return stage === 'preliminary' || stage === 'semi_final';
+}
+
+function updateUserUI() {
+  const userArea = document.getElementById('dd-user-area');
+  const loginArea = document.getElementById('dd-login-area');
+  if (ddAuthed && ddUser) {
+    userArea.style.display = 'inline-flex';
+    userArea.style.alignItems = 'center';
+    userArea.style.gap = '6px';
+    loginArea.style.display = 'none';
+    document.getElementById('dd-user-name').textContent = ddUser.nick;
+    const stageLabel = isVotingStage ? '（' + STAGE_LABELS[currentStage] + '）' : '';
+    document.getElementById('dd-remaining').textContent = isVotingStage ? '剩余 ' + ddRemaining + ' 票' + stageLabel : STAGE_LABELS[currentStage];
+  } else {
+    userArea.style.display = 'none';
+    loginArea.style.display = 'inline';
+  }
+}
+
+function updateStageUI() {
+  const label = document.getElementById('stageLabel');
+  if (label) {
+    label.textContent = '📍 ' + (STAGE_LABELS[currentStage] || '初赛') + '阶段';
+  }
+  const stages = ['preliminary', 'semi_final', 'final', 'awarded'];
+  const currentIdx = stages.indexOf(currentStage);
+  stages.forEach((s, i) => {
+    const dot = document.getElementById('dot-' + s);
+    if (dot) {
+      dot.className = 'stage-dot';
+      if (i < currentIdx) dot.classList.add('done');
+      else if (i === currentIdx) dot.classList.add('active');
+    }
+  });
+  const desc = document.getElementById('rankingDesc');
+  if (desc) {
+    if (currentStage === 'final' || currentStage === 'awarded') {
+      desc.textContent = '决赛阶段：按评委打分（100%）排名';
+    } else {
+      desc.textContent = '按专家评审分（80%）+ 全员投票分（20%）合并计算';
+    }
+  }
+  const title = document.getElementById('rankingTitle');
+  if (title) {
+    const stageText = STAGE_LABELS[currentStage] || '初赛';
+    title.textContent = stageText + ' — 综合排名 Top 30';
+  }
+  const jsl = document.getElementById('judgeStageLabel');
+  if (jsl) jsl.textContent = STAGE_LABELS[currentStage] || '初赛';
+}
+
+async function checkVotingStatus() {
+  try {
+    const resp = await fetch('/api/voting/status');
+    const data = await resp.json();
+    votingEnabled = !!data.votingEnabled;
+    currentStage = data.currentStage || 'preliminary';
+    isVotingStage = isStageVoting(currentStage);
+  } catch(e) {
+    votingEnabled = false;
+  }
+  updateVotingUI();
+  updateStageUI();
+}
+
+function updateVotingUI() {
+  const banner = document.getElementById('voting-banner');
+  if (votingEnabled && isVotingStage) {
+    banner.style.display = 'none';
+  } else if (!isVotingStage) {
+    banner.style.display = 'block';
+    banner.innerHTML = '📋 当前为<strong>' + STAGE_LABELS[currentStage] + '</strong>阶段，不支持投票';
+    banner.style.background = 'rgba(37,99,235,0.06)';
+    banner.style.borderColor = 'rgba(37,99,235,0.15)';
+    banner.style.color = '#2563eb';
+  } else {
+    banner.style.display = 'block';
+    banner.innerHTML = '⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道';
+    banner.style.background = 'rgba(255,215,64,0.08)';
+    banner.style.borderColor = 'rgba(255,215,64,0.2)';
+    banner.style.color = '#ffd740';
+  }
+}
+
+async function ddLogout() {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+  } catch(e) {}
+  ddAuthed = false;
+  ddUser = null;
+  ddRemaining = 5;
+  updateUserUI();
+  refreshCurrentPage();
+  showToast('已退出登录');
+}
+
+function refreshCurrentPage() {
+  const activeTab = document.querySelector('.tab.active');
+  if (activeTab) {
+    switch(activeTab.dataset.tab) {
+      case 'submit': renderSubmitPage(); break;
+      case 'gallery': renderGallery(); break;
+      case 'ranking': renderRanking(); break;
+      case 'judge': renderJudgePage(); break;
+      case 'admin': renderAdminPage(); break;
+    }
+  }
+}
+
+// ========== HELPERS ==========
+function showToast(msg, type) {
+  type = type || '';
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 2800);
+}
+
+function trackLabel(t) {
+  return { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' }[t] || t;
+}
+
+function trackClass(t) {
+  return { efficiency: 'track-efficiency', creative: 'track-creative', business: 'track-business' }[t] || '';
+}
+
+function roundBadge(rs) {
+  if (!rs || rs === 'approved') return '';
+  const map = {
+    semi_finalist: '<span class="round-badge badge-semi">🟢 复赛</span>',
+    finalist: '<span class="round-badge badge-final">🔵 决赛</span>',
+    awarded: '<span class="round-badge badge-awarded">🏆 已获奖</span>',
+    eliminated_semi: '<span class="round-badge badge-eliminated">淘汰</span>',
+    eliminated_final: '<span class="round-badge badge-eliminated">淘汰</span>'
+  };
+  return map[rs] || '';
+}
+
+function awardBadge(award) {
+  if (!award) return '';
+  return '<span class="round-badge badge-awarded">' + (AWARD_LABELS[award] || award) + '</span>';
+}
+
+function linkify(text) {
+  if (!text) return '';
+  const urlRegex = /(https?:\/\/[^\s<]+)/gi;
+  return text.replace(/\n/g, '<br>').replace(urlRegex, function(url) {
+    let cleanUrl = url.replace(/[.,;:!?)\]]+$/, '');
+    return '<a href="' + cleanUrl + '" target="_blank" rel="noopener" style="color:#00b578;word-break:break-all;">' + cleanUrl + '</a>';
+  });
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+// ========== API CALLS ==========
+async function api(url, options) {
+  options = options || {};
+  const resp = await fetch(url, {
+    method: options.method || 'GET',
+    headers: options.headers || {},
+    body: options.body,
+    credentials: 'include'
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+let allEntries = [];
+let judgePassword = '';
+
+// ========== TAB SWITCHING ==========
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    document.getElementById('page-' + tab.dataset.tab).classList.add('active');
+    switch(tab.dataset.tab) {
+      case 'submit': renderSubmitPage(); break;
+      case 'gallery': renderGallery(); break;
+      case 'ranking': renderRanking(); break;
+      case 'judge': renderJudgePage(); break;
+      case 'admin': renderAdminPage(); break;
+    }
+  });
+});
+
+// ========== STATS ==========
+async function loadStats() {
+  try {
+    const stats = await api('/api/stats');
+    document.getElementById('badge-submit').textContent = stats.totalEntries;
+    document.getElementById('badge-gallery').textContent = stats.approvedEntries;
+    return stats;
+  } catch(e) { return {}; }
+}
+
+function renderStatsBar(containerId, stats) {
+  const container = document.getElementById(containerId);
+  if (!container || !stats) return;
+  let html = '';
+  html += '<div class="stat-card"><div class="num">' + (stats.totalEntries || 0) + '</div><div class="label">总投稿数</div></div>';
+  html += '<div class="stat-card"><div class="num">' + (stats.approvedEntries || 0) + '</div><div class="label">已收录作品</div></div>';
+  html += '<div class="stat-card"><div class="num">' + (stats.totalVotes || 0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '投票数</div></div>';
+  html += '<div class="stat-card"><div class="num">' + (stats.judgeCount || 0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '评委数</div></div>';
+  if (stats.semiFinalists !== undefined) {
+    html += '<div class="stat-card"><div class="num" style="color:#00b578;">' + stats.semiFinalists + '</div><div class="label">复赛晋级</div></div>';
+  }
+  if (stats.finalists !== undefined) {
+    html += '<div class="stat-card"><div class="num" style="color:#2563eb;">' + stats.finalists + '</div><div class="label">决赛晋级</div></div>';
+  }
+  if (stats.awarded !== undefined) {
+    html += '<div class="stat-card"><div class="num" style="color:#ffa726;">' + stats.awarded + '</div><div class="label">已获奖</div></div>';
+  }
+  container.innerHTML = html;
+}
+
+// ========== SUBMIT PAGE ==========
+function renderSubmitPage() {
+  loadStats().then(function(stats) { renderStatsBar('submitStats', stats); });
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('step1').classList.add('active');
+  document.getElementById('step2').classList.remove('active');
+  ['f-name','f-subdept','f-title','f-scene','f-process','f-result','f-extra'].forEach(function(id) { document.getElementById(id).value = ''; });
+  document.getElementById('f-dept').value = '';
+  document.getElementById('f-track').value = '';
+  clearAttachment();
+}
+
+function nextStep(n) {
+  const name = document.getElementById('f-name').value.trim();
+  const dept = document.getElementById('f-dept').value;
+  const subdept = document.getElementById('f-subdept').value.trim();
+  const track = document.getElementById('f-track').value;
+  const title = document.getElementById('f-title').value.trim();
+  if (!name) return showToast('请填写姓名', 'error');
+  if (!dept) return showToast('请选择部门', 'error');
+  if (!subdept) return showToast('请填写子部门名称', 'error');
+  if (!track) return showToast('请选择赛道', 'error');
+  if (!title) return showToast('请填写作品标题', 'error');
+  document.querySelectorAll('.form-step').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('step' + n).classList.add('active');
+}
+
+function prevStep(n) {
+  document.querySelectorAll('.form-step').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('step' + n).classList.add('active');
+}
+
+// ========== ATTACHMENT ==========
+let pendingFile = null;
+
+function handleAttachmentSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 50 * 1024 * 1024) {
+    showToast('文件大小不能超过 50MB！', 'error');
+    event.target.value = '';
+    return;
+  }
+  pendingFile = file;
+  document.getElementById('attachment-name').textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+  document.getElementById('attachment-clear').style.display = 'inline-flex';
+}
+
+function clearAttachment() {
+  pendingFile = null;
+  document.getElementById('attachment-name').textContent = '未选择文件';
+  document.getElementById('attachment-clear').style.display = 'none';
+  const fileInput = document.getElementById('f-attachment');
+  if (fileInput) fileInput.value = '';
+}
+
+// ========== SUBMIT ENTRY ==========
+async function submitEntry() {
+  const scene = document.getElementById('f-scene').value.trim();
+  const process = document.getElementById('f-process').value.trim();
+  const result = document.getElementById('f-result').value.trim();
+  if (!scene) return showToast('请填写场景描述', 'error');
+  if (!process) return showToast('请填写使用过程', 'error');
+  if (!result) return showToast('请填写效果呈现', 'error');
+  const formData = new FormData();
+  formData.append('name', document.getElementById('f-name').value.trim());
+  formData.append('dept', document.getElementById('f-dept').value);
+  formData.append('subdept', document.getElementById('f-subdept').value.trim());
+  formData.append('track', document.getElementById('f-track').value);
+  formData.append('title', document.getElementById('f-title').value.trim());
+  formData.append('scene', scene);
+  formData.append('process_text', process);
+  formData.append('result_text', result);
+  formData.append('extra', document.getElementById('f-extra').value.trim());
+  if (pendingFile) formData.append('attachment', pendingFile);
+  try {
+    const resp = await fetch('/api/entries', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '提交失败');
+    showToast('作品提交成功！', 'success');
+    document.getElementById('formCard').innerHTML = '<div class="success-page"><div class="icon">🎉</div><h2>作品提交成功！</h2><p>你的作品已收录，可以在「作品展示」中查看。</p><p style="font-size:13px;color:var(--text-dim);">每人可多次提交，欢迎继续投稿！</p><button class="btn btn-primary" onclick="location.reload()">继续投稿</button><button class="btn btn-outline" style="margin-left:8px;" onclick="switchTab(\'gallery\')">查看全部作品</button></div>';
+    loadStats();
+  } catch(e) {
+    showToast('提交失败：' + e.message, 'error');
+  }
+}
+
+// ========== GALLERY ==========
+async function renderGallery() {
+  const stats = await loadStats();
+  renderStatsBar('galleryStats', stats);
+  const search = document.getElementById('gallerySearch').value;
+  const track = document.getElementById('galleryTrack').value;
+  const dept = document.getElementById('galleryDept').value;
+  const sort = document.getElementById('gallerySort').value;
+  let url = '/api/entries?sort=' + sort;
+  if (track) url += '&track=' + track;
+  if (dept) url += '&dept=' + encodeURIComponent(dept);
+  if (search) url += '&search=' + encodeURIComponent(search);
+  try {
+    const data = await api(url);
+    allEntries = data.entries;
+    if (data.currentStage) {
+      currentStage = data.currentStage;
+      updateStageUI();
+    }
+    const deptSelect = document.getElementById('galleryDept');
+    const deptVal = deptSelect.value;
+    const depts = [];
+    data.entries.forEach(function(e) { if (depts.indexOf(e.dept) === -1) depts.push(e.dept); });
+    deptSelect.innerHTML = '<option value="">全部部门</option>' + depts.map(function(d) { return '<option value="' + d + '">' + d + '</option>'; }).join('');
+    deptSelect.value = deptVal;
+    const grid = document.getElementById('galleryGrid');
+    if (data.entries.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">📭</div><p>暂无作品，快来投稿吧！</p></div>';
+      return;
+    }
+    grid.innerHTML = data.entries.map(function(e) {
+      const rs = e.roundStatus || 'approved';
+      const rsClass = 'rs-' + rs;
+      const badge = awardBadge(e.award) || roundBadge(rs);
+      const isEliminated = rs === 'eliminated_semi' || rs === 'eliminated_final';
+      const canVote = isVotingStage && !isEliminated && rs !== 'awarded' && rs !== 'finalist';
+      let voteBtn = '';
+      if (isVotingStage && canVote) {
+        voteBtn = '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();voteEntry(\'' + e.id + '\')">👍 投票</button>';
+      } else if (!isVotingStage) {
+        voteBtn = '<span style="font-size:12px;color:var(--text-dim);">' + (STAGE_LABELS[currentStage] || '') + '阶段</span>';
+      }
+      var extraHtml = '';
+      if (e.extra) {
+        extraHtml = '<div style="font-size:13px;color:var(--accent);margin-top:8px;word-break:break-all;">' + linkify(e.extra.substring(0,100)) + (e.extra.length>100?'...':'') + '</div>';
+      }
+      return '<div class="entry-card ' + rsClass + '" onclick="openDetail(\'' + e.id + '\')"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + (e.attachmentName ? ' 📎' : '') + '</span>' + badge + '<h3>' + e.title + '</h3><div class="meta">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + new Date(e.createdAt).toLocaleDateString('zh-CN') + '</div><div class="desc">' + e.scene + '</div>' + extraHtml + '<div class="card-footer"><div style="display:flex;align-items:center;gap:16px;"><span class="score-display">' + (e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分') + '</span><span class="votes">👍 ' + (e.voteCount||0) + ' 票</span></div>' + voteBtn + '</div></div>';
+    }).join('');
+  } catch(e) {
+    console.error('Gallery error:', e);
+  }
+}
+
+async function voteEntry(entryId) {
+  if (!ddAuthed) {
+    showToast('请先通过钉钉登录后再投票', 'error');
+    return;
+  }
+  if (!votingEnabled) {
+    showToast('投票暂未开启，请等待管理员开放投票通道', 'error');
+    return;
+  }
+  if (!isVotingStage) {
+    showToast('当前阶段不支持投票', 'error');
+    return;
+  }
+  if (ddRemaining <= 0) {
+    showToast('你的' + (STAGE_LABELS[currentStage] || '') + '5票已用完', 'error');
+    return;
+  }
+  try {
+    const resp = await fetch('/api/votes/' + entryId, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+      credentials: 'include'
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '投票失败');
+    ddRemaining = data.remaining;
+    updateUserUI();
+    showToast('👍 投票成功！剩余 ' + ddRemaining + ' 票', 'success');
+    renderGallery();
+  } catch(e) {
+    showToast(e.message, 'error');
+  }
+}
+
+// ========== DETAIL MODAL ==========
+async function openDetail(entryId) {
+  try {
+    const data = await api('/api/entries/' + entryId);
+    const e = data.entry;
+    const rs = e.roundStatus || 'approved';
+    const badge = awardBadge(e.award) || roundBadge(rs);
+    const stageText = STAGE_LABELS[currentStage] || '初赛';
+    const canVote = isVotingStage && rs !== 'eliminated_semi' && rs !== 'eliminated_final' && rs !== 'awarded' && rs !== 'finalist';
+    let voteBtnHtml = '';
+    if (isVotingStage && canVote) {
+      voteBtnHtml = '<button class="btn btn-outline btn-sm" onclick="voteEntry(\'' + e.id + '\')">👍 投票</button>';
+    }
+    var extraHtml = '';
+    if (e.extra) {
+      extraHtml = '<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">' + linkify(e.extra) + '</div></div>';
+    }
+    var attachHtml = '';
+    if (e.attachmentName) {
+      attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/' + e.attachmentPath + '" download="' + e.attachmentName + '" style="color:#00b578;">📥 下载 ' + e.attachmentName + '</a></div></div>';
+    }
+    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + '</span><span style="font-size:13px;color:var(--text-dim);margin-left:8px;">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div><div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + e.scene + '</div></div><div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + e.process_text + '</div></div><div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + e.result_text + '</div></div>' + extraHtml + attachHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#00b578;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#00e676;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions">' + voteBtnHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+    document.getElementById('detailModal').style.display = 'flex';
+  } catch(e) {
+    showToast('加载失败：' + e.message, 'error');
+  }
+}
+
+function closeDetail() { document.getElementById('detailModal').style.display = 'none'; }
+
+// ========== RANKING ==========
+async function renderRanking() {
+  const stats = await loadStats();
+  renderStatsBar('rankingStats', stats);
+  updateStageUI();
+  const track = document.getElementById('rankTrack').value;
+  let url = '/api/ranking';
+  if (track) url += '?track=' + track;
+  try {
+    const data = await api(url);
+    if (data.currentStage) {
+      currentStage = data.currentStage;
+      updateStageUI();
+    }
+    const list = document.getElementById('rankingList');
+    if (data.ranking.length === 0) {
+      list.innerHTML = '<div class="empty-state"><div class="icon">🏆</div><p>暂无排名数据</p></div>';
+      return;
+    }
+    list.innerHTML = data.ranking.map(function(e, i) {
+      const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : 'normal';
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+      const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
+      return '<div class="rank-item" onclick="openDetail(\'' + e.id + '\')"><div class="rank-num ' + rankClass + '">' + (medal || (i+1)) + '</div><div class="rank-info"><div class="rname">' + e.title + ' ' + badge + '</div><div class="rdept">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + trackLabel(e.track) + '</div></div><div class="rank-score">' + (e.composite||0) + '</div></div>';
+    }).join('');
+  } catch(e) { console.error('Ranking error:', e); }
+}
+
+// ========== JUDGE PAGE ==========
+let judgeName = '';
+
+function renderJudgePage() {
+  document.getElementById('judgeLogin').style.display = 'block';
+  document.getElementById('judgePanel').classList.remove('active');
+  document.getElementById('judgeNameInput').value = '';
+  document.getElementById('judgePwInput').value = '';
+  updateStageUI();
+}
+
+function enterJudge() {
+  const name = document.getElementById('judgeNameInput').value.trim();
+  const pw = document.getElementById('judgePwInput').value.trim();
+  if (!name) return showToast('请输入评委姓名', 'error');
+  if (!pw) return showToast('请输入评审密码', 'error');
+  judgeName = name;
+  judgePassword = pw;
+  document.getElementById('judgeLogin').style.display = 'none';
+  document.getElementById('judgePanel').classList.add('active');
+  document.getElementById('judgeNameDisplay').textContent = '当前评委：' + name;
+  updateStageUI();
+  renderJudgePanel();
+}
+
+function logoutJudge() {
+  judgePassword = '';
+  judgeName = '';
+  renderJudgePage();
+}
+
+async function renderJudgePanel() {
+  if (!judgeName || !judgePassword) return;
+  const track = document.getElementById('judgeTrackFilter').value;
+  let url = '/api/entries?sort=newest';
+  if (track) url += '&track=' + track;
+  try {
+    const data = await api(url);
+    if (data.currentStage) {
+      currentStage = data.currentStage;
+      updateStageUI();
+    }
+    let myScores = {};
+    try {
+      const resp = await fetch('/api/judge/my-scores?judgeName=' + encodeURIComponent(judgeName) + '&judgePassword=' + encodeURIComponent(judgePassword));
+      if (resp.ok) {
+        const sdata = await resp.json();
+        (sdata.scores || []).forEach(function(s) { myScores[s.entryId] = s; });
+      }
+    } catch(e) {}
+
+    let judgableEntries = data.entries;
+    if (currentStage === 'semi_final') {
+      judgableEntries = data.entries.filter(function(e) { return e.roundStatus === 'semi_finalist'; });
+    } else if (currentStage === 'final' || currentStage === 'awarded') {
+      judgableEntries = data.entries.filter(function(e) { return e.roundStatus === 'finalist' || e.roundStatus === 'awarded'; });
+    }
+
+    const tbody = document.getElementById('judgeTableBody');
+    if (judgableEntries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-dim);">当前阶段（' + (STAGE_LABELS[currentStage] || '初赛') + '）没有可评审的作品</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = judgableEntries.map(function(e) {
+      const s = myScores[e.id] || {};
+      const total = (s.practicality||0) + (s.innovation||0) + (s.scalability||0) + (s.presentation||0);
+      const hasScored = myScores[e.id] ? 'scored' : '';
+      const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
+      return '<tr class="' + hasScored + '"><td><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#00b578;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + e.dept + (e.subdept ? '/'+e.subdept : '') + '</td><td>' + trackLabel(e.track) + '</td><td><input type="number" min="0" max="30" value="' + (s.practicality||'') + '" id="j_p_' + e.id + '" placeholder="0-30"></td><td><input type="number" min="0" max="25" value="' + (s.innovation||'') + '" id="j_c_' + e.id + '" placeholder="0-25"></td><td><input type="number" min="0" max="25" value="' + (s.scalability||'') + '" id="j_s_' + e.id + '" placeholder="0-25"></td><td><input type="number" min="0" max="20" value="' + (s.presentation||'') + '" id="j_r_' + e.id + '" placeholder="0-20"></td><td><strong>' + total + '</strong></td><td><button class="btn btn-sm ' + (hasScored ? 'btn-success' : 'btn-primary') + '" onclick="saveScore(\'' + e.id + '\')">' + (hasScored ? '更新' : '打分') + '</button></td></tr>';
+    }).join('');
+  } catch(e) { console.error('Judge panel error:', e); }
+}
+
+async function saveScore(entryId) {
+  const p = parseInt(document.getElementById('j_p_' + entryId).value) || 0;
+  const c = parseInt(document.getElementById('j_c_' + entryId).value) || 0;
+  const s = parseInt(document.getElementById('j_s_' + entryId).value) || 0;
+  const r = parseInt(document.getElementById('j_r_' + entryId).value) || 0;
+  if (p > 30 || c > 25 || s > 25 || r > 20) {
+    return showToast('分数超出上限，请检查！', 'error');
+  }
+  try {
+    const data = await api('/api/judge/scores/' + entryId, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ judgeName: judgeName, practicality: p, innovation: c, scalability: s, presentation: r, judgePassword: judgePassword })
+    });
+    showToast('打分已保存！总分：' + data.total + '（' + (STAGE_LABELS[data.stage] || '') + '）', 'success');
+    renderJudgePanel();
+  } catch(e) {
+    showToast(e.message, 'error');
+  }
+}
+
+// ========== ADMIN ==========
+let adminAuthed = false;
+let adminToken = '';
+
+function renderAdminPage() {
+  document.getElementById('adminLogin').style.display = 'block';
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('adminPanel').classList.remove('active');
+  document.getElementById('adminPwInput').value = '';
+  adminAuthed = false;
+  adminToken = '';
+}
+
+async function adminLogin() {
+  const pw = document.getElementById('adminPwInput').value.trim();
+  if (!pw) return showToast('请输入管理员密码', 'error');
+  try {
+    const data = await api('/api/admin/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    adminAuthed = true;
+    adminToken = data.token;
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('adminPanel').classList.add('active');
+    await renderAdminDashboard();
+    const sdata = await api('/api/settings', {
+      headers: { 'x-admin-token': adminToken }
+    });
+    currentStage = sdata.settings.currentStage || 'preliminary';
+    isVotingStage = isStageVoting(currentStage);
+    document.getElementById('adminVotingToggle').checked = !!sdata.settings.votingEnabled;
+    const stageSel = document.getElementById('adminStageSelect');
+    if (stageSel) stageSel.value = currentStage;
+    updateStageUI();
+    updateAdminStageLabel();
+  } catch(e) {
+    showToast(e.message, 'error');
+  }
+}
+
+function updateAdminStageLabel() {
+  const el = document.getElementById('adminStageLabel');
+  if (el) el.textContent = STAGE_LABELS[currentStage] || '初赛';
+}
+
+function adminLogout() {
+  adminAuthed = false;
+  adminToken = '';
+  renderAdminPage();
+}
+
+async function renderAdminDashboard() {
+  if (!adminAuthed || !adminToken) return;
+  try {
+    const data = await api('/api/admin/scores', {
+      headers: { 'x-admin-token': adminToken }
+    });
+    if (data.summary && data.summary.currentStage) {
+      currentStage = data.summary.currentStage;
+      isVotingStage = isStageVoting(currentStage);
+      updateStageUI();
+      updateAdminStageLabel();
+    }
+    const entryScores = data.entryScores;
+    const allJudges = data.allJudges;
+    const summary = data.summary;
+
+    const statsBar = document.getElementById('adminStatsBar');
+    statsBar.innerHTML = '<div class="stat-card"><div class="num">' + (summary.totalEntries||0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '作品</div></div><div class="stat-card"><div class="num">' + (summary.totalJudges||0) + '</div><div class="label">评委人数</div></div><div class="stat-card"><div class="num">' + (summary.totalScores||0) + '</div><div class="label">打分总数</div></div><div class="stat-card"><div class="num">' + (summary.scoredEntries||0) + '</div><div class="label">已评作品</div></div><div class="stat-card"><div class="num" style="color:#ff5252;">' + (summary.unscoredEntries||0) + '</div><div class="label">未评作品</div></div>';
+
+    renderStageManagePanel(entryScores);
+
+    var unscoredMap = {};
+    if (allJudges.length > 0 && entryScores.length > 0) {
+      allJudges.forEach(function(judge) { unscoredMap[judge] = []; });
+      entryScores.forEach(function(e) {
+        allJudges.forEach(function(judge) {
+          if (!e.scores.find(function(sc) { return sc.judgeName === judge; })) {
+            unscoredMap[judge].push(e.title.substring(0, 12));
+          }
+        });
+      });
+    }
+    var judgeGapCards = allJudges.map(function(judge) {
+      var missing = unscoredMap[judge] || [];
+      var done = (entryScores.length || 1) - missing.length;
+      var pct = Math.round(done / Math.max(1, entryScores.length) * 100);
+      var doneClass = pct === 100 ? 'gap-done' : (pct >= 50 ? 'gap-half' : 'gap-low');
+      var titleList = missing.length > 0 ? missing.join('、') : '全部完成 ✓';
+      var missingHtml = missing.length > 0 ? '<div class="gap-missing" onclick="event.stopPropagation();showToast(\'' + judge + ' 未评: ' + titleList + '\', \'info\')">' + missing.length + '个待评</div>' : '<div class="gap-ok">✓</div>';
+      return '<div class="judge-gap-card ' + doneClass + '" title="' + judge + ': ' + titleList + '"><div class="gap-judge">' + judge + '</div><div class="gap-bar"><div class="gap-fill" style="width:' + pct + '%"></div></div><div class="gap-nums">' + done + '/' + entryScores.length + ' 完成</div>' + missingHtml + '</div>';
+    }).join('');
+
+    document.getElementById('judgeGapSummary').innerHTML = allJudges.length > 0 ? judgeGapCards : '<div style="color:var(--text-dim);font-size:13px;">暂无评委数据</div>';
+
+    var headerRow = document.getElementById('adminScoreHeaderRow');
+    var judgeHeaders = allJudges.length > 0
+      ? allJudges.map(function(j) { return '<th>' + j + '<br><small>总分</small></th>'; }).join('')
+      : '<th>暂无评委评分</th>';
+    headerRow.innerHTML = '<th style="position:sticky;left:0;background:#f9fafb;z-index:1;">作品</th><th>姓名</th><th>部门</th><th>赛道</th><th>轮次</th>' + judgeHeaders + '<th>均分</th><th>综合分</th><th>评委数</th><th>操作</th>';
+
+    var tbody = document.getElementById('adminScoreBody');
+    if (entryScores.length === 0) {
+      var totalCols = 9 + Math.max(1, allJudges.length);
+      tbody.innerHTML = '<tr><td colspan="' + totalCols + '" style="text-align:center;padding:40px;color:var(--text-dim);">当前阶段暂无可评审作品</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = entryScores.map(function(e) {
+      var judgeCells = allJudges.map(function(judge) {
+        var s = e.scores.find(function(sc) { return sc.judgeName === judge; });
+        if (s) {
+          return '<td style="background:rgba(0,230,118,0.08);font-weight:500;">' + s.total + '<br><small style="color:var(--text-dim);font-weight:400;">实' + s.practicality + ' 创' + s.innovation + ' 推' + s.scalability + ' 效' + s.presentation + '</small></td>';
+        }
+        return '<td style="background:rgba(255,82,82,0.08);color:#ff5252;font-weight:500;text-align:center;" title="' + judge + ' 未评分">未评</td>';
+      }).join('');
+
+      var hasScores = e.scores.length > 0;
+      var badge = awardBadge(e.award) || roundBadge(e.roundStatus);
+      return '<tr><td style="position:sticky;left:0;background:#f9fafb;z-index:1;"><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#00b578;font-weight:500;">' + e.title.substring(0,16) + (e.title.length>16?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + e.dept + (e.subdept ? '/'+e.subdept : '') + '</td><td>' + trackLabel(e.track) + '</td><td style="font-size:12px;">' + (ROUND_LABELS[e.roundStatus] || '初赛') + '</td>' + judgeCells + '<td style="font-weight:700;color:' + (hasScores ? '#00b578' : 'var(--text-dim)') + ';">' + (hasScores ? e.avgScore : '—') + '</td><td style="font-weight:700;color:#00b578;">' + (e.composite || '—') + '</td><td>' + (e.judgeCount||0) + '</td><td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry(\'' + e.id + '\')">删除</button></td></tr>';
+    }).join('');
+  } catch(e) {
+    console.error('Admin dashboard error:', e);
+    showToast('加载失败', 'error');
+  }
+}
+
+function renderStageManagePanel(entryScores) {
+  var panel = document.getElementById('stageManagePanel');
+  if (!panel) return;
+
+  if (currentStage === 'preliminary') {
+    var sorted = entryScores.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
+    panel.innerHTML = '<div class="promote-panel"><h3>🔄 晋级复赛管理</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">勾选需要晋级复赛的作品，未勾选的将标记为淘汰。点击"确认晋级复赛"后阶段将切换到复赛。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted.map(function(e) { return '<div class="promote-entry"><input type="checkbox" id="promote_' + e.id + '" ' + (e.roundStatus === 'semi_finalist' ? 'checked' : '') + '><span class="pe-title">' + e.title + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center;"><button class="btn btn-success btn-sm" onclick="adminPromote(\'semi_final\')">✅ 确认晋级复赛</button><span style="font-size:12px;color:var(--text-dim);">已勾选 <strong id="promoteCount">0</strong> 个作品</span></div></div>';
+    document.querySelectorAll('input[id^="promote_"]').forEach(function(cb) { cb.addEventListener('change', updatePromoteCount); });
+    updatePromoteCount();
+  } else if (currentStage === 'semi_final') {
+    var semiEntries = entryScores.filter(function(e) { return e.roundStatus === 'semi_finalist'; });
+    var sorted2 = semiEntries.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
+    panel.innerHTML = '<div class="promote-panel"><h3>🏆 晋级决赛管理</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">勾选需要晋级决赛的作品，未勾选的将标记为淘汰。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted2.map(function(e) { return '<div class="promote-entry"><input type="checkbox" id="promote_' + e.id + '" ' + (e.roundStatus === 'finalist' ? 'checked' : '') + '><span class="pe-title">' + e.title + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center;"><button class="btn btn-primary btn-sm" onclick="adminPromote(\'final\')">✅ 确认晋级决赛</button><span style="font-size:12px;color:var(--text-dim);">已勾选 <strong id="promoteCount">0</strong> 个作品</span></div></div>';
+    document.querySelectorAll('input[id^="promote_"]').forEach(function(cb) { cb.addEventListener('change', updatePromoteCount); });
+    updatePromoteCount();
+  } else if (currentStage === 'final') {
+    var finalEntries = entryScores.filter(function(e) { return e.roundStatus === 'finalist'; });
+    var sorted3 = finalEntries.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
+    panel.innerHTML = '<div class="promote-panel"><h3>🏆 结算获奖</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">为决赛作品设置获奖等级。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted3.map(function(e) { return '<div class="promote-entry"><select class="award-select" id="award_' + e.id + '"><option value="">未获奖</option><option value="first" ' + (e.award === 'first' ? 'selected' : '') + '>🥇 一等奖</option><option value="second" ' + (e.award === 'second' ? 'selected' : '') + '>🥈 二等奖</option><option value="third" ' + (e.award === 'third' ? 'selected' : '') + '>🥉 三等奖</option><option value="excellence" ' + (e.award === 'excellence' ? 'selected' : '') + '>🎖️ 优秀奖</option></select><span class="pe-title">' + e.title + '</span><span class="pe-score">评委均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;"><button class="btn btn-gold btn-sm" onclick="adminSettle()">🏆 确认结算</button></div></div>';
+  } else if (currentStage === 'awarded') {
+    panel.innerHTML = '<div class="promote-panel" style="background:linear-gradient(135deg,rgba(255,215,64,0.08),transparent);border:1px solid rgba(255,215,64,0.2);"><h3>🏆 比赛已结算</h3><p style="color:var(--text-dim);font-size:13px;">获奖结果已公布。</p></div>';
+  } else {
+    panel.innerHTML = '';
+  }
+}
+
+function updatePromoteCount() {
+  var count = 0;
+  document.querySelectorAll('input[id^="promote_"]:checked').forEach(function(cb) {
+    if (cb.id.replace('promote_', '').startsWith('entry_')) count++;
+  });
+  var el = document.getElementById('promoteCount');
+  if (el) el.textContent = count;
+}
+
+async function adminPromote(stage) {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  var entryIds = [];
+  document.querySelectorAll('input[id^="promote_"]:checked').forEach(function(cb) {
+    var id = cb.id.replace('promote_', '');
+    if (id.startsWith('entry_')) entryIds.push(id);
+  });
+  var stageName = stage === 'semi_final' ? '复赛' : '决赛';
+  if (!confirm('确认将选中的 ' + entryIds.length + ' 个作品晋级' + stageName + '？\n\n未选中的作品将被标记为淘汰。此操作不可撤销。')) return;
+  try {
+    var data = await api('/api/admin/promote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ stage: stage, entryIds: entryIds })
+    });
+    showToast('✅ 已晋级 ' + data.promoted + ' 个作品到' + stageName + '！', 'success');
+    currentStage = data.currentStage;
+    isVotingStage = isStageVoting(currentStage);
+    updateStageUI();
+    updateAdminStageLabel();
+    renderAdminDashboard();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function adminSettle() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  var awards = {};
+  document.querySelectorAll('select[id^="award_"]').forEach(function(sel) {
+    if (sel.value) {
+      var id = sel.id.replace('award_', '');
+      awards[id] = sel.value;
+    }
+  });
+  var awardCount = Object.keys(awards).length;
+  if (!confirm('确认结算？\n\n将标记 ' + awardCount + ' 个作品获奖，比赛阶段将切换到"已结算"。此操作不可撤销。')) return;
+  try {
+    var data = await api('/api/admin/settle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ awards: awards })
+    });
+    showToast('🏆 结算完成！' + data.awardedCount + ' 个作品获奖', 'success');
+    currentStage = 'awarded';
+    isVotingStage = false;
+    updateStageUI();
+    updateAdminStageLabel();
+    renderAdminDashboard();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function adminExportCSV() {
+  if (!adminAuthed || !adminToken) return showToast('请先登录管理后台', 'error');
+  window.open('/api/admin/export/csv?adminToken=' + encodeURIComponent(adminToken), '_blank');
+}
+
+async function deleteEntry(id) {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  if (!confirm('确定删除该作品吗？\n\n此操作将同时删除该作品的投票和评委打分记录，不可恢复。')) return;
+  try {
+    var resp = await api('/api/admin/entries/' + id, {
+      method: 'DELETE',
+      headers: { 'x-admin-token': adminToken }
+    });
+    showToast('已删除「' + resp.title + '」', 'success');
+    loadStats();
+    renderAdminDashboard();
+  } catch(e) { showToast('删除失败：' + e.message, 'error'); }
+}
+
+async function saveVotingToggle() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  var on = document.getElementById('adminVotingToggle').checked;
+  try {
+    await api('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ votingEnabled: on })
+    });
+    votingEnabled = on;
+    updateVotingUI();
+    showToast(on ? '✅ 投票已开启' : '⏸️ 投票已暂停', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function saveStageSelect() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  var newStage = document.getElementById('adminStageSelect').value;
+  try {
+    var data = await api('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ currentStage: newStage })
+    });
+    currentStage = data.currentStage || newStage;
+    isVotingStage = isStageVoting(currentStage);
+    updateStageUI();
+    renderAdminDashboard();
+    showToast('已切换到' + (STAGE_LABELS[currentStage] || ''), 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function adminReset(mode) {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  var label = mode === 'stage' ? '重置阶段' : '完全重置';
+  var desc = mode === 'stage' ? '将清空晋级标记和获奖标记，回到初赛阶段。\n投票记录和评委打分将保留。' : '将清空晋级标记和获奖标记，并清空所有投票和评委打分。\n仅保留作品投稿。';
+  if (!confirm('确认执行「' + label + '」？\n\n' + desc + '\n\n此操作不可撤销，确定继续？')) return;
+  try {
+    var data = await api('/api/admin/reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ mode: mode })
+    });
+    currentStage = 'preliminary';
+    isVotingStage = true;
+    votingEnabled = false;
+    document.getElementById('adminVotingToggle').checked = false;
+    document.getElementById('adminStageSelect').value = 'preliminary';
+    updateStageUI();
+    updateVotingUI();
+    loadStats();
+    renderAdminDashboard();
+    showToast('「' + label + '」完成，已回到初赛', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function exportData() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  window.open('/api/export/json?adminToken=' + encodeURIComponent(adminToken), '_blank');
+}
+
+function exportCSV() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  window.open('/api/export/csv?adminToken=' + encodeURIComponent(adminToken), '_blank');
+}
+
+async function clearAllData(type) {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  try {
+    await api('/api/admin/clear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ type: type })
+    });
+    showToast('操作完成', 'success');
+    loadStats();
+    if (adminAuthed) renderAdminDashboard();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function switchTab(tabName) {
+  var tab = document.querySelector('.tab[data-tab="' + tabName + '"]');
+  if (tab) tab.click();
+}
+
+// ========== INIT ==========
+async function init() {
+  await checkAuth();
+  await checkVotingStatus();
+  await loadStats();
+  renderSubmitPage();
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { closeDetail(); }
+  });
+}
+
+init();
+</script>
+</body>
+</html>
