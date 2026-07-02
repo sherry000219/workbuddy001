@@ -325,7 +325,7 @@ async function ghPull() {
 function ghPushSchedule() {
   if (!GITHUB_TOKEN) return;
   if (_ghTimer) clearTimeout(_ghTimer);
-  _ghTimer = setTimeout(ghPush, 30000);
+  _ghTimer = setTimeout(ghPush, 5000);
 }
 
 async function ghPush() {
