@@ -161,17 +161,30 @@ async function exchangeDingTalkCode(code) {
     try { corpToken = await getCorpAccessToken(); } catch (e) { console.log('[dd] getCorpAccessToken failed:', e.message); }
 
     if (corpToken) {
-      // Step 1: unionId -> staffId (企业 token 调 topapi/v2)
-      try {
-        const byUnion = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/getbyunionid?access_token=${corpToken}`, { unionid: unionId });
-        console.log('[dd] v2/user/getbyunionid resp:', JSON.stringify(byUnion).substring(0, 300));
-        if (byUnion.errcode === 0 && byUnion.result) {
-          staffId = byUnion.result.userid || '';
-        } else {
-          console.log('[dd] v2/user/getbyunionid errcode:', byUnion.errcode, byUnion.errmsg);
+      // Step 1: unionId -> staffId (尝试多个端点)
+      const unionIdEndpoints = [
+        { url: `https://oapi.dingtalk.com/topapi/v2/user/getbyunionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'v2/user/getbyunionid' },
+        { url: `https://oapi.dingtalk.com/topapi/v2/user/getuserid_by_unionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'v2/user/getuserid_by_unionid' },
+        { url: `https://oapi.dingtalk.com/topapi/v1/user/getbyunionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'v1/user/getbyunionid' },
+        { url: `https://oapi.dingtalk.com/user/getbyunionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'user/getbyunionid' },
+      ];
+      for (const ep of unionIdEndpoints) {
+        try {
+          const resp = await ddApi('POST', ep.url, ep.body);
+          console.log(`[dd] ${ep.name} resp:`, JSON.stringify(resp).substring(0, 300));
+          if (resp.errcode === 0) {
+            const r = resp.result || resp;
+            staffId = r.userid || r.staffId || r.user_id || '';
+            if (staffId) {
+              console.log(`[dd] got staffId via ${ep.name}:`, staffId);
+              break;
+            }
+          } else {
+            console.log(`[dd] ${ep.name} errcode:`, resp.errcode, resp.errmsg);
+          }
+        } catch (e) {
+          console.log(`[dd] ${ep.name} failed:`, e.message);
         }
-      } catch (e) {
-        console.log('[dd] v2/user/getbyunionid failed:', e.message);
       }
     }
 
