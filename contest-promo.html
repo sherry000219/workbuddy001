@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云帐房头号玩家第二季 — WorkBuddy 实战应用大赛</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #f8f9fc; --card: #fff; --text: #1f2937; --text2: #4b5563; --text3: #6b7280;
+  --green: #ff6b35; --green2: #e55d2b; --blue: #2563eb; --gold: #f59e0b;
+  --radius: 16px; --radius-sm: 10px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.06); --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+/* ===== HERO ===== */
+.hero { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: linear-gradient(180deg, #fff 0%, #f8f9fc 50%, #f0f4ff 100%); }
+.hero::before { content:''; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 20%, rgba(255,107,53,0.08) 0%, transparent 45%), radial-gradient(ellipse at 20% 80%, rgba(37,99,235,0.06) 0%, transparent 45%); z-index: 0; }
+.hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 48px 48px; z-index: 0; opacity: .4; }
+.hero-content { position: relative; z-index: 2; text-align: center; padding: 100px 24px 120px; max-width: 880px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,107,53,0.08); border: 1px solid rgba(255,107,53,0.2); color: var(--green); padding: 8px 20px; border-radius: 24px; font-size: 13px; font-weight: 600; letter-spacing: 1px; margin-bottom: 24px; }
+.hero-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+.hero-logo { width: 240px; height: 240px; margin: 0 auto 32px; background: linear-gradient(135deg, #1f2937, #111827); border-radius: 32px; padding: 8px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg), 0 0 60px rgba(255,107,53,0.12); animation: heroFloat 3s ease-in-out infinite; }
+@keyframes heroFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.hero-title { font-size: clamp(36px, 6vw, 60px); font-weight: 800; color: #1f2937; margin-bottom: 12px; line-height: 1.15; letter-spacing: 0.16em; }
+.hero-title span { background: linear-gradient(135deg, var(--green), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-sub { font-size: clamp(16px, 2.2vw, 20px); color: var(--text2); margin-bottom: 8px; }
+.hero-desc { font-size: 15px; color: var(--text3); margin-bottom: 36px; max-width: 560px; margin-left: auto; margin-right: auto; }
+.hero-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--green); color: #fff; font-weight: 600; font-size: 17px; padding: 16px 36px; border-radius: 12px; text-decoration: none; box-shadow: 0 8px 28px rgba(255,107,53,0.25); transition: all .2s; }
+.hero-cta:hover { background: var(--green2); transform: translateY(-2px); box-shadow: 0 14px 36px rgba(255,107,53,0.32); }
+.hero-meta { margin-top: 40px; display: flex; justify-content: center; gap: 40px; font-size: 14px; color: var(--text3); flex-wrap: wrap; }
+.hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+/* ===== SECTIONS ===== */
+.section { padding: 80px 24px; }
+.section-inner { max-width: 900px; margin: 0 auto; }
+.section-label { text-align: center; color: var(--green); font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+.section-title { text-align: center; font-size: clamp(26px, 4vw, 38px); font-weight: 800; color: #1f2937; margin-bottom: 12px; }
+.section-sub { text-align: center; font-size: 16px; color: var(--text3); margin-bottom: 48px; }
+
+/* ===== IP DECORATIONS ===== */
+.ip-deco { position: absolute; pointer-events: none; z-index: 1; }
+.ip-deco img { width: 100%; height: 100%; object-fit: contain; }
+.ip-circle { width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 4px solid #fff; box-shadow: var(--shadow-lg); background: #fff; }
+.ip-circle img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+
+/* ===== INTRO ===== */
+.intro { background: #fff; }
+.intro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+.intro-card { background: var(--bg); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 32px 24px; text-align: center; transition: all .3s; }
+.intro-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.intro-card .icon { font-size: 48px; margin-bottom: 16px; }
+.intro-card h4 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.intro-card p { font-size: 14px; color: var(--text3); line-height: 1.7; }
+
+/* ===== TIMELINE ===== */
+.timeline-bg { background: linear-gradient(180deg, var(--bg) 0%, #fff 100%); }
+.timeline { position: relative; max-width: 700px; margin: 0 auto; padding-left: 40px; }
+.timeline::before { content: ''; position: absolute; left: 18px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--green), var(--blue)); }
+.timeline-item { position: relative; margin-bottom: 36px; }
+.timeline-item::before { content: ''; position: absolute; left: -30px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: var(--green); border: 3px solid #fff; box-shadow: 0 0 0 3px rgba(255,107,53,0.15); }
+.timeline-item:last-child::before { background: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+.timeline-num { font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 1px; margin-bottom: 4px; }
+.timeline-item:last-child .timeline-num { color: var(--blue); }
+.timeline-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.timeline-desc { font-size: 14px; color: var(--text3); }
+
+/* ===== STEPS ===== */
+.steps-bg { background: #fff; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; counter-reset: step; }
+.step { position: relative; background: var(--bg); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 36px 24px; text-align: center; }
+.step::before { counter-increment: step; content: counter(step); position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; border-radius: 50%; background: var(--green); color: #fff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(255,107,53,0.2); }
+.step:nth-child(2)::before { background: var(--blue); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+.step:nth-child(3)::before { background: var(--gold); box-shadow: 0 4px 12px rgba(245,158,11,0.2); }
+.step h4 { font-size: 17px; font-weight: 700; margin: 12px 0 8px; }
+.step p { font-size: 13px; color: var(--text3); line-height: 1.7; }
+
+/* ===== SCORING TABLE ===== */
+.score-bg { background: var(--bg); }
+.score-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.score-table thead { background: #f8fafc; }
+.score-table th { padding: 16px; text-align: left; font-size: 14px; font-weight: 700; color: var(--text2); border-bottom: 2px solid #e5e7eb; }
+.score-table td { padding: 16px; font-size: 14px; color: var(--text); border-bottom: 1px solid #f3f4f6; }
+.score-table tr:last-child td { border-bottom: none; font-weight: 700; }
+.score-table .dim { font-weight: 600; }
+.score-table .weight { color: var(--green); font-weight: 700; }
+
+/* ===== PRIZES ===== */
+.prizes-bg { background: #fff; }
+.prizes-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+.prize-card { background: var(--bg); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 32px 20px; text-align: center; transition: all .3s; flex: 0 0 calc(33.333% - 14px); min-width: 180px; max-width: 220px; }
+.prize-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.prize-card.grand { border: 2px solid var(--gold); background: linear-gradient(180deg, #fffbeb, #fff); }
+.prize-card .prize-icon { font-size: 40px; margin-bottom: 12px; }
+.prize-card .prize-rank { font-size: 13px; font-weight: 700; color: var(--text3); letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+.prize-card .prize-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+.prize-card.grand .prize-title { color: var(--gold); }
+.prize-card .prize-desc { font-size: 13px; color: var(--text3); line-height: 1.6; }
+
+/* ===== RULES BOX ===== */
+.rules-bg { background: linear-gradient(180deg, var(--bg) 0%, #f0f4ff 100%); }
+.rules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.rule-item { background: #fff; border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 24px; display: flex; gap: 16px; align-items: flex-start; }
+.rule-icon { font-size: 28px; flex-shrink: 0; }
+.rule-text h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.rule-text p { font-size: 13px; color: var(--text3); }
+
+/* ===== FAQ ===== */
+.faq-bg { background: #fff; }
+.faq-item { border: 1px solid #e5e7eb; border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+.faq-q { padding: 20px 24px; font-size: 16px; font-weight: 700; background: #fafafa; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+.faq-q .q-icon { color: var(--green); font-size: 20px; }
+.faq-a { padding: 0 24px 20px; font-size: 14px; color: var(--text2); line-height: 1.8; }
+
+/* ===== CTA BOTTOM ===== */
+.cta-bottom { text-align: center; padding: 80px 24px; background: linear-gradient(180deg, #f0f4ff, #fff); }
+.cta-bottom .cta-title { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+.cta-bottom .cta-desc { font-size: 16px; color: var(--text3); margin-bottom: 32px; }
+.cta-bottom .hero-cta { background: var(--green); }
+
+/* ===== FOOTER ===== */
+.footer { text-align: center; padding: 40px 24px; background: #111827; color: var(--text3); font-size: 13px; }
+.footer a { color: var(--green); text-decoration: none; }
+
+/* ===== PLATFORM ENTRY ===== */
+.platform-entry { text-align: center; padding: 64px 24px; background: linear-gradient(135deg, #1f2937 0%, #111827 100%); position: relative; overflow: hidden; }
+.platform-entry::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(255,107,53,0.12) 0%, transparent 60%); }
+.platform-entry-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+.platform-entry-label { display: inline-block; font-size: 13px; font-weight: 600; color: rgba(255,107,53,0.9); letter-spacing: 2px; margin-bottom: 16px; }
+.platform-entry-title { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 12px; }
+.platform-entry-desc { font-size: 15px; color: rgba(255,255,255,0.5); margin-bottom: 32px; }
+.platform-entry-links { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+.platform-entry-links a { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all .2s; }
+.platform-entry-links .btn-primary { background: var(--green); color: #fff; box-shadow: 0 8px 28px rgba(255,107,53,0.3); }
+.platform-entry-links .btn-primary:hover { background: var(--green2); transform: translateY(-2px); box-shadow: 0 14px 36px rgba(255,107,53,0.4); }
+.platform-entry-links .btn-outline { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+.platform-entry-links .btn-outline:hover { border-color: rgba(255,107,53,0.5); background: rgba(255,107,53,0.08); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  .ip-deco { display: none; }
+}
+@media (max-width: 768px) {
+  .intro-grid, .steps { grid-template-columns: 1fr; }
+  .prizes-grid { flex-direction: column; align-items: center; }
+  .prize-card { flex: 0 0 auto; width: 100%; max-width: 320px; }
+  .rules-grid { grid-template-columns: 1fr; }
+  .hero-meta { gap: 20px; }
+  .hero-logo { width: 180px; height: 180px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot"></span> 云帐房 · 内部赛事</div>
+    <div class="hero-logo">
+      <img src="logo-yzf-white.png" alt="云帐房" width="100%" height="100%" style="object-fit: contain; filter: drop-shadow(0 0 12px rgba(255,107,53,0.15));" />
+    </div>
+    <h1 class="hero-title">云帐房<span>头号玩家</span> 第二季</h1>
+    <p class="hero-sub">WorkBuddy 实战应用大赛</p>
+    <p class="hero-desc">AI 已来，你是观望还是上场？用 WorkBuddy 解决一个真实工作难题，秀出你的 AI 实战力，赢取荣誉与奖励。</p>
+    <a class="hero-cta" href="https://workbuddy-contest.onrender.com" target="_blank">🚀 立即参赛</a>
+    <div class="hero-meta">
+      <span>📅 即日起开放投稿</span>
+      <span>👥 云帐房全员可参与</span>
+      <span>🏆 初赛 · 复赛 · 决赛</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 大赛介绍 ===== -->
+<section class="section intro">
+  <div class="section-inner">
+    <div class="section-label">About</div>
+    <h2 class="section-title">为什么参加这场大赛？</h2>
+    <p class="section-sub">这不是一场传统的技能竞赛——这是一次 AI 时代的实战练兵</p>
+    <div class="intro-grid">
+      <div class="intro-card">
+        <div class="icon">🛠️</div>
+        <h4>实战出真知</h4>
+        <p>用 WorkBuddy 解决你工作中遇到的真实问题，不限场景、不限方向，只要有效就是好作品。</p>
+      </div>
+      <div class="intro-card">
+        <div class="icon">👁️</div>
+        <h4>全员评审团</h4>
+        <p>你的作品将被全公司看到。评委专业打分 + 同事人气投票，双重维度决定最终排名。</p>
+      </div>
+      <div class="intro-card">
+        <div class="icon">🏅</div>
+        <h4>荣誉加身</h4>
+        <p>一等奖、二等奖、三等奖、优秀奖，公司级荣誉表彰，让你的 AI 能力被看见。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 赛程安排 ===== -->
+<section class="section timeline-bg" style="position:relative;">
+  <img class="ip-deco" src="ip-yunxiaoshui.png" alt="云小税" style="right: calc(50% + 90px); top: 75px; width: 110px; opacity: .95;" />
+  <div class="section-inner">
+    <div class="section-label">Timeline</div>
+    <h2 class="section-title">赛程安排</h2>
+    <p class="section-sub">四阶段晋级制，层层选拔，公平竞技</p>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-num">STAGE 01</div>
+        <div class="timeline-title">🏁 初赛 — 提交作品 & 投票</div>
+        <div class="timeline-desc">提交你的 WorkBuddy 实战作品。全员投票 + 评委打分，综合排名靠前者晋级复赛。每人 5 票，评委四维打分（实用性/创新性/可推广性/效果呈现）。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-num">STAGE 02</div>
+        <div class="timeline-title">🔥 复赛 — 晋级角逐 & 重新投票</div>
+        <div class="timeline-desc">初赛晋级作品进入复赛，投票重新发放（每人再获 5 票），评委重新独立打分。综合分 = 评委分 × 80% + 人气 × 20%。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-num">STAGE 03</div>
+        <div class="timeline-title">⚡ 决赛 — 巅峰对决</div>
+        <div class="timeline-desc">复赛晋级作品进入最终评审。决赛不设投票，评委 100% 权重决定最终排名，确保专业公正。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-num">STAGE 04</div>
+        <div class="timeline-title">🏆 结算颁奖</div>
+        <div class="timeline-desc">管理员根据决赛排名公布获奖名单：一等奖 / 二等奖 / 三等奖 / 优秀奖。获奖作品首页展示金色勋章。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 参与方式 ===== -->
+<section class="section steps-bg">
+  <div class="section-inner">
+    <div class="section-label">How to Join</div>
+    <h2 class="section-title">三步参赛</h2>
+    <p class="section-sub">简单直接，零门槛参与</p>
+    <div class="steps">
+      <div class="step">
+        <h4>用 WorkBuddy 完成一个任务</h4>
+        <p>不限场景——数据分析、自动化脚本、报告生成、网页搭建……只要是你用 WorkBuddy 解决的真实工作问题，都可以投稿。</p>
+      </div>
+      <div class="step">
+        <h4>提交作品到平台</h4>
+        <p>在竞赛平台填写作品标题、赛道分类、场景描述、使用过程、效果呈现。可上传附件或作品链接。管理员审核通过后进入展厅。</p>
+      </div>
+      <div class="step">
+        <h4>接受评审 & 拉票</h4>
+        <p>作品进入展厅后，可分享给同事投票。初赛每人 5 票，复赛重新发放 5 票。评委同步进行四维专业打分。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 评审规则 ===== -->
+<section class="section score-bg" style="position:relative;">
+  <img class="ip-deco" src="ip-xiaor.png" alt="小R" style="left: calc(50% + 90px); top: 75px; width: 110px; opacity: .95;" />
+  <div class="section-inner">
+    <div class="section-label">Scoring</div>
+    <h2 class="section-title">评审规则</h2>
+    <p class="section-sub">专业评委四维度打分，满分 100 分</p>
+    <table class="score-table">
+      <thead>
+        <tr><th>评审维度</th><th>满分</th><th>评判标准</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="dim">💼 实用性</td><td class="weight">30 分</td>
+          <td>作品是否解决了实际工作中的痛点？能否在团队中落地使用？</td>
+        </tr>
+        <tr>
+          <td class="dim">💡 创新性</td><td class="weight">25 分</td>
+          <td>创意是否新颖？AI 工具使用是否有创新思路？</td>
+        </tr>
+        <tr>
+          <td class="dim">📈 可推广性</td><td class="weight">25 分</td>
+          <td>方案是否具备跨部门、跨团队复制的价值？</td>
+        </tr>
+        <tr>
+          <td class="dim">📊 效果呈现</td><td class="weight">20 分</td>
+          <td>展示是否清晰？数据是否充分？说服力如何？</td>
+        </tr>
+        <tr>
+          <td><strong>综合得分</strong></td><td><strong>100 分</strong></td>
+          <td>初赛/复赛 = 评委分 × 80% + 人气投票 × 20%；决赛 = 评委分 × 100%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 奖项设置 ===== -->
+<section class="section prizes-bg" style="position:relative;">
+  <img class="ip-deco" src="ip-astronaut.png" alt="宇航员" style="left: calc(50% + 90px); top: 65px; width: 156px; opacity: .95;" />
+  <div class="section-inner">
+    <div class="section-label">Prizes</div>
+    <h2 class="section-title">奖项设置</h2>
+    <p class="section-sub">决赛排名前若干名获公司级荣誉表彰</p>
+    <div class="prizes-grid">
+      <div class="prize-card grand">
+        <div class="prize-icon">🥇</div>
+        <div class="prize-rank">GRAND PRIZE</div>
+        <div class="prize-title">一等奖</div>
+        <div class="prize-desc">决赛综合排名第一名<br>获得 AI 蓝带（中级）荣誉<br><strong style="color:var(--green);">¥1,500</strong> · 上限 3 名</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-icon">🥈</div>
+        <div class="prize-rank">SECOND PRIZE</div>
+        <div class="prize-title">二等奖</div>
+        <div class="prize-desc">决赛综合排名第二名<br>获得 AI 蓝带（中级）荣誉<br><strong style="color:var(--green);">¥800</strong> · 上限 3 名</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-icon">🥉</div>
+        <div class="prize-rank">THIRD PRIZE</div>
+        <div class="prize-title">三等奖</div>
+        <div class="prize-desc">决赛综合排名第三名<br>获得 AI 绿带（中级）荣誉<br><strong style="color:var(--green);">¥300</strong> · 上限 6 名</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-icon">🌟</div>
+        <div class="prize-rank">EXCELLENCE</div>
+        <div class="prize-title">优秀奖</div>
+        <div class="prize-desc">决赛入围其他获奖者<br>获得 AI 黄带（初级）荣誉<br>纪念品一份 · 若干名</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-icon">🏢</div>
+        <div class="prize-rank">BEST TEAM</div>
+        <div class="prize-title">最佳组织奖</div>
+        <div class="prize-desc">参赛率最高的部门<br>流动锦旗 + 部门荣誉<br><strong style="color:var(--green);">¥2,000</strong> 团建基金</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 参赛须知 ===== -->
+<section class="section rules-bg">
+  <div class="section-inner">
+    <div class="section-label">Rules</div>
+    <h2 class="section-title">参赛须知</h2>
+    <p class="section-sub" style="margin-bottom: 36px;">请在投稿前仔细阅读以下规则</p>
+    <div class="rules-grid">
+      <div class="rule-item"><div class="rule-icon">✅</div><div class="rule-text"><h4>原创作品</h4><p>投稿内容须为本人使用 WorkBuddy 完成的原创作品，不得抄袭他人。</p></div></div>
+      <div class="rule-item"><div class="rule-icon">🔄</div><div class="rule-text"><h4>一人多稿</h4><p>每位参赛者可以投递多个作品，每个作品独立参与评审和投票。</p></div></div>
+      <div class="rule-item"><div class="rule-icon">🗳️</div><div class="rule-text"><h4>公平投票</h4><p>每人每阶段 5 票，不得使用多个账号刷票。投票数据按阶段隔离，晋级后重新发放。</p></div></div>
+      <div class="rule-item"><div class="rule-icon">⚖️</div><div class="rule-text"><h4>评委独立</h4><p>评委打分按阶段隔离，每阶段重新打分。评委不得为自己的作品打分。</p></div></div>
+      <div class="rule-item"><div class="rule-icon">🔒</div><div class="rule-text"><h4>数据安全</h4><p>所有投稿作品及评分数据仅限公司内部使用，不会对外公开。</p></div></div>
+      <div class="rule-item"><div class="rule-icon">📋</div><div class="rule-text"><h4>最终解释权</h4><p>大赛最终解释权归云帐房大赛组委会所有。赛程安排如有调整以平台公告为准。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="section faq-bg" style="position:relative;">
+  <div class="ip-deco ip-circle" style="left:50%; top:-60px; transform:translateX(-50%);">
+    <img src="ip-zhangsir.png" alt="帐Sir" />
+  </div>
+  <div class="section-inner">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">常见问题</h2>
+    <div class="faq-list" style="margin-top: 36px;">
+      <div class="faq-item">
+        <div class="faq-q"><span class="q-icon">Q</span> 什么样的作品可以参赛？</div>
+        <div class="faq-a">任何使用 WorkBuddy 完成的工作成果都可以参赛。比如：用 WorkBuddy 写了一个自动化脚本、生成了一份数据分析报告、搭建了一个内部工具页面、整理了一套工作流程等。只要是对工作有帮助的，都欢迎投稿。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span class="q-icon">Q</span> 我不是技术岗位，也能参赛吗？</div>
+        <div class="faq-a">当然可以！WorkBuddy 的应用场景远不止写代码。市场、运营、财务、HR、行政等任何岗位都可以用 WorkBuddy 提升效率。我们特别设置了「实用性」和「可推广性」评审维度，鼓励非技术类作品。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span class="q-icon">Q</span> 投票和评委打分怎么算？</div>
+        <div class="faq-a">初赛和复赛采用「评委分 × 80% + 人气投票 × 20%」的加权方式。决赛阶段不设投票，由评委 100% 决定排名，确保最终结果的公正性。每个阶段投票独立，晋级后每人重新获得 5 票。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span class="q-icon">Q</span> 投稿后还能修改吗？</div>
+        <div class="faq-a">投稿审核通过后，如需修改可直接联系管理员。建议提交前仔细检查内容完整性和准确性。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span class="q-icon">Q</span> 平台地址在哪？怎么登录？</div>
+        <div class="faq-a">竞赛平台地址：<a href="https://workbuddy-contest.onrender.com">workbuddy-contest.onrender.com</a>。普通员工使用钉钉扫码登录即可投稿和投票。评委和管理员使用专用密码登录。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA Bottom ===== -->
+<section class="cta-bottom">
+  <div class="cta-title">准备好成为云帐房头号玩家了吗？</div>
+  <div class="cta-desc">打开 WorkBuddy，解决一个真实问题，投稿参赛——就这么简单。</div>
+  <a class="hero-cta" href="https://workbuddy-contest.onrender.com" target="_blank">🚀 立即参赛</a>
+</section>
+
+<!-- ===== PLATFORM ENTRY ===== -->
+<section class="platform-entry">
+  <div class="platform-entry-inner">
+    <div class="platform-entry-label">PLATFORM</div>
+    <div class="platform-entry-title">大赛平台入口</div>
+    <div class="platform-entry-desc">点击下方按钮进入竞赛平台，投稿、投票、查看排行</div>
+    <div class="platform-entry-links">
+      <a class="btn-primary" href="https://workbuddy-contest.onrender.com" target="_blank">🚀 进入竞赛平台</a>
+      <a class="btn-outline" href="https://workbuddy-contest.onrender.com/app/submit.html" target="_blank">📝 投稿作品</a>
+      <a class="btn-outline" href="https://workbuddy-contest.onrender.com/app/browse.html" target="_blank">👀 浏览作品</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <p>云帐房头号玩家第二季 · WorkBuddy 实战应用大赛</p>
+  <p style="margin-top: 8px;">竞赛平台：<a href="https://workbuddy-contest.onrender.com">workbuddy-contest.onrender.com</a> &nbsp;|&nbsp; 内部活动，仅限云帐房员工参与</p>
+</footer>
+
+</body>
+</html>
