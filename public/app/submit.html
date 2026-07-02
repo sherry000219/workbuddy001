@@ -90,25 +90,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 <!-- ===== MAIN CONTENT ===== -->
 <div class="main-container">
   <div class="stats-bar" id="submitStats"></div>
-  <div class="form-card" id="formCard">
+
+  <!-- Login gate -->
+  <div id="loginGate" style="display:none; text-align:center; padding:60px 20px; background:var(--bg-card); border:1px solid #e5e7eb; border-radius:var(--radius); box-shadow:var(--shadow);">
+    <div style="font-size:64px; margin-bottom:16px;">🔐</div>
+    <h3 style="margin-bottom:8px; color:var(--text);">请先登录钉钉</h3>
+    <p style="color:var(--text-dim); font-size:14px; margin-bottom:24px;">参赛需通过钉钉认证，以便自动代入你的姓名和部门信息</p>
+    <button class="btn btn-primary" onclick="startLogin()" id="loginBtn" style="padding:12px 40px; font-size:16px;">钉钉扫码登录</button>
+    <p id="loginStatus" style="margin-top:12px; font-size:13px; color:var(--text-dim);"></p>
+  </div>
+
+  <div class="form-card" id="formCard" style="display:none;">
     <div class="form-step active" id="step1">
       <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第1步：基本信息</div>
       <div class="form-row">
         <div class="form-group">
-          <label>姓名 <span class="required">*</span></label>
-          <input type="text" id="f-name" placeholder="请输入你的姓名">
+          <label>姓名 <span class="required">*</span> <small style="font-weight:400;color:var(--accent);">（已自动代入）</small></label>
+          <input type="text" id="f-name" readonly placeholder="通过钉钉自动获取" style="background:#f9fafb; cursor:not-allowed;">
         </div>
         <div class="form-group">
-          <label>部门 <span class="required">*</span></label>
-          <select id="f-dept">
-            <option value="">请选择部门</option>
-            <option value="中小微-总部">中小微-总部</option>
-            <option value="中小微-区域团队">中小微-区域团队</option>
-            <option value="产研中心">产研中心</option>
-            <option value="职能中台">职能中台</option>
-            <option value="有度税智">有度税智</option>
-            <option value="其他">其他</option>
-          </select>
+          <label>部门 <span class="required">*</span> <small style="font-weight:400;color:var(--accent);">（已自动代入）</small></label>
+          <input type="text" id="f-dept" readonly placeholder="通过钉钉自动获取" style="background:#f9fafb; cursor:not-allowed;">
         </div>
       </div>
       <div class="form-group">
@@ -179,6 +181,8 @@ let ddAuthed = false;
 let ddUser = null;
 const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
 let currentStage = 'preliminary';
+let loginState = null;
+let loginCallbackUri = null;
 
 // ========== HELPERS ==========
 function showToast(msg, type) {
@@ -193,6 +197,26 @@ function formatFileSize(bytes) {
   if (bytes < 1024) return bytes + ' B';
   if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
   return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+// ========== DINGTALK LOGIN ==========
+async function startLogin() {
+  const btn = document.getElementById('loginBtn');
+  const status = document.getElementById('loginStatus');
+  btn.disabled = true;
+  btn.textContent = '正在跳转钉钉...';
+  status.textContent = '请在钉钉中完成授权';
+  try {
+    const resp = await fetch('/api/auth/dd-url');
+    const data = await resp.json();
+    loginState = data.state;
+    loginCallbackUri = window.location.href;
+    window.location.href = data.url;
+  } catch(e) {
+    status.textContent = '获取登录链接失败';
+    btn.disabled = false;
+    btn.textContent = '钉钉扫码登录';
+  }
 }
 
 // ========== DINGTALK AUTH (check only) ==========
@@ -244,23 +268,34 @@ function renderStatsBar(containerId, stats) {
 // ========== SUBMIT PAGE ==========
 function renderSubmitPage() {
   loadStats().then(function(stats) { renderStatsBar('submitStats', stats); });
-  document.getElementById('formCard').style.display = 'block';
   document.getElementById('step1').classList.add('active');
   document.getElementById('step2').classList.remove('active');
-  ['f-name','f-subdept','f-title','f-scene','f-process','f-result','f-extra'].forEach(function(id) { document.getElementById(id).value = ''; });
-  document.getElementById('f-dept').value = '';
+  ['f-subdept','f-title','f-scene','f-process','f-result','f-extra'].forEach(function(id) { document.getElementById(id).value = ''; });
   document.getElementById('f-track').value = '';
   clearAttachment();
+
+  if (ddAuthed && ddUser) {
+    // Show form, hide login gate
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('formCard').style.display = 'block';
+    // Auto-fill name and department from DingTalk
+    document.getElementById('f-name').value = ddUser.nick || '';
+    document.getElementById('f-dept').value = ddUser.dept || '未获取到部门信息';
+  } else {
+    // Show login gate
+    document.getElementById('loginGate').style.display = 'block';
+    document.getElementById('formCard').style.display = 'none';
+  }
 }
 
 function nextStep(n) {
   const name = document.getElementById('f-name').value.trim();
-  const dept = document.getElementById('f-dept').value;
+  const dept = document.getElementById('f-dept').value.trim();
   const subdept = document.getElementById('f-subdept').value.trim();
   const track = document.getElementById('f-track').value;
   const title = document.getElementById('f-title').value.trim();
-  if (!name) return showToast('请填写姓名', 'error');
-  if (!dept) return showToast('请选择部门', 'error');
+  if (!name) return showToast('姓名尚未获取，请先完成钉钉登录', 'error');
+  if (!dept || dept === '未获取到部门信息') return showToast('部门信息尚未获取，请重新登录钉钉', 'error');
   if (!subdept) return showToast('请填写子部门名称', 'error');
   if (!track) return showToast('请选择赛道', 'error');
   if (!title) return showToast('请填写作品标题', 'error');
@@ -315,7 +350,7 @@ async function submitEntry() {
 
   const formData = new FormData();
   formData.append('name', document.getElementById('f-name').value.trim());
-  formData.append('dept', document.getElementById('f-dept').value);
+  formData.append('dept', document.getElementById('f-dept').value.trim());
   formData.append('subdept', document.getElementById('f-subdept').value.trim());
   formData.append('track', document.getElementById('f-track').value);
   formData.append('title', document.getElementById('f-title').value.trim());
