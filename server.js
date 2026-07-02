@@ -858,7 +858,7 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
 app.get('/api/auth/dd-url', (req, res) => {
   const redirectUri = `https://${req.hostname}/auth/dingtalk/callback`;
   const state = Math.random().toString(36).slice(2, 12);
-  const authUrl = `${DINGTALK.authUrl}?redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${DINGTALK.appKey}&scope=openid+profile+contact&state=${state}&prompt=consent`;
+  const authUrl = `${DINGTALK.authUrl}?redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${DINGTALK.appKey}&scope=openid+profile&state=${state}&prompt=consent`;
   res.json({ url: authUrl, state });
 });
 
