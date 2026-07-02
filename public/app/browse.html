@@ -306,6 +306,15 @@ function renderStatsBar(containerId, stats) {
   html += '<div class="stat-card"><div class="num">' + (stats.approvedEntries || 0) + '</div><div class="label">已收录作品</div></div>';
   html += '<div class="stat-card"><div class="num">' + (stats.totalVotes || 0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '投票数</div></div>';
   html += '<div class="stat-card"><div class="num">' + (stats.judgeCount || 0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '评委数</div></div>';
+  if (currentStage === 'semi_final' || currentStage === 'final' || currentStage === 'awarded') {
+    html += '<div class="stat-card"><div class="num" style="color:#ff6b35;">' + (stats.semiFinalists || 0) + '</div><div class="label">复赛晋级</div></div>';
+  }
+  if (currentStage === 'final' || currentStage === 'awarded') {
+    html += '<div class="stat-card"><div class="num" style="color:#2563eb;">' + (stats.finalists || 0) + '</div><div class="label">决赛晋级</div></div>';
+  }
+  if (currentStage === 'awarded') {
+    html += '<div class="stat-card"><div class="num" style="color:#ffa726;">' + (stats.awarded || 0) + '</div><div class="label">已获奖</div></div>';
+  }
   container.innerHTML = html;
 }
 
