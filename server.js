@@ -339,8 +339,10 @@ app.use(express.json({ limit: '60mb' }));
 app.use(express.urlencoded({ extended: true, limit: '60mb' }));
 app.use(cookieParser());
 
-// Redirect /app to /app/ (directory with index.html)
-app.get('/app', (req, res) => res.redirect('/app/'));
+// Serve app.html at /app route
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'app.html'));
+});
 
 app.use(express.static('public'));
 app.use('/uploads', express.static(UPLOAD_DIR));
