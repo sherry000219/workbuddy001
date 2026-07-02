@@ -1,6 +1,28 @@
 {
   "entries": [
     {
+      "id": "entry_1782996831999_m56vm9",
+      "name": "徐聪明",
+      "mobile": "18952230018",
+      "dept": "职能中台",
+      "dept1": "职能中台",
+      "dept2": "人力资源",
+      "dept3": "",
+      "subdept": "人力资源",
+      "track": "efficiency",
+      "title": "测试5",
+      "scene": "测试1",
+      "process_text": "22",
+      "result_text": "22",
+      "extra": "https://alidocs.dingtalk.com/i/nodes/mExel2BLV54y492jUPOjv7z6Wgk9rpMq?utm_scene=person_space",
+      "attachmentName": "screenshot-20260701-195022.png",
+      "attachmentPath": "965ee801f51978bb9fd460d989518810",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-07-02T12:53:51.999Z"
+    },
+    {
       "id": "entry_1782800781942_sukg3c",
       "name": "刘相丞",
       "dept": "职能中台",
@@ -14,7 +36,13 @@
       "attachmentName": null,
       "attachmentPath": null,
       "status": "approved",
-      "createdAt": "2026-06-30T06:26:21.942Z"
+      "createdAt": "2026-06-30T06:26:21.942Z",
+      "roundStatus": "approved",
+      "award": null,
+      "dept1": "职能中台",
+      "dept2": "企业文化",
+      "dept3": "",
+      "mobile": ""
     },
     {
       "id": "entry_1782800737849_uhn6mb",
@@ -30,40 +58,52 @@
       "attachmentName": null,
       "attachmentPath": null,
       "status": "approved",
-      "createdAt": "2026-06-30T06:25:37.849Z"
+      "createdAt": "2026-06-30T06:25:37.849Z",
+      "roundStatus": "approved",
+      "award": null,
+      "dept1": "职能中台",
+      "dept2": "企业文化",
+      "dept3": "",
+      "mobile": ""
     }
   ],
   "votes": [
     {
       "entryId": "entry_1782800781942_sukg3c",
       "voterName": "刘相丞",
-      "createdAt": "2026-06-30T06:45:16.955Z"
+      "createdAt": "2026-06-30T06:45:16.955Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
       "voterName": "测试",
-      "createdAt": "2026-06-30T06:46:03.344Z"
+      "createdAt": "2026-06-30T06:46:03.344Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
       "voterName": "xxx",
-      "createdAt": "2026-06-30T06:50:56.357Z"
+      "createdAt": "2026-06-30T06:50:56.357Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
       "voterName": "aaa",
-      "createdAt": "2026-06-30T06:51:05.793Z"
+      "createdAt": "2026-06-30T06:51:05.793Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800781942_sukg3c",
       "voterName": "qqq",
-      "createdAt": "2026-06-30T06:51:20.639Z"
+      "createdAt": "2026-06-30T06:51:20.639Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800781942_sukg3c",
       "voterId": "qHFb13ALXHzhuoCrGUaaiPAiEiE",
       "voterName": "徐聪明",
-      "createdAt": "2026-06-30T11:45:24.654Z"
+      "createdAt": "2026-06-30T11:45:24.654Z",
+      "stage": "preliminary"
     }
   ],
   "judgeScores": [
@@ -74,7 +114,8 @@
       "innovation": 25,
       "scalability": 3,
       "presentation": 3,
-      "updatedAt": "2026-06-30T06:44:10.876Z"
+      "updatedAt": "2026-06-30T06:44:10.876Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800781942_sukg3c",
@@ -83,7 +124,8 @@
       "innovation": 25,
       "scalability": 25,
       "presentation": 20,
-      "updatedAt": "2026-06-30T06:53:25.594Z"
+      "updatedAt": "2026-06-30T06:53:25.594Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
@@ -92,7 +134,8 @@
       "innovation": 10,
       "scalability": 10,
       "presentation": 10,
-      "updatedAt": "2026-06-30T06:53:40.254Z"
+      "updatedAt": "2026-06-30T06:53:40.254Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800781942_sukg3c",
@@ -101,7 +144,8 @@
       "innovation": 6,
       "scalability": 6,
       "presentation": 6,
-      "updatedAt": "2026-06-30T07:09:43.317Z"
+      "updatedAt": "2026-06-30T07:09:43.317Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
@@ -110,7 +154,8 @@
       "innovation": 5,
       "scalability": 5,
       "presentation": 5,
-      "updatedAt": "2026-06-30T07:09:44.480Z"
+      "updatedAt": "2026-06-30T07:09:44.480Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800781942_sukg3c",
@@ -119,7 +164,8 @@
       "innovation": 3,
       "scalability": 4,
       "presentation": 2,
-      "updatedAt": "2026-06-30T11:34:43.536Z"
+      "updatedAt": "2026-06-30T11:34:43.536Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
@@ -128,7 +174,8 @@
       "innovation": 2,
       "scalability": 2,
       "presentation": 2,
-      "updatedAt": "2026-06-30T11:35:01.204Z"
+      "updatedAt": "2026-06-30T11:35:01.204Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
@@ -137,29 +184,14 @@
       "innovation": 3,
       "scalability": 4,
       "presentation": 4,
-      "updatedAt": "2026-06-30T11:36:13.274Z"
+      "updatedAt": "2026-06-30T11:36:13.274Z",
+      "stage": "preliminary"
     }
   ],
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
-    "votingEnabled": false
-  },
-  "users": {
-    "16553702451766789": {
-      "nick": "徐铭瑞",
-      "jobNumber": "E03427",
-      "email": "xumingrui@yunzhangfang.com",
-      "dept": "人力运营与发展",
-      "title": "COE-企业文化",
-      "corpId": "ding8216a14c6ca8bfd8"
-    }
-  },
-  "sessions": {
-    "36f30e06-a2b1-4bbc-adb9-1063c495940d": {
-      "unionId": "16553702451766789",
-      "nick": "徐铭瑞",
-      "createdAt": "2026-06-30T04:28:29.605Z"
-    }
+    "votingEnabled": false,
+    "currentStage": "preliminary"
   }
 }
