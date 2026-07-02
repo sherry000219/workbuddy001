@@ -111,7 +111,7 @@ let _corpToken = '';
 let _corpTokenExpire = 0;
 async function getCorpAccessToken() {
   if (_corpToken && Date.now() < _corpTokenExpire - 60000) return _corpToken;
-  const resp = await ddApi('POST', `https://oapi.dingtalk.com/gettoken?appkey=${DINGTALK.appKey}&appsecret=${encodeURIComponent(DINGTALK.appSecret)}`, null, null);
+  const resp = await ddApi('GET', `https://oapi.dingtalk.com/gettoken?appkey=${DINGTALK.appKey}&appsecret=${encodeURIComponent(DINGTALK.appSecret)}`, null, null);
   console.log('[dd] gettoken resp:', JSON.stringify(resp).substring(0, 200));
   if (resp.errcode !== 0) throw new Error('获取企业token失败: ' + (resp.errmsg || ''));
   _corpToken = resp.access_token;
