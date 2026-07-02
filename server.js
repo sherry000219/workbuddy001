@@ -140,52 +140,72 @@ async function exchangeDingTalkCode(code) {
     console.log('[dd] contact/users/me call failed:', e.message);
   }
   // Get real name and department chain (up to 3 levels) from full user detail
+  // 钉钉 v1.0 contact API 实际需要的是 staffId（企业内 userid），不是 unionId；
+  // 用 topapi/v2/user/getbyunionid 先把 unionId 换成 staffId，再调 v1.0 contact/users/{staffId}
   let dept1 = '', dept2 = '', dept3 = '';
-  // 优先用 unionId 调新版 contact API；如果失败，fallback 用 oldAPI（v1.0 old）+staffId
-  const userId = unionId; // 钉钉 openapi v1.0 contact/users/{userId} 接 unionId/staffId
-  if (userId) {
+  let staffId = '';
+  if (unionId) {
+    // Step 1: unionId -> staffId
+    try {
+      const byUnionResp = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/getbyunionid?access_token=${tokenResp.accessToken}`, { unionid: unionId });
+      console.log('[dd] getbyunionid resp:', JSON.stringify(byUnionResp).substring(0, 300));
+      if (byUnionResp && byUnionResp.result) {
+        staffId = byUnionResp.result.userid || byUnionResp.result.staffId || '';
+        if (!name && byUnionResp.result.name) name = byUnionResp.result.name;
+      }
+    } catch (e) {
+      console.log('[dd] topapi/v2/user/getbyunionid failed:', e.message);
+    }
+  }
+  if (!staffId && openId) {
+    // 备选：通过 openId 转 staffId
+    try {
+      const byOpenResp = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/getuserid_by_unionid?access_token=${tokenResp.accessToken}`, { unionid: unionId, openid: openId });
+      console.log('[dd] getuserid_by_unionid resp:', JSON.stringify(byOpenResp).substring(0, 300));
+      if (byOpenResp && byOpenResp.result) {
+        staffId = byOpenResp.result.userid || byOpenResp.result.staffId || '';
+      }
+    } catch (e) {
+      console.log('[dd] topapi/v2/user/getuserid_by_unionid failed:', e.message);
+    }
+  }
+  console.log('[dd] resolved staffId:', staffId);
+  if (staffId) {
+    // Step 2: staffId 调新版 contact API（这个 API 接收的 userid 实际是 staffId）
     let detailResp = null;
     let detailSource = '';
-    // 方案1: 新版 v1.0 contact API (unionId)
     try {
-      detailResp = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/users/${userId}`, null, tokenResp.accessToken);
-      detailSource = 'v1.0/contact/users/{unionId}';
-      console.log('[dd] users/{unionId} resp:', JSON.stringify(detailResp).substring(0, 500));
+      detailResp = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/users/${staffId}`, null, tokenResp.accessToken);
+      detailSource = 'v1.0/contact/users/{staffId}';
+      console.log('[dd] users/{staffId} resp:', JSON.stringify(detailResp).substring(0, 500));
     } catch (e1) {
-      console.log('[dd] v1.0/contact/users/{unionId} failed:', e1.message);
-      // 方案2: 旧版 oldAPI topapi/v2/user/get (by unionid)
+      console.log('[dd] v1.0/contact/users/{staffId} failed:', e1.message);
       try {
-        const oldResp = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/get?access_token=${tokenResp.accessToken}`, { unionid: userId });
+        const oldResp = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/get?access_token=${tokenResp.accessToken}`, { userid: staffId });
         if (oldResp && oldResp.result) {
           detailResp = oldResp.result;
           detailSource = 'topapi/v2/user/get';
-          console.log('[dd] topapi/v2/user/get resp:', JSON.stringify(detailResp).substring(0, 500));
+          console.log('[dd] topapi/v2/user/get (by userid) resp:', JSON.stringify(detailResp).substring(0, 500));
         }
       } catch (e2) {
-        console.log('[dd] topapi/v2/user/get also failed:', e2.message);
+        console.log('[dd] topapi/v2/user/get (by userid) failed:', e2.message);
       }
     }
     if (detailResp) {
-      // name = 真实姓名（企业管理员设置，员工无法修改）
       if (detailResp.name) name = detailResp.name;
-      // 部门ID列表字段名兼容: dept_id_list / deptIdList
       const deptIdList = detailResp.dept_id_list || detailResp.deptIdList || [];
       console.log(`[dd] dept id list (${detailSource}):`, JSON.stringify(deptIdList));
       if (deptIdList.length > 0) {
         const primaryDeptId = deptIdList[0];
-        // Trace department chain from leaf to root
         const chain = [];
         let currentId = primaryDeptId;
         for (let i = 0; i < 5 && currentId && currentId !== 1; i++) {
           try {
-            // 部门信息优先用旧版 topapi/v2/department/get（最稳定）
             let d = null;
             try {
               d = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/department/get?access_token=${tokenResp.accessToken}`, { dept_id: currentId });
               if (d && d.result) d = d.result;
             } catch (de) {
-              console.log(`[dd] topapi/v2/department/get ${currentId} failed:`, de.message);
-              // fallback 新版
               d = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/depts/${currentId}`, null, tokenResp.accessToken);
             }
             console.log(`[dd] dept chain [${i}] id=${currentId} name=${d.name} parentId=${d.parent_id || d.parentId}`);
@@ -197,7 +217,6 @@ async function exchangeDingTalkCode(code) {
           }
         }
         console.log('[dd] Dept chain:', chain.map(c => c.name).join(' → '));
-        // Map to 3 levels: chain is root→leaf order
         dept1 = chain[0] ? chain[0].name : '';
         dept2 = chain[1] ? chain[1].name : '';
         dept3 = chain[2] ? chain[2].name : '';
