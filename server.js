@@ -290,36 +290,35 @@ function ghReq(method, apiPath, body) {
 }
 
 async function ghPull() {
-  if (!GITHUB_TOKEN) { console.log('[gh] No GITHUB_TOKEN, skip'); return; }
-  try {
-    const { status, data } = await ghReq('GET', `/repos/${GITHUB_REPO}/contents/data/contest.json?ref=${GITHUB_DATA_BRANCH}`);
-    if (status === 404) { console.log('[gh] No data on GitHub yet, starting fresh'); return; }
-    if (status >= 400) throw new Error(data.message || status);
-    _ghSha = data.sha;
-    const buf = Buffer.from(data.content, data.encoding || 'base64');
-    // Only overwrite local file if local is older/empty OR GitHub has more entries
-    const remoteData = JSON.parse(buf.toString('utf8'));
-    const localExists = fs.existsSync(DB_FILE);
-    if (localExists) {
-      const localData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-      const localCount = (localData.entries || []).length;
-      const remoteCount = (remoteData.entries || []).length;
-      if (remoteCount > localCount) {
-        // GitHub has more data, use it
-        fs.writeFileSync(DB_FILE, buf, 'utf8');
-        console.log('[gh] Pulled data (GitHub newer) — entries:', remoteCount, '> local:', localCount, 'sha:', _ghSha.slice(0, 7));
-      } else if (localCount > remoteCount) {
-        // Local has more data, push it up instead
-        console.log('[gh] Local data newer — entries:', localCount, '> GitHub:', remoteCount, '— will push on next save');
-        _ghSha = data.sha; // still track sha for future pushes
-      } else {
-        console.log('[gh] Data in sync — entries:', localCount, 'sha:', _ghSha.slice(0, 7));
-      }
-    } else {
+  if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN not set');
+  const { status, data } = await ghReq('GET', `/repos/${GITHUB_REPO}/contents/data/contest.json?ref=${GITHUB_DATA_BRANCH}`);
+  _syncStatus.lastStatus = status;
+  _syncStatus.lastResponse = data && data.message ? data.message : null;
+  if (status === 404) throw new Error('GitHub data file not found (status 404). Token may lack repo scope or branch/file missing.');
+  if (status >= 400) throw new Error(data.message || `GitHub API error ${status}`);
+  _ghSha = data.sha;
+  const buf = Buffer.from(data.content, data.encoding || 'base64');
+  const remoteData = JSON.parse(buf.toString('utf8'));
+  const remoteCount = (remoteData.entries || []).length;
+  _syncStatus.githubEntries = remoteCount;
+  const localExists = fs.existsSync(DB_FILE);
+  if (localExists) {
+    const localData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    const localCount = (localData.entries || []).length;
+    if (remoteCount > localCount || (remoteCount === localCount && remoteCount === 0 && localCount === 0)) {
+      // Use remote when it has more data, or when both are empty but remote file exists (keep in sync)
       fs.writeFileSync(DB_FILE, buf, 'utf8');
-      console.log('[gh] Pulled data (no local file) — entries:', remoteCount, 'sha:', _ghSha.slice(0, 7));
+      console.log('[gh] Pulled data (GitHub newer) — entries:', remoteCount, '> local:', localCount, 'sha:', _ghSha.slice(0, 7));
+    } else if (localCount > remoteCount) {
+      console.log('[gh] Local data newer — entries:', localCount, '> GitHub:', remoteCount, '— will push on next save');
+      _ghSha = data.sha;
+    } else {
+      console.log('[gh] Data in sync — entries:', localCount, 'sha:', _ghSha.slice(0, 7));
     }
-  } catch (e) { console.error('[gh] Pull failed:', e.message); }
+  } else {
+    fs.writeFileSync(DB_FILE, buf, 'utf8');
+    console.log('[gh] Pulled data (no local file) — entries:', remoteCount, 'sha:', _ghSha.slice(0, 7));
+  }
 }
 
 function ghPushSchedule() {
@@ -973,7 +972,7 @@ app.post('/api/admin/reset', verifyAdminToken, (req, res) => {
 });
 
 // ========== START ==========
-let _syncStatus = { pulling: false, pulled: false, error: null, lastAttempt: null, githubEntries: 0 };
+let _syncStatus = { pulling: false, pulled: false, error: null, lastAttempt: null, lastStatus: null, lastResponse: null, githubEntries: 0 };
 
 async function tryPullWithRetry(maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
@@ -1007,6 +1006,8 @@ app.get('/api/sync-status', (req, res) => {
     try { localCount = JSON.parse(fs.readFileSync(DB_FILE, 'utf8')).entries?.length || 0; } catch {}
   }
   res.json({
+    githubRepo: GITHUB_REPO,
+    dataBranch: GITHUB_DATA_BRANCH,
     githubToken: GITHUB_TOKEN ? `ghp_...${GITHUB_TOKEN.slice(-4)}` : 'NOT SET',
     syncStatus: _syncStatus,
     localFile: localExists ? `exists (${localCount} entries)` : 'not found',
@@ -1014,6 +1015,24 @@ app.get('/api/sync-status', (req, res) => {
     dbVotes: db.votes.length,
     dbScores: db.judgeScores.length
   });
+});
+
+app.post('/api/force-sync', async (req, res) => {
+  try {
+    const pulled = await tryPullWithRetry(2);
+    if (pulled) {
+      const refreshed = loadDB();
+      db.entries = refreshed.entries;
+      db.votes = refreshed.votes;
+      db.judgeScores = refreshed.judgeScores;
+      db.settings = refreshed.settings;
+      _syncStatus.githubEntries = db.entries.length;
+    }
+    await ghPush();
+    res.json({ success: true, pulled, syncStatus: _syncStatus, dbEntries: db.entries.length });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message, syncStatus: _syncStatus });
+  }
 });
 
 (async () => {
