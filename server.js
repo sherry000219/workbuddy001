@@ -156,75 +156,85 @@ async function exchangeDingTalkCode(code) {
   // 关键：topapi 端点必须用企业 access_token，不能用用户的 userAccessToken
   let dept1 = '', dept2 = '', dept3 = '';
   let staffId = '';
+  let userDetail = null;
   if (unionId) {
     let corpToken = '';
     try { corpToken = await getCorpAccessToken(); } catch (e) { console.log('[dd] getCorpAccessToken failed:', e.message); }
 
     if (corpToken) {
-      // Step 1: unionId -> staffId (尝试多个端点)
-      const unionIdEndpoints = [
-        { url: `https://oapi.dingtalk.com/topapi/v2/user/getbyunionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'v2/user/getbyunionid' },
-        { url: `https://oapi.dingtalk.com/topapi/v2/user/getuserid_by_unionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'v2/user/getuserid_by_unionid' },
-        { url: `https://oapi.dingtalk.com/topapi/v1/user/getbyunionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'v1/user/getbyunionid' },
-        { url: `https://oapi.dingtalk.com/user/getbyunionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'user/getbyunionid' },
-      ];
-      for (const ep of unionIdEndpoints) {
-        try {
-          const resp = await ddApi('POST', ep.url, ep.body);
-          console.log(`[dd] ${ep.name} resp:`, JSON.stringify(resp).substring(0, 300));
-          if (resp.errcode === 0) {
-            const r = resp.result || resp;
-            staffId = r.userid || r.staffId || r.user_id || '';
-            if (staffId) {
-              console.log(`[dd] got staffId via ${ep.name}:`, staffId);
-              break;
-            }
-          } else {
-            console.log(`[dd] ${ep.name} errcode:`, resp.errcode, resp.errmsg);
-          }
-        } catch (e) {
-          console.log(`[dd] ${ep.name} failed:`, e.message);
+      // Step 1: 直接拿用户详情，尝试用 unionId 调 v2/user/get（新API可能直接用 unionId）
+      try {
+        const directGet = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/get?access_token=${corpToken}`, { unionid: unionId });
+        console.log('[dd] v2/user/get (by unionid) resp:', JSON.stringify(directGet).substring(0, 500));
+        if (directGet.errcode === 0 && directGet.result) {
+          userDetail = directGet.result;
+          staffId = userDetail.userid || '';
+        } else {
+          console.log('[dd] v2/user/get (by unionid) errcode:', directGet.errcode, directGet.errmsg);
         }
+      } catch (e) { console.log('[dd] v2/user/get (by unionid) failed:', e.message); }
+
+      // Step 2: unionId -> staffId 转换
+      if (!staffId) {
+        const unionIdEndpoints = [
+          { url: `https://oapi.dingtalk.com/topapi/v2/user/getbyunionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'v2/user/getbyunionid' },
+          { url: `https://oapi.dingtalk.com/topapi/v2/user/getuserid_by_unionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'v2/user/getuserid_by_unionid' },
+          { url: `https://oapi.dingtalk.com/topapi/v1/user/getbyunionid?access_token=${corpToken}`, body: { unionid: unionId }, name: 'v1/user/getbyunionid' },
+        ];
+        for (const ep of unionIdEndpoints) {
+          try {
+            const resp = await ddApi('POST', ep.url, ep.body);
+            console.log(`[dd] ${ep.name} resp:`, JSON.stringify(resp).substring(0, 300));
+            if (resp.errcode === 0) {
+              const r = resp.result || resp;
+              staffId = r.userid || r.user_id || '';
+              if (staffId) { console.log(`[dd] got staffId via ${ep.name}:`, staffId); break; }
+            } else {
+              console.log(`[dd] ${ep.name} errcode:`, resp.errcode, resp.errmsg);
+            }
+          } catch (e) { console.log(`[dd] ${ep.name} failed:`, e.message); }
+        }
+      }
+
+      // Step 3: staffId -> 用户详情
+      if (staffId && !userDetail) {
+        try {
+          const detail = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/get?access_token=${corpToken}`, { userid: staffId });
+          console.log('[dd] v2/user/get (by userid) resp:', JSON.stringify(detail).substring(0, 500));
+          if (detail.errcode === 0 && detail.result) userDetail = detail.result;
+          else console.log('[dd] v2/user/get (by userid) errcode:', detail.errcode, detail.errmsg);
+        } catch (e) { console.log('[dd] v2/user/get (by userid) failed:', e.message); }
       }
     }
 
-    // Step 2: staffId -> 用户详情 (包含 dept_id_list 和 name)
-    if (staffId) {
-      try {
-        const detail = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/user/get?access_token=${corpToken}`, { userid: staffId });
-        console.log('[dd] v2/user/get resp:', JSON.stringify(detail).substring(0, 500));
-        if (detail.errcode === 0 && detail.result) {
-          const r = detail.result;
-          if (r.name) name = r.name;
-          const deptIdList = r.dept_id_list || r.deptIdList || [];
-          console.log('[dd] dept_id_list:', JSON.stringify(deptIdList));
-          if (deptIdList.length > 0) {
-            const primaryDeptId = deptIdList[0];
-            const chain = [];
-            let currentId = primaryDeptId;
-            for (let i = 0; i < 5 && currentId && currentId !== 1; i++) {
-              try {
-                const dResp = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/department/get?access_token=${corpToken}`, { dept_id: currentId });
-                if (dResp.errcode === 0 && dResp.result) {
-                  const d = dResp.result;
-                  console.log(`[dd] dept [${i}] id=${currentId} name=${d.name} parent=${d.parent_id}`);
-                  if (d.name) chain.unshift({ id: currentId, name: d.name });
-                  currentId = d.parent_id;
-                } else { break; }
-              } catch (e) { break; }
-            }
-            console.log('[dd] Dept chain:', chain.map(c => c.name).join(' → '));
-            dept1 = chain[0] ? chain[0].name : '';
-            dept2 = chain[1] ? chain[1].name : '';
-            dept3 = chain[2] ? chain[2].name : '';
-            if (chain.length > 3) dept3 = chain.slice(2).map(c => c.name).join('/');
-            console.log(`[dd] Dept 3-level: L1="${dept1}" L2="${dept2}" L3="${dept3}"`);
-          }
-        } else {
-          console.log('[dd] v2/user/get errcode:', detail.errcode, detail.errmsg);
+    // Step 4: 解析用户详情中的部门和姓名
+    if (userDetail) {
+      if (userDetail.name) name = userDetail.name;
+      const deptIdList = userDetail.dept_id_list || userDetail.deptIdList || [];
+      console.log('[dd] dept_id_list:', JSON.stringify(deptIdList));
+      if (deptIdList.length > 0) {
+        const primaryDeptId = deptIdList[0];
+        const chain = [];
+        let currentId = primaryDeptId;
+        for (let i = 0; i < 5 && currentId && currentId !== 1; i++) {
+          try {
+            const dResp = await ddApi('POST', `https://oapi.dingtalk.com/topapi/v2/department/get?access_token=${corpToken}`, { dept_id: currentId });
+            if (dResp.errcode === 0 && dResp.result) {
+              const d = dResp.result;
+              console.log(`[dd] dept [${i}] id=${currentId} name=${d.name} parent=${d.parent_id}`);
+              if (d.name) chain.unshift({ id: currentId, name: d.name });
+              currentId = d.parent_id;
+            } else { break; }
+          } catch (e) { break; }
         }
-      } catch (e) {
-        console.log('[dd] v2/user/get failed:', e.message);
+        console.log('[dd] Dept chain:', chain.map(c => c.name).join(' → '));
+        dept1 = chain[0] ? chain[0].name : '';
+        dept2 = chain[1] ? chain[1].name : '';
+        dept3 = chain[2] ? chain[2].name : '';
+        if (chain.length > 3) dept3 = chain.slice(2).map(c => c.name).join('/');
+        console.log(`[dd] Dept 3-level: L1="${dept1}" L2="${dept2}" L3="${dept3}"`);
+      } else {
+        console.log('[dd] deptIdList is empty');
       }
     }
   }
@@ -825,7 +835,7 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
 app.get('/api/auth/dd-url', (req, res) => {
   const redirectUri = `https://${req.hostname}/auth/dingtalk/callback`;
   const state = Math.random().toString(36).slice(2, 12);
-  const authUrl = `${DINGTALK.authUrl}?redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${DINGTALK.appKey}&scope=openid+profile&state=${state}&prompt=consent`;
+  const authUrl = `${DINGTALK.authUrl}?redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${DINGTALK.appKey}&scope=openid+profile+contact&state=${state}&prompt=consent`;
   res.json({ url: authUrl, state });
 });
 
