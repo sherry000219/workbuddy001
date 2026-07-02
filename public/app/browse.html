@@ -63,8 +63,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .gallery-toolbar select { padding: 8px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; background: #fff; color: var(--text); }
 .gallery-toolbar select option { background: #fff; }
 .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
-.entry-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 20px; transition: all 0.25s; border-left: 4px solid transparent; position: relative; cursor: pointer; box-shadow: var(--shadow); }
-.entry-card:hover { border-color: #d1d5db; transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.entry-card { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius); padding: 20px; transition: all 0.15s; border-left: 4px solid transparent; position: relative; cursor: pointer; box-shadow: var(--shadow); }
+.entry-card:hover { border-color: #d1d5db; transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.entry-card:active { transform: scale(0.98); opacity: 0.85; }
 .entry-card.rs-approved { border-left-color: #d1d5db; }
 .entry-card.rs-semi_finalist { border-left-color: var(--green); }
 .entry-card.rs-finalist { border-left-color: var(--blue); }
@@ -88,6 +89,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .votes { font-size: 12px; color: var(--text-dim); }
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
 .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+/* ===== LOADING SPINNER ===== */
+.loading-spinner { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ===== MODAL ===== */
 .modal-overlay { position: fixed; inset: 0; background: rgba(17,24,39,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
@@ -368,10 +373,31 @@ async function voteEntry(entryId) {
 }
 
 // ========== DETAIL MODAL ==========
+let detailLoading = false;
+let detailLoadingTimer = null;
+
 async function openDetail(entryId) {
+  // 防止重复点击
+  if (detailLoading) return;
+  detailLoading = true;
+
+  // 立刻显示弹窗 + 加载动画
+  document.getElementById('detailContent').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;"><div class="loading-spinner"></div><p style="margin-top:20px;font-size:15px;color:var(--text-dim);">正在加载作品详情...</p><p style="font-size:12px;color:#9ca3af;margin-top:6px;">请稍候</p></div>';
+  document.getElementById('detailModal').style.display = 'flex';
+
+  // 超时保护：8秒后还没加载出来就提示
+  clearTimeout(detailLoadingTimer);
+  detailLoadingTimer = setTimeout(function() {
+    if (detailLoading) {
+      document.getElementById('detailContent').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;"><div style="font-size:48px;">⏳</div><p style="margin-top:16px;font-size:15px;color:var(--text-dim);">加载时间较长，请检查网络后重试</p><div class="modal-actions" style="margin-top:20px;justify-content:center;"><button class="btn btn-outline btn-sm" onclick="detailLoading=false;closeDetail();">关闭</button><button class="btn btn-primary btn-sm" onclick="detailLoading=false;openDetail(\'' + entryId + '\')" style="margin-left:8px;">重试</button></div></div>';
+    }
+  }, 8000);
+
   try {
     const data = await api('/api/entries/' + entryId);
+    clearTimeout(detailLoadingTimer);
     const e = data.entry;
+    if (!e) throw new Error('作品不存在');
     const rs = e.roundStatus || 'approved';
     const badge = awardBadge(e.award) || roundBadge(rs);
     const stageText = STAGE_LABELS[currentStage] || '初赛';
@@ -383,11 +409,14 @@ async function openDetail(entryId) {
     var attachHtml = '';
     if (e.attachmentName) attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/' + e.attachmentPath + '" download="' + e.attachmentName + '" style="color:#ff6b35;">📥 下载 ' + e.attachmentName + '</a></div></div>';
     document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + e.dept + (e.subdept ? ' / ' + e.subdept : '') + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div><div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + e.scene + '</div></div><div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + e.process_text + '</div></div><div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + e.result_text + '</div></div>' + extraHtml + attachHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions">' + voteBtnHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
-    document.getElementById('detailModal').style.display = 'flex';
-  } catch(e) { showToast('加载失败：' + e.message, 'error'); }
+  } catch(e) {
+    clearTimeout(detailLoadingTimer);
+    document.getElementById('detailContent').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;"><div style="font-size:48px;">😞</div><p style="margin-top:16px;font-size:15px;color:#ef4444;">加载失败：' + e.message + '</p><div class="modal-actions" style="margin-top:20px;justify-content:center;"><button class="btn btn-outline btn-sm" onclick="detailLoading=false;closeDetail();">关闭</button><button class="btn btn-primary btn-sm" onclick="detailLoading=false;openDetail(\'' + entryId + '\')" style="margin-left:8px;">重试</button></div></div>';
+  }
+  detailLoading = false;
 }
 
-function closeDetail() { document.getElementById('detailModal').style.display = 'none'; }
+function closeDetail() { detailLoading = false; clearTimeout(detailLoadingTimer); document.getElementById('detailModal').style.display = 'none'; }
 
 // ========== INIT ==========
 async function init() {
