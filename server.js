@@ -368,7 +368,7 @@ function ghReq(method, apiPath, body) {
   return new Promise((resolve, reject) => {
     const url = new URL(GITHUB_API_BASE + apiPath);
     const opts = {
-      hostname: url.hostname, path: url.pathname, method,
+      hostname: url.hostname, path: url.pathname + url.search, method,
       timeout: GH_TIMEOUT,
       headers: {
         'Authorization': 'Bearer ' + GITHUB_TOKEN,
