@@ -255,12 +255,14 @@ const VOTE_LIMIT_PER_STAGE = 5;
 // ========== GITHUB SYNC ==========
 let _ghSha = null;
 let _ghTimer = null;
+const GH_TIMEOUT = 10000; // 10s timeout for GitHub API calls
 
 function ghReq(method, apiPath, body) {
   return new Promise((resolve, reject) => {
     const url = new URL(GITHUB_API_BASE + apiPath);
     const opts = {
       hostname: url.hostname, path: url.pathname, method,
+      timeout: GH_TIMEOUT,
       headers: {
         'Authorization': 'Bearer ' + GITHUB_TOKEN,
         'User-Agent': 'WorkBuddy-Contest',
@@ -281,6 +283,7 @@ function ghReq(method, apiPath, body) {
       });
     });
     r.on('error', reject);
+    r.on('timeout', () => { r.destroy(); reject(new Error('GitHub API timeout after ' + GH_TIMEOUT + 'ms')); });
     if (body) r.write(JSON.stringify(body));
     r.end();
   });
@@ -294,9 +297,28 @@ async function ghPull() {
     if (status >= 400) throw new Error(data.message || status);
     _ghSha = data.sha;
     const buf = Buffer.from(data.content, data.encoding || 'base64');
-    if (!fs.existsSync(path.dirname(DB_FILE))) fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
-    fs.writeFileSync(DB_FILE, buf, 'utf8');
-    console.log('[gh] Pulled data — sha:', _ghSha.slice(0, 7), 'bytes:', buf.length);
+    // Only overwrite local file if local is older/empty OR GitHub has more entries
+    const remoteData = JSON.parse(buf.toString('utf8'));
+    const localExists = fs.existsSync(DB_FILE);
+    if (localExists) {
+      const localData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      const localCount = (localData.entries || []).length;
+      const remoteCount = (remoteData.entries || []).length;
+      if (remoteCount > localCount) {
+        // GitHub has more data, use it
+        fs.writeFileSync(DB_FILE, buf, 'utf8');
+        console.log('[gh] Pulled data (GitHub newer) — entries:', remoteCount, '> local:', localCount, 'sha:', _ghSha.slice(0, 7));
+      } else if (localCount > remoteCount) {
+        // Local has more data, push it up instead
+        console.log('[gh] Local data newer — entries:', localCount, '> GitHub:', remoteCount, '— will push on next save');
+        _ghSha = data.sha; // still track sha for future pushes
+      } else {
+        console.log('[gh] Data in sync — entries:', localCount, 'sha:', _ghSha.slice(0, 7));
+      }
+    } else {
+      fs.writeFileSync(DB_FILE, buf, 'utf8');
+      console.log('[gh] Pulled data (no local file) — entries:', remoteCount, 'sha:', _ghSha.slice(0, 7));
+    }
   } catch (e) { console.error('[gh] Pull failed:', e.message); }
 }
 
@@ -952,14 +974,7 @@ app.post('/api/admin/reset', verifyAdminToken, (req, res) => {
 
 // ========== START ==========
 (async () => {
-  await ghPull();
-  const refreshed = loadDB();
-  db.entries = refreshed.entries;
-  db.votes = refreshed.votes;
-  db.judgeScores = refreshed.judgeScores;
-  db.settings = refreshed.settings;
-  console.log('[db] Loaded — entries:', db.entries.length, 'votes:', db.votes.length, 'scores:', db.judgeScores.length, 'stage:', getCurrentStage());
-
+  // Start server immediately, don't wait for GitHub sync
   app.listen(PORT, () => {
     console.log(`\n========================================`);
     console.log(`  云帐房头号玩家第二季 — WorkBuddy 实战应用大赛`);
@@ -968,4 +983,13 @@ app.post('/api/admin/reset', verifyAdminToken, (req, res) => {
     console.log(`  GitHub sync: ${GITHUB_TOKEN ? 'ENABLED' : 'DISABLED'}`);
     console.log(`========================================\n`);
   });
+
+  // GitHub sync in background (non-blocking)
+  await ghPull();
+  const refreshed = loadDB();
+  db.entries = refreshed.entries;
+  db.votes = refreshed.votes;
+  db.judgeScores = refreshed.judgeScores;
+  db.settings = refreshed.settings;
+  console.log('[db] Loaded — entries:', db.entries.length, 'votes:', db.votes.length, 'scores:', db.judgeScores.length, 'stage:', getCurrentStage());
 })().catch(e => { console.error('[fatal]', e); process.exit(1); });
