@@ -1,6 +1,42 @@
 {
   "entries": [
     {
+      "id": "entry_1782973981450_dc4c8v",
+      "name": "%B2%E2%CA%D4",
+      "dept": "%B2%FA%D1%D0%D6%D0%D0%C4",
+      "subdept": "%C7%B0%B6%CB%D7%E9",
+      "track": "efficiency",
+      "title": "%B2%E2%CA%D4%B1%EA%CC%E2",
+      "scene": "%B2%E2%CA%D4%B3%A1%BE%B0",
+      "process_text": "%B2%E2%CA%D4%B9%FD%B3%CC",
+      "result_text": "%B2%E2%CA%D4%BD%E1%B9%FB",
+      "extra": "",
+      "attachmentName": null,
+      "attachmentPath": null,
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-07-02T06:33:01.451Z"
+    },
+    {
+      "id": "entry_1782973897412_tfj7si",
+      "name": "���ز���",
+      "dept": "��������",
+      "subdept": "ǰ����",
+      "track": "efficiency",
+      "title": "���ز��Ա���",
+      "scene": "���ز��Գ���",
+      "process_text": "���ز��Թ���",
+      "result_text": "���ز��Խ��",
+      "extra": "",
+      "attachmentName": null,
+      "attachmentPath": null,
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-07-02T06:31:37.413Z"
+    },
+    {
       "id": "entry_1782800781942_sukg3c",
       "name": "刘相丞",
       "dept": "职能中台",
@@ -14,7 +50,9 @@
       "attachmentName": null,
       "attachmentPath": null,
       "status": "approved",
-      "createdAt": "2026-06-30T06:26:21.942Z"
+      "createdAt": "2026-06-30T06:26:21.942Z",
+      "roundStatus": "approved",
+      "award": null
     },
     {
       "id": "entry_1782800737849_uhn6mb",
@@ -30,40 +68,48 @@
       "attachmentName": null,
       "attachmentPath": null,
       "status": "approved",
-      "createdAt": "2026-06-30T06:25:37.849Z"
+      "createdAt": "2026-06-30T06:25:37.849Z",
+      "roundStatus": "approved",
+      "award": null
     }
   ],
   "votes": [
     {
       "entryId": "entry_1782800781942_sukg3c",
       "voterName": "刘相丞",
-      "createdAt": "2026-06-30T06:45:16.955Z"
+      "createdAt": "2026-06-30T06:45:16.955Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
       "voterName": "测试",
-      "createdAt": "2026-06-30T06:46:03.344Z"
+      "createdAt": "2026-06-30T06:46:03.344Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
       "voterName": "xxx",
-      "createdAt": "2026-06-30T06:50:56.357Z"
+      "createdAt": "2026-06-30T06:50:56.357Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
       "voterName": "aaa",
-      "createdAt": "2026-06-30T06:51:05.793Z"
+      "createdAt": "2026-06-30T06:51:05.793Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800781942_sukg3c",
       "voterName": "qqq",
-      "createdAt": "2026-06-30T06:51:20.639Z"
+      "createdAt": "2026-06-30T06:51:20.639Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800781942_sukg3c",
       "voterId": "qHFb13ALXHzhuoCrGUaaiPAiEiE",
       "voterName": "徐聪明",
-      "createdAt": "2026-06-30T11:45:24.654Z"
+      "createdAt": "2026-06-30T11:45:24.654Z",
+      "stage": "preliminary"
     }
   ],
   "judgeScores": [
@@ -74,7 +120,8 @@
       "innovation": 25,
       "scalability": 3,
       "presentation": 3,
-      "updatedAt": "2026-06-30T06:44:10.876Z"
+      "updatedAt": "2026-06-30T06:44:10.876Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800781942_sukg3c",
@@ -83,7 +130,8 @@
       "innovation": 25,
       "scalability": 25,
       "presentation": 20,
-      "updatedAt": "2026-06-30T06:53:25.594Z"
+      "updatedAt": "2026-06-30T06:53:25.594Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
@@ -92,7 +140,8 @@
       "innovation": 10,
       "scalability": 10,
       "presentation": 10,
-      "updatedAt": "2026-06-30T06:53:40.254Z"
+      "updatedAt": "2026-06-30T06:53:40.254Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800781942_sukg3c",
@@ -101,7 +150,8 @@
       "innovation": 6,
       "scalability": 6,
       "presentation": 6,
-      "updatedAt": "2026-06-30T07:09:43.317Z"
+      "updatedAt": "2026-06-30T07:09:43.317Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
@@ -110,7 +160,8 @@
       "innovation": 5,
       "scalability": 5,
       "presentation": 5,
-      "updatedAt": "2026-06-30T07:09:44.480Z"
+      "updatedAt": "2026-06-30T07:09:44.480Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800781942_sukg3c",
@@ -119,7 +170,8 @@
       "innovation": 3,
       "scalability": 4,
       "presentation": 2,
-      "updatedAt": "2026-06-30T11:34:43.536Z"
+      "updatedAt": "2026-06-30T11:34:43.536Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
@@ -128,7 +180,8 @@
       "innovation": 2,
       "scalability": 2,
       "presentation": 2,
-      "updatedAt": "2026-06-30T11:35:01.204Z"
+      "updatedAt": "2026-06-30T11:35:01.204Z",
+      "stage": "preliminary"
     },
     {
       "entryId": "entry_1782800737849_uhn6mb",
@@ -137,12 +190,15 @@
       "innovation": 3,
       "scalability": 4,
       "presentation": 4,
-      "updatedAt": "2026-06-30T11:36:13.274Z"
+      "updatedAt": "2026-06-30T11:36:13.274Z",
+      "stage": "preliminary"
     }
   ],
   "settings": {
     "judgePassword": "wb2026",
-    "adminPassword": "yzfwb2026"
+    "adminPassword": "yzfwb2026",
+    "votingEnabled": false,
+    "currentStage": "preliminary"
   },
   "users": {
     "16553702451766789": {
