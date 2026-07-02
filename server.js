@@ -141,7 +141,7 @@ async function exchangeDingTalkCode(code) {
   let mobile = '';
   try {
     const userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
-    console.log('[dd] users/me resp:', JSON.stringify({ nick: userResp.nick, openId: userResp.openId, name: userResp.name }).substring(0, 300));
+    console.log('[dd] users/me full resp:', JSON.stringify(userResp).substring(0, 600));
     if (userResp.nick) nick = userResp.nick;
     if (userResp.name) name = userResp.name;  // 真实姓名
     if (userResp.openId) openId = userResp.openId;
@@ -149,74 +149,82 @@ async function exchangeDingTalkCode(code) {
     if (userResp.avatarUrl) avatarUrl = userResp.avatarUrl;
     if (userResp.email) email = userResp.email;
     if (userResp.mobile) mobile = userResp.mobile;
+    // 如果 users/me 直接返回 deptIdList，直接用
+    if (userResp.deptIdList && userResp.deptIdList.length > 0) {
+      console.log('[dd] users/me already has deptIdList:', JSON.stringify(userResp.deptIdList));
+      // 存入变量，后续统一解析
+      userResp._deptFromMe = userResp.deptIdList;
+    }
   } catch (e) {
     console.log('[dd] contact/users/me call failed:', e.message);
   }
   // Get real name and department chain (up to 3 levels)
-  // 新版钉钉应用必须用 api.dingtalk.com/v1.0/* 端点，不能用 oapi.dingtalk.com/topapi/*（会返回 errcode 22）
-  // 认证方式：x-acs-dingtalk-access-token header（ddApi 已支持）
+  // 新版钉钉应用必须用 api.dingtalk.com/v1.0/* 端点
   let dept1 = '', dept2 = '', dept3 = '';
   let staffId = '';
   let userDetail = null;
-  if (unionId) {
+  let deptIdList = [];
+
+  // 优先使用 users/me 直接返回的 deptIdList（如果 contact scope 生效）
+  if (userResp && userResp._deptFromMe) {
+    deptIdList = userResp._deptFromMe;
+    console.log('[dd] using deptIdList from users/me');
+  }
+
+  if (unionId && deptIdList.length === 0) {
     let corpToken = '';
     try { corpToken = await getCorpAccessToken(); } catch (e) { console.log('[dd] getCorpAccessToken failed:', e.message); }
 
     if (corpToken) {
-      // Step 1: unionId -> staffId (新版 API)
-      // GET https://api.dingtalk.com/v1.0/contact/users/getByUnionId?unionId=xxx
+      // 新版 API：unionId -> staffId
       try {
         const byUnion = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/users/getByUnionId?unionId=${unionId}`, null, corpToken);
         console.log('[dd] getByUnionId resp:', JSON.stringify(byUnion).substring(0, 300));
-        if (byUnion.userid) {
-          staffId = byUnion.userid;
-          console.log('[dd] got staffId:', staffId);
-        } else if (byUnion.result && byUnion.result.userid) {
-          staffId = byUnion.result.userid;
-        }
+        if (byUnion.userid) staffId = byUnion.userid;
+        else if (byUnion.result && byUnion.result.userid) staffId = byUnion.result.userid;
       } catch (e) { console.log('[dd] getByUnionId failed:', e.message); }
 
-      // Step 2: staffId -> 用户详情 (新版 API)
-      // GET https://api.dingtalk.com/v1.0/contact/users/{userid}
+      // 新版 API：staffId -> 用户详情
       if (staffId) {
         try {
           userDetail = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/users/${staffId}`, null, corpToken);
           console.log('[dd] users/{staffId} resp:', JSON.stringify(userDetail).substring(0, 500));
         } catch (e) { console.log('[dd] users/{staffId} failed:', e.message); }
       }
-    }
 
-    // Step 3: 解析用户详情中的部门和姓名
-    if (userDetail) {
-      if (userDetail.name) name = userDetail.name;
-      const deptIdList = userDetail.deptIdList || userDetail.dept_id_list || [];
-      console.log('[dd] deptIdList:', JSON.stringify(deptIdList));
-      if (deptIdList.length > 0) {
-        const primaryDeptId = deptIdList[0];
-        const chain = [];
-        let currentId = primaryDeptId;
-        for (let i = 0; i < 5 && currentId && currentId !== 1; i++) {
-          try {
-            // 新版 API: GET api.dingtalk.com/v1.0/contact/depts/{deptId}
-            const d = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/depts/${currentId}`, null, corpToken);
-            console.log(`[dd] dept [${i}] id=${currentId} name=${d.name} parent=${d.parentId}`);
-            if (d.name) chain.unshift({ id: currentId, name: d.name });
-            currentId = d.parentId;
-          } catch (e) {
-            console.log(`[dd] dept trace ${currentId} failed:`, e.message);
-            break;
-          }
-        }
-        console.log('[dd] Dept chain:', chain.map(c => c.name).join(' → '));
-        dept1 = chain[0] ? chain[0].name : '';
-        dept2 = chain[1] ? chain[1].name : '';
-        dept3 = chain[2] ? chain[2].name : '';
-        if (chain.length > 3) dept3 = chain.slice(2).map(c => c.name).join('/');
-        console.log(`[dd] Dept 3-level: L1="${dept1}" L2="${dept2}" L3="${dept3}"`);
-      } else {
-        console.log('[dd] deptIdList is empty');
+      // 解析详情中的部门和姓名
+      if (userDetail) {
+        if (userDetail.name) name = userDetail.name;
+        deptIdList = userDetail.deptIdList || userDetail.dept_id_list || [];
       }
     }
+  }
+
+  // 解析部门链路
+  console.log('[dd] final deptIdList:', JSON.stringify(deptIdList));
+  if (deptIdList.length > 0) {
+    const primaryDeptId = deptIdList[0];
+    const chain = [];
+    let currentId = primaryDeptId;
+    for (let i = 0; i < 5 && currentId && currentId !== 1; i++) {
+      try {
+        const d = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/depts/${currentId}`, null, corpToken || '');
+        console.log(`[dd] dept [${i}] id=${currentId} name=${d.name} parent=${d.parentId}`);
+        if (d.name) chain.unshift({ id: currentId, name: d.name });
+        currentId = d.parentId;
+      } catch (e) {
+        console.log(`[dd] dept trace ${currentId} failed:`, e.message);
+        break;
+      }
+    }
+    console.log('[dd] Dept chain:', chain.map(c => c.name).join(' → '));
+    dept1 = chain[0] ? chain[0].name : '';
+    dept2 = chain[1] ? chain[1].name : '';
+    dept3 = chain[2] ? chain[2].name : '';
+    if (chain.length > 3) dept3 = chain.slice(2).map(c => c.name).join('/');
+    console.log(`[dd] Dept 3-level: L1="${dept1}" L2="${dept2}" L3="${dept3}"`);
+  } else {
+    console.log('[dd] deptIdList is empty');
   }
   // Fallback: if no real name, use nick
   const displayName = name || nick;
@@ -390,10 +398,45 @@ function ghReq(method, apiPath, body) {
 
 async function ghPull() {
   if (!GITHUB_TOKEN) throw new Error('GITHUB_TOKEN not set');
+  // Ensure data branch exists; if not, create it from an empty orphan branch
+  try {
+    const branchResp = await ghReq('GET', `/repos/${GITHUB_REPO}/git/ref/heads/${GITHUB_DATA_BRANCH}`);
+    if (branchResp.status === 404) {
+      console.log('[gh] data branch not found, trying to create it...');
+      // Get default branch latest commit
+      const repoResp = await ghReq('GET', `/repos/${GITHUB_REPO}`);
+      if (repoResp.status >= 400) throw new Error(repoResp.data.message || 'Cannot fetch repo info');
+      const defaultBranch = repoResp.data.default_branch;
+      const baseRef = await ghReq('GET', `/repos/${GITHUB_REPO}/git/ref/heads/${defaultBranch}`);
+      if (baseRef.status >= 400) throw new Error(baseRef.data.message || 'Cannot fetch default branch');
+      const baseSha = baseRef.data.object.sha;
+      // Create data branch pointing to default branch commit
+      const createRef = await ghReq('POST', `/repos/${GITHUB_REPO}/git/refs`, {
+        ref: `refs/heads/${GITHUB_DATA_BRANCH}`,
+        sha: baseSha
+      });
+      if (createRef.status >= 400) throw new Error(createRef.data.message || 'Cannot create data branch');
+      console.log('[gh] created data branch:', GITHUB_DATA_BRANCH);
+    }
+  } catch (e) {
+    console.log('[gh] branch check/create error:', e.message);
+  }
+
   const { status, data } = await ghReq('GET', `/repos/${GITHUB_REPO}/contents/data/contest.json?ref=${GITHUB_DATA_BRANCH}`);
   _syncStatus.lastStatus = status;
   _syncStatus.lastResponse = data && data.message ? data.message : null;
-  if (status === 404) throw new Error('GitHub data file not found (status 404). Token may lack repo scope or branch/file missing.');
+  if (status === 404) {
+    // File doesn't exist yet — create initial empty file on data branch
+    console.log('[gh] data/contest.json not found, creating initial empty file...');
+    const initial = JSON.stringify(DEFAULT_DB, null, 2);
+    const body = { message: 'auto: init data file', content: Buffer.from(initial).toString('base64'), branch: GITHUB_DATA_BRANCH };
+    const createResp = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest.json`, body);
+    if (createResp.status >= 400) throw new Error(createResp.data.message || 'Failed to create data file');
+    _ghSha = createResp.data.content.sha;
+    fs.writeFileSync(DB_FILE, initial, 'utf8');
+    console.log('[gh] Created initial data file — sha:', _ghSha.slice(0, 7));
+    return;
+  }
   if (status >= 400) throw new Error(data.message || `GitHub API error ${status}`);
   _ghSha = data.sha;
   const buf = Buffer.from(data.content, data.encoding || 'base64');
@@ -405,7 +448,6 @@ async function ghPull() {
     const localData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     const localCount = (localData.entries || []).length;
     if (remoteCount > localCount || (remoteCount === localCount && remoteCount === 0 && localCount === 0)) {
-      // Use remote when it has more data, or when both are empty but remote file exists (keep in sync)
       fs.writeFileSync(DB_FILE, buf, 'utf8');
       console.log('[gh] Pulled data (GitHub newer) — entries:', remoteCount, '> local:', localCount, 'sha:', _ghSha.slice(0, 7));
     } else if (localCount > remoteCount) {
