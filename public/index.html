@@ -25,10 +25,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .hero-content { position: relative; z-index: 2; text-align: center; padding: 100px 24px 120px; max-width: 880px; }
 .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,107,53,0.08); border: 1px solid rgba(255,107,53,0.2); color: var(--green); padding: 8px 20px; border-radius: 24px; font-size: 13px; font-weight: 600; letter-spacing: 1px; }
 .hero-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
-.hero-pills { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 24px; padding: 6px; background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.04); border-radius: 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-.hero-pill { display: inline-flex; align-items: center; gap: 6px; color: var(--green); font-size: 13px; font-weight: 600; letter-spacing: 1px; padding: 8px 20px; border-radius: 24px; text-decoration: none; transition: all .2s; }
-.hero-pill:hover { background: rgba(255,107,53,0.1); }
-.hero-pill.outline { background: rgba(255,107,53,0.06); border: 1px solid rgba(255,107,53,0.15); }
+.hero-pills { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px; padding: 6px 6px 6px 6px; background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.05); border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+.hero-pill { display: inline-flex; align-items: center; gap: 6px; color: var(--green); font-size: 13px; font-weight: 600; letter-spacing: 1px; padding: 8px 18px; border-radius: 16px; text-decoration: none; transition: all .2s; }
+.hero-pill.season { background: rgba(255,107,53,0.08); }
+.hero-pill.intro { background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.06); color: var(--text2); }
+.hero-pill:hover { background: rgba(255,107,53,0.12); }
+.hero-pill.intro:hover { background: rgba(255,107,53,0.08); color: var(--green); }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
 .hero-logo { width: 240px; height: 240px; margin: 0 auto 32px; background: linear-gradient(135deg, #1f2937, #111827); border-radius: 32px; padding: 8px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg), 0 0 60px rgba(255,107,53,0.12); animation: heroFloat 3s ease-in-out infinite; }
 @keyframes heroFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -153,8 +155,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   <div class="hero-grid"></div>
   <div class="hero-content">
     <div class="hero-pills">
-      <a class="hero-pill" href="/" style="text-decoration:none;"><span class="dot"></span> YUNZHANGFANG · SEASON 2</a>
-      <a class="hero-pill outline" href="/contest-promo.html" style="text-decoration:none;">活动介绍</a>
+      <a class="hero-pill season" href="/" style="text-decoration:none;"><span class="dot"></span> YUNZHANGFANG · SEASON 2</a>
+      <a class="hero-pill intro" href="/contest-promo.html" style="text-decoration:none;">← 活动介绍</a>
     </div>
     <div class="hero-logo">
       <img src="logo-yzf-white.webp" alt="云帐房" width="100%" height="100%" style="object-fit: contain; filter: drop-shadow(0 0 12px rgba(255,107,53,0.15));" />
