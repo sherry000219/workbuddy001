@@ -139,8 +139,10 @@ async function exchangeDingTalkCode(code) {
   let dept = '';
   let email = tokenResp.email || '';
   let mobile = '';
+  let corpToken = '';  // 提到外层，部门追溯时需要
+  let userResp = null;  // 提到外层，避免 try 块外引用报错
   try {
-    const userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
+    userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
     console.log('[dd] users/me full resp:', JSON.stringify(userResp).substring(0, 600));
     if (userResp.nick) nick = userResp.nick;
     if (userResp.name) name = userResp.name;  // 真实姓名
@@ -149,12 +151,6 @@ async function exchangeDingTalkCode(code) {
     if (userResp.avatarUrl) avatarUrl = userResp.avatarUrl;
     if (userResp.email) email = userResp.email;
     if (userResp.mobile) mobile = userResp.mobile;
-    // 如果 users/me 直接返回 deptIdList，直接用
-    if (userResp.deptIdList && userResp.deptIdList.length > 0) {
-      console.log('[dd] users/me already has deptIdList:', JSON.stringify(userResp.deptIdList));
-      // 存入变量，后续统一解析
-      userResp._deptFromMe = userResp.deptIdList;
-    }
   } catch (e) {
     console.log('[dd] contact/users/me call failed:', e.message);
   }
@@ -165,18 +161,18 @@ async function exchangeDingTalkCode(code) {
   let userDetail = null;
   let deptIdList = [];
 
-  // 优先使用 users/me 直接返回的 deptIdList（如果 contact scope 生效）
-  if (userResp && userResp._deptFromMe) {
-    deptIdList = userResp._deptFromMe;
-    console.log('[dd] using deptIdList from users/me');
+  // 优先使用 users/me 直接返回的 deptIdList（如果权限够）
+  if (userResp && userResp.deptIdList && userResp.deptIdList.length > 0) {
+    deptIdList = userResp.deptIdList;
+    console.log('[dd] using deptIdList from users/me:', JSON.stringify(deptIdList));
   }
 
   if (unionId && deptIdList.length === 0) {
-    let corpToken = '';
     try { corpToken = await getCorpAccessToken(); } catch (e) { console.log('[dd] getCorpAccessToken failed:', e.message); }
 
     if (corpToken) {
       // 新版 API：unionId -> staffId
+      // GET https://api.dingtalk.com/v1.0/contact/users/getByUnionId?unionId=xxx
       try {
         const byUnion = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/users/getByUnionId?unionId=${unionId}`, null, corpToken);
         console.log('[dd] getByUnionId resp:', JSON.stringify(byUnion).substring(0, 300));
@@ -185,6 +181,7 @@ async function exchangeDingTalkCode(code) {
       } catch (e) { console.log('[dd] getByUnionId failed:', e.message); }
 
       // 新版 API：staffId -> 用户详情
+      // GET https://api.dingtalk.com/v1.0/contact/users/{userid}
       if (staffId) {
         try {
           userDetail = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/users/${staffId}`, null, corpToken);
@@ -200,14 +197,19 @@ async function exchangeDingTalkCode(code) {
     }
   }
 
-  // 解析部门链路
+  // 解析部门链路（用 corpToken 追溯部门层级）
   console.log('[dd] final deptIdList:', JSON.stringify(deptIdList));
   if (deptIdList.length > 0) {
+    // 如果还没 corpToken（users/me 直接给了 deptIdList），获取一下
+    if (!corpToken) {
+      try { corpToken = await getCorpAccessToken(); } catch (e) { console.log('[dd] getCorpAccessToken for dept trace failed:', e.message); }
+    }
     const primaryDeptId = deptIdList[0];
     const chain = [];
     let currentId = primaryDeptId;
     for (let i = 0; i < 5 && currentId && currentId !== 1; i++) {
       try {
+        // 新版 API: GET api.dingtalk.com/v1.0/contact/depts/{deptId}
         const d = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/depts/${currentId}`, null, corpToken || '');
         console.log(`[dd] dept [${i}] id=${currentId} name=${d.name} parent=${d.parentId}`);
         if (d.name) chain.unshift({ id: currentId, name: d.name });
