@@ -298,13 +298,21 @@ function clearAttachment() {
 }
 
 // ========== SUBMIT ENTRY ==========
+let isSubmitting = false;
+
 async function submitEntry() {
+  if (isSubmitting) return;
+  const submitBtn = document.querySelector('.btn-success');
   const scene = document.getElementById('f-scene').value.trim();
   const process = document.getElementById('f-process').value.trim();
   const result = document.getElementById('f-result').value.trim();
   if (!scene) return showToast('请填写场景描述', 'error');
   if (!process) return showToast('请填写使用过程', 'error');
   if (!result) return showToast('请填写效果呈现', 'error');
+
+  isSubmitting = true;
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '提交中...'; }
+
   const formData = new FormData();
   formData.append('name', document.getElementById('f-name').value.trim());
   formData.append('dept', document.getElementById('f-dept').value);
@@ -316,19 +324,35 @@ async function submitEntry() {
   formData.append('result_text', result);
   formData.append('extra', document.getElementById('f-extra').value.trim());
   if (pendingFile) formData.append('attachment', pendingFile);
+
   try {
+    console.log('[submit] Sending entry...', { name: formData.get('name'), dept: formData.get('dept'), title: formData.get('title') });
+    const controller = new AbortController();
+    const timeout = setTimeout(function() { controller.abort(); }, 30000);
     const resp = await fetch('/api/entries', {
       method: 'POST',
       body: formData,
-      credentials: 'include'
+      credentials: 'include',
+      signal: controller.signal
     });
+    clearTimeout(timeout);
     const data = await resp.json();
-    if (!resp.ok) throw new Error(data.error || '提交失败');
+    console.log('[submit] Response:', resp.status, data);
+    if (!resp.ok) throw new Error(data.error || '提交失败（HTTP ' + resp.status + '）');
     showToast('作品提交成功！', 'success');
     document.getElementById('formCard').innerHTML = '<div class="success-page"><div class="icon">🎉</div><h2>作品提交成功！</h2><p>你的作品已收录，可以在「作品展示」中查看。</p><p style="font-size:13px;color:var(--text-dim);">每人可多次提交，欢迎继续投稿！</p><button class="btn btn-primary" onclick="location.reload()">继续投稿</button><a href="/app/browse.html" class="btn btn-outline" style="margin-left:8px;">查看全部作品</a></div>';
     loadStats();
   } catch(e) {
-    showToast('提交失败：' + e.message, 'error');
+    console.error('[submit] Error:', e);
+    if (e.name === 'AbortError') {
+      showToast('提交超时（30秒），请检查网络后重试', 'error');
+    } else if (e.message === 'Failed to fetch') {
+      showToast('网络连接失败，请检查网络后重试', 'error');
+    } else {
+      showToast('提交失败：' + (e.message || '未知错误'), 'error');
+    }
+    isSubmitting = false;
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '提交作品'; }
   }
 }
 
