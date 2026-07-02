@@ -121,50 +121,58 @@ async function exchangeDingTalkCode(code) {
   let openId = tokenResp.openId || '';
   let unionId = tokenResp.unionId || '';
   let nick = tokenResp.nick || tokenResp.nickname || '';
+  let name = '';  // 真实姓名（来自 contact/users API）
   let avatarUrl = tokenResp.avatarUrl || tokenResp.avatar || '';
   let dept = '';
   let email = tokenResp.email || '';
+  let mobile = '';
   try {
     const userResp = await ddApi('GET', DINGTALK.userInfoUrl, null, tokenResp.accessToken);
+    console.log('[dd] users/me resp:', JSON.stringify({ nick: userResp.nick, openId: userResp.openId, name: userResp.name }).substring(0, 300));
     if (userResp.nick) nick = userResp.nick;
+    if (userResp.name) name = userResp.name;  // 真实姓名
     if (userResp.openId) openId = userResp.openId;
     if (userResp.unionId) unionId = userResp.unionId;
     if (userResp.avatarUrl) avatarUrl = userResp.avatarUrl;
     if (userResp.email) email = userResp.email;
-    if (userResp.mobile) userInfo.mobile = userResp.mobile;
+    if (userResp.mobile) mobile = userResp.mobile;
   } catch (e) {
     console.log('[dd] contact/users/me call failed:', e.message);
   }
-  // Try to get department info
+  // Get real name and department info from full user detail
   if (unionId) {
     try {
       const deptResp = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/users/${unionId}`, null, tokenResp.accessToken);
-      console.log('[dd] dept info:', JSON.stringify(deptResp).substring(0, 300));
+      console.log('[dd] users/{unionId} full resp:', JSON.stringify(deptResp).substring(0, 500));
+      // name = 真实姓名（企业管理员设置，员工无法修改）
+      if (deptResp.name) name = deptResp.name;
+      // deptIdList = 所属部门ID列表
       if (deptResp.deptIdList && deptResp.deptIdList.length > 0) {
-        // Get the primary department name
         const primaryDeptId = deptResp.deptIdList[0];
         try {
           const deptNameResp = await ddApi('GET', `https://api.dingtalk.com/v1.0/contact/depts/${primaryDeptId}`, null, tokenResp.accessToken);
+          console.log('[dd] dept name resp:', JSON.stringify(deptNameResp).substring(0, 300));
           if (deptNameResp.name) {
             dept = deptNameResp.name;
             console.log('[dd] Got dept name:', dept);
           }
         } catch (de) { console.log('[dd] Failed to get dept name:', de.message); }
-        // Store all department IDs for later use
-        userInfo.deptIdList = deptResp.deptIdList;
       }
     } catch (e) {
-      console.log('[dd] Failed to fetch department info:', e.message);
+      console.log('[dd] Failed to fetch department/name info:', e.message);
     }
   }
+  // Fallback: if no real name, use nick
+  const displayName = name || nick;
   if (!openId) throw new Error('授权失败：未能获取用户身份');
-  if (!nick) nick = '钉钉用户_' + openId.slice(-6);
+  if (!displayName) throw new Error('授权失败：未能获取用户姓名');
   // Map known department names to our options
   const knownDepts = ['产研中心', '职能中台', '中小微-总部', '中小微-区域团队', '有度税智', '人力运营与发展', '其他'];
+  let matchedDept = '';
   for (const kd of knownDepts) {
-    if (dept.includes(kd)) { dept = kd; break; }
+    if (dept.includes(kd)) { matchedDept = kd; break; }
   }
-  return { openId, unionId, nick, avatarUrl, dept, email };
+  return { openId, unionId, nick: displayName, name, avatarUrl, dept: matchedDept || dept, email };
 }
 
 // ========== JSON FILE STORAGE ==========
@@ -731,7 +739,7 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
 app.get('/api/auth/dd-url', (req, res) => {
   const redirectUri = `https://${req.hostname}/auth/dingtalk/callback`;
   const state = Math.random().toString(36).slice(2, 12);
-  const authUrl = `${DINGTALK.authUrl}?redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${DINGTALK.appKey}&scope=openid&state=${state}&prompt=consent`;
+  const authUrl = `${DINGTALK.authUrl}?redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${DINGTALK.appKey}&scope=openid+profile&state=${state}&prompt=consent`;
   res.json({ url: authUrl, state });
 });
 
