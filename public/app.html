@@ -698,7 +698,7 @@ async function ddLogin() {
     return;
   }
   try {
-    const resp = await fetch('/api/auth/dd-url');
+    const resp = await fetch('/api/auth/dd-url?redirect=/app.html');
     const data = await resp.json();
     window.location.href = data.url;
   } catch(e) {

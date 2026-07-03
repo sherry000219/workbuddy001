@@ -213,7 +213,7 @@ async function ddLogin() {
     return;
   }
   try {
-    const resp = await fetch('/api/auth/dd-url');
+    const resp = await fetch('/api/auth/dd-url?redirect=/app/browse.html');
     const data = await resp.json();
     window.location.href = data.url;
   } catch(e) { showToast('无法发起钉钉登录，请重试', 'error'); }
