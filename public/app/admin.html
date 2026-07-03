@@ -134,9 +134,19 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
 <!-- ===== MAIN CONTENT ===== -->
 <div class="main-container">
   <div class="section-title">⚙️ 数据管理</div>
+  <!-- DD login gate -->
+  <div id="loginGate" style="display:none; text-align:center; padding:60px 20px; background:var(--bg-card); border:1px solid #e5e7eb; border-radius:var(--radius); box-shadow:var(--shadow); max-width:400px; margin:0 auto;">
+    <div style="font-size:64px; margin-bottom:16px;">🔐</div>
+    <h3 style="margin-bottom:8px; color:var(--text);">请先登录钉钉</h3>
+    <p style="color:var(--text-dim); font-size:14px; margin-bottom:24px;">管理员需先通过钉钉认证，确保身份可追溯</p>
+    <button class="btn btn-primary" onclick="startLogin()" id="loginBtn" style="padding:12px 40px; font-size:16px;">钉钉扫码登录</button>
+    <p id="loginStatus" style="margin-top:12px; font-size:13px; color:var(--text-dim);"></p>
+  </div>
+  <!-- Admin password login (shown after DD auth) -->
   <div class="judge-login" id="adminLogin">
-    <div style="font-size:48px;margin-bottom:16px;">🛡️</div>
+    <div style="font-size:48px;margin-bottom:8px;">🛡️</div>
     <h2 style="margin-bottom:8px;">管理员登录</h2>
+    <p id="adminDDName" style="color:var(--accent);font-size:14px;font-weight:600;margin-bottom:16px;"></p>
     <input type="password" id="adminPwInput" placeholder="管理员密码" autocomplete="off">
     <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="adminLogin()">登录管理后台</button>
   </div>
@@ -222,6 +232,9 @@ let adminToken = '';
 let currentStage = 'preliminary';
 let isVotingStage = true;
 let votingEnabled = false;
+let ddAuthed = false;
+let ddUser = null;
+let loginState = null;
 const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
 const ROUND_LABELS = { approved: '初赛', semi_finalist: '复赛晋级', eliminated_semi: '复赛淘汰', finalist: '决赛晋级', eliminated_final: '决赛淘汰', awarded: '已获奖' };
 const AWARD_LABELS = { first: '🥇 一等奖', second: '🥈 二等奖', third: '🥉 三等奖', excellence: '🎖️ 优秀奖' };
@@ -248,16 +261,53 @@ function renderStatsBar(containerId, stats) {
   container.innerHTML = html;
 }
 
+// ========== DD AUTH ==========
+async function checkAuth() {
+  try {
+    const resp = await fetch('/api/auth/me', { credentials: 'include' });
+    const data = await resp.json();
+    if (data.user) { ddAuthed = true; ddUser = data.user; currentStage = data.currentStage || 'preliminary'; }
+  } catch(e) { ddAuthed = false; }
+}
+
+async function startLogin() {
+  const btn = document.getElementById('loginBtn');
+  const status = document.getElementById('loginStatus');
+  btn.disabled = true; btn.textContent = '正在跳转钉钉...';
+  status.textContent = '请在钉钉中完成授权';
+  try {
+    const resp = await fetch('/api/auth/dd-url');
+    const data = await resp.json();
+    loginState = data.state;
+    window.location.href = data.url;
+  } catch(e) {
+    status.textContent = '获取登录链接失败';
+    btn.disabled = false; btn.textContent = '钉钉扫码登录';
+  }
+}
+
 // ========== ADMIN ==========
 function renderAdminPage() {
-  document.getElementById('adminLogin').style.display = 'block';
-  document.getElementById('adminPanel').style.display = 'none';
-  document.getElementById('adminPanel').classList.remove('active');
-  document.getElementById('adminPwInput').value = '';
+  const gate = document.getElementById('loginGate');
+  const login = document.getElementById('adminLogin');
+  const panel = document.getElementById('adminPanel');
+
+  if (ddAuthed && ddUser) {
+    gate.style.display = 'none';
+    login.style.display = 'block';
+    document.getElementById('adminDDName').textContent = '👤 当前身份：' + (ddUser.nick || '');
+    document.getElementById('adminPwInput').value = '';
+  } else {
+    gate.style.display = 'block';
+    login.style.display = 'none';
+  }
+  panel.style.display = 'none';
+  panel.classList.remove('active');
   adminAuthed = false; adminToken = '';
 }
 
 async function adminLogin() {
+  if (!ddAuthed || !ddUser) return showToast('请先通过钉钉认证', 'error');
   const pw = document.getElementById('adminPwInput').value.trim();
   if (!pw) return showToast('请输入管理员密码', 'error');
   try {
@@ -475,6 +525,7 @@ function closeDetail() { document.getElementById('detailModal').style.display = 
 
 // ========== INIT ==========
 async function init() {
+  await checkAuth();
   try {
     const resp = await fetch('/api/voting/status'); const data = await resp.json();
     currentStage = data.currentStage || 'preliminary'; isVotingStage = isStageVoting(currentStage);
