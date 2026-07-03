@@ -273,7 +273,7 @@ async function startLogin() {
   btn.textContent = '正在跳转钉钉...';
   status.textContent = '请在钉钉中完成授权';
   try {
-    const resp = await fetch('/api/auth/dd-url');
+    const resp = await fetch('/api/auth/dd-url?redirect=' + encodeURIComponent(window.location.pathname));
     const data = await resp.json();
     loginState = data.state;
     loginCallbackUri = window.location.href;

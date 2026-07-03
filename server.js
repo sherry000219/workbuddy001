@@ -398,6 +398,7 @@ function getAdminPassword() {
 
 // ========== EXPRESS ==========
 const app = express();
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '60mb' }));
 app.use(express.urlencoded({ extended: true, limit: '60mb' }));
 app.use(cookieParser());
@@ -693,6 +694,10 @@ function verifyAdminToken(req, res, next) {
 }
 
 // ========== API: DINGTALK AUTH ==========
+// state -> redirect URL 映射（OAuth 登录后跳回原页面）
+const loginRedirects = new Map();
+const LOGIN_REDIRECT_TTL = 10 * 60 * 1000; // 10分钟过期
+
 app.post('/api/auth/dd-code', async (req, res) => {
   const { code } = req.body;
   if (!code) return res.status(400).json({ error: '缺少授权码' });
@@ -724,7 +729,7 @@ app.post('/api/auth/dd-code', async (req, res) => {
 });
 
 app.get('/auth/dingtalk/callback', async (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
   if (!code) return res.status(400).send('Missing authorization code');
   try {
     const userInfo = await exchangeDingTalkCode(code);
@@ -744,7 +749,10 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
       secure: true,
       path: '/',
     });
-    res.redirect('/');
+    // 回到登录前所在页面
+    const redirect = (state && loginRedirects.get(state)) || '/';
+    if (state) loginRedirects.delete(state);
+    res.redirect(redirect);
   } catch (e) {
     console.error('DingTalk callback error:', e.message);
     res.status(400).send('DingTalk login failed: ' + (e.message || 'unknown error'));
@@ -754,6 +762,14 @@ app.get('/auth/dingtalk/callback', async (req, res) => {
 app.get('/api/auth/dd-url', (req, res) => {
   const redirectUri = `https://${req.hostname}/auth/dingtalk/callback`;
   const state = Math.random().toString(36).slice(2, 12);
+  // 前端可传 redirect 参数指定登录后跳回哪个页面
+  const redirect = req.query.redirect || '/';
+  loginRedirects.set(state, redirect);
+  // 定期清理过期映射
+  const now = Date.now();
+  for (const [k, v] of loginRedirects) {
+    if (now - v.time > LOGIN_REDIRECT_TTL) loginRedirects.delete(k);
+  }
   const authUrl = `${DINGTALK.authUrl}?redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${DINGTALK.appKey}&scope=openid+profile&state=${state}&prompt=consent`;
   res.json({ url: authUrl, state });
 });

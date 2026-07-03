@@ -219,7 +219,7 @@ async function startJudgeLogin() {
   btn.disabled = true; btn.textContent = '正在跳转钉钉...';
   status.textContent = '请在钉钉中完成授权';
   try {
-    const resp = await fetch('/api/auth/dd-url');
+    const resp = await fetch('/api/auth/dd-url?redirect=/app/judge.html');
     const data = await resp.json();
     loginState = data.state;
     window.location.href = data.url;
