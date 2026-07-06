@@ -575,6 +575,9 @@ app.get('/api/entries/:id', (req, res) => {
 });
 
 // ========== API: VOTES ==========
+const _voteRL = new Map(); // 投票频率限制: userId -> lastVoteTimestamp
+const VOTE_COOLDOWN_MS = 3000;
+
 app.get('/api/voting/status', (req, res) => {
   res.json({ votingEnabled: !!db.settings.votingEnabled, currentStage: getCurrentStage() });
 });
@@ -585,7 +588,14 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
     return res.status(403).json({ error: '当前阶段不支持投票' });
   }
   if (!db.settings.votingEnabled) return res.status(403).json({ error: '投票暂未开启，请等待管理员开启后再投票' });
+
   const userId = req.ddUser.openId;
+  // 频率限制：两次投票之间至少间隔 3 秒
+  const lastVote = _voteRL.get(userId);
+  if (lastVote && Date.now() - lastVote < VOTE_COOLDOWN_MS) {
+    return res.status(429).json({ error: '操作过快，请稍后再试' });
+  }
+
   // Check entry is votable in current stage
   const votable = getVotableEntries(stage);
   const entry = votable.find(e => e.id === req.params.entryId);
@@ -604,6 +614,7 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
     createdAt: new Date().toISOString()
   });
   saveDB();
+  _voteRL.set(userId, Date.now()); // 记录本次投票时间用于频率限制
   const remaining = VOTE_LIMIT_PER_STAGE - userVoteCount - 1;
   res.json({ success: true, voteCount: db.votes.filter(v => v.entryId === req.params.entryId && (v.stage || 'preliminary') === stage).length, remaining });
 });
