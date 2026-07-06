@@ -11,5 +11,9 @@ services:
         value: "3000"
       - key: NODE_ENV
         value: production
+      - key: JUDGE_PASSWORD
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
       - key: GITHUB_TOKEN
         sync: false

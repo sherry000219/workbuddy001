@@ -44,11 +44,13 @@ function loadSessions() {
   }
 }
 
+// 保存 session 时同步到 GitHub
 function saveSessions() {
   try {
     const obj = {};
     sessions.forEach((session, token) => { obj[token] = session; });
     fs.writeFileSync(SESSION_FILE, JSON.stringify(obj, null, 2), 'utf8');
+    ghPushSessionsSchedule();
   } catch (e) {
     console.error('[session] save failed:', e.message);
   }
@@ -366,8 +368,25 @@ async function ghPull() {
 function ghPushSchedule() {
   if (!GITHUB_TOKEN) return;
   if (_ghTimer) clearTimeout(_ghTimer);
-  _ghTimer = setTimeout(ghPush, 5000);
+  _ghTimer = setTimeout(ghPush, 1000);
 }
+
+// 进程退出前强制同步一次（Render 休眠/重启时触发）
+let _shuttingDown = false;
+async function forceSyncBeforeExit() {
+  if (_shuttingDown) return;
+  _shuttingDown = true;
+  console.log('[gh] Force sync before exit...');
+  try {
+    await ghPush();
+    await ghPushSessions();
+    console.log('[gh] Force sync complete');
+  } catch (e) {
+    console.error('[gh] Force sync failed:', e.message);
+  }
+}
+process.on('SIGTERM', () => { forceSyncBeforeExit().then(() => process.exit(0)); });
+process.on('SIGINT', () => { forceSyncBeforeExit().then(() => process.exit(0)); });
 
 async function ghPush() {
   try {
@@ -378,7 +397,53 @@ async function ghPush() {
     if (status >= 400) throw new Error(data.message || status);
     _ghSha = data.content.sha;
     console.log('[gh] Pushed data — sha:', _ghSha.slice(0, 7));
-  } catch (e) { console.error('[gh] Push failed:', e.message); }
+  } catch (e) { console.error('[gh] Push data failed:', e.message); }
+}
+
+// ===== SESSIONS GITHUB SYNC =====
+let _ghSessionSha = null;
+let _ghSessionTimer = null;
+
+async function ghPushSessions() {
+  if (!GITHUB_TOKEN || sessions.size === 0) return;
+  try {
+    const obj = {}; sessions.forEach((s, t) => { obj[t] = s; });
+    const buf = Buffer.from(JSON.stringify(obj));
+    const body = { message: 'auto: sync sessions', content: buf.toString('base64'), branch: GITHUB_DATA_BRANCH };
+    if (_ghSessionSha) body.sha = _ghSessionSha;
+    const { status, data } = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/sessions.json`, body);
+    if (status >= 400) {
+      // 文件不存在时先创建
+      if (status === 404) { _ghSessionSha = null; const body2 = { message: 'auto: init sessions', content: buf.toString('base64'), branch: GITHUB_DATA_BRANCH };
+        const r2 = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/sessions.json`, body2);
+        if (r2.status < 400) _ghSessionSha = r2.data.content.sha; }
+      return;
+    }
+    _ghSessionSha = data.content.sha;
+  } catch (e) { /* silent */ }
+}
+
+function ghPushSessionsSchedule() {
+  if (!GITHUB_TOKEN) return;
+  if (_ghSessionTimer) clearTimeout(_ghSessionTimer);
+  _ghSessionTimer = setTimeout(ghPushSessions, 2000);
+}
+
+async function ghPullSessions() {
+  if (!GITHUB_TOKEN) return;
+  try {
+    const { status, data } = await ghReq('GET', `/repos/${GITHUB_REPO}/contents/data/sessions.json?ref=${GITHUB_DATA_BRANCH}`);
+    if (status >= 400) return;
+    _ghSessionSha = data.sha;
+    const buf = Buffer.from(data.content, data.encoding || 'base64');
+    const remote = JSON.parse(buf.toString('utf8'));
+    for (const [token, s] of Object.entries(remote)) {
+      if (s && s.createdAt && (Date.now() - s.createdAt <= SESSION_MAX_AGE)) {
+        if (!sessions.has(token)) sessions.set(token, s);
+      }
+    }
+    console.log('[gh] Pulled sessions — count:', sessions.size);
+  } catch (e) { /* silent */ }
 }
 
 const _realSaveDB = saveDB;
@@ -387,13 +452,13 @@ saveDB = function() {
   ghPushSchedule();
 };
 
-// ========== PASSWORD HELPERS ==========
+// ========== PASSWORD HELPERS (设置 Render 环境变量 JUDGE_PASSWORD / ADMIN_PASSWORD) ==========
 function getJudgePassword() {
-  return process.env.JUDGE_PASSWORD || 'wb2026';
+  return process.env.JUDGE_PASSWORD || db.settings.judgePassword || '';
 }
 
 function getAdminPassword() {
-  return process.env.ADMIN_PASSWORD || 'yzfwb2026';
+  return process.env.ADMIN_PASSWORD || db.settings.adminPassword || '';
 }
 
 // ========== EXPRESS ==========
@@ -1123,6 +1188,9 @@ app.post('/api/force-sync', async (req, res) => {
     console.log(`  http://localhost:${PORT}`);
     console.log(`  Stage: ${getCurrentStage()}`);
     console.log(`  GitHub sync: ${GITHUB_TOKEN ? 'ENABLED' : 'DISABLED'}`);
+    if (!process.env.JUDGE_PASSWORD) console.log(`  ⚠️  JUDGE_PASSWORD not set via env — passwords only editable via admin panel`);
+    if (!process.env.ADMIN_PASSWORD) console.log(`  ⚠️  ADMIN_PASSWORD not set via env — passwords only editable via admin panel`);
+    if (!GITHUB_TOKEN) console.log(`  ⚠️  GITHUB_TOKEN not set — data WILL be lost on restart!`);
     console.log(`========================================\n`);
   });
 
@@ -1142,4 +1210,8 @@ app.post('/api/force-sync', async (req, res) => {
   db.settings = refreshed.settings;
   _syncStatus.githubEntries = db.entries.length;
   console.log('[db] Loaded — entries:', db.entries.length, 'votes:', db.votes.length, 'scores:', db.judgeScores.length, 'stage:', getCurrentStage());
+
+  // Pull sessions from GitHub
+  if (GITHUB_TOKEN) await ghPullSessions().catch(() => {});
+  console.log('[session] Loaded — count:', sessions.size);
 })().catch(e => { console.error('[fatal]', e); process.exit(1); });
