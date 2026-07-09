@@ -145,28 +145,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
       </div>
       <div class="form-group">
         <label>参赛形式 <span class="required">*</span></label>
-        <div style="display:flex;gap:16px;margin-top:6px;">
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:500;">
-            <input type="radio" name="entry-type" value="individual" checked onchange="toggleEntryType()"> 个人参赛
-          </label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:500;">
-            <input type="radio" name="entry-type" value="team" onchange="toggleEntryType()"> 部门/团队参赛
-          </label>
-        </div>
-      </div>
-      <div id="team-fields" style="display:none;background:rgba(255,107,53,0.04);border:1px solid rgba(255,107,53,0.12);border-radius:10px;padding:16px;margin-top:4px;">
-        <p style="font-size:12px;color:var(--accent);margin-bottom:12px;">🏢 <strong>参评「最佳组织氛围奖」</strong>：面向二级部门/中小微三级部门，阐述组织方式、场景与效果，入围后需现场汇报。详见大赛奖项说明。</p>
-        <div class="form-row">
-          <div class="form-group">
-            <label>部门/团队名称 <span class="required">*</span></label>
-            <input type="text" id="f-team-name" placeholder="如：福鹿事业部华东团队 / 职能中台">
-          </div>
-          <div class="form-group">
-            <label>组织成员 <span class="required">*</span></label>
-            <input type="text" id="f-team-members" placeholder="用逗号分隔成员姓名，如：张三,李四,王五">
-            <div class="form-hint">提交人为组织负责人或AI项目代表</div>
-          </div>
-        </div>
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px;padding:12px;background:rgba(255,107,53,0.04);border:1px solid rgba(255,107,53,0.12);border-radius:10px;">
+          <input type="checkbox" id="f-team-entry" style="margin-top:3px;" onchange="toggleTeamEntry()">
+          <span>
+            <strong>以部门/团队形式参赛，参评「最佳组织氛围奖」</strong><br>
+            <span style="font-size:12px;color:var(--text-dim);">默认个人参赛；勾选后本作品将以部门/团队为单位参评最佳组织氛围奖</span>
+          </span>
+        </label>
       </div>
       <div class="form-group">
         <label>参赛赛道 <span class="required">*</span></label>
@@ -175,6 +160,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
           <option value="efficiency">效率提升</option>
           <option value="creative">创意应用</option>
           <option value="business">业务赋能</option>
+          <option value="other">其他</option>
         </select>
         <div class="form-hint">鼓励方向，不强制归入；选最贴近的即可</div>
       </div>
@@ -273,13 +259,27 @@ function getLevel3Options(dept1, dept2) {
   return tree.level3Children || [];
 }
 
-function toggleEntryType() {
-  const isTeam = document.querySelector('input[name="entry-type"]:checked').value === 'team';
-  document.getElementById('team-fields').style.display = isTeam ? 'block' : 'none';
+function toggleTeamEntry() {
+  const isTeam = document.getElementById('f-team-entry').checked;
+  const hint = document.querySelector('#f-team-entry').closest('label').querySelector('span');
+  if (hint) {
+    hint.style.color = isTeam ? 'var(--accent)' : '';
+  }
 }
 
 function getEntryType() {
-  return document.querySelector('input[name="entry-type"]:checked').value;
+  return document.getElementById('f-team-entry').checked ? 'team' : 'individual';
+}
+
+function getTeamName() {
+  if (getEntryType() !== 'team') return '';
+  const dept1 = document.getElementById('f-dept1').value.trim();
+  const dept2 = document.getElementById('f-dept2').value.trim();
+  const dept3 = document.getElementById('f-dept3').value.trim();
+  let name = dept1;
+  if (dept2) name += ' / ' + dept2;
+  if (dept3) name += ' / ' + dept3;
+  return name || '未选择部门';
 }
 
 // ========== HELPERS ==========
@@ -373,10 +373,8 @@ function renderSubmitPage() {
   clearAttachment();
   resetDeptSelects();
   // Reset team fields
-  document.querySelector('input[name="entry-type"][value="individual"]').checked = true;
-  document.getElementById('f-team-name').value = '';
-  document.getElementById('f-team-members').value = '';
-  document.getElementById('team-fields').style.display = 'none';
+  document.getElementById('f-team-entry').checked = false;
+  toggleTeamEntry();
 
   if (ddAuthed && ddUser) {
     // Show form, hide login gate
@@ -475,11 +473,6 @@ function nextStep(n) {
   }
   if (!track) return showToast('请选择赛道', 'error');
   if (!title) return showToast('请填写作品标题', 'error');
-  // 团队校验
-  if (getEntryType() === 'team') {
-    if (!document.getElementById('f-team-name').value.trim()) return showToast('请输入团队名称', 'error');
-    if (!document.getElementById('f-team-members').value.trim()) return showToast('请输入团队成员', 'error');
-  }
   document.querySelectorAll('.form-step').forEach(function(s) { s.classList.remove('active'); });
   document.getElementById('step' + n).classList.add('active');
 }
@@ -550,8 +543,8 @@ async function submitEntry() {
   formData.append('result_text', result);
   formData.append('entryType', getEntryType());
   if (getEntryType() === 'team') {
-    formData.append('teamName', document.getElementById('f-team-name').value.trim());
-    formData.append('teamMembers', document.getElementById('f-team-members').value.trim());
+    formData.append('teamName', getTeamName());
+    formData.append('teamMembers', '部门/团队参赛');
   }
   if (pendingFile) formData.append('attachment', pendingFile);
 

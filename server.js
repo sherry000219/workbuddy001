@@ -545,10 +545,9 @@ app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) =>
   if (!validMime.includes(req.file.mimetype)) {
     return res.status(400).json({ error: '海报必须是图片格式（JPG/PNG/WebP）' });
   }
-  // 团队校验
-  if (entryType === 'team') {
-    if (!teamName || !teamName.trim()) return res.status(400).json({ error: '请输入团队名称' });
-    if (!teamMembers || !teamMembers.trim()) return res.status(400).json({ error: '请输入团队成员' });
+  // 团队校验（团队名称由部门信息自动拼接）
+  if (entryType === 'team' && (!teamName || !teamName.trim())) {
+    teamName = dept1 + (dept2 ? ' / ' + dept2 : '') + (dept3 ? ' / ' + dept3 : '');
   }
   const id = 'entry_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
   const entry = {
