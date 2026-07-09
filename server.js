@@ -168,6 +168,9 @@ function loadDB() {
       if (!e.dept2) e.dept2 = e.subdept || '';
       if (!e.dept3) e.dept3 = '';
       if (!e.mobile) e.mobile = '';
+      if (!e.entryType) e.entryType = 'individual';
+      if (!e.teamName) e.teamName = '';
+      if (!e.teamMembers) e.teamMembers = '';
     });
     (merged.votes || []).forEach(v => {
       if (!v.stage) v.stage = 'preliminary';
@@ -513,7 +516,7 @@ app.get('/api/entries', (req, res) => {
 });
 
 app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) => {
-  let { name, mobile, dept, dept1, dept2, dept3, subdept, track, title, scene, process_text, result_text, extra } = req.body;
+  let { name, mobile, dept, dept1, dept2, dept3, subdept, track, title, scene, process_text, result_text, extra, entryType, teamName, teamMembers } = req.body;
   // Auto-fill name and mobile from DingTalk session if not provided
   if (!name && req.ddUser.nick) name = req.ddUser.nick;
   if (!mobile && req.ddUser.mobile) mobile = req.ddUser.mobile;
@@ -542,10 +545,18 @@ app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) =>
   if (!validMime.includes(req.file.mimetype)) {
     return res.status(400).json({ error: '海报必须是图片格式（JPG/PNG/WebP）' });
   }
+  // 团队校验
+  if (entryType === 'team') {
+    if (!teamName || !teamName.trim()) return res.status(400).json({ error: '请输入团队名称' });
+    if (!teamMembers || !teamMembers.trim()) return res.status(400).json({ error: '请输入团队成员' });
+  }
   const id = 'entry_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
   const entry = {
     id, name, mobile: mobile || '', dept: dept1, dept1, dept2: dept2 || '', dept3: dept3 || '',
     subdept: subdept || dept2 || '', // backward compat
+    entryType: entryType || 'individual',
+    teamName: teamName || '',
+    teamMembers: teamMembers || '',
     track, title, scene,
     process_text, result_text, extra: extra || '',
     attachmentName: req.file ? req.file.originalname : null,
