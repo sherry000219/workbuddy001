@@ -150,20 +150,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
             <input type="radio" name="entry-type" value="individual" checked onchange="toggleEntryType()"> 个人参赛
           </label>
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:500;">
-            <input type="radio" name="entry-type" value="team" onchange="toggleEntryType()"> 团队参赛
+            <input type="radio" name="entry-type" value="team" onchange="toggleEntryType()"> 部门/团队参赛
           </label>
         </div>
       </div>
-      <div id="team-fields" style="display:none;">
+      <div id="team-fields" style="display:none;background:rgba(255,107,53,0.04);border:1px solid rgba(255,107,53,0.12);border-radius:10px;padding:16px;margin-top:4px;">
+        <p style="font-size:12px;color:var(--accent);margin-bottom:12px;">🏢 <strong>参评「最佳组织氛围奖」</strong>：面向二级部门/中小微三级部门，阐述组织方式、场景与效果，入围后需现场汇报。详见大赛奖项说明。</p>
         <div class="form-row">
           <div class="form-group">
-            <label>团队名称 <span class="required">*</span></label>
-            <input type="text" id="f-team-name" placeholder="给你的团队起个名字">
+            <label>部门/团队名称 <span class="required">*</span></label>
+            <input type="text" id="f-team-name" placeholder="如：福鹿事业部华东团队 / 职能中台">
           </div>
           <div class="form-group">
-            <label>团队成员 <span class="required">*</span></label>
+            <label>组织成员 <span class="required">*</span></label>
             <input type="text" id="f-team-members" placeholder="用逗号分隔成员姓名，如：张三,李四,王五">
-            <div class="form-hint">队长应为提交人；团队成员也需为云帐房非研发序列人员</div>
+            <div class="form-hint">提交人为组织负责人或AI项目代表</div>
           </div>
         </div>
       </div>
