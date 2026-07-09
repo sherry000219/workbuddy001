@@ -532,6 +532,16 @@ app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) =>
   if (!track || !title || !scene || !process_text || !result_text) {
     return res.status(400).json({ error: '请填写所有必填字段' });
   }
+  // 链接格式校验
+  if (!/^https?:\/\//.test(scene) || !/^https?:\/\//.test(process_text) || !/^https?:\/\//.test(result_text)) {
+    return res.status(400).json({ error: '场景描述、使用过程、效果呈现必须以链接形式提交' });
+  }
+  // 海报必传 + 图片校验
+  if (!req.file) return res.status(400).json({ error: '请上传一张参赛作品海报' });
+  const validMime = ['image/jpeg','image/png','image/webp','image/gif','image/bmp'];
+  if (!validMime.includes(req.file.mimetype)) {
+    return res.status(400).json({ error: '海报必须是图片格式（JPG/PNG/WebP）' });
+  }
   const id = 'entry_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
   const entry = {
     id, name, mobile: mobile || '', dept: dept1, dept1, dept2: dept2 || '', dept3: dept3 || '',
@@ -632,7 +642,7 @@ app.post('/api/judge/scores/:entryId', (req, res) => {
   const entry = judgable.find(e => e.id === req.params.entryId);
   if (!entry) return res.status(404).json({ error: '该作品在当前阶段不可打分' });
   const p = parseInt(practicality) || 0, c = parseInt(innovation) || 0, s = parseInt(scalability) || 0, r = parseInt(presentation) || 0;
-  if (p > 30 || c > 25 || s > 25 || r > 20) return res.status(400).json({ error: '分数超出上限' });
+  if (p > 50 || c > 20 || s > 15 || r > 15) return res.status(400).json({ error: '分数超出上限' });
   const idx = db.judgeScores.findIndex(sc => sc.entryId === req.params.entryId && sc.judgeName === judgeName && (sc.stage || 'preliminary') === stage);
   const scoreData = { entryId: req.params.entryId, judgeName, practicality: p, innovation: c, scalability: s, presentation: r, stage, updatedAt: new Date().toISOString() };
   if (idx >= 0) db.judgeScores[idx] = scoreData;
@@ -952,7 +962,7 @@ app.get('/api/admin/export/csv', verifyAdminToken, (req, res) => {
   let headers = ['作品ID', '标题', '姓名', '部门', '子部门', '赛道', '轮次', '提交时间', '投票数', '评委数', '评委均分', '综合分'];
   if (stage === 'awarded') headers.push('获奖等级');
   allJudges.forEach(j => {
-    headers.push(`${j}-总分`, `${j}-实用性(/30)`, `${j}-创新性(/25)`, `${j}-可推广性(/25)`, `${j}-效果呈现(/20)`);
+    headers.push(`${j}-总分`, `${j}-实用性(/50)`, `${j}-创新性(/20)`, `${j}-可推广性(/15)`, `${j}-效果呈现(/15)`);
   });
   csv += headers.map(esc).join(',') + '\n';
 

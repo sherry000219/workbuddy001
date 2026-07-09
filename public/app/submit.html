@@ -162,33 +162,31 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
       </div>
     </div>
     <div class="form-step" id="step2">
-      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第2步：作品详情</div>
+      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第2步：作品详情（以链接形式提交）</div>
       <div class="form-group">
-        <label>场景描述 <span class="required">*</span></label>
-        <textarea id="f-scene" rows="3" placeholder="描述你解决的是什么工作场景/问题？"></textarea>
+        <label>场景描述链接 <span class="required">*</span></label>
+        <input type="url" id="f-scene" placeholder="粘贴文档链接（钉钉文档 / 飞书文档 / Notion 等）">
+        <div class="form-hint">请将场景描述写在在线文档中，粘贴链接即可</div>
       </div>
       <div class="form-group">
-        <label>使用过程 <span class="required">*</span></label>
-        <textarea id="f-process" rows="4" placeholder="描述你如何使用WorkBuddy完成这个任务？包括关键步骤、用到的功能等"></textarea>
+        <label>使用过程链接 <span class="required">*</span></label>
+        <input type="url" id="f-process" placeholder="粘贴文档链接（钉钉文档 / 飞书文档 / Notion 等）">
+        <div class="form-hint">请将使用过程写在在线文档中，粘贴链接即可</div>
       </div>
       <div class="form-group">
-        <label>效果呈现 <span class="required">*</span></label>
-        <textarea id="f-result" rows="3" placeholder="使用WorkBuddy后的效果如何？推荐用量化数据"></textarea>
+        <label>效果呈现链接 <span class="required">*</span></label>
+        <input type="url" id="f-result" placeholder="粘贴文档链接（钉钉文档 / 飞书文档 / Notion 等）">
+        <div class="form-hint">请将效果呈现在在线文档中，粘贴链接即可</div>
       </div>
       <div class="form-group">
-        <label>作品链接 / 附加信息（选填）<br><small style="font-weight:400;color:var(--accent);">建议上传钉钉文档链接或网页链接展示作品，评委可直接点击查看</small></label>
-        <textarea id="f-extra" rows="2" placeholder="粘贴钉钉文档链接、网页链接，或补充其他说明"></textarea>
-        <div class="form-hint">链接提交后可在作品详情中直接点击跳转</div>
-      </div>
-      <div class="form-group">
-        <label>上传附件（选填，单文件 50MB 以内）</label>
+        <label>作品海报 <span class="required">*</span> <br><small style="font-weight:400;color:var(--accent);">上传一张参赛作品的功能宣传海报（仅限图片）</small></label>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-          <input type="file" id="f-attachment" style="display:none;" onchange="handleAttachmentSelect(event)">
-          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('f-attachment').click()">选择文件</button>
-          <span id="attachment-name" style="font-size:13px;color:var(--text-dim);">未选择文件</span>
+          <input type="file" id="f-attachment" accept="image/*" style="display:none;" onchange="handleAttachmentSelect(event)">
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('f-attachment').click()">选择图片</button>
+          <span id="attachment-name" style="font-size:13px;color:var(--text-dim);">未选择图片</span>
           <button type="button" id="attachment-clear" class="btn btn-sm" style="display:none;background:#f3f4f6;border:none;color:var(--text-dim);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;" onclick="clearAttachment()">清除</button>
         </div>
-        <div class="form-hint">支持图片、PDF、Word、Excel、压缩包等格式</div>
+        <div class="form-hint">支持 JPG、PNG、WebP 等图片格式，建议尺寸 1200×800</div>
       </div>
       <div class="form-actions">
         <button class="btn btn-outline" onclick="prevStep(1)">← 上一步</button>
@@ -336,7 +334,7 @@ function renderSubmitPage() {
   loadStats().then(function(stats) { renderStatsBar('submitStats', stats); });
   document.getElementById('step1').classList.add('active');
   document.getElementById('step2').classList.remove('active');
-  ['f-title','f-scene','f-process','f-result','f-extra'].forEach(function(id) { document.getElementById(id).value = ''; });
+  ['f-title','f-scene','f-process','f-result'].forEach(function(id) { document.getElementById(id).value = ''; });
   document.getElementById('f-track').value = '';
   clearAttachment();
   resetDeptSelects();
@@ -465,7 +463,7 @@ function handleAttachmentSelect(event) {
 
 function clearAttachment() {
   pendingFile = null;
-  document.getElementById('attachment-name').textContent = '未选择文件';
+  document.getElementById('attachment-name').textContent = '未选择图片';
   document.getElementById('attachment-clear').style.display = 'none';
   const fileInput = document.getElementById('f-attachment');
   if (fileInput) fileInput.value = '';
@@ -480,9 +478,14 @@ async function submitEntry() {
   const scene = document.getElementById('f-scene').value.trim();
   const process = document.getElementById('f-process').value.trim();
   const result = document.getElementById('f-result').value.trim();
-  if (!scene) return showToast('请填写场景描述', 'error');
-  if (!process) return showToast('请填写使用过程', 'error');
-  if (!result) return showToast('请填写效果呈现', 'error');
+  if (!scene || !scene.startsWith('http')) return showToast('请填写有效的场景描述链接', 'error');
+  if (!process || !process.startsWith('http')) return showToast('请填写有效的使用过程链接', 'error');
+  if (!result || !result.startsWith('http')) return showToast('请填写有效的效果呈现链接', 'error');
+  if (!pendingFile) return showToast('请上传一张参赛作品海报', 'error');
+
+  // 验证是图片
+  const validTypes = ['image/jpeg','image/png','image/webp','image/gif','image/bmp'];
+  if (!validTypes.includes(pendingFile.type)) return showToast('海报文件必须是图片格式（JPG/PNG/WebP）', 'error');
 
   isSubmitting = true;
   if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '提交中...'; }
@@ -501,7 +504,6 @@ async function submitEntry() {
   formData.append('scene', scene);
   formData.append('process_text', process);
   formData.append('result_text', result);
-  formData.append('extra', document.getElementById('f-extra').value.trim());
   if (pendingFile) formData.append('attachment', pendingFile);
 
   try {

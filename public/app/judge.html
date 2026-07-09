@@ -133,17 +133,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     </div>
     <div style="background:rgba(255,215,64,0.06);padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:rgba(255,215,64,0.7);">
       <b>打分维度参考：</b>
-      实用性(30%)：解决了真实工作问题 |
-      创新性(25%)：场景/用法新颖有启发性 |
-      可推广性(25%)：其他同事可复用 |
-      效果呈现(20%)：有量化数据支撑
+      实用性(50%)：解决了真实工作问题 |
+      创新性(20%)：场景/用法新颖有启发性 |
+      可推广性(15%)：其他同事可复用 |
+      效果呈现(15%)：有量化数据支撑
     </div>
     <div class="score-table">
       <table>
         <thead>
           <tr>
             <th>作品</th><th>姓名</th><th>部门</th><th>赛道</th>
-            <th>实用性<br><small>/30</small></th><th>创新性<br><small>/25</small></th><th>可推广性<br><small>/25</small></th><th>效果呈现<br><small>/20</small></th>
+            <th>实用性<br><small>/50</small></th><th>创新性<br><small>/20</small></th><th>可推广性<br><small>/15</small></th><th>效果呈现<br><small>/15</small></th>
             <th>总分</th><th>操作</th>
           </tr>
         </thead>
@@ -302,7 +302,7 @@ async function renderJudgePanel() {
       const hasScored = myScores[e.id] ? 'scored' : '';
       const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
       const deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join('/') || '-';
-      return '<tr class="' + hasScored + '"><td><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#ff6b35;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + deptChain + '</td><td>' + trackLabel(e.track) + '</td><td><input type="number" min="0" max="30" value="' + (s.practicality||'') + '" id="j_p_' + e.id + '" placeholder="0-30"></td><td><input type="number" min="0" max="25" value="' + (s.innovation||'') + '" id="j_c_' + e.id + '" placeholder="0-25"></td><td><input type="number" min="0" max="25" value="' + (s.scalability||'') + '" id="j_s_' + e.id + '" placeholder="0-25"></td><td><input type="number" min="0" max="20" value="' + (s.presentation||'') + '" id="j_r_' + e.id + '" placeholder="0-20"></td><td><strong>' + total + '</strong></td><td><button class="btn btn-sm ' + (hasScored ? 'btn-success' : 'btn-primary') + '" onclick="saveScore(\'' + e.id + '\')">' + (hasScored ? '更新' : '打分') + '</button></td></tr>';
+      return '<tr class="' + hasScored + '"><td><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#ff6b35;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + deptChain + '</td><td>' + trackLabel(e.track) + '</td><td><input type="number" min="0" max="50" value="' + (s.practicality||'') + '" id="j_p_' + e.id + '" placeholder="0-50"></td><td><input type="number" min="0" max="20" value="' + (s.innovation||'') + '" id="j_c_' + e.id + '" placeholder="0-20"></td><td><input type="number" min="0" max="15" value="' + (s.scalability||'') + '" id="j_s_' + e.id + '" placeholder="0-15"></td><td><input type="number" min="0" max="15" value="' + (s.presentation||'') + '" id="j_r_' + e.id + '" placeholder="0-15"></td><td><strong>' + total + '</strong></td><td><button class="btn btn-sm ' + (hasScored ? 'btn-success' : 'btn-primary') + '" onclick="saveScore(\'' + e.id + '\')">' + (hasScored ? '更新' : '打分') + '</button></td></tr>';
     }).join('');
   } catch(e) { console.error('Judge panel error:', e); }
 }
@@ -312,7 +312,7 @@ async function saveScore(entryId) {
   const c = parseInt(document.getElementById('j_c_' + entryId).value) || 0;
   const s = parseInt(document.getElementById('j_s_' + entryId).value) || 0;
   const r = parseInt(document.getElementById('j_r_' + entryId).value) || 0;
-  if (p > 30 || c > 25 || s > 25 || r > 20) return showToast('分数超出上限，请检查！', 'error');
+  if (p > 50 || c > 20 || s > 15 || r > 15) return showToast('分数超出上限，请检查！', 'error');
   try {
     const data = await api('/api/judge/scores/' + entryId, {
       method: 'POST',
