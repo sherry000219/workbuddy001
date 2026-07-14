@@ -1,6 +1,31 @@
 {
   "entries": [
     {
+      "id": "entry_1783995343957_p5o8re",
+      "name": "刘木目",
+      "mobile": "15205203629",
+      "dept": "职能中台",
+      "dept1": "职能中台",
+      "dept2": "人力资源",
+      "dept3": "",
+      "subdept": "人力资源",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "efficiency",
+      "title": "企业文化小漫画ai工作流",
+      "scene": "https://workbuddy-contest.onrender.com",
+      "process_text": "https://workbuddy-contest.onrender.com",
+      "result_text": "https://workbuddy-contest.onrender.com",
+      "extra": "",
+      "attachmentName": "å§å§01.png",
+      "attachmentPath": "784de629cf6efb4554a4f5626dc04464",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-07-14T02:15:43.957Z"
+    },
+    {
       "id": "entry_1783048230830_x4ysb2",
       "name": "徐聪明",
       "mobile": "18952230018",
@@ -20,7 +45,10 @@
       "status": "approved",
       "roundStatus": "approved",
       "award": null,
-      "createdAt": "2026-07-03T03:10:30.830Z"
+      "createdAt": "2026-07-03T03:10:30.830Z",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": ""
     },
     {
       "id": "entry_1782998715798_799gm6",
@@ -42,7 +70,10 @@
       "status": "approved",
       "roundStatus": "approved",
       "award": null,
-      "createdAt": "2026-07-02T13:25:15.798Z"
+      "createdAt": "2026-07-02T13:25:15.798Z",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": ""
     },
     {
       "id": "entry_1782996831999_m56vm9",
@@ -64,7 +95,10 @@
       "status": "approved",
       "roundStatus": "approved",
       "award": null,
-      "createdAt": "2026-07-02T12:53:51.999Z"
+      "createdAt": "2026-07-02T12:53:51.999Z",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": ""
     },
     {
       "id": "entry_1782800781942_sukg3c",
@@ -86,7 +120,10 @@
       "dept1": "职能中台",
       "dept2": "企业文化",
       "dept3": "",
-      "mobile": ""
+      "mobile": "",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": ""
     },
     {
       "id": "entry_1782800737849_uhn6mb",
@@ -108,7 +145,10 @@
       "dept1": "职能中台",
       "dept2": "企业文化",
       "dept3": "",
-      "mobile": ""
+      "mobile": "",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": ""
     }
   ],
   "votes": [
