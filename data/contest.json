@@ -21,7 +21,7 @@
       "attachmentName": "å§å§01.png",
       "attachmentPath": "784de629cf6efb4554a4f5626dc04464",
       "status": "approved",
-      "roundStatus": "semi_finalist",
+      "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-07-14T02:15:43.957Z"
     },
@@ -43,7 +43,7 @@
       "attachmentName": "screenshot-20260701-195022.png",
       "attachmentPath": "3af97b5534a6e4b4c4389f2d46aba03c",
       "status": "approved",
-      "roundStatus": "semi_finalist",
+      "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-07-03T03:10:30.830Z",
       "entryType": "individual",
@@ -93,7 +93,7 @@
       "attachmentName": "screenshot-20260701-195022.png",
       "attachmentPath": "965ee801f51978bb9fd460d989518810",
       "status": "approved",
-      "roundStatus": "semi_finalist",
+      "roundStatus": "eliminated_final",
       "award": null,
       "createdAt": "2026-07-02T12:53:51.999Z",
       "entryType": "individual",
@@ -140,7 +140,7 @@
       "attachmentPath": null,
       "status": "approved",
       "createdAt": "2026-06-30T06:25:37.849Z",
-      "roundStatus": "semi_finalist",
+      "roundStatus": "eliminated_final",
       "award": null,
       "dept1": "职能中台",
       "dept2": "企业文化",
@@ -313,7 +313,7 @@
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
-    "votingEnabled": true,
-    "currentStage": "semi_final"
+    "votingEnabled": false,
+    "currentStage": "final"
   }
 }
