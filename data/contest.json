@@ -242,12 +242,12 @@
     {
       "entryId": "entry_1783995343957_p5o8re",
       "judgeName": "刘木目",
-      "practicality": 0,
-      "innovation": 0,
-      "scalability": 0,
-      "presentation": 0,
+      "practicality": 50,
+      "innovation": 20,
+      "scalability": 15,
+      "presentation": 15,
       "stage": "preliminary",
-      "updatedAt": "2026-07-14T03:57:12.583Z"
+      "updatedAt": "2026-07-14T03:57:21.304Z"
     }
   ],
   "settings": {
