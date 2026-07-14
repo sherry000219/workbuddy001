@@ -21,8 +21,8 @@
       "attachmentName": "å§å§01.png",
       "attachmentPath": "784de629cf6efb4554a4f5626dc04464",
       "status": "approved",
-      "roundStatus": "finalist",
-      "award": null,
+      "roundStatus": "awarded",
+      "award": "first",
       "createdAt": "2026-07-14T02:15:43.957Z"
     },
     {
@@ -68,8 +68,8 @@
       "attachmentName": null,
       "attachmentPath": null,
       "status": "approved",
-      "roundStatus": "finalist",
-      "award": null,
+      "roundStatus": "awarded",
+      "award": "second",
       "createdAt": "2026-07-02T13:25:15.798Z",
       "entryType": "individual",
       "teamName": "",
@@ -325,6 +325,6 @@
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
     "votingEnabled": false,
-    "currentStage": "final"
+    "currentStage": "awarded"
   }
 }
