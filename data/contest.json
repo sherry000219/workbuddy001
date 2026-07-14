@@ -333,11 +333,11 @@
       "entryId": "entry_1782800737849_uhn6mb",
       "judgeName": "刘木目",
       "practicality": 10,
-      "innovation": 0,
-      "scalability": 0,
-      "presentation": 0,
+      "innovation": 10,
+      "scalability": 10,
+      "presentation": 10,
       "stage": "preliminary",
-      "updatedAt": "2026-07-14T03:45:58.378Z"
+      "updatedAt": "2026-07-14T03:46:02.647Z"
     }
   ],
   "settings": {
