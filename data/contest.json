@@ -21,7 +21,7 @@
       "attachmentName": "å§å§01.png",
       "attachmentPath": "784de629cf6efb4554a4f5626dc04464",
       "status": "approved",
-      "roundStatus": "semi_finalist",
+      "roundStatus": "approved",
       "award": null,
       "createdAt": "2026-07-14T02:15:43.957Z"
     },
@@ -43,7 +43,7 @@
       "attachmentName": "screenshot-20260701-195022.png",
       "attachmentPath": "3af97b5534a6e4b4c4389f2d46aba03c",
       "status": "approved",
-      "roundStatus": "semi_finalist",
+      "roundStatus": "approved",
       "award": null,
       "createdAt": "2026-07-03T03:10:30.830Z",
       "entryType": "individual",
@@ -68,7 +68,7 @@
       "attachmentName": null,
       "attachmentPath": null,
       "status": "approved",
-      "roundStatus": "eliminated_semi",
+      "roundStatus": "approved",
       "award": null,
       "createdAt": "2026-07-02T13:25:15.798Z",
       "entryType": "individual",
@@ -93,7 +93,7 @@
       "attachmentName": "screenshot-20260701-195022.png",
       "attachmentPath": "965ee801f51978bb9fd460d989518810",
       "status": "approved",
-      "roundStatus": "semi_finalist",
+      "roundStatus": "approved",
       "award": null,
       "createdAt": "2026-07-02T12:53:51.999Z",
       "entryType": "individual",
@@ -115,7 +115,7 @@
       "attachmentPath": null,
       "status": "approved",
       "createdAt": "2026-06-30T06:26:21.942Z",
-      "roundStatus": "semi_finalist",
+      "roundStatus": "approved",
       "award": null,
       "dept1": "职能中台",
       "dept2": "企业文化",
@@ -140,7 +140,7 @@
       "attachmentPath": null,
       "status": "approved",
       "createdAt": "2026-06-30T06:25:37.849Z",
-      "roundStatus": "eliminated_semi",
+      "roundStatus": "approved",
       "award": null,
       "dept1": "职能中台",
       "dept2": "企业文化",
@@ -151,264 +151,12 @@
       "teamMembers": ""
     }
   ],
-  "votes": [
-    {
-      "entryId": "entry_1782800781942_sukg3c",
-      "voterName": "刘相丞",
-      "createdAt": "2026-06-30T06:45:16.955Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800737849_uhn6mb",
-      "voterName": "测试",
-      "createdAt": "2026-06-30T06:46:03.344Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800737849_uhn6mb",
-      "voterName": "xxx",
-      "createdAt": "2026-06-30T06:50:56.357Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800737849_uhn6mb",
-      "voterName": "aaa",
-      "createdAt": "2026-06-30T06:51:05.793Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800781942_sukg3c",
-      "voterName": "qqq",
-      "createdAt": "2026-06-30T06:51:20.639Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800781942_sukg3c",
-      "voterId": "qHFb13ALXHzhuoCrGUaaiPAiEiE",
-      "voterName": "徐聪明",
-      "createdAt": "2026-06-30T11:45:24.654Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1783995343957_p5o8re",
-      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
-      "voterName": "刘木目",
-      "stage": "semi_final",
-      "createdAt": "2026-07-14T03:18:09.114Z"
-    },
-    {
-      "entryId": "entry_1782996831999_m56vm9",
-      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
-      "voterName": "刘木目",
-      "stage": "semi_final",
-      "createdAt": "2026-07-14T03:18:12.315Z"
-    },
-    {
-      "entryId": "entry_1782800737849_uhn6mb",
-      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
-      "voterName": "刘木目",
-      "stage": "semi_final",
-      "createdAt": "2026-07-14T03:18:15.353Z"
-    },
-    {
-      "entryId": "entry_1783048230830_x4ysb2",
-      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
-      "voterName": "刘木目",
-      "stage": "semi_final",
-      "createdAt": "2026-07-14T03:18:22.730Z"
-    },
-    {
-      "entryId": "entry_1782800781942_sukg3c",
-      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
-      "voterName": "刘木目",
-      "stage": "preliminary",
-      "createdAt": "2026-07-14T03:48:38.276Z"
-    },
-    {
-      "entryId": "entry_1783995343957_p5o8re",
-      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
-      "voterName": "刘木目",
-      "stage": "preliminary",
-      "createdAt": "2026-07-14T03:48:41.388Z"
-    },
-    {
-      "entryId": "entry_1782998715798_799gm6",
-      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
-      "voterName": "刘木目",
-      "stage": "preliminary",
-      "createdAt": "2026-07-14T03:48:47.389Z"
-    },
-    {
-      "entryId": "entry_1782996831999_m56vm9",
-      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
-      "voterName": "刘木目",
-      "stage": "preliminary",
-      "createdAt": "2026-07-14T03:48:50.586Z"
-    },
-    {
-      "entryId": "entry_1782800781942_sukg3c",
-      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
-      "voterName": "刘木目",
-      "stage": "semi_final",
-      "createdAt": "2026-07-14T03:54:02.739Z"
-    }
-  ],
-  "judgeScores": [
-    {
-      "entryId": "entry_1782800781942_sukg3c",
-      "judgeName": "001",
-      "practicality": 30,
-      "innovation": 25,
-      "scalability": 3,
-      "presentation": 3,
-      "updatedAt": "2026-06-30T06:44:10.876Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800781942_sukg3c",
-      "judgeName": "002",
-      "practicality": 30,
-      "innovation": 25,
-      "scalability": 25,
-      "presentation": 20,
-      "updatedAt": "2026-06-30T06:53:25.594Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800737849_uhn6mb",
-      "judgeName": "002",
-      "practicality": 12,
-      "innovation": 10,
-      "scalability": 10,
-      "presentation": 10,
-      "updatedAt": "2026-06-30T06:53:40.254Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800781942_sukg3c",
-      "judgeName": "003",
-      "practicality": 6,
-      "innovation": 6,
-      "scalability": 6,
-      "presentation": 6,
-      "updatedAt": "2026-06-30T07:09:43.317Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800737849_uhn6mb",
-      "judgeName": "003",
-      "practicality": 5,
-      "innovation": 5,
-      "scalability": 5,
-      "presentation": 5,
-      "updatedAt": "2026-06-30T07:09:44.480Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800781942_sukg3c",
-      "judgeName": "徐铭瑞",
-      "practicality": 30,
-      "innovation": 3,
-      "scalability": 4,
-      "presentation": 2,
-      "updatedAt": "2026-06-30T11:34:43.536Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800737849_uhn6mb",
-      "judgeName": "徐铭瑞",
-      "practicality": 21,
-      "innovation": 2,
-      "scalability": 2,
-      "presentation": 2,
-      "updatedAt": "2026-06-30T11:35:01.204Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782800737849_uhn6mb",
-      "judgeName": "001",
-      "practicality": 21,
-      "innovation": 3,
-      "scalability": 4,
-      "presentation": 4,
-      "updatedAt": "2026-06-30T11:36:13.274Z",
-      "stage": "preliminary"
-    },
-    {
-      "entryId": "entry_1782996831999_m56vm9",
-      "judgeName": "徐铭瑞",
-      "practicality": 5,
-      "innovation": 25,
-      "scalability": 20,
-      "presentation": 20,
-      "stage": "preliminary",
-      "updatedAt": "2026-07-02T13:18:57.392Z"
-    },
-    {
-      "entryId": "entry_1783995343957_p5o8re",
-      "judgeName": "刘木目",
-      "practicality": 50,
-      "innovation": 20,
-      "scalability": 15,
-      "presentation": 15,
-      "stage": "preliminary",
-      "updatedAt": "2026-07-14T03:45:25.344Z"
-    },
-    {
-      "entryId": "entry_1783048230830_x4ysb2",
-      "judgeName": "刘木目",
-      "practicality": 49,
-      "innovation": 19,
-      "scalability": 14,
-      "presentation": 14,
-      "stage": "preliminary",
-      "updatedAt": "2026-07-14T03:45:40.392Z"
-    },
-    {
-      "entryId": "entry_1782800737849_uhn6mb",
-      "judgeName": "刘木目",
-      "practicality": 10,
-      "innovation": 10,
-      "scalability": 10,
-      "presentation": 10,
-      "stage": "preliminary",
-      "updatedAt": "2026-07-14T03:46:02.647Z"
-    },
-    {
-      "entryId": "entry_1782800781942_sukg3c",
-      "judgeName": "刘木目",
-      "practicality": 1,
-      "innovation": 1,
-      "scalability": 1,
-      "presentation": 1,
-      "stage": "preliminary",
-      "updatedAt": "2026-07-14T03:46:09.517Z"
-    },
-    {
-      "entryId": "entry_1782996831999_m56vm9",
-      "judgeName": "刘木目",
-      "practicality": 18,
-      "innovation": 8,
-      "scalability": 8,
-      "presentation": 8,
-      "stage": "preliminary",
-      "updatedAt": "2026-07-14T03:46:17.272Z"
-    },
-    {
-      "entryId": "entry_1782998715798_799gm6",
-      "judgeName": "刘木目",
-      "practicality": 0,
-      "innovation": 20,
-      "scalability": 15,
-      "presentation": 15,
-      "stage": "preliminary",
-      "updatedAt": "2026-07-14T03:46:23.187Z"
-    }
-  ],
+  "votes": [],
+  "judgeScores": [],
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
-    "votingEnabled": true,
-    "currentStage": "semi_final"
+    "votingEnabled": false,
+    "currentStage": "preliminary"
   }
 }
