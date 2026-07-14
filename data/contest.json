@@ -188,7 +188,58 @@
       "createdAt": "2026-07-14T03:56:17.143Z"
     }
   ],
-  "judgeScores": [],
+  "judgeScores": [
+    {
+      "entryId": "entry_1782800737849_uhn6mb",
+      "judgeName": "刘木目",
+      "practicality": 1,
+      "innovation": 0,
+      "scalability": 0,
+      "presentation": 0,
+      "stage": "preliminary",
+      "updatedAt": "2026-07-14T03:57:09.624Z"
+    },
+    {
+      "entryId": "entry_1782800781942_sukg3c",
+      "judgeName": "刘木目",
+      "practicality": 10,
+      "innovation": 2,
+      "scalability": 2,
+      "presentation": 1,
+      "stage": "preliminary",
+      "updatedAt": "2026-07-14T03:57:09.859Z"
+    },
+    {
+      "entryId": "entry_1782996831999_m56vm9",
+      "judgeName": "刘木目",
+      "practicality": 20,
+      "innovation": 5,
+      "scalability": 5,
+      "presentation": 5,
+      "stage": "preliminary",
+      "updatedAt": "2026-07-14T03:57:10.263Z"
+    },
+    {
+      "entryId": "entry_1782998715798_799gm6",
+      "judgeName": "刘木目",
+      "practicality": 40,
+      "innovation": 10,
+      "scalability": 10,
+      "presentation": 8,
+      "stage": "preliminary",
+      "updatedAt": "2026-07-14T03:57:10.583Z"
+    },
+    {
+      "entryId": "entry_1783048230830_x4ysb2",
+      "judgeName": "刘木目",
+      "practicality": 0,
+      "innovation": 0,
+      "scalability": 0,
+      "presentation": 0,
+      "stage": "preliminary",
+      "updatedAt": "2026-07-14T03:57:10.974Z"
+    }
+  ],
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
