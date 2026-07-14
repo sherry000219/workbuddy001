@@ -21,8 +21,8 @@
       "attachmentName": "å§å§01.png",
       "attachmentPath": "784de629cf6efb4554a4f5626dc04464",
       "status": "approved",
-      "roundStatus": "awarded",
-      "award": "first",
+      "roundStatus": "approved",
+      "award": null,
       "createdAt": "2026-07-14T02:15:43.957Z"
     },
     {
@@ -43,7 +43,7 @@
       "attachmentName": "screenshot-20260701-195022.png",
       "attachmentPath": "3af97b5534a6e4b4c4389f2d46aba03c",
       "status": "approved",
-      "roundStatus": "eliminated_final",
+      "roundStatus": "approved",
       "award": null,
       "createdAt": "2026-07-03T03:10:30.830Z",
       "entryType": "individual",
@@ -68,8 +68,8 @@
       "attachmentName": null,
       "attachmentPath": null,
       "status": "approved",
-      "roundStatus": "awarded",
-      "award": "second",
+      "roundStatus": "approved",
+      "award": null,
       "createdAt": "2026-07-02T13:25:15.798Z",
       "entryType": "individual",
       "teamName": "",
@@ -93,7 +93,7 @@
       "attachmentName": "screenshot-20260701-195022.png",
       "attachmentPath": "965ee801f51978bb9fd460d989518810",
       "status": "approved",
-      "roundStatus": "eliminated_semi",
+      "roundStatus": "approved",
       "award": null,
       "createdAt": "2026-07-02T12:53:51.999Z",
       "entryType": "individual",
@@ -115,7 +115,7 @@
       "attachmentPath": null,
       "status": "approved",
       "createdAt": "2026-06-30T06:26:21.942Z",
-      "roundStatus": "eliminated_semi",
+      "roundStatus": "approved",
       "award": null,
       "dept1": "职能中台",
       "dept2": "企业文化",
@@ -140,7 +140,7 @@
       "attachmentPath": null,
       "status": "approved",
       "createdAt": "2026-06-30T06:25:37.849Z",
-      "roundStatus": "eliminated_semi",
+      "roundStatus": "approved",
       "award": null,
       "dept1": "职能中台",
       "dept2": "企业文化",
@@ -325,6 +325,6 @@
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
     "votingEnabled": false,
-    "currentStage": "awarded"
+    "currentStage": "preliminary"
   }
 }
