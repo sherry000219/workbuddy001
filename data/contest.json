@@ -408,7 +408,7 @@
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
-    "votingEnabled": true,
+    "votingEnabled": false,
     "currentStage": "semi_final"
   }
 }
