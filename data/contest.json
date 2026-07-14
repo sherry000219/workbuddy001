@@ -269,6 +269,36 @@
       "presentation": 15,
       "stage": "preliminary",
       "updatedAt": "2026-07-14T03:57:21.304Z"
+    },
+    {
+      "entryId": "entry_1782998715798_799gm6",
+      "judgeName": "刘木目",
+      "practicality": 50,
+      "innovation": 20,
+      "scalability": 15,
+      "presentation": 15,
+      "stage": "semi_final",
+      "updatedAt": "2026-07-14T04:00:29.860Z"
+    },
+    {
+      "entryId": "entry_1783048230830_x4ysb2",
+      "judgeName": "刘木目",
+      "practicality": 50,
+      "innovation": 20,
+      "scalability": 15,
+      "presentation": 15,
+      "stage": "semi_final",
+      "updatedAt": "2026-07-14T04:00:30.264Z"
+    },
+    {
+      "entryId": "entry_1783995343957_p5o8re",
+      "judgeName": "刘木目",
+      "practicality": 50,
+      "innovation": 20,
+      "scalability": 15,
+      "presentation": 15,
+      "stage": "semi_final",
+      "updatedAt": "2026-07-14T04:00:30.579Z"
     }
   ],
   "settings": {
