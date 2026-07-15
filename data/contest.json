@@ -152,7 +152,18 @@
     }
   ],
   "votes": [],
-  "judgeScores": [],
+  "judgeScores": [
+    {
+      "entryId": "entry_1783995343957_p5o8re",
+      "judgeName": "徐聪明",
+      "practicality": 20,
+      "innovation": 14,
+      "scalability": 13,
+      "presentation": 12,
+      "stage": "semi_final",
+      "updatedAt": "2026-07-15T08:50:23.972Z"
+    }
+  ],
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
