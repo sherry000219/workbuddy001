@@ -1215,7 +1215,7 @@ app.post('/api/force-sync', async (req, res) => {
   // Start server immediately, don't wait for GitHub sync
   app.listen(PORT, () => {
     console.log(`\n========================================`);
-    console.log(`  云帐房头号玩家第二季 — WorkBuddy 实战应用大赛`);
+    console.log(`  云帐房头号玩家第三季 — WorkBuddy 实战应用大赛`);
     console.log(`  http://localhost:${PORT}`);
     console.log(`  Stage: ${getCurrentStage()}`);
     console.log(`  GitHub sync: ${GITHUB_TOKEN ? 'ENABLED' : 'DISABLED'}`);
