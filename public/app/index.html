@@ -35,6 +35,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .hero-pill.intro { background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.06); color: var(--text-dim); }
 .hero-pill:hover { background: rgba(255,107,53,0.12); }
 .hero-pill.intro:hover { background: rgba(255,107,53,0.08); color: var(--accent); }
+.hero-pill.static { cursor: default; }
+.hero-pill.static:hover { background: rgba(255,255,255,0.9); color: var(--text-dim); }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
 .hero-title { font-size: clamp(36px, 6vw, 64px); font-weight: 800; color: #1f2937; margin-bottom: 16px; line-height: 1.15; letter-spacing: -0.02em; }
 .hero-sub { font-size: clamp(16px, 2.4vw, 22px); color: #4b5563; font-weight: 400; letter-spacing: 0; margin-bottom: 24px; line-height: 1.6; }
@@ -173,7 +175,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   <div class="hero-content">
     <div class="hero-pills">
       <a href="/" class="hero-pill season" style="text-decoration:none;"><span class="dot"></span> YUNZHANGFANG · SEASON 2</a>
-      <span class="hero-pill intro" style="text-decoration:none;">← 活动介绍</span>
+      <span class="hero-pill intro static" style="text-decoration:none;">← 活动介绍</span>
     </div>
     <div class="logo-container">
       <img src="/logo-yzf-white.webp" alt="云帐房" onerror="this.src='/logo-yzf-white.png'">
