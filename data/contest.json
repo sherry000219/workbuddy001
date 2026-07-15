@@ -21,8 +21,8 @@
       "attachmentName": "å§å§01.png",
       "attachmentPath": "784de629cf6efb4554a4f5626dc04464",
       "status": "approved",
-      "roundStatus": "awarded",
-      "award": "first",
+      "roundStatus": "approved",
+      "award": null,
       "createdAt": "2026-07-14T02:15:43.957Z"
     },
     {
@@ -43,7 +43,7 @@
       "attachmentName": "screenshot-20260701-195022.png",
       "attachmentPath": "3af97b5534a6e4b4c4389f2d46aba03c",
       "status": "approved",
-      "roundStatus": "eliminated_final",
+      "roundStatus": "approved",
       "award": null,
       "createdAt": "2026-07-03T03:10:30.830Z",
       "entryType": "individual",
@@ -68,7 +68,7 @@
       "attachmentName": null,
       "attachmentPath": null,
       "status": "approved",
-      "roundStatus": "eliminated_final",
+      "roundStatus": "approved",
       "award": null,
       "createdAt": "2026-07-02T13:25:15.798Z",
       "entryType": "individual",
@@ -93,7 +93,7 @@
       "attachmentName": "screenshot-20260701-195022.png",
       "attachmentPath": "965ee801f51978bb9fd460d989518810",
       "status": "approved",
-      "roundStatus": "eliminated_semi",
+      "roundStatus": "approved",
       "award": null,
       "createdAt": "2026-07-02T12:53:51.999Z",
       "entryType": "individual",
@@ -115,7 +115,7 @@
       "attachmentPath": null,
       "status": "approved",
       "createdAt": "2026-06-30T06:26:21.942Z",
-      "roundStatus": "eliminated_semi",
+      "roundStatus": "approved",
       "award": null,
       "dept1": "职能中台",
       "dept2": "企业文化",
@@ -140,8 +140,8 @@
       "attachmentPath": null,
       "status": "approved",
       "createdAt": "2026-06-30T06:25:37.849Z",
-      "roundStatus": "awarded",
-      "award": "second",
+      "roundStatus": "approved",
+      "award": null,
       "dept1": "职能中台",
       "dept2": "企业文化",
       "dept3": "",
@@ -152,48 +152,7 @@
     }
   ],
   "votes": [],
-  "judgeScores": [
-    {
-      "entryId": "entry_1783995343957_p5o8re",
-      "judgeName": "徐聪明",
-      "practicality": 20,
-      "innovation": 14,
-      "scalability": 13,
-      "presentation": 12,
-      "stage": "semi_final",
-      "updatedAt": "2026-07-15T08:50:23.972Z"
-    },
-    {
-      "entryId": "entry_1783048230830_x4ysb2",
-      "judgeName": "徐聪明",
-      "practicality": 23,
-      "innovation": 0,
-      "scalability": 0,
-      "presentation": 0,
-      "stage": "semi_final",
-      "updatedAt": "2026-07-15T08:50:42.135Z"
-    },
-    {
-      "entryId": "entry_1782998715798_799gm6",
-      "judgeName": "徐聪明",
-      "practicality": 50,
-      "innovation": 0,
-      "scalability": 10,
-      "presentation": 0,
-      "stage": "semi_final",
-      "updatedAt": "2026-07-15T08:50:53.961Z"
-    },
-    {
-      "entryId": "entry_1782800737849_uhn6mb",
-      "judgeName": "徐聪明",
-      "practicality": 22,
-      "innovation": 20,
-      "scalability": 11,
-      "presentation": 1,
-      "stage": "semi_final",
-      "updatedAt": "2026-07-15T08:51:05.518Z"
-    }
-  ],
+  "judgeScores": [],
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
