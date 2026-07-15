@@ -21,8 +21,8 @@
       "attachmentName": "å§å§01.png",
       "attachmentPath": "784de629cf6efb4554a4f5626dc04464",
       "status": "approved",
-      "roundStatus": "finalist",
-      "award": null,
+      "roundStatus": "awarded",
+      "award": "first",
       "createdAt": "2026-07-14T02:15:43.957Z"
     },
     {
@@ -140,8 +140,8 @@
       "attachmentPath": null,
       "status": "approved",
       "createdAt": "2026-06-30T06:25:37.849Z",
-      "roundStatus": "finalist",
-      "award": null,
+      "roundStatus": "awarded",
+      "award": "second",
       "dept1": "职能中台",
       "dept2": "企业文化",
       "dept3": "",
@@ -198,6 +198,6 @@
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
     "votingEnabled": false,
-    "currentStage": "final"
+    "currentStage": "awarded"
   }
 }
