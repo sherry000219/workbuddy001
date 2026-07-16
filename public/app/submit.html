@@ -60,6 +60,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
 
+/* ===== ENTRY TYPE ===== */
+.entry-type-group { margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
+.entry-type-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #fff; border: 1.5px solid #e5e7eb; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+.entry-type-card:hover { border-color: rgba(255,107,53,0.4); }
+.entry-type-card.selected { border-color: var(--accent); background: rgba(255,107,53,0.05); }
+.entry-type-card input[type="radio"] { display: none; }
+.entry-type-card .radio-circle { width: 20px; height: 20px; border: 2px solid #d1d5db; border-radius: 50%; flex-shrink: 0; position: relative; transition: border-color 0.2s; }
+.entry-type-card.selected .radio-circle { border-color: var(--accent); }
+.entry-type-card.selected .radio-circle::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; background: var(--accent); border-radius: 50%; }
+.entry-type-text { display: flex; flex-direction: column; gap: 2px; }
+.entry-type-text strong { font-size: 14px; font-weight: 600; color: var(--text); }
+.entry-type-text span { font-size: 12px; color: var(--text-dim); line-height: 1.4; }
+
 /* ===== SUCCESS ===== */
 .success-page { text-align: center; padding: 60px 20px; }
 .success-page .icon { font-size: 64px; margin-bottom: 20px; }
@@ -145,19 +158,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
       </div>
       <div class="form-group">
         <label>参赛形式 <span class="required">*</span></label>
-        <div style="margin-top:8px;display:flex;flex-direction:column;gap:10px;">
-          <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;padding:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(0,0,0,0.08);border-radius:10px;">
-            <input type="radio" name="entryType" value="individual" id="f-entry-individual" style="margin-top:3px;" checked onchange="toggleTeamEntry()">
-            <span>
-              <strong>个人参赛</strong><br>
-              <span style="font-size:12px;color:var(--text-dim);">本作品以个人名义参与个人奖项评选</span>
+        <div class="entry-type-group">
+          <label class="entry-type-card selected">
+            <input type="radio" name="entryType" value="individual" id="f-entry-individual" checked onchange="toggleTeamEntry()">
+            <span class="radio-circle"></span>
+            <span class="entry-type-text">
+              <strong>个人参赛</strong>
+              <span>本作品以个人名义参与个人奖项评选</span>
             </span>
           </label>
-          <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;padding:12px;background:rgba(255,107,53,0.04);border:1px solid rgba(255,107,53,0.12);border-radius:10px;">
-            <input type="radio" name="entryType" value="team" id="f-entry-team" style="margin-top:3px;" onchange="toggleTeamEntry()">
-            <span>
-              <strong>以部门/团队形式参赛，参评「最佳组织氛围奖」</strong><br>
-              <span style="font-size:12px;color:var(--text-dim);">本作品将以部门/团队为单位参评最佳组织氛围奖</span>
+          <label class="entry-type-card">
+            <input type="radio" name="entryType" value="team" id="f-entry-team" onchange="toggleTeamEntry()">
+            <span class="radio-circle"></span>
+            <span class="entry-type-text">
+              <strong>以部门/团队形式参赛，参评「最佳组织氛围奖」</strong>
+              <span>本作品将以部门/团队为单位参评最佳组织氛围奖</span>
             </span>
           </label>
         </div>
@@ -269,8 +284,9 @@ function getLevel3Options(dept1, dept2) {
 }
 
 function toggleTeamEntry() {
-  const isTeam = document.getElementById('f-entry-team').checked;
-  // Optional: dynamic visual feedback can be added here
+  document.querySelectorAll('.entry-type-card').forEach(card => {
+    card.classList.toggle('selected', card.querySelector('input[type="radio"]').checked);
+  });
 }
 
 function getEntryType() {
