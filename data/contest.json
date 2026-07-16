@@ -1,5 +1,31 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "id": "entry_1784190723267_8r8xc0",
+      "name": "裴海涛",
+      "mobile": "17621983739",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "区域团队",
+      "dept3": "沪浙片区",
+      "subdept": "区域团队",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "business",
+      "title": "对比竞品功能优劣和成本对比表",
+      "scene": "https://codebuddy.work/agents/tasks/share/cdPhYuFLHi?platform=workbuddy",
+      "process_text": "https://codebuddy.work/agents/tasks/share/B613BueciS?platform=workbuddy",
+      "result_text": "https://codebuddy.work/agents/tasks/share/RSluv0SOwW?platform=workbuddy",
+      "extra": "",
+      "attachmentName": "å¾®ä¿¡å¾ç_2026-07-16_142402_367.png",
+      "attachmentPath": "fb92ed0e4a935e23d1716a3ed9fd26e3",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-07-16T08:32:03.267Z"
+    }
+  ],
   "votes": [],
   "judgeScores": [],
   "settings": {
