@@ -572,7 +572,7 @@ app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) =>
     process_text, process_link,
     result_text, result_link,
     extra: extra || '',
-    attachmentName: req.file ? req.file.originalname : null,
+    attachmentName: req.file ? Buffer.from(req.file.originalname, 'latin1').toString('utf8') : null,
     attachmentBase64,
     attachmentPath: null, // 新数据不再依赖本地路径
     status: 'approved',
@@ -618,7 +618,7 @@ app.put('/api/entries/:id', requireAuth, upload.single('attachment'), (req, res)
     const fileBuf = fs.readFileSync(req.file.path);
     attachmentBase64 = `data:${req.file.mimetype};base64,${fileBuf.toString('base64')}`;
     try { fs.unlinkSync(req.file.path); } catch (e) { /* ignore */ }
-    attachmentName = req.file.originalname;
+    attachmentName = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
   }
 
   entry.track = track || entry.track;

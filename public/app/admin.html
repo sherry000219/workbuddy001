@@ -533,13 +533,11 @@ async function openDetail(entryId) {
     if (e.attachmentName) attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/api/attachments/' + e.id + '" download="' + e.attachmentName + '" style="color:#ff6b35;">📥 下载 ' + e.attachmentName + '</a></div></div>';
     const isNewFormat = e.process_link || e.result_link;
     var sceneHtml = '';
-    if (e.scene) sceneHtml = '<div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + (isNewFormat ? escapeHtml(e.scene).replace(/
-/g, '<br>') : linkify(e.scene)) + '</div></div>';
+    if (e.scene) sceneHtml = '<div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + (isNewFormat ? escapeHtml(e.scene).replace(/\n/g, '<br>') : linkify(e.scene)) + '</div></div>';
     var processHtml = '';
     if (e.process_text || e.process_link) {
       if (isNewFormat) {
-        processHtml = '<div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + escapeHtml(e.process_text || '').replace(/
-/g, '<br>') + (e.process_link ? '<br><a href="' + e.process_link + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.process_link + '</a>' : '') + '</div></div>';
+        processHtml = '<div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + escapeHtml(e.process_text || '').replace(/\n/g, '<br>') + (e.process_link ? '<br><a href="' + e.process_link + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.process_link + '</a>' : '') + '</div></div>';
       } else {
         processHtml = '<div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + linkify(e.process_text) + '</div></div>';
       }
@@ -547,8 +545,7 @@ async function openDetail(entryId) {
     var resultHtml = '';
     if (e.result_text || e.result_link) {
       if (isNewFormat) {
-        resultHtml = '<div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + escapeHtml(e.result_text || '').replace(/
-/g, '<br>') + (e.result_link ? '<br><a href="' + e.result_link + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.result_link + '</a>' : '') + '</div></div>';
+        resultHtml = '<div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + escapeHtml(e.result_text || '').replace(/\n/g, '<br>') + (e.result_link ? '<br><a href="' + e.result_link + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.result_link + '</a>' : '') + '</div></div>';
       } else {
         resultHtml = '<div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + linkify(e.result_text) + '</div></div>';
       }

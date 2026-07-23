@@ -668,7 +668,7 @@ async function openMyEntries() {
       const editBtn = e.editable
         ? '<a href="/app/submit.html?edit=' + e.id + '" class="btn btn-primary btn-sm">✏️ 编辑</a>'
         : '<span class="round-badge badge-awarded" style="font-size:12px;">🔒 已获奖·锁定</span>';
-      const notice = e.editNotice ? '<span style="display:inline-block;margin-left:8px;font-size:12px;color:#b45309;background:rgba(255,215,64,0.12);padding:2px 8px;border-radius:8px;">📝 更新待评委确认</span>' : '';
+      const notice = e.editNotice ? '<span style="display:inline-block;margin-left:8px;font-size:12px;color:#b45309;background:rgba(255,215,64,0.12);padding:2px 8px;border-radius:8px;">📝 更新后会提示评委</span>' : '';
       return '<div style="border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:12px;">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
           '<div style="font-weight:600;font-size:15px;">' + escapeHtml(e.title) + ' ' + badge + notice + '</div>' +
