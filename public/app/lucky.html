@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎁 幸运投票人名单 · 云帐房 WorkBuddy 实战应用大赛</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f3f4f6; color: #1f2937; }
+  .topbar { background: linear-gradient(135deg, #ff6b35, #e55d2b); color: #fff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .topbar h1 { font-size: 18px; font-weight: 700; }
+  .topbar a { color: #fff; text-decoration: none; font-size: 13px; background: rgba(255,255,255,.18); padding: 6px 14px; border-radius: 16px; }
+  .wrap { max-width: 1040px; margin: 22px auto; padding: 0 16px; }
+  .summary { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
+  .stat { background: #fff; border-radius: 12px; padding: 16px 20px; flex: 1; min-width: 150px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .stat .num { font-size: 26px; font-weight: 800; color: #ff6b35; }
+  .stat .lab { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .round { background: #fff; border-radius: 14px; padding: 20px 22px; margin-bottom: 22px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .round h2 { font-size: 16px; margin-bottom: 4px; }
+  .round .sub { font-size: 12px; color: #6b7280; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+  .card { border: 1px solid #eef0f3; border-radius: 12px; padding: 14px; display: flex; gap: 12px; align-items: flex-start; }
+  .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #ffe6da; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #e55d2b; font-size: 16px; }
+  .card .info { flex: 1; min-width: 0; }
+  .card .name { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .ticket { background: #fff3e0; color: #e55d2b; font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: 600; }
+  .entries { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
+  .entry { font-size: 12px; color: #374151; display: flex; align-items: center; gap: 6px; }
+  .badge { font-size: 10px; padding: 1px 7px; border-radius: 8px; background: #eef2ff; color: #4338ca; font-weight: 600; white-space: nowrap; }
+  .badge.award { background: #fff3e0; color: #b45309; }
+  .empty { text-align: center; padding: 70px 20px; color: #6b7280; }
+  .empty .big { font-size: 40px; margin-bottom: 12px; }
+  .loading { text-align: center; padding: 60px; color: #9ca3af; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>🎁 幸运投票人名单</h1>
+    <a href="index.html">← 返回首页</a>
+  </div>
+  <div class="wrap">
+    <div id="root"><div class="loading">加载中…</div></div>
+  </div>
+
+<script>
+const ESC = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function avatarHtml(v) {
+  if (v.voterAvatar) return `<img class="avatar" src="${ESC(v.voterAvatar)}" alt="">`;
+  const ch = (v.voterName || '?').trim().charAt(0) || '?';
+  return `<div class="avatar">${ESC(ch)}</div>`;
+}
+
+function entryHtml(e) {
+  const award = e.award ? ` · ${ESC(e.award)}` : '';
+  const cls = e.result && e.result.indexOf('获奖') >= 0 ? 'badge award' : 'badge';
+  return `<div class="entry">· ${ESC(e.title)} <span class="${cls}">${ESC(e.result)}${award}</span></div>`;
+}
+
+function render(data) {
+  const root = document.getElementById('root');
+  if (!data.enabled) {
+    root.innerHTML = `<div class="empty"><div class="big">🎁</div><div>幸运名单公布中，敬请期待</div><div style="font-size:12px;margin-top:8px;color:#9ca3af;">各赛程晋级作品的支持者名单，将由管理员在对应赛程开启公示</div></div>`;
+    return;
+  }
+  const s = data.summary || {};
+  let html = `<div class="summary">
+    <div class="stat"><div class="num">${s.rounds || 0}</div><div class="lab">已公示赛程轮次</div></div>
+    <div class="stat"><div class="num">${s.totalVoters || 0}</div><div class="lab">幸运支持者（人次）</div></div>
+    <div class="stat"><div class="num">${s.totalTickets || 0}</div><div class="lab">抽奖票数（每轮 1 票）</div></div>
+  </div>`;
+  (data.rounds || []).forEach(r => {
+    html += `<div class="round">
+      <h2>🎁 ${ESC(r.roundLabel || r.label || '')} · 幸运支持者</h2>
+      <div class="sub">本赛程投票支持晋级/获奖作品的小伙伴，均参与本赛程抽奖（各计 1 票）。奖池及最终获奖情况见员工社区公布。</div>
+      <div class="grid">`;
+    (r.voters || []).forEach(v => {
+      html += `<div class="card">
+        ${avatarHtml(v)}
+        <div class="info">
+          <div class="name">${ESC(v.voterName)} <span class="ticket">${v.tickets || 1} 票</span></div>
+          <div class="entries">${(v.entries || []).map(entryHtml).join('')}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  root.innerHTML = html;
+}
+
+fetch('/api/lucky/list')
+  .then(r => r.json())
+  .then(render)
+  .catch(() => {
+    document.getElementById('root').innerHTML = '<div class="empty">加载失败，请稍后刷新</div>';
+  });
+</script>
+</body>
+</html>

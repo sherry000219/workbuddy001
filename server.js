@@ -151,7 +151,7 @@ const DEFAULT_DB = {
   entries: [],
   votes: [],
   judgeScores: [],
-  settings: { judgePassword: 'wb2026', adminPassword: 'yzfwb2016', votingEnabled: false, currentStage: 'preliminary' }
+  settings: { judgePassword: 'wb2026', adminPassword: 'yzfwb2016', votingEnabled: false, currentStage: 'preliminary', luckyListEnabled: false }
 };
 
 function loadDB() {
@@ -766,6 +766,7 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
     entryId: req.params.entryId,
     voterId: userId,
     voterName: req.ddUser.nick,
+    voterAvatar: req.ddUser.avatarUrl || '',
     stage,
     createdAt: new Date().toISOString()
   });
@@ -901,9 +902,68 @@ app.post('/api/settings', verifyAdminToken, async (req, res) => {
   if (req.body.adminPassword !== undefined) {
     db.settings.adminPassword = req.body.adminPassword;
   }
+  if (req.body.luckyListEnabled !== undefined) {
+    db.settings.luckyListEnabled = Boolean(req.body.luckyListEnabled);
+  }
   saveDB();
   ghPush().catch(e => console.error('[settings] GitHub push failed:', e.message));
   res.json({ success: true, currentStage: getCurrentStage() });
+});
+
+// ========== API: LUCKY VOTER LIST（幸运投票人名单 / 各赛程抽奖资格） ==========
+// 按赛程分轮：作品从某赛程晋级/获奖 → 该赛程投票支持它的人，获得本赛程 1 张抽奖票
+// 名单动态计算，不落库；luckyListEnabled 仅控制是否公开公示
+const LUCKY_STAGE_ADV = {
+  preliminary: ['semi_finalist', 'finalist', 'eliminated_final', 'awarded'],
+  semi_final: ['finalist', 'eliminated_final', 'awarded'],
+  final:       ['awarded']
+};
+const LUCKY_STAGE_LABEL = { preliminary: '初赛', semi_final: '复赛', final: '决赛' };
+const LUCKY_ROUND_LABEL = { preliminary: '初赛轮', semi_final: '复赛轮', final: '决赛轮' };
+const ROUND_LABEL = { approved: '初赛', semi_finalist: '复赛晋级', eliminated_semi: '复赛淘汰', finalist: '决赛晋级', eliminated_final: '决赛淘汰', awarded: '已获奖' };
+
+function getLuckyRounds() {
+  const idMap = {};
+  db.entries.forEach(e => { idMap[e.id] = e; });
+  const rounds = [];
+  for (const S of ['preliminary', 'semi_final', 'final']) {
+    const qualIds = new Set(
+      db.entries.filter(e => LUCKY_STAGE_ADV[S].includes(e.roundStatus)).map(e => e.id)
+    );
+    if (qualIds.size === 0) continue;
+    // 支持者：在赛程 S 投过票，且作品属于 qualIds
+    const bucket = new Map(); // voterId -> {name, avatar, entries:Set(id)}
+    for (const v of db.votes) {
+      if ((v.stage || 'preliminary') !== S) continue;
+      if (!qualIds.has(v.entryId)) continue;
+      if (!bucket.has(v.voterId)) bucket.set(v.voterId, { name: v.voterName, avatar: v.voterAvatar || '', entries: new Set() });
+      bucket.get(v.voterId).entries.add(v.entryId);
+    }
+    if (bucket.size === 0) continue;
+    const voters = [...bucket.entries()].map(([id, b]) => ({
+      voterName: b.name,
+      voterAvatar: b.avatar,
+      tickets: 1, // 每赛程参与 1 次抽奖
+      entries: [...b.entries].map(eid => {
+        const e = idMap[eid] || {};
+        return { title: e.title || eid, result: (ROUND_LABEL[e.roundStatus] || e.roundStatus || ''), award: e.award || null };
+      })
+    }));
+    rounds.push({ stage: S, label: LUCKY_STAGE_LABEL[S], roundLabel: LUCKY_ROUND_LABEL[S], total: voters.length, voters });
+  }
+  return rounds;
+}
+
+app.get('/api/lucky/list', (req, res) => {
+  const rounds = getLuckyRounds();
+  const totalVoters = rounds.reduce((s, r) => s + r.total, 0);
+  const totalTickets = rounds.reduce((s, r) => s + r.voters.length, 0);
+  res.json({
+    enabled: !!db.settings.luckyListEnabled,
+    summary: { rounds: rounds.length, totalVoters, totalTickets },
+    // 隐私脱敏：仅返回昵称/头像/支持作品/结果，不含 openId/手机号
+    rounds
+  });
 });
 
 // ========== ADMIN TOKEN STORE ==========

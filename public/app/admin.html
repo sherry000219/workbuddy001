@@ -195,6 +195,22 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
         </div>
       </div>
     </details>
+    <details style="margin-bottom:20px;">
+      <summary>🎁 幸运投票人名单（奖池瓜分 / 抽奖资格）</summary>
+      <div style="background:var(--bg-card);border:1px solid #e5e7eb;border-radius:var(--radius);padding:24px;margin-top:12px;box-shadow:var(--shadow);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500;">
+              <span>🎁 公开公示幸运名单</span>
+              <input type="checkbox" id="adminLuckyToggle" onchange="saveLuckyToggle()" style="width:18px;height:18px;">
+            </label>
+            <p style="color:var(--text-dim);font-size:12px;margin:4px 0 0 28px;">进入下一赛程时开启，网页端公示本赛程支持者名单（奖池 / 获奖见员工社区）</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="exportLuckyCSV()">📥 导出幸运名单 CSV</button>
+        </div>
+        <div id="luckyPreview"></div>
+      </div>
+    </details>
     <div class="score-table" style="overflow-x:auto;">
       <table style="min-width:900px;">
         <thead>
@@ -332,6 +348,7 @@ async function adminLogin() {
     const stageSel = document.getElementById('adminStageSelect');
     if (stageSel) stageSel.value = currentStage;
     updateAdminStageLabel();
+    loadLucky();
   } catch(e) { showToast(e.message, 'error'); }
 }
 
@@ -488,6 +505,67 @@ async function saveVotingToggle() {
     showToast(on ? '✅ 投票已开启' : '⏸️ 投票已暂停', 'success');
   } catch(e) { showToast(e.message, 'error'); }
 }
+
+async function loadLucky() {
+  try {
+    const data = await api('/api/lucky/list');
+    renderLuckyPreview(data);
+    const tog = document.getElementById('adminLuckyToggle');
+    if (tog) tog.checked = !!data.enabled;
+  } catch(e) { /* 忽略 */ }
+}
+
+function renderLuckyPreview(data) {
+  const el = document.getElementById('luckyPreview');
+  if (!el) return;
+  if (!data || !data.rounds || data.rounds.length === 0) {
+    el.innerHTML = '<p style="color:var(--text-dim);font-size:13px;">暂无晋级/获奖作品的支持者名单。作品晋级后将自动生成对应赛程轮次。</p>';
+    return;
+  }
+  let html = '';
+  if (!data.enabled) html += '<p style="color:#b45309;font-size:12px;margin-bottom:10px;">⚠️ 当前未开启公开公示（网页端访客不可见，仅你在此预览）。</p>';
+  data.rounds.forEach(r => {
+    html += `<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:6px;">🎁 ${escHtml(r.roundLabel || r.label || '')} · 支持者 ${r.total} 人</div><div style="display:flex;flex-wrap:wrap;gap:6px;">`;
+    (r.voters || []).forEach(v => {
+      const ents = (v.entries || []).map(e => e.title).join('、');
+      html += `<span style="background:#fff3e0;color:#b45309;font-size:12px;padding:3px 10px;border-radius:10px;">${escHtml(v.voterName)}（${escHtml(ents)}）</span>`;
+    });
+    html += '</div></div>';
+  });
+  el.innerHTML = html;
+}
+
+async function saveLuckyToggle() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  const on = document.getElementById('adminLuckyToggle').checked;
+  try {
+    await api('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ luckyListEnabled: on }) });
+    showToast(on ? '✅ 幸运名单已开启公示' : '⏸️ 幸运名单已隐藏', 'success');
+    loadLucky();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function exportLuckyCSV() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  try {
+    const data = await api('/api/lucky/list');
+    let csv = '﻿轮次,昵称,头像URL,支持作品,结果,票数\n';
+    (data.rounds || []).forEach(r => {
+      (r.voters || []).forEach(v => {
+        const ents = (v.entries || []).map(e => (e.title || '') + (e.result ? '(' + e.result + (e.award ? '·' + e.award : '') + ')' : '')).join('、');
+        csv += `"${csvCell(r.roundLabel || r.label || '')}","${csvCell(v.voterName)}","${csvCell(v.voterAvatar || '')}","${csvCell(ents)}","${(v.tickets||1)}"\n`;
+      });
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = '幸运投票人名单.csv'; a.click();
+    URL.revokeObjectURL(url);
+    showToast('已导出幸运名单 CSV', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function escHtml(s) { return (s==null?'':String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function csvCell(s) { return (s==null?'':String(s)).replace(/"/g, '""'); }
 
 async function saveStageSelect() {
   if (!adminToken) return showToast('请先登录管理后台', 'error');
