@@ -207,6 +207,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   <span style="display:flex;align-items:center;gap:6px;">
     <span id="dd-user-area" style="display:none;">
       <span id="dd-user-name" style="font-size:13px;font-weight:500;margin-right:6px;"></span>
+      <button onclick="openMyEntries()" style="background:rgba(37,99,235,0.1);border:1px solid rgba(37,99,235,0.25);color:var(--blue);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:4px;">我的投稿</button>
       <span id="dd-remaining" style="background:rgba(255,107,53,0.1);padding:2px 10px;border-radius:12px;font-size:11px;"></span>
       <button onclick="ddLogout()" style="background:#f3f4f6;border:none;color:var(--text-dim);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:4px;">退出</button>
     </span>
@@ -254,6 +255,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 <!-- ===== DETAIL MODAL ===== -->
 <div class="modal-overlay" id="detailModal" style="display:none;" onclick="if(event.target===this)closeDetail()">
   <div class="modal" id="detailContent"></div>
+</div>
+
+<!-- ===== MY ENTRIES MODAL ===== -->
+<div class="modal-overlay" id="myEntriesModal" style="display:none;" onclick="if(event.target===this)closeMyEntries()">
+  <div class="modal" id="myEntriesContent"></div>
 </div>
 
 <script>
@@ -627,8 +633,12 @@ async function openDetail(entryId) {
         resultHtml = '<div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + linkify(e.result_text) + '</div></div>';
       }
     }
-    var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + processHtml + resultHtml + extraHtml + attachHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+        var editNoticeHtml = '';
+    if (e.editNotice) {
+      editNoticeHtml = '<div style="background:rgba(255,215,64,0.12);border:1px solid rgba(255,215,64,0.35);color:#b45309;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;">📝 作者于 ' + new Date(e.lastEditedAt || e.updatedAt || e.createdAt).toLocaleString('zh-CN') + ' 编辑过本作品，内容可能有更新，请留意。</div>';
+    }
+var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
+    document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + processHtml + resultHtml + extraHtml + attachHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
     document.getElementById('detailModal').style.display = 'flex';
   } catch(e) {
     showToast('加载失败：' + e.message, 'error');
@@ -636,6 +646,43 @@ async function openDetail(entryId) {
 }
 
 function closeDetail() { document.getElementById('detailModal').style.display = 'none'; }
+
+// ========== MY ENTRIES (我的投稿) ==========
+async function openMyEntries() {
+  if (!ddAuthed || !ddUser) { showToast('请先登录钉钉', 'error'); return; }
+  const modal = document.getElementById('myEntriesModal');
+  const content = document.getElementById('myEntriesContent');
+  content.innerHTML = '<h2>📂 我的投稿</h2><div id="myEntriesList" style="margin-top:16px;">加载中...</div>';
+  modal.style.display = 'flex';
+  try {
+    const data = await api('/api/entries/mine');
+    const list = data.entries || [];
+    const box = document.getElementById('myEntriesList');
+    if (list.length === 0) {
+      box.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>你还没有投稿，<a href="/app/submit.html" style="color:#ff6b35;">去投稿</a></p></div>';
+      return;
+    }
+    box.innerHTML = list.map(function(e) {
+      const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
+      const updated = e.updatedAt ? new Date(e.updatedAt).toLocaleString('zh-CN') : '';
+      const editBtn = e.editable
+        ? '<a href="/app/submit.html?edit=' + e.id + '" class="btn btn-primary btn-sm">✏️ 编辑</a>'
+        : '<span class="round-badge badge-awarded" style="font-size:12px;">🔒 已获奖·锁定</span>';
+      const notice = e.editNotice ? '<span style="display:inline-block;margin-left:8px;font-size:12px;color:#b45309;background:rgba(255,215,64,0.12);padding:2px 8px;border-radius:8px;">📝 更新待评委确认</span>' : '';
+      return '<div style="border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:12px;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
+          '<div style="font-weight:600;font-size:15px;">' + escapeHtml(e.title) + ' ' + badge + notice + '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;">' + editBtn + '</div>' +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--text-dim);margin-top:8px;">' + trackLabel(e.track) + ' · 更新于 ' + updated + '</div>' +
+      '</div>';
+    }).join('');
+  } catch (err) {
+    document.getElementById('myEntriesList').innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>加载失败：' + (err.message || '未知错误') + '</p></div>';
+  }
+}
+
+function closeMyEntries() { document.getElementById('myEntriesModal').style.display = 'none'; }
 
 // ========== INIT ==========
 async function init() {

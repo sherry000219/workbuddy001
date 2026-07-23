@@ -229,6 +229,7 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
 // ========== STATE ==========
 let adminAuthed = false;
 let adminToken = '';
+let adminPassword = '';
 let currentStage = 'preliminary';
 let isVotingStage = true;
 let votingEnabled = false;
@@ -319,7 +320,7 @@ async function adminLogin() {
   if (!pw) return showToast('请输入管理员密码', 'error');
   try {
     const data = await api('/api/admin/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) });
-    adminAuthed = true; adminToken = data.token;
+    adminAuthed = true; adminToken = data.token; adminPassword = pw;
     document.getElementById('adminLogin').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
     document.getElementById('adminPanel').classList.add('active');
@@ -391,7 +392,15 @@ async function renderAdminDashboard() {
       }).join('');
       var hasScores = e.scores.length > 0;
       var badge = awardBadge(e.award) || roundBadge(e.roundStatus);
-      var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join('/') || '-';
+          var editNoticeHtml = '';
+    if (e.editNotice) {
+      editNoticeHtml = '<div style="background:rgba(255,215,64,0.12);border:1px solid rgba(255,215,64,0.35);color:#b45309;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;">📝 作者于 ' + new Date(e.lastEditedAt || e.updatedAt || e.createdAt).toLocaleString('zh-CN') + ' 编辑过本作品，内容可能有更新，请留意。</div>';
+    }
+    var ackHtml = '';
+    if (e.editNotice) {
+      ackHtml = "<button class=\"btn btn-outline btn-sm\" onclick=\"ackEdit('" + e.id + "')\">已知悉更新</button>";
+    }
+var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join('/') || '-';
       return '<tr><td style="position:sticky;left:0;background:#f9fafb;z-index:1;"><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#ff6b35;font-weight:500;">' + e.title.substring(0,16) + (e.title.length>16?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + deptChain + '</td><td>' + trackLabel(e.track) + '</td><td style="font-size:12px;">' + (ROUND_LABELS[e.roundStatus] || '初赛') + '</td>' + judgeCells + '<td style="font-weight:700;color:' + (hasScores ? '#ff6b35' : 'var(--text-dim)') + ';">' + (hasScores ? e.avgScore : '—') + '</td><td style="font-weight:700;color:#ff6b35;">' + (e.composite || '—') + '</td><td>' + (e.judgeCount||0) + '</td><td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry(\'' + e.id + '\')">删除</button></td></tr>';
     }).join('');
   } catch(e) { console.error('Admin dashboard error:', e); showToast('加载失败', 'error'); }
@@ -545,12 +554,27 @@ async function openDetail(entryId) {
       }
     }
     var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + processHtml + resultHtml + extraHtml + attachHtml + '<div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+    document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + processHtml + resultHtml + extraHtml + attachHtml + '<div class="modal-actions">' + ackHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
     document.getElementById('detailModal').style.display = 'flex';
   } catch(e) { showToast('加载失败：' + e.message, 'error'); }
 }
 
 function closeDetail() { document.getElementById('detailModal').style.display = 'none'; }
+
+async function ackEdit(id) {
+  try {
+    await api('/api/entries/' + id + '/ack-edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminPassword: adminPassword })
+    });
+    showToast('已标记已知悉，提醒已消除', 'success');
+    closeDetail();
+    openDetail(id);
+  } catch(e) {
+    showToast('操作失败：' + e.message, 'error');
+  }
+}
 
 // ========== INIT ==========
 async function init() {

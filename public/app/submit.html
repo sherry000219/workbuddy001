@@ -98,7 +98,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 <!-- ===== BACK HEADER ===== -->
 <div class="back-header">
   <a href="/app/">← 返回竞赛大厅</a>
-  <span class="page-title">📝 报名投稿</span>
+  <span class="page-title" id="pageTitle">📝 报名投稿</span>
 </div>
 
 <!-- ===== MAIN CONTENT ===== -->
@@ -157,7 +157,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
           </select>
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="entryTypeGroup">
         <label>参赛形式 <span class="required">*</span></label>
         <div class="entry-type-group">
           <label class="entry-type-card selected">
@@ -198,7 +198,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
       </div>
     </div>
     <div class="form-step" id="step2">
-      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第2步：作品详情</div>
+      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;" id="step2Title">第2步：作品详情</div>
       <div class="form-group">
         <label>场景描述 <span class="required">*</span> <small style="font-weight:400;color:var(--text-dim);">（200字以内）</small></label>
         <textarea id="f-scene" rows="4" maxlength="200" placeholder="简要描述作品解决了什么场景问题，200字以内" oninput="updateCharCount('f-scene','scene-count')"></textarea>
@@ -218,6 +218,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
       </div>
       <div class="form-group">
         <label>作品海报 <span class="required">*</span> <br><small style="font-weight:400;color:var(--accent);">上传一张参赛作品的功能宣传海报（仅限图片）</small></label>
+        <div id="current-attachment" style="display:none;margin-bottom:12px;padding:12px;background:rgba(37,99,235,0.04);border:1px solid rgba(37,99,235,0.15);border-radius:10px;">
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">当前海报（默认保留，如需更换请选择新图片）</div>
+          <img id="current-attachment-img" src="" alt="当前海报" style="max-width:200px;max-height:140px;border-radius:8px;border:1px solid #e5e7eb;display:block;">
+        </div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <input type="file" id="f-attachment" accept="image/*" style="display:none;" onchange="handleAttachmentSelect(event)">
           <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('f-attachment').click()">选择图片</button>
@@ -241,6 +245,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 // ========== STATE ==========
 let ddAuthed = false;
 let ddUser = null;
+let editMode = false;
+let editId = null;
 const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
 let currentStage = 'preliminary';
 let loginState = null;
@@ -330,7 +336,7 @@ async function startLogin() {
   btn.textContent = '正在跳转钉钉...';
   status.textContent = '请在钉钉中完成授权';
   try {
-    const resp = await fetch('/api/auth/dd-url?redirect=' + encodeURIComponent(window.location.pathname));
+    const resp = await fetch('/api/auth/dd-url?redirect=' + encodeURIComponent(window.location.pathname + window.location.search));
     const data = await resp.json();
     loginState = data.state;
     loginCallbackUri = window.location.href;
@@ -556,47 +562,65 @@ async function submitEntry() {
   if (!scene) return showToast('请填写场景描述', 'error');
   if (scene.length > 200) return showToast('场景描述请控制在 200 字以内', 'error');
   if (!processText) return showToast('请填写使用过程简介', 'error');
-  if (!processLink || !processLink.startsWith('http')) return showToast('请填写有效的使用过程链接', 'error');
   if (!resultText) return showToast('请填写效果呈现简介', 'error');
-  if (!resultLink || !resultLink.startsWith('http')) return showToast('请填写有效的效果呈现链接', 'error');
-  if (!pendingFile) return showToast('请上传一张参赛作品海报', 'error');
+  // 编辑模式允许链接为空；新建模式必须 http 链接
+  if (editMode) {
+    if (processLink && !processLink.startsWith('http')) return showToast('使用过程链接需以 http 开头', 'error');
+    if (resultLink && !resultLink.startsWith('http')) return showToast('效果呈现链接需以 http 开头', 'error');
+  } else {
+    if (!processLink || !processLink.startsWith('http')) return showToast('请填写有效的使用过程链接', 'error');
+    if (!resultLink || !resultLink.startsWith('http')) return showToast('请填写有效的效果呈现链接', 'error');
+  }
+  // 编辑模式可保留原图；新建必须传海报
+  if (!editMode && !pendingFile) return showToast('请上传一张参赛作品海报', 'error');
 
   // 验证是图片
   const validTypes = ['image/jpeg','image/png','image/webp','image/gif','image/bmp'];
-  if (!validTypes.includes(pendingFile.type)) return showToast('海报文件必须是图片格式（JPG/PNG/WebP）', 'error');
+  if (pendingFile && !validTypes.includes(pendingFile.type)) return showToast('海报文件必须是图片格式（JPG/PNG/WebP）', 'error');
 
   isSubmitting = true;
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '提交中...'; }
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = editMode ? '保存中...' : '提交中...'; }
 
   const formData = new FormData();
-  formData.append('name', document.getElementById('f-name').value.trim());
-  formData.append('mobile', document.getElementById('f-mobile').value.trim());
-  formData.append('dept1', document.getElementById('f-dept1').value.trim());
-  formData.append('dept2', document.getElementById('f-dept2').value.trim());
-  formData.append('dept3', document.getElementById('f-dept3').value.trim());
-  // backward compat
-  formData.append('dept', document.getElementById('f-dept1').value.trim());
-  formData.append('subdept', document.getElementById('f-dept2').value.trim());
-  formData.append('track', document.getElementById('f-track').value);
-  formData.append('title', document.getElementById('f-title').value.trim());
-  formData.append('scene', scene);
-  formData.append('process_text', processText);
-  formData.append('process_link', processLink);
-  formData.append('result_text', resultText);
-  formData.append('result_link', resultLink);
-  formData.append('entryType', getEntryType());
-  if (getEntryType() === 'team') {
-    formData.append('teamName', getTeamName());
-    formData.append('teamMembers', '部门/团队参赛');
+  if (editMode) {
+    formData.append('track', document.getElementById('f-track').value);
+    formData.append('title', document.getElementById('f-title').value.trim());
+    formData.append('scene', scene);
+    formData.append('process_text', processText);
+    formData.append('process_link', processLink);
+    formData.append('result_text', resultText);
+    formData.append('result_link', resultLink);
+    if (pendingFile) formData.append('attachment', pendingFile);
+  } else {
+    formData.append('name', document.getElementById('f-name').value.trim());
+    formData.append('mobile', document.getElementById('f-mobile').value.trim());
+    formData.append('dept1', document.getElementById('f-dept1').value.trim());
+    formData.append('dept2', document.getElementById('f-dept2').value.trim());
+    formData.append('dept3', document.getElementById('f-dept3').value.trim());
+    // backward compat
+    formData.append('dept', document.getElementById('f-dept1').value.trim());
+    formData.append('subdept', document.getElementById('f-dept2').value.trim());
+    formData.append('track', document.getElementById('f-track').value);
+    formData.append('title', document.getElementById('f-title').value.trim());
+    formData.append('scene', scene);
+    formData.append('process_text', processText);
+    formData.append('process_link', processLink);
+    formData.append('result_text', resultText);
+    formData.append('result_link', resultLink);
+    formData.append('entryType', getEntryType());
+    if (getEntryType() === 'team') {
+      formData.append('teamName', getTeamName());
+      formData.append('teamMembers', '部门/团队参赛');
+    }
+    if (pendingFile) formData.append('attachment', pendingFile);
   }
-  if (pendingFile) formData.append('attachment', pendingFile);
 
   try {
-    console.log('[submit] Sending entry...', { name: formData.get('name'), mobile: formData.get('mobile'), dept1: formData.get('dept1'), dept2: formData.get('dept2'), dept3: formData.get('dept3'), title: formData.get('title') });
+    console.log('[submit] Sending entry...', { editMode, editId });
     const controller = new AbortController();
     const timeout = setTimeout(function() { controller.abort(); }, 30000);
-    const resp = await fetch('/api/entries', {
-      method: 'POST',
+    const resp = await fetch(editMode ? ('/api/entries/' + editId) : '/api/entries', {
+      method: editMode ? 'PUT' : 'POST',
       body: formData,
       credentials: 'include',
       signal: controller.signal
@@ -605,20 +629,66 @@ async function submitEntry() {
     const data = await resp.json();
     console.log('[submit] Response:', resp.status, data);
     if (!resp.ok) throw new Error(data.error || '提交失败（HTTP ' + resp.status + '）');
-    showToast('作品提交成功！', 'success');
-    document.getElementById('formCard').innerHTML = '<div class="success-page"><div class="icon">🎉</div><h2>作品提交成功！</h2><p>你的作品已收录，可以在「作品展示」中查看。</p><p style="font-size:13px;color:var(--text-dim);">每人可多次提交，欢迎继续投稿！</p><button class="btn btn-primary" onclick="location.reload()">继续投稿</button><a href="/app/browse.html" class="btn btn-outline" style="margin-left:8px;">查看全部作品</a></div>';
+    if (editMode) {
+      showToast('作品已更新！', 'success');
+      document.getElementById('formCard').innerHTML = '<div class="success-page"><div class="icon">✅</div><h2>作品已更新！</h2><p>修改已保存，评委将收到更新提醒。</p><a href="/app/browse.html" class="btn btn-primary" style="margin-top:16px;">查看全部作品</a></div>';
+    } else {
+      showToast('作品提交成功！', 'success');
+      document.getElementById('formCard').innerHTML = '<div class="success-page"><div class="icon">🎉</div><h2>作品提交成功！</h2><p>你的作品已收录，可以在「作品展示」中查看。</p><p style="font-size:13px;color:var(--text-dim);">每人可多次提交，欢迎继续投稿！</p><button class="btn btn-primary" onclick="location.reload()">继续投稿</button><a href="/app/browse.html" class="btn btn-outline" style="margin-left:8px;">查看全部作品</a></div>';
+    }
     loadStats();
   } catch(e) {
     console.error('[submit] Error:', e);
     if (e.name === 'AbortError') {
-      showToast('提交超时（30秒），请检查网络后重试', 'error');
+      showToast('操作超时（30秒），请检查网络后重试', 'error');
     } else if (e.message === 'Failed to fetch') {
       showToast('网络连接失败，请检查网络后重试', 'error');
     } else {
-      showToast('提交失败：' + (e.message || '未知错误'), 'error');
+      showToast('操作失败：' + (e.message || '未知错误'), 'error');
     }
     isSubmitting = false;
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '提交作品'; }
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = editMode ? '保存修改' : '提交作品'; }
+  }
+}
+
+// ========== EDIT MODE ==========
+async function loadEntryForEdit(id) {
+  // 编辑需先登录
+  if (!ddAuthed) {
+    document.getElementById('loginGate').style.display = 'block';
+    document.getElementById('formCard').style.display = 'none';
+    return;
+  }
+  try {
+    const data = await api('/api/entries/' + id);
+    const e = data.entry;
+    document.getElementById('f-title').value = e.title || '';
+    document.getElementById('f-track').value = e.track || '';
+    document.getElementById('f-scene').value = e.scene || '';
+    updateCharCount('f-scene', 'scene-count');
+    document.getElementById('f-process-text').value = e.process_text || '';
+    document.getElementById('f-process-link').value = e.process_link || '';
+    document.getElementById('f-result-text').value = e.result_text || '';
+    document.getElementById('f-result-link').value = e.result_link || '';
+    document.getElementById('f-name').value = e.name || ddUser.nick || '';
+    document.getElementById('f-mobile').value = e.mobile || ddUser.mobile || '';
+    // 隐藏第1步（部门/参赛形式编辑时冻结），直接进入第2步
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('entryTypeGroup').style.display = 'none';
+    document.getElementById('step2').classList.add('active');
+    document.querySelector('#step2 .btn-success').textContent = '保存修改';
+    document.getElementById('formCard').style.display = 'block';
+    document.getElementById('loginGate').style.display = 'none';
+    // 当前海报（编辑默认保留）
+    const ca = document.getElementById('current-attachment');
+    if (e.attachmentName) {
+      document.getElementById('current-attachment-img').src = '/api/attachments/' + e.id;
+      ca.style.display = 'block';
+    } else {
+      ca.style.display = 'none';
+    }
+  } catch (err) {
+    showToast('加载作品失败：' + (err.message || '未知错误'), 'error');
   }
 }
 
@@ -626,7 +696,20 @@ async function submitEntry() {
 async function init() {
   await checkAuth();
   initDeptCascading();
-  renderSubmitPage();
+  // 编辑模式：URL 带 ?edit=<id>
+  const params = new URLSearchParams(window.location.search);
+  const editParam = params.get('edit');
+  if (editParam) {
+    editMode = true;
+    editId = editParam;
+    document.getElementById('pageTitle').textContent = '✏️ 编辑作品';
+    document.getElementById('step2Title').textContent = '编辑作品内容';
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('entryTypeGroup').style.display = 'none';
+    await loadEntryForEdit(editId);
+  } else {
+    renderSubmitPage();
+  }
 }
 
 init();

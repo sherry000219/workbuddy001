@@ -585,6 +585,98 @@ app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) =>
   res.json({ success: true, id });
 });
 
+// ========== API: UPDATE OWN ENTRY ==========
+// 本人可编辑本人作品；已获奖(awarded)锁定；附件可选替换；编辑后标记 editNotice 提醒评委
+app.put('/api/entries/:id', requireAuth, upload.single('attachment'), (req, res) => {
+  const entry = db.entries.find(e => e.id === req.params.id);
+  if (!entry) return res.status(404).json({ error: '作品不存在' });
+  // 仅本人可改（按钉钉手机号匹配）
+  if (entry.mobile && req.ddUser.mobile && entry.mobile !== req.ddUser.mobile) {
+    return res.status(403).json({ error: '只能修改本人提交的作品' });
+  }
+  // 已获奖锁定
+  if (entry.roundStatus === 'awarded') {
+    return res.status(403).json({ error: '作品已获奖，内容已锁定不可修改' });
+  }
+  let { track, title, scene, process_text, process_link, result_text, result_link, extra } = req.body;
+  if (!title || !title.trim()) return res.status(400).json({ error: '请填写作品标题' });
+  if (!scene || !scene.trim()) return res.status(400).json({ error: '请填写场景描述' });
+  if (!process_text || !process_text.trim()) return res.status(400).json({ error: '请填写使用过程' });
+  if (!result_text || !result_text.trim()) return res.status(400).json({ error: '请填写效果呈现' });
+  if (String(scene).length > 200) return res.status(400).json({ error: '场景描述请控制在 200 字以内' });
+  if (process_link && !/^https?:\/\//.test(process_link)) return res.status(400).json({ error: '使用过程链接必须以 http/https 开头' });
+  if (result_link && !/^https?:\/\//.test(result_link)) return res.status(400).json({ error: '效果呈现链接必须以 http/https 开头' });
+
+  // 附件：可选，传了则替换，否则保留原值
+  let attachmentName = entry.attachmentName;
+  let attachmentBase64 = entry.attachmentBase64;
+  if (req.file) {
+    const validMime = ['image/jpeg','image/png','image/webp','image/gif','image/bmp'];
+    if (!validMime.includes(req.file.mimetype)) {
+      return res.status(400).json({ error: '海报必须是图片格式（JPG/PNG/WebP）' });
+    }
+    const fileBuf = fs.readFileSync(req.file.path);
+    attachmentBase64 = `data:${req.file.mimetype};base64,${fileBuf.toString('base64')}`;
+    try { fs.unlinkSync(req.file.path); } catch (e) { /* ignore */ }
+    attachmentName = req.file.originalname;
+  }
+
+  entry.track = track || entry.track;
+  entry.title = title.trim();
+  entry.scene = scene;
+  entry.process_text = process_text;
+  entry.process_link = process_link || '';
+  entry.result_text = result_text;
+  entry.result_link = result_link || '';
+  entry.extra = extra || entry.extra || '';
+  entry.attachmentName = attachmentName;
+  entry.attachmentBase64 = attachmentBase64;
+  // 冻结字段不动：entryType / teamName / teamMembers / name / dept* / mobile / roundStatus / award
+  entry.updatedAt = new Date().toISOString();
+  entry.lastEditedAt = entry.updatedAt;
+  entry.editNotice = true;
+  saveDB();
+  res.json({ success: true, id: entry.id });
+});
+
+// ========== API: ACK EDIT NOTICE (评委/管理员标记已读) ==========
+app.post('/api/entries/:id/ack-edit', (req, res) => {
+  const entry = db.entries.find(e => e.id === req.params.id);
+  if (!entry) return res.status(404).json({ error: '作品不存在' });
+  const { judgeName, judgePassword, adminPassword } = req.body;
+  const judgeOk = judgePassword && judgePassword === getJudgePassword();
+  const adminOk = adminPassword && adminPassword === getAdminPassword();
+  if (!judgeOk && !adminOk) return res.status(403).json({ error: '仅评委或管理员可标记已读' });
+  entry.editNotice = false;
+  entry.editNoticeAckBy = judgeName || '管理员';
+  entry.editNoticeAckAt = new Date().toISOString();
+  saveDB();
+  res.json({ success: true });
+});
+
+// ========== API: MY ENTRIES (本人投稿列表) ==========
+// 按钉钉会话手机号匹配本人作品，用于「我的投稿」入口
+// 注意：必须注册在 GET /api/entries/:id 之前，否则 'mine' 会被当作 :id 捕获
+app.get('/api/entries/mine', requireAuth, (req, res) => {
+  const mobile = req.ddUser.mobile;
+  if (!mobile) return res.json({ entries: [] });
+  const entries = db.entries
+    .filter(e => e.mobile && e.mobile === mobile)
+    .map(e => {
+      const { attachmentBase64, ...rest } = e;
+      return {
+        ...rest,
+        roundStatus: e.roundStatus || 'approved',
+        award: e.award || null,
+        editable: e.roundStatus !== 'awarded',
+        editNoticeAckBy: e.editNoticeAckBy || null,
+        editNoticeAckAt: e.editNoticeAckAt || null
+      };
+    })
+    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+  res.json({ entries });
+});
+
 app.get('/api/entries/:id', (req, res) => {
   const entry = db.entries.find(e => e.id === req.params.id);
   if (!entry) return res.status(404).json({ error: '作品不存在' });
