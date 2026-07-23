@@ -512,6 +512,13 @@ function linkify(text) {
   });
 }
 
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text).replace(/[&<>'"]/g, function(m) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[m];
+  });
+}
+
 // ========== API CALLS ==========
 async function api(url, options) {
   options = options || {};
@@ -597,10 +604,31 @@ async function openDetail(entryId) {
     }
     var attachHtml = '';
     if (e.attachmentName) {
-      attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/' + e.attachmentPath + '" download="' + e.attachmentName + '" style="color:#ff6b35;">📥 下载 ' + e.attachmentName + '</a></div></div>';
+      attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/api/attachments/' + e.id + '" download="' + e.attachmentName + '" style="color:#ff6b35;">📥 下载 ' + e.attachmentName + '</a></div></div>';
+    }
+    const isNewFormat = e.process_link || e.result_link;
+    var sceneHtml = '';
+    if (e.scene) {
+      sceneHtml = '<div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + (isNewFormat ? escapeHtml(e.scene).replace(/\n/g, '<br>') : linkify(e.scene)) + '</div></div>';
+    }
+    var processHtml = '';
+    if (e.process_text || e.process_link) {
+      if (isNewFormat) {
+        processHtml = '<div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + escapeHtml(e.process_text || '').replace(/\n/g, '<br>') + (e.process_link ? '<br><a href="' + e.process_link + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.process_link + '</a>' : '') + '</div></div>';
+      } else {
+        processHtml = '<div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + linkify(e.process_text) + '</div></div>';
+      }
+    }
+    var resultHtml = '';
+    if (e.result_text || e.result_link) {
+      if (isNewFormat) {
+        resultHtml = '<div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + escapeHtml(e.result_text || '').replace(/\n/g, '<br>') + (e.result_link ? '<br><a href="' + e.result_link + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.result_link + '</a>' : '') + '</div></div>';
+      } else {
+        resultHtml = '<div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + linkify(e.result_text) + '</div></div>';
+      }
     }
     var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div><div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + e.scene + '</div></div><div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + e.process_text + '</div></div><div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + e.result_text + '</div></div>' + extraHtml + attachHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + processHtml + resultHtml + extraHtml + attachHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
     document.getElementById('detailModal').style.display = 'flex';
   } catch(e) {
     showToast('加载失败：' + e.message, 'error');

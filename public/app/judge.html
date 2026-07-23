@@ -178,6 +178,13 @@ function trackLabel(t) { return { efficiency: '效率提升', creative: '创意�
 function roundBadge(rs) { if (!rs || rs === 'approved') return ''; const map = { semi_finalist: '<span class="round-badge badge-semi">🟢 复赛</span>', finalist: '<span class="round-badge badge-final">🔵 决赛</span>', awarded: '<span class="round-badge badge-awarded">🏆 已获奖</span>', eliminated_semi: '<span class="round-badge badge-eliminated">淘汰</span>', eliminated_final: '<span class="round-badge badge-eliminated">淘汰</span>' }; return map[rs] || ''; }
 function awardBadge(award) { if (!award) return ''; return '<span class="round-badge badge-awarded">' + (AWARD_LABELS[award] || award) + '</span>'; }
 function linkify(text) { if (!text) return ''; const urlRegex = /(https?:\/\/[^\s<]+)/gi; return text.replace(/\n/g, '<br>').replace(urlRegex, function(url) { let cleanUrl = url.replace(/[.,;:!?)\]]+$/, ''); return '<a href="' + cleanUrl + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + cleanUrl + '</a>'; }); }
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text).replace(/[&<>'"]/g, function(m) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[m];
+  });
+}
+
 
 // ========== API ==========
 async function api(url, options) { options = options || {}; const resp = await fetch(url, { method: options.method || 'GET', headers: options.headers || {}, body: options.body, credentials: 'include' }); const data = await resp.json(); if (!resp.ok) throw new Error(data.error || 'Request failed'); return data; }
@@ -333,9 +340,31 @@ async function openDetail(entryId) {
     var extraHtml = '';
     if (e.extra) extraHtml = '<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">' + linkify(e.extra) + '</div></div>';
     var attachHtml = '';
-    if (e.attachmentName) attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/uploads/' + e.attachmentPath + '" download="' + e.attachmentName + '" style="color:#ff6b35;">📥 下载 ' + e.attachmentName + '</a></div></div>';
+    if (e.attachmentName) attachHtml = '<div class="detail-row"><div class="dlabel">📎 附件</div><div class="dvalue"><a href="/api/attachments/' + e.id + '" download="' + e.attachmentName + '" style="color:#ff6b35;">📥 下载 ' + e.attachmentName + '</a></div></div>';
+    const isNewFormat = e.process_link || e.result_link;
+    var sceneHtml = '';
+    if (e.scene) sceneHtml = '<div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + (isNewFormat ? escapeHtml(e.scene).replace(/
+/g, '<br>') : linkify(e.scene)) + '</div></div>';
+    var processHtml = '';
+    if (e.process_text || e.process_link) {
+      if (isNewFormat) {
+        processHtml = '<div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + escapeHtml(e.process_text || '').replace(/
+/g, '<br>') + (e.process_link ? '<br><a href="' + e.process_link + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.process_link + '</a>' : '') + '</div></div>';
+      } else {
+        processHtml = '<div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + linkify(e.process_text) + '</div></div>';
+      }
+    }
+    var resultHtml = '';
+    if (e.result_text || e.result_link) {
+      if (isNewFormat) {
+        resultHtml = '<div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + escapeHtml(e.result_text || '').replace(/
+/g, '<br>') + (e.result_link ? '<br><a href="' + e.result_link + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.result_link + '</a>' : '') + '</div></div>';
+      } else {
+        resultHtml = '<div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + linkify(e.result_text) + '</div></div>';
+      }
+    }
     var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div><div class="detail-row"><div class="dlabel">场景描述</div><div class="dvalue">' + e.scene + '</div></div><div class="detail-row"><div class="dlabel">使用过程</div><div class="dvalue">' + e.process_text + '</div></div><div class="detail-row"><div class="dlabel">效果呈现</div><div class="dvalue">' + e.result_text + '</div></div>' + extraHtml + attachHtml + '<div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+    document.getElementById('detailContent').innerHTML = '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + processHtml + resultHtml + extraHtml + attachHtml + '<div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
     document.getElementById('detailModal').style.display = 'flex';
   } catch(e) { showToast('加载失败：' + e.message, 'error'); }
 }

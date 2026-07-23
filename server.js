@@ -507,7 +507,8 @@ app.get('/api/entries', (req, res) => {
   entries = entries.map(e => {
     const sd = getEntryStageScores(e.id, stage);
     const composite = getCompositeScore(e.id, stage);
-    return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, avgScore: sd.avgScore, judgeCount: sd.judgeCount, composite };
+    const { attachmentBase64, ...rest } = e;
+    return { ...rest, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, avgScore: sd.avgScore, judgeCount: sd.judgeCount, composite };
   });
   if (sort === 'score') entries.sort((a, b) => b.composite - a.composite);
   else if (sort === 'votes') entries.sort((a, b) => b.voteCount - a.voteCount);
@@ -516,7 +517,7 @@ app.get('/api/entries', (req, res) => {
 });
 
 app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) => {
-  let { name, mobile, dept, dept1, dept2, dept3, subdept, track, title, scene, process_text, result_text, extra, entryType, teamName, teamMembers } = req.body;
+  let { name, mobile, dept, dept1, dept2, dept3, subdept, track, title, scene, process_text, process_link, result_text, result_link, extra, entryType, teamName, teamMembers } = req.body;
   // Auto-fill name and mobile from DingTalk session if not provided
   if (!name && req.ddUser.nick) name = req.ddUser.nick;
   if (!mobile && req.ddUser.mobile) mobile = req.ddUser.mobile;
@@ -532,12 +533,16 @@ app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) =>
   if (dept1 === '产研中心' || dept2 === '研发部') {
     return res.status(403).json({ error: '本次参赛范围仅限云帐房非研发序列人员，研发序列同事欢迎参与投票' });
   }
-  if (!track || !title || !scene || !process_text || !result_text) {
+  if (!track || !title || !scene || !process_text || !process_link || !result_text || !result_link) {
     return res.status(400).json({ error: '请填写所有必填字段' });
   }
+  // 字数限制
+  if (String(scene).length > 200) {
+    return res.status(400).json({ error: '场景描述请控制在 200 字以内' });
+  }
   // 链接格式校验
-  if (!/^https?:\/\//.test(scene) || !/^https?:\/\//.test(process_text) || !/^https?:\/\//.test(result_text)) {
-    return res.status(400).json({ error: '场景描述、使用过程、效果呈现必须以链接形式提交' });
+  if (!/^https?:\/\//.test(process_link) || !/^https?:\/\//.test(result_link)) {
+    return res.status(400).json({ error: '使用过程、效果呈现链接必须以 http/https 开头' });
   }
   // 海报必传 + 图片校验
   if (!req.file) return res.status(400).json({ error: '请上传一张参赛作品海报' });
@@ -549,6 +554,13 @@ app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) =>
   if (entryType === 'team' && (!teamName || !teamName.trim())) {
     teamName = dept1 + (dept2 ? ' / ' + dept2 : '') + (dept3 ? ' / ' + dept3 : '');
   }
+  // 读取附件并转 base64，随后删除临时文件
+  let attachmentBase64 = null;
+  if (req.file) {
+    const fileBuf = fs.readFileSync(req.file.path);
+    attachmentBase64 = `data:${req.file.mimetype};base64,${fileBuf.toString('base64')}`;
+    try { fs.unlinkSync(req.file.path); } catch (e) { /* ignore */ }
+  }
   const id = 'entry_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
   const entry = {
     id, name, mobile: mobile || '', dept: dept1, dept1, dept2: dept2 || '', dept3: dept3 || '',
@@ -557,9 +569,12 @@ app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) =>
     teamName: teamName || '',
     teamMembers: teamMembers || '',
     track, title, scene,
-    process_text, result_text, extra: extra || '',
+    process_text, process_link,
+    result_text, result_link,
+    extra: extra || '',
     attachmentName: req.file ? req.file.originalname : null,
-    attachmentPath: req.file ? req.file.filename : null,
+    attachmentBase64,
+    attachmentPath: null, // 新数据不再依赖本地路径
     status: 'approved',
     roundStatus: 'approved',
     award: null,
@@ -578,9 +593,10 @@ app.get('/api/entries/:id', (req, res) => {
   // Also include all-stage data for reference
   const allVotes = db.votes.filter(v => v.entryId === entry.id);
   const allScores = db.judgeScores.filter(s => s.entryId === entry.id);
+  const { attachmentBase64, ...entryRest } = entry;
   res.json({
     entry: {
-      ...entry,
+      ...entryRest,
       roundStatus: entry.roundStatus || 'approved',
       award: entry.award || null,
       votes: allVotes,
@@ -592,6 +608,34 @@ app.get('/api/entries/:id', (req, res) => {
       currentStage: stage
     }
   });
+});
+
+// ========== API: ATTACHMENTS ==========
+app.get('/api/attachments/:entryId', (req, res) => {
+  const entry = db.entries.find(e => e.id === req.params.entryId);
+  if (!entry) return res.status(404).json({ error: '作品不存在' });
+
+  // 新格式：base64 嵌入 contest.json
+  if (entry.attachmentBase64) {
+    const match = entry.attachmentBase64.match(/^data:([^;]+);base64,(.*)$/);
+    if (!match) return res.status(500).json({ error: '附件数据格式异常' });
+    const mime = match[1];
+    const base64 = match[2];
+    const buf = Buffer.from(base64, 'base64');
+    const filename = entry.attachmentName || 'attachment';
+    res.setHeader('Content-Type', mime);
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`);
+    return res.send(buf);
+  }
+
+  // 兼容旧格式：本地 uploads 目录
+  if (entry.attachmentPath) {
+    const filePath = path.join(UPLOAD_DIR, entry.attachmentPath);
+    if (!fs.existsSync(filePath)) return res.status(404).json({ error: '附件文件不存在' });
+    return res.sendFile(path.resolve(filePath));
+  }
+
+  res.status(404).json({ error: '该作品没有附件' });
 });
 
 // ========== API: VOTES ==========
@@ -694,7 +738,8 @@ app.get('/api/ranking', (req, res) => {
   const enriched = entries.map(e => {
     const sd = getEntryStageScores(e.id, stage);
     const composite = getCompositeScore(e.id, stage);
-    return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, judgeAvg: sd.avgScore, composite };
+    const { attachmentBase64, ...rest } = e;
+    return { ...rest, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, judgeAvg: sd.avgScore, composite };
   });
   enriched.sort((a, b) => b.composite - a.composite);
   res.json({ ranking: enriched.slice(0, 30), currentStage: stage });
@@ -725,7 +770,7 @@ app.get('/api/export/json', verifyAdminToken, (req, res) => {
 app.get('/api/export/csv', verifyAdminToken, (req, res) => {
   const trackLabel = { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' };
   const stage = getCurrentStage();
-  let csv = '\uFEFFID,状态,轮次状态,姓名,部门,子部门,赛道,标题,场景描述,使用过程,效果呈现,作品链接,附件名称,提交时间,当前阶段投票数,当前阶段评委均分,当前阶段综合分\n';
+  let csv = '\uFEFFID,状态,轮次状态,姓名,部门,子部门,赛道,标题,场景描述,使用过程简介,使用过程链接,效果呈现简介,效果呈现链接,作品链接,附件名称,提交时间,当前阶段投票数,当前阶段评委均分,当前阶段综合分\n';
   const votable = getVotableEntries(stage);
   const allVoteCounts = votable.map(e => getEntryStageScores(e.id, stage).voteCount);
   const maxVotes = Math.max(1, ...allVoteCounts);
@@ -735,7 +780,7 @@ app.get('/api/export/csv', verifyAdminToken, (req, res) => {
     const composite = stage === 'final' ? sd.avgScore : Math.round(sd.avgScore * 0.8 + voteScore * 0.2);
     const roundLabel = { approved: '初赛', semi_finalist: '复赛晋级', eliminated_semi: '复赛淘汰', finalist: '决赛晋级', eliminated_final: '决赛淘汰', awarded: '已获奖' }[e.roundStatus] || '初赛';
     const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
-    csv += `${esc(e.id)},${esc(e.status === 'approved' ? '已收录' : '待审核')},${esc(roundLabel)},${esc(e.name)},${esc(e.dept)},${esc(e.subdept)},${esc(trackLabel[e.track] || e.track)},${esc(e.title)},${esc(e.scene)},${esc(e.process_text)},${esc(e.result_text)},${esc(e.extra)},${esc(e.attachmentName)},${esc(e.createdAt)},${sd.voteCount},${sd.avgScore},${composite}\n`;
+    csv += `${esc(e.id)},${esc(e.status === 'approved' ? '已收录' : '待审核')},${esc(roundLabel)},${esc(e.name)},${esc(e.dept)},${esc(e.subdept)},${esc(trackLabel[e.track] || e.track)},${esc(e.title)},${esc(e.scene)},${esc(e.process_text)},${esc(e.process_link || '')},${esc(e.result_text)},${esc(e.result_link || '')},${esc(e.extra)},${esc(e.attachmentName)},${esc(e.createdAt)},${sd.voteCount},${sd.avgScore},${composite}\n`;
   });
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="WorkBuddy-entries.csv"');

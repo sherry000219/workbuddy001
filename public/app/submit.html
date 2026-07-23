@@ -57,6 +57,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .form-group textarea { min-height: 100px; resize: vertical; }
 .form-group select option { background: #fff; color: var(--text); }
 .form-hint { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.char-count { font-size: 12px; color: var(--text-dim); text-align: right; margin-top: 4px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
 
@@ -197,21 +198,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
       </div>
     </div>
     <div class="form-step" id="step2">
-      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第2步：作品详情（以链接形式提交）</div>
+      <div style="font-size:14px;color:var(--accent);margin-bottom:20px;font-weight:600;">第2步：作品详情</div>
       <div class="form-group">
-        <label>场景描述链接 <span class="required">*</span></label>
-        <input type="url" id="f-scene" placeholder="粘贴文档链接（钉钉文档 / 飞书文档 / Notion 等）">
-        <div class="form-hint">请将场景描述写在在线文档中，粘贴链接即可</div>
+        <label>场景描述 <span class="required">*</span> <small style="font-weight:400;color:var(--text-dim);">（200字以内）</small></label>
+        <textarea id="f-scene" rows="4" maxlength="200" placeholder="简要描述作品解决了什么场景问题，200字以内" oninput="updateCharCount('f-scene','scene-count')"></textarea>
+        <div class="char-count"><span id="scene-count">0</span>/200</div>
       </div>
       <div class="form-group">
-        <label>使用过程链接 <span class="required">*</span></label>
-        <input type="url" id="f-process" placeholder="粘贴文档链接（钉钉文档 / 飞书文档 / Notion 等）">
-        <div class="form-hint">请将使用过程写在在线文档中，粘贴链接即可</div>
+        <label>使用过程 <span class="required">*</span></label>
+        <textarea id="f-process-text" rows="3" placeholder="简要描述使用过程、操作步骤"></textarea>
+        <input type="url" id="f-process-link" placeholder="详细文档链接（钉钉文档 / 飞书文档 / Notion 等）" style="margin-top:8px;">
+        <div class="form-hint">文字简介 + 详细文档链接</div>
       </div>
       <div class="form-group">
-        <label>效果呈现链接 <span class="required">*</span></label>
-        <input type="url" id="f-result" placeholder="粘贴文档链接（钉钉文档 / 飞书文档 / Notion 等）">
-        <div class="form-hint">请将效果呈现在在线文档中，粘贴链接即可</div>
+        <label>效果呈现 <span class="required">*</span></label>
+        <textarea id="f-result-text" rows="3" placeholder="简要描述效果、成果数据"></textarea>
+        <input type="url" id="f-result-link" placeholder="效果展示文档链接（钉钉文档 / 飞书文档 / Notion 等）" style="margin-top:8px;">
+        <div class="form-hint">文字简介 + 效果展示链接</div>
       </div>
       <div class="form-group">
         <label>作品海报 <span class="required">*</span> <br><small style="font-weight:400;color:var(--accent);">上传一张参赛作品的功能宣传海报（仅限图片）</small></label>
@@ -386,11 +389,21 @@ function renderStatsBar(containerId, stats) {
 }
 
 // ========== SUBMIT PAGE ==========
+function updateCharCount(inputId, countId) {
+  const input = document.getElementById(inputId);
+  const count = document.getElementById(countId);
+  if (!input || !count) return;
+  const len = input.value.length;
+  count.textContent = len;
+  count.style.color = len > 200 ? 'var(--red)' : 'var(--text-dim)';
+}
+
 function renderSubmitPage() {
   loadStats().then(function(stats) { renderStatsBar('submitStats', stats); });
   document.getElementById('step1').classList.add('active');
   document.getElementById('step2').classList.remove('active');
-  ['f-title','f-scene','f-process','f-result'].forEach(function(id) { document.getElementById(id).value = ''; });
+  ['f-title','f-scene','f-process-text','f-process-link','f-result-text','f-result-link'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+  updateCharCount('f-scene','scene-count');
   document.getElementById('f-track').value = '';
   clearAttachment();
   resetDeptSelects();
@@ -536,11 +549,16 @@ async function submitEntry() {
   if (isSubmitting) return;
   const submitBtn = document.querySelector('.btn-success');
   const scene = document.getElementById('f-scene').value.trim();
-  const process = document.getElementById('f-process').value.trim();
-  const result = document.getElementById('f-result').value.trim();
-  if (!scene || !scene.startsWith('http')) return showToast('请填写有效的场景描述链接', 'error');
-  if (!process || !process.startsWith('http')) return showToast('请填写有效的使用过程链接', 'error');
-  if (!result || !result.startsWith('http')) return showToast('请填写有效的效果呈现链接', 'error');
+  const processText = document.getElementById('f-process-text').value.trim();
+  const processLink = document.getElementById('f-process-link').value.trim();
+  const resultText = document.getElementById('f-result-text').value.trim();
+  const resultLink = document.getElementById('f-result-link').value.trim();
+  if (!scene) return showToast('请填写场景描述', 'error');
+  if (scene.length > 200) return showToast('场景描述请控制在 200 字以内', 'error');
+  if (!processText) return showToast('请填写使用过程简介', 'error');
+  if (!processLink || !processLink.startsWith('http')) return showToast('请填写有效的使用过程链接', 'error');
+  if (!resultText) return showToast('请填写效果呈现简介', 'error');
+  if (!resultLink || !resultLink.startsWith('http')) return showToast('请填写有效的效果呈现链接', 'error');
   if (!pendingFile) return showToast('请上传一张参赛作品海报', 'error');
 
   // 验证是图片
@@ -562,8 +580,10 @@ async function submitEntry() {
   formData.append('track', document.getElementById('f-track').value);
   formData.append('title', document.getElementById('f-title').value.trim());
   formData.append('scene', scene);
-  formData.append('process_text', process);
-  formData.append('result_text', result);
+  formData.append('process_text', processText);
+  formData.append('process_link', processLink);
+  formData.append('result_text', resultText);
+  formData.append('result_link', resultLink);
   formData.append('entryType', getEntryType());
   if (getEntryType() === 'team') {
     formData.append('teamName', getTeamName());
