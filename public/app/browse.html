@@ -429,6 +429,10 @@ async function openDetail(entryId) {
     const badge = awardBadge(e.award) || roundBadge(rs);
     const stageText = STAGE_LABELS[currentStage] || '初赛';
     const canVote = isVotingStage && rs !== 'eliminated_semi' && rs !== 'eliminated_final' && rs !== 'awarded' && rs !== 'finalist';
+    var editNoticeHtml = '';
+    if (e.editNotice) {
+      editNoticeHtml = '<div style="background:rgba(255,215,64,0.12);border:1px solid rgba(255,215,64,0.35);color:#b45309;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;">📝 作者于 ' + new Date(e.lastEditedAt || e.updatedAt || e.createdAt).toLocaleString('zh-CN') + ' 编辑过本作品，内容可能有更新，请留意。</div>';
+    }
     let voteBtnHtml = '';
     if (isVotingStage && canVote) voteBtnHtml = '<button class="btn btn-outline btn-sm" onclick="voteEntry(\'' + e.id + '\')">👍 投票</button>';
     var extraHtml = '';
