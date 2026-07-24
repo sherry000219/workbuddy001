@@ -766,6 +766,7 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
     entryId: req.params.entryId,
     voterId: userId,
     voterName: req.ddUser.nick,
+    voterMobile: req.ddUser.mobile || '',
     voterAvatar: req.ddUser.avatarUrl || '',
     stage,
     createdAt: new Date().toISOString()
@@ -925,33 +926,55 @@ const ROUND_LABEL = { approved: '初赛', semi_finalist: '复赛晋级', elimina
 function getLuckyRounds() {
   const idMap = {};
   db.entries.forEach(e => { idMap[e.id] = e; });
-  const rounds = [];
+  const stageData = [];
   for (const S of ['preliminary', 'semi_final', 'final']) {
     const qualIds = new Set(
       db.entries.filter(e => LUCKY_STAGE_ADV[S].includes(e.roundStatus)).map(e => e.id)
     );
     if (qualIds.size === 0) continue;
-    // 支持者：在赛程 S 投过票，且作品属于 qualIds
-    const bucket = new Map(); // voterId -> {name, avatar, entries:Set(id)}
+    // 支持者：在赛程 S 投过票，且作品属于 qualIds；去重主键用手机号（缺则回退 openId）
+    const bucket = new Map(); // dupKey -> {mobile, name, avatar, entries:Set(id)}
     for (const v of db.votes) {
       if ((v.stage || 'preliminary') !== S) continue;
       if (!qualIds.has(v.entryId)) continue;
-      if (!bucket.has(v.voterId)) bucket.set(v.voterId, { name: v.voterName, avatar: v.voterAvatar || '', entries: new Set() });
-      bucket.get(v.voterId).entries.add(v.entryId);
+      const dupKey = v.voterMobile || v.voterId || v.voterName || '?';
+      if (!bucket.has(dupKey)) bucket.set(dupKey, { mobile: v.voterMobile || '', name: v.voterName, avatar: v.voterAvatar || '', entries: new Set() });
+      bucket.get(dupKey).entries.add(v.entryId);
     }
     if (bucket.size === 0) continue;
-    const voters = [...bucket.entries()].map(([id, b]) => ({
+    const voters = [...bucket.values()].map(b => ({
       voterName: b.name,
       voterAvatar: b.avatar,
+      _mobile: b.mobile, // 内部用于跨轮重名判定，不返回前端
+      mobileLast4: b.mobile ? b.mobile.slice(-4) : null,
       tickets: 1, // 每赛程参与 1 次抽奖
       entries: [...b.entries].map(eid => {
         const e = idMap[eid] || {};
         return { title: e.title || eid, result: (ROUND_LABEL[e.roundStatus] || e.roundStatus || ''), award: e.award || null };
       })
     }));
-    rounds.push({ stage: S, label: LUCKY_STAGE_LABEL[S], roundLabel: LUCKY_ROUND_LABEL[S], total: voters.length, voters });
+    stageData.push({ stage: S, label: LUCKY_STAGE_LABEL[S], roundLabel: LUCKY_ROUND_LABEL[S], voters });
   }
-  return rounds;
+  // 跨轮统计「重名」：同一份名单内，不同手机号却同昵称 → 需展示后四位区分
+  const nameMobiles = {};
+  stageData.forEach(r => r.voters.forEach(v => {
+    const nm = v.voterName || '';
+    if (!nameMobiles[nm]) nameMobiles[nm] = new Set();
+    nameMobiles[nm].add(v._mobile || '__no_mobile__');
+  }));
+  const dupNames = {};
+  Object.keys(nameMobiles).forEach(nm => { dupNames[nm] = nameMobiles[nm].size > 1; });
+  // 组装返回：仅重名者带 mobileLast4（用于前端展示），其余置 null；不返回完整手机号/openId
+  return stageData.map(r => {
+    const voters = r.voters.map(v => ({
+      voterName: v.voterName,
+      voterAvatar: v.voterAvatar,
+      mobileLast4: (dupNames[v.voterName] && v.mobileLast4) ? v.mobileLast4 : null,
+      tickets: 1,
+      entries: v.entries
+    }));
+    return { stage: r.stage, label: r.label, roundLabel: r.roundLabel, total: voters.length, voters };
+  });
 }
 
 app.get('/api/lucky/list', (req, res) => {

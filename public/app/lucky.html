@@ -24,6 +24,7 @@
   .card .info { flex: 1; min-width: 0; }
   .card .name { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
   .ticket { background: #fff3e0; color: #e55d2b; font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: 600; }
+  .tail { background: #eef2f7; color: #64748b; font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: 600; }
   .entries { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
   .entry { font-size: 12px; color: #374151; display: flex; align-items: center; gap: 6px; }
   .badge { font-size: 10px; padding: 1px 7px; border-radius: 8px; background: #eef2ff; color: #4338ca; font-weight: 600; white-space: nowrap; }
@@ -78,7 +79,7 @@ function render(data) {
       html += `<div class="card">
         ${avatarHtml(v)}
         <div class="info">
-          <div class="name">${ESC(v.voterName)} <span class="ticket">${v.tickets || 1} 票</span></div>
+          <div class="name">${ESC(v.voterName)}${v.mobileLast4 ? ` <span class="tail">尾号${ESC(v.mobileLast4)}</span>` : ''} <span class="ticket">${v.tickets || 1} 票</span></div>
           <div class="entries">${(v.entries || []).map(entryHtml).join('')}</div>
         </div>
       </div>`;

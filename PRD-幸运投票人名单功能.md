@@ -8,7 +8,7 @@
 
 ## 1. 背景与目标
 
-现有赛段投票已按人记录（`db.votes`：`voterId`/`voterName`/`voterAvatar`/`entryId`/`stage`/`createdAt`）。
+现有赛段投票已按人记录（`db.votes`：`voterId`/`voterName`/`voterMobile`/`voterAvatar`/`entryId`/`stage`/`createdAt`）。
 新增诉求：**作品晋级/获奖时，当初在对应赛程投票支持它的人，获得该赛程抽奖资格**。本期只做"计算各赛程支持者名单 + 网页公示"，抽奖/奖池执行与获奖公布在线下员工社区完成。
 
 ---
@@ -18,10 +18,10 @@
 | # | 决策 | 结论 |
 |---|------|------|
 | 1 | 晋级口径 | **晋级即算（口径 A）**：作品只要"晋级过任一轮"或"获奖"，其对应赛程的支持者即合格（参考原 PRD 决策点 1 的选项 A） |
-| 2 | 去重 / 重名 | 投票人经钉钉实名认证，每人每赛程最多 5 票；基本不会重名；若重名，**头像不同**足以区分 → 展示头像+昵称，去重主键用 `voterId` |
+| 2 | 去重 / 重名 | 去重主键用 **手机号**（`db.votes.voterMobile`，取自钉钉认证 `mobile`，比 openId 稳健，重新授权不会拆人）；**仅当同一份名单内存在「不同手机号、同昵称」的重名时**，才展示该投票人手机号后四位以区分身份；**其他非重名者一律不展示手机号**（仅头像 + 昵称） |
 | 3 | 抽奖票数 | **每赛程参与 1 次抽奖**，即每个合格投票人在该赛程 = 1 票（不按支持作品数叠加） |
 | 4 | 公布时机 | **进入下一赛程时，管理员手动开启** `luckyListEnabled` 展示本赛程支持者名单 |
-| 5 | 隐私 | 公开仅展示：头像 + 昵称 + 支持作品 + 结果；不暴露 openId / 手机号 |
+| 5 | 隐私 | 公开仅展示：头像 + 昵称 + 支持作品 + 结果；**不暴露 openId 与完整手机号**；仅重名（不同手机号同昵称）时展示手机号后四位以区分，其余一律不展示手机号 |
 | — | 奖池/获奖 | 奖池金额与最终获奖情况在**员工社区**公布，本平台不展示 |
 
 ### 关键模型：按赛程分轮（每轮 = 一次晋级事件）
@@ -36,7 +36,7 @@
 ## 3. 数据模型变更（极小）
 
 1. `DEFAULT_DB.settings` 新增 `luckyListEnabled: false`（自动迁移，向后兼容）。
-2. `db.votes` 投票记录新增字段 `voterAvatar`（写入时取 `req.ddUser.avatarUrl`）；旧数据缺该字段时展示占位头像。
+2. `db.votes` 投票记录新增字段 `voterAvatar`（取 `req.ddUser.avatarUrl`）、`voterMobile`（取 `req.ddUser.mobile`）；旧数据缺字段时展示占位头像 / 不展示尾号。
 3. 不改动 `entries` 任何字段。
 
 ---
@@ -49,6 +49,7 @@
 db.votes.push({
   entryId, voterId: userId, voterName: req.ddUser.nick,
   voterAvatar: req.ddUser.avatarUrl || '',   // 新增
+  voterMobile: req.ddUser.mobile || '',      // 新增：手机号去重 + 重名展示后四位
   stage, createdAt
 });
 ```
@@ -62,7 +63,7 @@ const STAGE_ADV = {
   final:       ['awarded']
 };
 // 对每个来源赛程 S：qualIds = 当前 roundStatus 命中 STAGE_ADV[S] 的作品 id 集合
-// 支持者 = 在赛程 S 投过票 且 entryId ∈ qualIds 的投票人（按 voterId 去重）
+// 支持者 = 在赛程 S 投过票 且 entryId ∈ qualIds 的投票人（按手机号 voterMobile 去重，缺则回退 voterId）
 // 每人 tickets = 1；展示 entries = 其在本赛程支持且晋级的作品列表（含 result 徽章）
 ```
 返回：
@@ -75,13 +76,15 @@ const STAGE_ADV = {
       "stage": "preliminary", "label": "初赛", "total": 12,
       "voters": [
         { "voterName": "张三", "voterAvatar": "https://...", "tickets": 1,
-          "entries": [ { "title": "PDF工具箱", "result": "复赛晋级" } ] }
+          "entries": [ { "title": "PDF工具箱", "result": "复赛晋级" } ] },
+        { "voterName": "李四", "voterAvatar": "https://...", "mobileLast4": "8888", "tickets": 1,
+          "entries": [ { "title": "报表助手", "result": "复赛晋级" } ] }
       ]
     }
   ]
 }
 ```
-隐私：仅返回 `voterName` / `voterAvatar` / `entries`，**不含 openId / 手机号**。
+隐私：仅返回 `voterName` / `voterAvatar` / `entries`；**`mobileLast4` 仅当重名（不同手机号同昵称）时返回后四位，其余为 null**；不返回 openId 与完整手机号。
 
 ### 4.3 `POST /api/settings`（现有，增量）
 新增接受 `luckyListEnabled` 字段，写入 `db.settings` 并触发 GitHub 同步（与现有 currentStage 等一致）。管理员"进入下一赛程时"开启。
@@ -97,7 +100,7 @@ const STAGE_ADV = {
 
 ### 5.2 管理员面板 `public/app/admin.html`（新增"🎁 幸运名单"标签）
 - 始终可预览各轮名单（不受 `enabled` 限制，作为"获取名单"操作台）。
-- **导出 CSV** 按钮（昵称、头像URL、支持作品、结果、票数）。
+- **导出 CSV** 按钮（轮次、昵称、手机号后四位、头像URL、支持作品、结果、票数）。
 - **`luckyListEnabled` 开关**（开启/关闭公开公示）。
 
 ### 5.3 首页 `public/app/index.html`

@@ -528,7 +528,7 @@ function renderLuckyPreview(data) {
     html += `<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:6px;">🎁 ${escHtml(r.roundLabel || r.label || '')} · 支持者 ${r.total} 人</div><div style="display:flex;flex-wrap:wrap;gap:6px;">`;
     (r.voters || []).forEach(v => {
       const ents = (v.entries || []).map(e => e.title).join('、');
-      html += `<span style="background:#fff3e0;color:#b45309;font-size:12px;padding:3px 10px;border-radius:10px;">${escHtml(v.voterName)}（${escHtml(ents)}）</span>`;
+      html += `<span style="background:#fff3e0;color:#b45309;font-size:12px;padding:3px 10px;border-radius:10px;">${escHtml(v.voterName)}${v.mobileLast4 ? '（尾号' + escHtml(v.mobileLast4) + '）' : ''}（${escHtml(ents)}）</span>`;
     });
     html += '</div></div>';
   });
@@ -549,11 +549,11 @@ async function exportLuckyCSV() {
   if (!adminToken) return showToast('请先登录管理后台', 'error');
   try {
     const data = await api('/api/lucky/list');
-    let csv = '﻿轮次,昵称,头像URL,支持作品,结果,票数\n';
+    let csv = '﻿轮次,昵称,手机号后四位,头像URL,支持作品,结果,票数\n';
     (data.rounds || []).forEach(r => {
       (r.voters || []).forEach(v => {
         const ents = (v.entries || []).map(e => (e.title || '') + (e.result ? '(' + e.result + (e.award ? '·' + e.award : '') + ')' : '')).join('、');
-        csv += `"${csvCell(r.roundLabel || r.label || '')}","${csvCell(v.voterName)}","${csvCell(v.voterAvatar || '')}","${csvCell(ents)}","${(v.tickets||1)}"\n`;
+        csv += `"${csvCell(r.roundLabel || r.label || '')}","${csvCell(v.voterName)}","${csvCell(v.mobileLast4 || '')}","${csvCell(v.voterAvatar || '')}","${csvCell(ents)}","${(v.tickets||1)}"\n`;
       });
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
