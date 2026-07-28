@@ -613,6 +613,7 @@ async function renderRanking() {
 
 // ========== DETAIL MODAL ==========
 async function openDetail(entryId) {
+  if (!ddAuthed) { showToast('请先登录钉钉查看作品详情', 'error'); return; }
   try {
     const data = await api('/api/entries/' + entryId);
     const e = data.entry;
@@ -654,7 +655,11 @@ var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(functi
     document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + posterHtml + processHtml + resultHtml + extraHtml + docHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
     document.getElementById('detailModal').style.display = 'flex';
   } catch(e) {
-    showToast('加载失败：' + e.message, 'error');
+    if (e.message && (e.message.indexOf('登录') !== -1 || e.message.indexOf('请先') !== -1 || e.message.indexOf('unauthorized') !== -1 || e.message.indexOf('Unauthorized') !== -1)) {
+      showToast('请先登录钉钉查看作品详情', 'error');
+    } else {
+      showToast('加载失败：' + e.message, 'error');
+    }
   }
 }
 
@@ -706,10 +711,23 @@ async function checkLucky() {
   } catch(e) { /* 忽略 */ }
 }
 
+function renderLoginPrompt() {
+  const list = document.getElementById('rankingList');
+  if (list) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">🔒</div><p>查看作品排名需先登录</p><button class="btn btn-primary" onclick="ddLogin()" style="margin-top:16px;">钉钉登录</button></div>';
+  }
+  const stats = document.getElementById('rankingStats');
+  if (stats) stats.innerHTML = '';
+}
+
 async function init() {
   await checkAuth();
   await checkVotingStatus();
-  await renderRanking();
+  if (!ddAuthed) {
+    renderLoginPrompt();
+  } else {
+    await renderRanking();
+  }
   await checkLucky();
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') { closeDetail(); }

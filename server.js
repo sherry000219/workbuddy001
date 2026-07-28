@@ -523,7 +523,7 @@ function requireAuth(req, res, next) {
 }
 
 // ========== API: ENTRIES ==========
-app.get('/api/entries', (req, res) => {
+app.get('/api/entries', requireAuth, (req, res) => {
   const { track, dept, search, sort } = req.query;
   const stage = getCurrentStage();
   let entries = db.entries.filter(e => e.status === 'approved');
@@ -682,7 +682,7 @@ app.get('/api/entries/mine', requireAuth, (req, res) => {
   res.json({ entries });
 });
 
-app.get('/api/entries/:id', (req, res) => {
+app.get('/api/entries/:id', requireAuth, (req, res) => {
   const entry = db.entries.find(e => e.id === req.params.id);
   if (!entry) return res.status(404).json({ error: '作品不存在' });
   const stage = getCurrentStage();
@@ -707,7 +707,7 @@ app.get('/api/entries/:id', (req, res) => {
 });
 
 // ========== API: ATTACHMENTS ==========
-app.get('/api/attachments/:entryId', (req, res) => {
+app.get('/api/attachments/:entryId', requireAuth, (req, res) => {
   const entry = db.entries.find(e => e.id === req.params.entryId);
   if (!entry) return res.status(404).json({ error: '作品不存在' });
   if (entry.docUrl) return res.redirect(entry.docUrl);
@@ -798,7 +798,7 @@ app.get('/api/judge/my-scores', (req, res) => {
 });
 
 // ========== API: RANKING ==========
-app.get('/api/ranking', (req, res) => {
+app.get('/api/ranking', requireAuth, (req, res) => {
   const { track } = req.query;
   const stage = getCurrentStage();
   // Determine which entries to rank based on stage
@@ -823,7 +823,7 @@ app.get('/api/ranking', (req, res) => {
 });
 
 // ========== API: STATS ==========
-app.get('/api/stats', (req, res) => {
+app.get('/api/stats', requireAuth, (req, res) => {
   const stage = getCurrentStage();
   const totalEntries = db.entries.length;
   const approvedEntries = db.entries.filter(e => e.status === 'approved').length;

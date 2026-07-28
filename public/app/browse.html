@@ -423,6 +423,7 @@ let detailLoading = false;
 let detailLoadingTimer = null;
 
 async function openDetail(entryId) {
+  if (!ddAuthed) { showToast('请先登录钉钉查看作品详情', 'error'); return; }
   // 防止重复点击
   if (detailLoading) return;
   detailLoading = true;
@@ -481,7 +482,8 @@ async function openDetail(entryId) {
     document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + posterHtml + processHtml + resultHtml + extraHtml + docHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions">' + voteBtnHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
   } catch(e) {
     clearTimeout(detailLoadingTimer);
-    document.getElementById('detailContent').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;"><div style="font-size:48px;">😞</div><p style="margin-top:16px;font-size:15px;color:#ef4444;">加载失败：' + e.message + '</p><div class="modal-actions" style="margin-top:20px;justify-content:center;"><button class="btn btn-outline btn-sm" onclick="detailLoading=false;closeDetail();">关闭</button><button class="btn btn-primary btn-sm" onclick="detailLoading=false;openDetail(\'' + entryId + '\')" style="margin-left:8px;">重试</button></div></div>';
+    const isAuthError = e.message && (e.message.indexOf('登录') !== -1 || e.message.indexOf('请先') !== -1 || e.message.indexOf('unauthorized') !== -1 || e.message.indexOf('Unauthorized') !== -1);
+    document.getElementById('detailContent').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;"><div style="font-size:48px;">😞</div><p style="margin-top:16px;font-size:15px;color:#ef4444;">加载失败：' + e.message + '</p><div class="modal-actions" style="margin-top:20px;justify-content:center;"><button class="btn btn-outline btn-sm" onclick="detailLoading=false;closeDetail();">关闭</button>' + (isAuthError ? '<button class="btn btn-primary btn-sm" onclick="detailLoading=false;ddLogin()" style="margin-left:8px;">去登录</button>' : '<button class="btn btn-primary btn-sm" onclick="detailLoading=false;openDetail(\'' + entryId + '\')" style="margin-left:8px;">重试</button>') + '</div></div>';
   }
   detailLoading = false;
 }
@@ -525,10 +527,24 @@ async function openMyEntries() {
 
 function closeMyEntries() { document.getElementById('myEntriesModal').style.display = 'none'; }
 
+// ========== LOGIN GUARD ==========
+function renderLoginPrompt() {
+  const grid = document.getElementById('galleryGrid');
+  if (grid) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">🔒</div><p>查看作品需先登录</p><button class="btn btn-primary" onclick="ddLogin()" style="margin-top:16px;">钉钉登录</button></div>';
+  }
+  const stats = document.getElementById('galleryStats');
+  if (stats) stats.innerHTML = '';
+}
+
 // ========== INIT ==========
 async function init() {
   await checkAuth();
   await checkVotingStatus();
+  if (!ddAuthed) {
+    renderLoginPrompt();
+    return;
+  }
   await renderGallery();
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDetail(); });
 }
