@@ -312,23 +312,33 @@ function isInDingTalk() {
   }
 }
 
+function getCorpId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('corpId') || params.get('corpid') || '';
+}
+
 async function ddLogin() {
-  if (isInDingTalk()) {
+  const corpId = isInDingTalk() ? getCorpId() : '';
+  if (corpId) {
+    // 钉钉工作台入口，URL 中带有 corpId，走 JSAPI 免登
     dd.ready(function() {
       dd.runtime.permission.requestAuthCode({
-        corpId: '',
+        corpId: corpId,
         onSuccess: function(result) {
           exchangeCode(result.code);
         },
         onFail: function(err) {
-          showToast('获取钉钉授权失败，请重试', 'error');
+          console.error('[dingtalk] requestAuthCode fail:', err);
+          showToast('获取钉钉授权失败，请确认从钉钉工作台打开并重试', 'error');
         }
       });
     });
     return;
   }
+  // 浏览器环境，或钉钉内从群聊/文档点击没有 corpId，走 OAuth 跳转
   try {
-    const resp = await fetch('/api/auth/dd-url?redirect=/app/');
+    const redirect = window.location.pathname + window.location.search;
+    const resp = await fetch('/api/auth/dd-url?redirect=' + encodeURIComponent(redirect));
     const data = await resp.json();
     window.location.href = data.url;
   } catch(e) {
