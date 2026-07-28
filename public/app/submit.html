@@ -466,11 +466,6 @@ function initDeptCascading() {
       dept2El.appendChild(option);
     });
     dept2El.disabled = false;
-
-    // 研发序列提示
-    if (dept1 === '产研中心') {
-      showToast('本次参赛范围仅限非研发序列人员，研发序列同事欢迎参与投票', 'error');
-    }
   });
 
   dept2El.addEventListener('change', function() {
@@ -507,7 +502,6 @@ function nextStep(n) {
   if (!dept1) return showToast('请选择一级部门', 'error');
   const level2Required = DEPT_TREE[dept1] && DEPT_TREE[dept1].children;
   if (level2Required && !dept2) return showToast('请选择二级部门', 'error');
-  if (dept1 === '产研中心' || dept2 === '研发部') return showToast('本次参赛范围仅限非研发序列人员', 'error');
   const dept3Row = document.getElementById('dept3-row');
   if (dept3Row.style.display !== 'none') {
     const dept3 = document.getElementById('f-dept3').value.trim();

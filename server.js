@@ -190,6 +190,10 @@ function saveDB() {
 
 const db = loadDB();
 
+// 启动闸门：GitHub 同步 + 本地数据载入完成前为 false，期间拒绝一切写入请求，
+// 避免启动窗口内提交的报名被 ghPull 用旧快照整体覆盖而静默丢失
+let _ready = false;
+
 // ========== STAGE SYSTEM ==========
 const STAGE_LABELS = {
   preliminary: '初赛',
@@ -392,15 +396,23 @@ process.on('SIGTERM', () => { forceSyncBeforeExit().then(() => process.exit(0));
 process.on('SIGINT', () => { forceSyncBeforeExit().then(() => process.exit(0)); });
 
 async function ghPush() {
-  try {
-    const buf = fs.readFileSync(DB_FILE);
-    const body = { message: 'auto: sync data', content: buf.toString('base64'), branch: GITHUB_DATA_BRANCH };
-    if (_ghSha) body.sha = _ghSha;
-    const { status, data } = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest.json`, body);
-    if (status >= 400) throw new Error(data.message || status);
-    _ghSha = data.content.sha;
-    console.log('[gh] Pushed data — sha:', _ghSha.slice(0, 7));
-  } catch (e) { console.error('[gh] Push data failed:', e.message); }
+  const maxAttempts = 3;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const buf = fs.readFileSync(DB_FILE);
+      const body = { message: 'auto: sync data', content: buf.toString('base64'), branch: GITHUB_DATA_BRANCH };
+      if (_ghSha) body.sha = _ghSha;
+      const { status, data } = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest.json`, body);
+      if (status >= 400) throw new Error(data.message || status);
+      _ghSha = data.content.sha;
+      console.log('[gh] Pushed data — sha:', _ghSha.slice(0, 7));
+      return;
+    } catch (e) {
+      console.error(`[gh] Push attempt ${attempt}/${maxAttempts} failed:`, e.message);
+      if (attempt < maxAttempts) await new Promise(r => setTimeout(r, 1500 * attempt));
+    }
+  }
+  console.error('[gh] Push data FAILED after retries — local file remains source of truth until next save');
 }
 
 // ===== SESSIONS GITHUB SYNC =====
@@ -471,6 +483,14 @@ app.use(express.json({ limit: '60mb' }));
 app.use(express.urlencoded({ extended: true, limit: '60mb' }));
 app.use(cookieParser());
 
+// 启动闸门：同步未完成前拒绝写入（GET/HEAD 放行），防止启动窗口内提交被旧快照覆盖
+app.use((req, res, next) => {
+  if (!_ready && req.method !== 'GET' && req.method !== 'HEAD') {
+    return res.status(503).json({ error: '服务器正在启动同步数据，请 3 秒后重试' });
+  }
+  next();
+});
+
 // Explicit routes for app pages (no trailing-slash redirect)
 app.get(['/app', '/app/'], (req, res) => res.sendFile(path.join(__dirname, 'public', 'app', 'index.html')));
 app.get('/app/submit.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'app', 'submit.html')));
@@ -529,10 +549,7 @@ app.post('/api/entries', requireAuth, upload.single('attachment'), (req, res) =>
   if (!name) return res.status(400).json({ error: '未获取到姓名，请重新登录钉钉' });
   if (!mobile) return res.status(400).json({ error: '未获取到手机号，请重新登录钉钉' });
   if (!dept1) return res.status(400).json({ error: '请选择一级部门' });
-  // 参赛范围限制：非研发序列人员可参赛
-  if (dept1 === '产研中心' || dept2 === '研发部') {
-    return res.status(403).json({ error: '本次参赛范围仅限云帐房非研发序列人员，研发序列同事欢迎参与投票' });
-  }
+  // 参赛范围：全员可参与（已取消产研中心/研发部限制，作品由评委/观众自行识别）
   if (!track || !title || !scene || !process_text || !process_link || !result_text || !result_link) {
     return res.status(400).json({ error: '请填写所有必填字段' });
   }
@@ -1460,6 +1477,7 @@ app.post('/api/force-sync', async (req, res) => {
   db.judgeScores = refreshed.judgeScores;
   db.settings = refreshed.settings;
   _syncStatus.githubEntries = db.entries.length;
+  _ready = true; // 数据载入完成，开放写入
   console.log('[db] Loaded — entries:', db.entries.length, 'votes:', db.votes.length, 'scores:', db.judgeScores.length, 'stage:', getCurrentStage());
 
   // Pull sessions from GitHub
