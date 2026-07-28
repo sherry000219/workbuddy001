@@ -525,6 +525,20 @@ function escapeHtml(text) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[m];
   });
 }
+function renderPosterCard(url) {
+  if (!url) return '';
+  if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
+    return '<div style="width:100%;height:160px;border-radius:8px;margin-bottom:12px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;font-size:14px;text-decoration:none;">🖼️ 查看作品海报</a></div>';
+  }
+  return '<img src="' + escapeHtml(url) + '" style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:12px;" alt="作品海报" onerror="this.style.display=\'none\'">';
+}
+function renderPosterDetail(url) {
+  if (!url) return '';
+  if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
+    return '<div class="dvalue"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">🖼️ 查看作品海报（钉盘）</a></div>';
+  }
+  return '<div class="dvalue"><img src="' + escapeHtml(url) + '" style="max-width:100%;max-height:300px;border-radius:8px;" alt="作品海报" onerror="this.style.display=\'none\'"></div>';
+}
 
 // ========== API CALLS ==========
 async function api(url, options) {
@@ -609,7 +623,7 @@ async function openDetail(entryId) {
     if (e.extra) {
       extraHtml = '<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">' + linkify(e.extra) + '</div></div>';
     }
-    var posterHtml = e.posterUrl ? '<div class="detail-row"><div class="dlabel">🖼️ 海报</div><div class="dvalue"><img src="' + e.posterUrl + '" style="max-width:100%;max-height:300px;border-radius:8px;" alt="作品海报" onerror="this.style.display=\'none\'"></div></div>' : '';
+    var posterHtml = e.posterUrl ? '<div class="detail-row"><div class="dlabel">🖼️ 海报</div>' + renderPosterDetail(e.posterUrl) + '</div>' : '';
     var docHtml = e.docUrl ? '<div class="detail-row"><div class="dlabel">📎 详情文档</div><div class="dvalue"><a href="' + e.docUrl + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.docUrl + '</a></div></div>' : '';
     const isNewFormat = e.process_link || e.result_link;
     var sceneHtml = '';
