@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1785489831557_3ranvw",
+      "name": "邓闻倩",
+      "mobile": "15520755295",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "区域团队",
+      "dept3": "直辖分公司",
+      "subdept": "区域团队",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "creative",
+      "title": "没有交接账务资料的非零申报账套，也可生成期初数据做账",
+      "scene": "当客户遇到交接资料不齐全的非零申报公司又着急做账报税时，可以先通过税局已申报的财报表生成与申报数据一致的科目余额表导入系统衔接数据做账报税，后续拿到完善的移交资料，在系统编辑期初录入末级科目明细，不用重置账套，减少客户手动核实数据的时间；如果后续也没有完善的期初资料，系统的期初跟申报一致也保证了数据的准确性。",
+      "process_text": "导入最近一期税局申报的资产负债表与利润表，选择账期时间，货币资金对应科目，勾选是否重分类还原，点击生成科目余额即可。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmzbzaQYV3kdP0wQ?utm_scene=person_space",
+      "result_text": "生成的科目余额，在系统导入期初选“云帐房”即可完成期初录入工作。",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/jb9Y4gmKWr7b7xwKT4kNZM0aVGXn6lpz?utm_scene=person_space",
+      "extra": "",
+      "posterUrl": "https://www.workbuddy.link/p/92Bjn1rOB5gZzzQ6l93TFc?ext2=browser_icon",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmzbzaQYV3kdP0wQ?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-07-31T09:23:51.557Z"
+    },
+    {
       "id": "entry_1785381803845_79s1e6",
       "name": "唐源",
       "mobile": "18030810588",
