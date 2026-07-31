@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1785491832015_wo32mn",
+      "name": "王歆歆",
+      "mobile": "13668180114",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "区域团队",
+      "dept3": "直辖分公司",
+      "subdept": "区域团队",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "other",
+      "title": "西藏银行回单负数处理工具",
+      "scene": "西藏银行官方回单有“-”号和“负”字，我们系统无法识别，会把负数支出识别成收入，只有会计补充完成后将生成的凭证手动修改，1是麻烦 2是如果回单量大没检查到就会导致做错账 3是对于西藏银行的企业我们系统的银行模块基本上不能用",
+      "process_text": "1打开EXE 2上传回单PDF文件（支持多文件） 3开始处理 4选择另存为路径即可",
+      "process_link": "https://www.kdocs.cn/l/cdJ89ujVa5aM",
+      "result_text": "将生成的文件正常按普通的银行文件导入系统，负数支出正常识别成支出 不会像之前一样错识别成收入，提升用这个银行的企业的会计效率 避免做错账",
+      "result_link": "https://www.kdocs.cn/l/cdJ89ujVa5aM",
+      "extra": "",
+      "posterUrl": "https://www.kdocs.cn/l/cdJ89ujVa5aM",
+      "docUrl": "https://www.kdocs.cn/l/cdJ89ujVa5aM",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-07-31T09:57:12.015Z"
+    },
+    {
       "id": "entry_1785489831557_3ranvw",
       "name": "邓闻倩",
       "mobile": "15520755295",
