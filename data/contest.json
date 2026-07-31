@@ -126,9 +126,9 @@
       "track": "business",
       "title": "最适配销售的CRM：用Workbuddy定制化系统",
       "scene": "对标现在正在使用的销售易CRM的常用功能（如线索、客户、机会、活动记录、公海池等）。新增直观的销售个人工作台，商机推进、预测金额一目了然，每日提醒可一键跳转对应的客户。可与CSM联动，无需切换系统即可完成从获客到续费的全链路闭环，降本提效。",
-      "process_text": "使用方法同现有销售易CRM，无需重新学习适应。",
+      "process_text": "使用方法同现有销售易CRM，无需重新学习适应：\n· 销售登录后进入个人首页，先看本月预测金额和今日待办：系统已按「下次拜访时间」把当天该拜访的客户自动列在提醒区。\n· 随后到「线索公海池」领取一条线索，填写跟进记录时系统同步记录跟进时间；若 2 天没跟进、或超 7 天没再次跟进、或领后 10 天未转客户，会提前 1 天预警并自动退回公海。\n· 领取客户同理，7 天/15 天未跟进、60 天未建商机、90 天未成交均触发回收。\n· 新建客户或联系人时，系统校验公司名与电话，重复即提示「系统内已有此客户」并阻止创建。\n· 把线索转客户时，一键生成客户、联系人、商机，原线索的活动记录自动同步到三个实体，全流程在左侧栏「CRM区域」折叠菜单内完成。",
       "process_link": "https://alidocs.dingtalk.com/i/nodes/93NwLYZXWygbgx4jUN0QgqLEJkyEqBQm?doc_type=wiki_doc&iframeQuery=utm_source=portal&utm_medium=portal_main_colum_create&rnd=0.021838823385927686",
-      "result_text": "覆盖基本CRM需求、功能灵活定制、数据完全自主",
+      "result_text": "覆盖基本CRM需求、功能灵活定制、数据完全自主：\n· 系统把散落的客户资产变成「看得见的流水」：个人首页实时显示本月预测金额（按商机阶段赢率加权），管理者一眼看清团队产出。\n· 今日提醒与待办让「该打的电话、该拜访的客户」主动找上门，不再靠人盯。\n· 双公海池自动回收 + 5 天冷却期，使沉睡客户持续回流、谁跟进谁负责，杜绝撞单与抢单。\n· 消息通知可点击直达对应实体，闭环无断点。\n· 试用可完整呈现「线索→客户→商机→成交/回收」全链路，以及系统用规则替代人工催促带来的效率提升，直观体现数字化运营效果。",
       "result_link": "https://alidocs.dingtalk.com/i/nodes/93NwLYZXWygbgx4jUN0QgqLEJkyEqBQm?doc_type=wiki_doc&iframeQuery=utm_source=portal&utm_medium=portal_main_colum_create&rnd=0.021838823385927686",
       "extra": "",
       "posterUrl": "https://qr.dingtalk.com/page/yunpan?route=previewDentry&spaceId=27940475098&fileId=230496777837&type=file",
@@ -136,7 +136,10 @@
       "status": "approved",
       "roundStatus": "approved",
       "award": null,
-      "createdAt": "2026-07-29T09:06:58.922Z"
+      "createdAt": "2026-07-29T09:06:58.922Z",
+      "updatedAt": "2026-07-31T09:41:33.366Z",
+      "lastEditedAt": "2026-07-31T09:41:33.366Z",
+      "editNotice": true
     },
     {
       "id": "entry_1785136604075_9xogv4",
