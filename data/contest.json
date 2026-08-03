@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1785728927248_rkd8gq",
+      "name": "肖玉婷",
+      "mobile": "13198253656",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "区域团队",
+      "dept3": "直辖分公司",
+      "subdept": "区域团队",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "other",
+      "title": "根据发票生成存货期初",
+      "scene": "场景一：客户做了存货，不知道那些做了那些没有做，需要按照发票进行对比，可用，或者客户不做库存，但是他们内账会计做了库存，需要核对数据，可用\n场景二：客户一直没有做存货，因此没有存货的期初，可以根据发票快速生成期初数据，导入系统",
+      "process_text": "在税局导出进项和销项的发票列表，导入系统，如果不调整可直接导出，如果调整，可以选中调整单位，商品名称，商品型号，合并后导出，对于服务发票需在导出的表格里面做删除",
+      "process_link": "https://www.kdocs.cn/l/cdcfByXgLLZV",
+      "result_text": "汇总了发票里面的数据情况，导出可按照系统模版进行导出",
+      "result_link": "https://www.kdocs.cn/l/cdcfByXgLLZV",
+      "extra": "",
+      "posterUrl": "https://codebuddy.work/agents/share/LGBoesI2za-tRuVfxCxixq76VBaEaxuU0lt6Zi7_GfhUlev_RDZakrN8fnq4P_RY?platform=workbuddy",
+      "docUrl": "https://www.kdocs.cn/l/cdcfByXgLLZV",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-03T03:48:47.248Z"
+    },
+    {
       "id": "entry_1785491832015_wo32mn",
       "name": "王歆歆",
       "mobile": "13668180114",
