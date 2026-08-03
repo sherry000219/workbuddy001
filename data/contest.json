@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1785739902617_utxej4",
+      "name": "张晓荣",
+      "mobile": "13258306238",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "区域团队",
+      "dept3": "直辖分公司",
+      "subdept": "区域团队",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "efficiency",
+      "title": "减轻数据挪动，快速整理工资表",
+      "scene": "代账公司向客户索要的工资表，基本上都是客户自己做的表格，但是云帐房导入工资表需要固定模版，此项主要解决未购买ai解析部分客户，快速完成标准版工资表。",
+      "process_text": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmZzvNvMV3kdP0wQ?utm_scene=person_space",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmZzvNvMV3kdP0wQ?utm_scene=person_space",
+      "result_text": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmZzvNvMV3kdP0wQ?utm_scene=person_space",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmZzvNvMV3kdP0wQ?utm_scene=person_space",
+      "extra": "",
+      "posterUrl": "https://codebuddy.work/agents/share/FmwpRXfwKakEiBGFFwhoO53hTNGEJJQDOVCztDNe9CeBUz0kzk8QrYg6F6gLlqSF?platform=workbuddy",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmZzvNvMV3kdP0wQ?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-03T06:51:42.617Z"
+    },
+    {
       "id": "entry_1785728927248_rkd8gq",
       "name": "肖玉婷",
       "mobile": "13198253656",
