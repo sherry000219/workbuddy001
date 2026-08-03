@@ -15,9 +15,9 @@
       "track": "efficiency",
       "title": "减轻数据挪动，快速整理工资表",
       "scene": "代账公司向客户索要的工资表，基本上都是客户自己做的表格，但是云帐房导入工资表需要固定模版，此项主要解决未购买ai解析部分客户，快速完成标准版工资表。",
-      "process_text": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmZzvNvMV3kdP0wQ?utm_scene=person_space",
+      "process_text": "1.使用小工具，导入客户给的工资表。\n2.导入标准工资表模板。\n3.能自动生成模板的工资表。",
       "process_link": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmZzvNvMV3kdP0wQ?utm_scene=person_space",
-      "result_text": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmZzvNvMV3kdP0wQ?utm_scene=person_space",
+      "result_text": "轻松整理客户给的工资表，减少数据挪动",
       "result_link": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUmZzvNvMV3kdP0wQ?utm_scene=person_space",
       "extra": "",
       "posterUrl": "https://codebuddy.work/agents/share/FmwpRXfwKakEiBGFFwhoO53hTNGEJJQDOVCztDNe9CeBUz0kzk8QrYg6F6gLlqSF?platform=workbuddy",
@@ -25,7 +25,10 @@
       "status": "approved",
       "roundStatus": "approved",
       "award": null,
-      "createdAt": "2026-08-03T06:51:42.617Z"
+      "createdAt": "2026-08-03T06:51:42.617Z",
+      "updatedAt": "2026-08-03T06:54:30.282Z",
+      "lastEditedAt": "2026-08-03T06:54:30.282Z",
+      "editNotice": true
     },
     {
       "id": "entry_1785728927248_rkd8gq",
