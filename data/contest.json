@@ -25,7 +25,10 @@
       "status": "approved",
       "roundStatus": "approved",
       "award": null,
-      "createdAt": "2026-08-03T10:13:03.953Z"
+      "createdAt": "2026-08-03T10:13:03.953Z",
+      "updatedAt": "2026-08-03T10:14:45.190Z",
+      "lastEditedAt": "2026-08-03T10:14:45.190Z",
+      "editNotice": true
     },
     {
       "id": "entry_1785739902617_utxej4",
