@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1785842445675_bql67e",
+      "name": "潘鑫玲",
+      "mobile": "18284359325",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "区域团队",
+      "dept3": "直辖分公司",
+      "subdept": "区域团队",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "creative",
+      "title": "往来核对生成器",
+      "scene": "往来核对是会计期末结账的 必做环节;会计可用于跟企业老板进行核对（月度/季度/年度）的\n1、已收款未开票（应收贷方）：是否延迟纳税义务？\n2、已付款未收到发票（应付借方）：是否虚列成本？\n3、长期挂账其他应付款：是否隐匿收入？",
+      "process_text": "将余额表导出表格；再导入工具中生成该表。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/MNDoBb60VLa22bL4tmDN2m72JlemrZQ3",
+      "result_text": "对往来科目分析一下账务核对\n1、未收款客户\n2、已收款未开票客户\n3、已付款未收到采购发票的供应商\n4、已收到采购发票但未付款的供应商\n5、其他应收单位及其他应付单位",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/MNDoBb60VLa22bL4tmDN2m72JlemrZQ3",
+      "extra": "",
+      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/Obva6QBXJwD00YvKuMwxAb2Y8n4qY5Pr",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/MNDoBb60VLa22bL4tmDN2m72JlemrZQ3",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-04T11:20:45.675Z"
+    },
+    {
       "id": "entry_1785834273411_1fek2r",
       "name": "万鑫",
       "mobile": "17602180590",
