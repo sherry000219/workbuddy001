@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1785834273411_1fek2r",
+      "name": "万鑫",
+      "mobile": "17602180590",
+      "dept": "数科中心",
+      "dept1": "数科中心",
+      "dept2": "",
+      "dept3": "",
+      "subdept": "",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "business",
+      "title": "数科中心业务工作台",
+      "scene": "数科中心管理多个合作机构的API调用量与账单，原有数据分散在各Excel中，统计耗时且容易出错。为此构建了一套完整的业务工作台，涵盖调用量录入、价格管理、账单结算、同比业务分析四大模块，支持多机构、多接口、多挡位的复杂计价体系，实现从数据录入到经营决策的一站式闭环。",
+      "process_text": "管理员登录后录入各机构每月的调用量数据 → 配置各机构按接口+挡位的价格策略 → 系统自动计算月度账单金额 → 在业务分析页面查看同比环比变化趋势和优化建议 → 本年业绩概览及分布和各机构调用量趋势变化",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/Obva6QBXJw969xwgfMwLw1ndWn4qY5Pr?utm_scene=person_space",
+      "result_text": "将原本分散在多个Excel文件的调用量/账单数据整合为一个统一平台，数据录入效率提升 80%，账单错误率降至 0；业务分析模块以同比图表呈现各机构增长态势并自动生成优化建议，管理层无需等待人工汇总即可秒级掌握经营全貌。",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/dQPGYqjpJYgmgZLkUBn6nmDKWakx1Z5N?utm_scene=person_space",
+      "extra": "",
+      "posterUrl": "https://api-workbench-anwinx-d5g9z3vzx5ae10d36.webapps.tcloudbase.com/poster.html",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/Obva6QBXJw969xwgfMwLw1ndWn4qY5Pr?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-04T09:04:33.411Z"
+    },
+    {
       "id": "entry_1785812485108_zegq9a",
       "name": "潘鑫玲",
       "mobile": "18284359325",
