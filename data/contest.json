@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1785812485108_zegq9a",
+      "name": "潘鑫玲",
+      "mobile": "18284359325",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "区域团队",
+      "dept3": "直辖分公司",
+      "subdept": "区域团队",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "business",
+      "title": "企业财务情况分析表",
+      "scene": "会计可将生成的财务分析表给企业老板分析汇报企业近几年的经营数据情况；支撑用户再给企业做深度专业服务提供有效专业数据支撑；并为用户给企业服务增加服务专业性和价值感。",
+      "process_text": "可导入企业余额表/利润表exlsx表生成一份财务数据分析表",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/AR4GpnMqJzjwwxg9fk67QO5wJKe0xjE3",
+      "result_text": "根据财务数据分析出企业多年的收入成本 税费 支出费用 及各向费用率占比数据（详见文档）",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/AR4GpnMqJzjwwxg9fk67QO5wJKe0xjE3",
+      "extra": "",
+      "posterUrl": "https://codebuddy.work/agents/share/eXmQJwF4InTtxylDuKONdt9lAag771Oa_7wkAzsMKsBAK0GZsfpCTvngRPkF-7QU?platform=workbuddy",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/AR4GpnMqJzjwwxg9fk67QO5wJKe0xjE3",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-04T03:01:25.108Z"
+    },
+    {
       "id": "entry_1785751983953_jddr0p",
       "name": "蒋蔚文",
       "mobile": "13372028601",
