@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1785909222508_t01wgt",
+      "name": "唐源",
+      "mobile": "18030810588",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "区域团队",
+      "dept3": "直辖分公司",
+      "subdept": "区域团队",
+      "entryType": "team",
+      "teamName": "中小微事业群 / 区域团队 / 直辖分公司",
+      "teamMembers": "部门/团队参赛",
+      "track": "efficiency",
+      "title": "四川分公司 WorkBuddy 实战应用",
+      "scene": "结合各自岗位的真实工作场景，面对面交流工作中遇到的实际卡点（科目余额表，回单账套数据衔接）以及操作繁琐的统计工作（存货，工资整理，数据统计）",
+      "process_text": "见文档",
+      "process_link": "https://www.kdocs.cn/l/ctYzLiQONa0M",
+      "result_text": "产出6 项 WorkBuddy 实战应用成果，按负责人分别介绍，包含 「【应用场景】【解决方案】【价值与亮点】」 三个维度，详情见文档",
+      "result_link": "https://www.kdocs.cn/l/ctYzLiQONa0M",
+      "extra": "",
+      "posterUrl": "https://www.kdocs.cn/l/ctYzLiQONa0M",
+      "docUrl": "https://www.kdocs.cn/l/ctYzLiQONa0M",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-05T05:53:42.508Z"
+    },
+    {
       "id": "entry_1785842445675_bql67e",
       "name": "潘鑫玲",
       "mobile": "18284359325",
