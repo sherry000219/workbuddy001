@@ -272,15 +272,18 @@
       "scene": "新客户上线特别是有一定体量客户上线阶段，每日反馈数据需要走财云导出，做表并反馈进度，包括不限于当前会计人员做账报税进度，确税进度等，人员越多做表时间花费的时间越多；通过程序预设，导表后自动处理数据，并生成当日进度以及本月截止到当日进度的折线图",
       "process_text": "从财云导出人员表，进度统计，进度跟踪三张表后直接导入到小程序，直接输出分析表",
       "process_link": "https://www.kdocs.cn/l/cpWj4arWyOoj",
-      "result_text": "【金山文档 | WPS云文档】 客成日报 https://www.kdocs.cn/l/crFK2nSepHJp",
-      "result_link": "https://www.kdocs.cn/l/crFK2nSepHJp",
+      "result_text": "【金山文档 | WPS云文档】 客户进度统计_20260805_1742\nhttps://www.kdocs.cn/l/cbrBGJJEEa1P",
+      "result_link": "https://www.kdocs.cn/l/cbrBGJJEEa1P",
       "extra": "",
       "posterUrl": "https://www.kdocs.cn/l/cdggb5ru0ugE",
-      "docUrl": "https://www.kdocs.cn/l/crFK2nSepHJp",
+      "docUrl": "https://www.kdocs.cn/l/cbrBGJJEEa1P",
       "status": "approved",
       "roundStatus": "approved",
       "award": null,
-      "createdAt": "2026-07-30T03:23:23.845Z"
+      "createdAt": "2026-07-30T03:23:23.845Z",
+      "updatedAt": "2026-08-05T09:50:39.261Z",
+      "lastEditedAt": "2026-08-05T09:50:39.261Z",
+      "editNotice": true
     },
     {
       "id": "entry_1785348752114_picbqa",
