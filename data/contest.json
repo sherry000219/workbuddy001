@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1785933777405_l85dpc",
+      "name": "王顺泽",
+      "mobile": "18551605664",
+      "dept": "福鹿事业部",
+      "dept1": "福鹿事业部",
+      "dept2": "",
+      "dept3": "",
+      "subdept": "",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "efficiency",
+      "title": "亮照业务支撑系统",
+      "scene": "淘宝亮照与代账业务订单量大、交付链条长：从在线客服、企微建群、材料收集、工商登记到运营交付，跨 6 类岗位。 过去靠表格和群消息管理，认领靠抢、跟进靠人记、资料靠反复催、业绩归属靠翻聊天记录，逾期和扯皮难以避免。 本系统以淘宝订单为主线，串联千牛聊天、企微群、材料表单与工商进度，配合 AI 资料识别、AI 核名和 AI 归属分析， 让每一笔订单都有人负责、有据可查、按时交付。",
+      "process_text": "第一步：数据自动同步，订单进系统\n第二步：在线客服认领，客户联系方式落地\n第三步：客户在线填资料 + AI 识别，材料不再反复催\n第四步：工商登记全程可查，异常自动回退\n第五步：淘宝运营交付，订单完结\n第六步：管理者看板 + AI 工具，复盘与提效",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/qnYMoO1rWxDbDrKMUjNR5DGjW47Z3je9?utm_scene=person_space",
+      "result_text": "系统上线后，897 笔淘宝亮照订单在同一工作台统一流转，534 笔自动生成待办、485 笔逾期被自动标记，认领和跟进不再靠人盯；旺旺沟通中心归集 2,033 位客户、57,505 条聊天消息并自动关联订单，客服受理率达 94.5%，统计期内成交 902 笔、金额 ¥160,840。材料收集、工商登记、运营交付全链路状态透明，AI 资料识别、AI 核名、AI 归属核对显著减少重复人工，让每一笔订单都有人负责、有据可查、按时交付。",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/a9E05BDRVQ6N6RA4hDnZBev6J63zgkYA?utm_scene=person_space",
+      "extra": "",
+      "posterUrl": "https://taobao.sjsdz.cn/ai-contest-poster.png",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/o14dA3GK8g5z5QZ3HnwvjabjV9ekBD76?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-05T12:42:57.405Z"
+    },
+    {
       "id": "entry_1785925402853_n2ttu7",
       "name": "桂万彬",
       "mobile": "18851786947",
