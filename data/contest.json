@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786014745788_j70nld",
+      "name": "徐航",
+      "mobile": "18344818667",
+      "dept": "福鹿事业部",
+      "dept1": "福鹿事业部",
+      "dept2": "",
+      "dept3": "",
+      "subdept": "",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "business",
+      "title": "恋爱式哄客销售技巧",
+      "scene": "当一个销售遇到难沟通、难搞定的客户（刁难、催进度、砍价、不信任、要退款、要流失）时，能快速拿到一套「温柔解决客户问题的方案 + 能直接发出去的话术」——先解决事，再解决话，再解决人。",
+      "process_text": "整理日常对接客户时遇到的各类常见问题，梳理标准化沟通思路与落地话术，帮助销售人员快速掌握客户应对方法，高效化解分歧，在沟通中把握分寸、恋爱式哄人，避免言语冲突。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUm7jZzGNV3kdP0wQ?doc_type=wiki_doc",
+      "result_text": "5.1 交付物\n交付物\n位置\n状态\n优化方案（v4.0 草案）\n10_项目交付物/2026-08-06_xuhang-sales优化方案_v4.0草案_*.md\n✅ 已完成\n技能包 v4.0（SKILL.md + 5 references + 部署说明）\nSOP包/xuhang-sales_v4.0/\n✅ 已完成\n回归验收报告\nSOP包/xuhang-sales_v4.0/回归验收_20260806.md\n✅ 已完成\n5.2 验收结果\n验收项\n结果\n触发词回归（难搞客户/砍价/催进度/不信任/去AI化等 20 项）\n20/20 通过\nAI 元话术词频扫描（话术正文）\n0\nhumanizer-zh 五维评分\n44-45/50（达到上线门槛）\n六类难客户场景（A-F）\n全部通过（每类都有”方案 + 可发话术 + 跟进”）\n风险红线回归（30 日/价格适用性/不承诺税额）\n全部通过",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUm7jZzGNV3kdP0wQ?doc_type=wiki_doc",
+      "extra": "",
+      "posterUrl": "https://picui.ogmua.cn/s1/2026/08/06/6a746b1b5b90a.webp",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/2Amq4vjg89gegjPpUm7jZzGNV3kdP0wQ?doc_type=wiki_doc",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-06T11:12:25.788Z"
+    },
+    {
       "id": "entry_1785933777405_l85dpc",
       "name": "王顺泽",
       "mobile": "18551605664",
