@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786090175578_r8wrru",
+      "name": "杨绵绵",
+      "mobile": "18068393979",
+      "dept": "产研中心",
+      "dept1": "产研中心",
+      "dept2": "产品部",
+      "dept3": "",
+      "subdept": "产品部",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "creative",
+      "title": "财税账套智能生成与创建助手",
+      "scene": "面向代账自动化产品的业务、产品及实施人员，解决财税知识门槛高、目标账套难查找、演示数据准备耗时等问题。用户通过自然语言描述企业地区、行业、纳税人类型、启账期间及业务数据需求，系统即可生成逻辑合理、勾稽一致的财税内容，并自动写入非生产环境形成可直接使用的新账套。",
+      "process_text": "用户提出需求 → AI补全合理信息并生成方案 → 用户确认 → 自动创建企业、完成初始化 → 新增银行账户、流水及进销项发票 → 回查接口并校验写入结果。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/YMyQA2dXW79r9g2kfZ0ljy9EJzlwrZgb?utm_scene=person_space",
+      "result_text": "最终在财云系统中直接生成可操作账套，而非仅输出文字或JSON；数据满足期间、税额、收付款方向、应收应付及银行余额等业务逻辑，并支持重复写入保护和失败定位。",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/EpGBa2Lm8azjzZonhwxXq5eBWgN7R35y?doc_type=wiki_doc",
+      "extra": "",
+      "posterUrl": "https://qr.dingtalk.com/page/yunpan?route=previewDentry&spaceId=29128768378&fileId=231566336730&type=file",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/qnYMoO1rWxDbDrKMUjlRjwdGW47Z3je9?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-07T08:09:35.578Z"
+    },
+    {
       "id": "entry_1786072687996_vvhoqi",
       "name": "许海蓉",
       "mobile": "18861994007",
