@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786072687996_vvhoqi",
+      "name": "许海蓉",
+      "mobile": "18861994007",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "市场中心",
+      "dept3": "",
+      "subdept": "市场中心",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "efficiency",
+      "title": "降低设计信息获取成本｜复杂表格轻量化输出方案",
+      "scene": "在设计工作中，业务原始表格信息冗余、字段繁杂，设计师需要花费大量时间从复杂表格中筛选、整理、提炼可用文本素材，重复操作多、耗时长，容易出现信息漏取、理解偏差问题。\n针对复杂原始表格做处理，对冗余字段、无效信息做过滤拆解，将原始表格数据转化为设计工作可直接复制提取的简易文字信息。输出结果适配各类设计场景，设计师无需二次拆解整理表格，直接复用处理后的文本素材减少人工重复劳动，缩短设计周期，提高效率。",
+      "process_text": "将原始表格给到buddy,对其发出详细指令【任务1：将表格中所有的照片重新命名“序号+人名”另存到一个文件夹并打包给我，任务2：按顺序提取表格中公司+职务名称的简称，例如“安宁臻信总经理”或者“臻信会计总经理”的命名方式重新整理成可编辑的表格给我.】",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbZNZxQ7tZDrrnoBJMGjLRb3?corpId=ding8216a14c6ca8bfd8&utm_medium=im_card&iframeQuery=sheet_range%3Dkgqie6hm_0_0_0_0%26utm_medium%3Dim_card%26utm_source%3Dim&utm_scene=person_space&utm_source=im",
+      "result_text": "减少设计师处理原始表格的重复手工工作\n输出标准化轻量化文本，可直接用于各类设计物料\n降低信息提取错误风险，提升设计前期准备效率",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/ydxXB52LJq7e7P3ETK05aAR1WqjMp697?corpId=ding8216a14c6ca8bfd8&utm_medium=im_card&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_scene=person_space&utm_source=im",
+      "extra": "",
+      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/gvNG4YZ7JnebexLqSNkp6XpPV2LD0oRE?utm_scene=person_space",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/qnYMoO1rWxDbDrKMUjl4opdKW47Z3je9?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-07T03:18:07.996Z"
+    },
+    {
       "id": "entry_1786067302411_rdbwma",
       "name": "张恒恒",
       "mobile": "18987866967",
