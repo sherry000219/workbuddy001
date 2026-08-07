@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786067302411_rdbwma",
+      "name": "张恒恒",
+      "mobile": "18987866967",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "运营中心",
+      "dept3": "",
+      "subdept": "运营中心",
+      "entryType": "team",
+      "teamName": "中小微事业群 / 运营中心",
+      "teamMembers": "部门/团队参赛",
+      "track": "business",
+      "title": "日常运营小助手——一点一点贴近你的心",
+      "scene": "根据日常需进行信息归集、数据分析和项目跟进的板块内容，放置到工作台的不同模块内，包括但不限于AI会计师的销售、运营动作、产品使用、试用转化，AI顾问的前期设计和种子用户跟进，每日对应代办的提醒，相关最新资料和分析结果的沉淀，以及每日AI与SAAS最新咨询速递。从而帮助用户了解不同项目的各项状态，并得出对应的运营建议。",
+      "process_text": "根据需要选择对应模块，即可得出相应的数据分析和运营建议。部分模块可以形成互动，进行资料的沉淀",
+      "process_link": "http://127.0.0.1:8765/index.html",
+      "result_text": "各项数据贴合业务变化窗口，每周自动更新，咨询每天自动推送，分析结果稳定产出。工作台的不同模块内，包括但不限于AI会计师的销售、运营动作、产品使用、试用转化，AI顾问的前期设计和种子用户跟进，每日对应代办的提醒，相关最新资料和分析结果的沉淀，以及每日AI与SAAS最新咨询速递。从而帮助用户了解不同项目的各项状态，并得出对应的运营建议。",
+      "result_link": "http://127.0.0.1:8765/index.html",
+      "extra": "",
+      "posterUrl": "https://qr.dingtalk.com/page/yunpan?route=previewDentry&spaceId=26433517380&fileId=231498844467&type=file",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/Qnp9zOoBVBZeZDx0tPdep6bAV1DK0g6l?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-07T01:48:22.411Z"
+    },
+    {
       "id": "entry_1786014745788_j70nld",
       "name": "徐航",
       "mobile": "18344818667",
