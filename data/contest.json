@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786094652380_rfnla8",
+      "name": "刘嘉欣",
+      "mobile": "19161714485",
+      "dept": "职能中台",
+      "dept1": "职能中台",
+      "dept2": "人力资源",
+      "dept3": "",
+      "subdept": "人力资源",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "business",
+      "title": "AI驱动的招聘工作台",
+      "scene": "本作品围绕\"AI+招聘流程\"提供一站式解决：上传简历后AI自动解析并匹配人才画像精准评分，低于阈值自动淘汰；通过筛选的候选人可一键生成个性化电话话术；招聘漏斗看板实时跟踪各阶段转化；工作日记模块融入每日金句、复盘与AI周月总结，助力HR自身持续成长。从筛简历到写话术再到自我复盘，一个工作台全搞定。",
+      "process_text": "第一步：建岗位、定标准 — 录入岗位JD、硬性标准和人才画像AI以此为评分基准。\n\n第二步：传简历、AI评分 — 批量上传PDF简历，AI自动提取姓名电话并匹配画像打分。60分以下自动淘汰，高分按序排列，勾选可对比详情。\n\n第三步：通电话、写话术 — 筛选通过的候选人，一键生成个性化沟通话术（含开场白、经历核实、岗位介绍）。\n\n第四步：盯进度、看数据 — 招聘漏斗实时展示各阶段人数，面试→offer→入职全流程跟踪；数据看板自动统计转化率。\n\n第五步：写日记、助成长 — 工作日记记录每日工作、问题复盘、三件小事，AI自动生成周/月总结，帮助HR持续进步。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/dpYLaezmVNLgLRNBhPAoGZnG8rMqPxX6?utm_scene=person_space",
+      "result_text": "筛选辅助：AI自动提取简历信息并匹配画像评分，HR可快速定位高分候选人，减少逐份通读的工作量。\n\n标准化尝试：画像支持ABC分类和多条件匹配，让评分有一定依据可循，尽量降低不同HR之间判断差异大的问题。\n\n话术参考：根据简历和岗位JD生成沟通要点，新人打电话前有东西可以参考，不用从零构思。\n\n进度可视化：招聘漏斗和数据看板把各阶段人数直观展示出来，方便盯进度和向上汇报。\n\n记录习惯：工作日记模块帮助HR随手记录日常工作和复盘，积累一段时间后AI可生成简单的周月小结。",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/o14dA3GK8g5z5QZ3HnDpN297V9ekBD76?utm_scene=person_space",
+      "extra": "",
+      "posterUrl": "https://ab1cae9aa31e46f32.sh2.agentos-app.net/poster.html",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/Y1OQX0akWm3l3zZ5sb42movjJGlDd3mE?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-07T09:24:12.380Z"
+    },
+    {
       "id": "entry_1786090175578_r8wrru",
       "name": "杨绵绵",
       "mobile": "18068393979",
