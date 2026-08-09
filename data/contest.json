@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786287685562_ypa37h",
+      "name": "吕玲",
+      "mobile": "18133445181",
+      "dept": "福鹿事业部",
+      "dept1": "福鹿事业部",
+      "dept2": "",
+      "dept3": "",
+      "subdept": "",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "creative",
+      "title": "《财税宫斗局》",
+      "scene": "传统财税、会计知识学习存在内容枯燥、记忆困难、缺少实际业务场景等问题，用户往往“学过但不会用”。本项目打造“狗血剧情化财税学习 Agent”，将增值税、企业所得税、发票管理、会计做账等专业知识融入连续剧式商业故事中，通过老板、财务、税务顾问等角色冲突，模拟真实企业经营场景。用户在追剧、解谜和角色互动过程中掌握财税知识，实现从被动学习到沉浸式学习，降低学习门槛，提高知识理解和记忆效果。",
+      "process_text": "1. 选择学习主题\n用户输入想学习的财税主题，如“增值税”“成本核算”“发票风险”等，Agent根据知识点匹配对应剧情。\n2. 进入剧情学习模式\nAgent生成连续剧故事，将财税知识融入企业经营冲突中。例如老板错误处理账务、财务发现税务风险、顾问分析解决问题。\n3. 剧情互动与决策\n用户参与关键节点选择，如判断账务处理方式、选择风险解决方案，Agent根据用户选择进行反馈和讲解。\n4. 知识提炼总结\n剧情结束后，Agent自动输出本集核心知识点、常见错误、实际应用场景，并生成知识卡片帮助复习。\n5. 持续成长学习\nAgent记录用户学习进度和薄弱知识点，逐步提升剧情难度，形成个性化财税学习路径。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/o14dA3GK8g5z5QZ3Hn1eqwoDV9ekBD76?utm_scene=person_space",
+      "result_text": "学习财税知识",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/jb9Y4gmKWr7b7xwKT4Xw5ry1VGXn6lpz?utm_scene=person_space",
+      "extra": "",
+      "posterUrl": "https://pan.baidu.com/s/1wh6RyX4H8u3J8ra80qsfsQ?pwd=1ixl  提取码：1ixl",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/o14dA3GK8g5z5QZ3Hn1eqwoDV9ekBD76?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-09T15:01:25.562Z"
+    },
+    {
       "id": "entry_1786094652380_rfnla8",
       "name": "刘嘉欣",
       "mobile": "19161714485",
