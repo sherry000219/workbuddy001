@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786359942777_etq9ft",
+      "name": "仲旭",
+      "mobile": "13142992707",
+      "dept": "福鹿事业部",
+      "dept1": "福鹿事业部",
+      "dept2": "",
+      "dept3": "",
+      "subdept": "",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "creative",
+      "title": "C盘爆红不用慌！Windows精准瘦身指南",
+      "scene": "C盘爆红、电脑卡顿，用户面对海量文件却不知哪些能删、哪些不能动。第三方工具暴力清理风险高，用户只能束手无策。windows-health 像一位专业电脑管家，用证据说话，让清理不再凭感觉。",
+      "process_text": "用户说“C盘满了”，Skill 即通过 PowerShell 实时扫描磁盘、进程和启动项，生成可视化报告。报告清晰标记可安全清理的缓存，自动保护系统关键目录。用户确认后逐项执行，每次操作生成含 SHA256 的审计记录，全程可追溯。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/KGZLxjv9VG3d3k4xs6vZBa35V6EDybno?doc_type=wiki_doc&rnd=0.14948896112817267",
+      "result_text": "用户说“C盘满了”，Skill 即通过 PowerShell 实时扫描磁盘、进程和启动项，生成可视化报告。报告清晰标记可安全清理的缓存，自动保护系统关键目录。用户确认后逐项执行，每次操作生成含 SHA256 的审计记录，全程可追溯。",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/KGZLxjv9VG3d3k4xs6vZBa35V6EDybno?doc_type=wiki_doc&rnd=0.14948896112817267",
+      "extra": "",
+      "posterUrl": "https://picui.ogmua.cn/s1/2026/08/10/6a79ac4f1f1fb.webp",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/KGZLxjv9VG3d3k4xs6vZBa35V6EDybno?doc_type=wiki_doc&rnd=0.14948896112817267",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-10T11:05:42.777Z"
+    },
+    {
       "id": "entry_1786356393193_79m4rk",
       "name": "徐艺珊",
       "mobile": "13916109830",
