@@ -944,15 +944,6 @@
       "contact": "刘相丞（刘木目）",
       "noWinWeight": 100
     },
-    "prizes": [
-      {
-        "id": "prize_msmyp1e5_wpci96",
-        "name": "测试",
-        "stock": 10,
-        "weight": 50,
-        "total": 10,
-        "createdAt": "2026-08-10T08:20:46.541Z"
-      }
-    ]
+    "prizes": []
   }
 }
