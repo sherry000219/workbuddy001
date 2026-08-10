@@ -3163,6 +3163,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T15:02:34.469Z"
+    },
+    {
+      "entryId": "entry_1785325566960_99axb6",
+      "voterId": "bLaqXH5k1VEiE",
+      "voterName": "王薇",
+      "voterMobile": "18252239361",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3UXNVJkU-_NBGfNBGmwOEKbBu8fgtAGi33Mh_Z0AQ_1129_1127.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T15:58:20.828Z"
     }
   ],
   "judgeScores": [],
