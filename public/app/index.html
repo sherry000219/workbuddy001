@@ -119,6 +119,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .badge-final { background: rgba(37,99,235,0.1); color: var(--blue); border: 1px solid rgba(37,99,235,0.25); }
 .badge-awarded { background: rgba(245,158,11,0.1); color: var(--gold); border: 1px solid rgba(245,158,11,0.25); }
 .badge-eliminated { background: #f3f4f6; color: var(--text-dim); border: 1px solid #e5e7eb; }
+.team-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 6px; vertical-align: middle; background: rgba(124,58,237,0.1); color: #7c3aed; border: 1px solid rgba(124,58,237,0.25); }
+.rank-section-title { font-size: 16px; font-weight: 700; margin: 24px 0 12px; color: var(--text); }
+.rank-section-title:first-child { margin-top: 0; }
 
 /* ===== MODAL ===== */
 .modal-overlay { position: fixed; inset: 0; background: rgba(17,24,39,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
@@ -245,7 +248,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
       <option value="business">业务赋能</option>
     </select>
   </div>
-  <div class="ranking-list" id="rankingList"></div>
+  <div class="rank-section-title">👤 个人参赛</div>
+  <div class="ranking-list" id="rankingListIndividual"></div>
+  <div class="rank-section-title">👥 团队参赛</div>
+  <div class="ranking-list" id="rankingListTeam"></div>
 </div>
 
 </div><!-- .main-container -->
@@ -593,6 +599,25 @@ function renderStatsBar(containerId, stats) {
 }
 
 // ========== RANKING ==========
+function teamBadgeHtml(entry) {
+  return entry.entryType === 'team' ? '<span class="team-badge">👥 团队</span>' : '';
+}
+function renderRankList(list, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (!list || list.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="padding:40px 20px;"><div class="icon">🏆</div><p>暂无排名数据</p></div>';
+    return;
+  }
+  container.innerHTML = list.map(function(e, i) {
+    const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : 'normal';
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+    const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
+    const tBadge = teamBadgeHtml(e);
+    const deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
+    return '<div class="rank-item" onclick="openDetail(\'' + e.id + '\')"><div class="rank-num ' + rankClass + '">' + (medal || (i+1)) + '</div><div class="rank-info"><div class="rname">' + e.title + ' ' + badge + tBadge + '</div><div class="rdept">' + e.name + ' · ' + deptChain + ' · ' + trackLabel(e.track) + '</div></div><div class="rank-score">' + (e.composite||0) + '</div></div>';
+  }).join('');
+}
 async function renderRanking() {
   const stats = await loadStats();
   renderStatsBar('rankingStats', stats);
@@ -606,18 +631,8 @@ async function renderRanking() {
       currentStage = data.currentStage;
       updateStageUI();
     }
-    const list = document.getElementById('rankingList');
-    if (data.ranking.length === 0) {
-      list.innerHTML = '<div class="empty-state"><div class="icon">🏆</div><p>暂无排名数据</p></div>';
-      return;
-    }
-    list.innerHTML = data.ranking.map(function(e, i) {
-      const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : 'normal';
-      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
-      const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
-      const deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-      return '<div class="rank-item" onclick="openDetail(\'' + e.id + '\')"><div class="rank-num ' + rankClass + '">' + (medal || (i+1)) + '</div><div class="rank-info"><div class="rname">' + e.title + ' ' + badge + '</div><div class="rdept">' + e.name + ' · ' + deptChain + ' · ' + trackLabel(e.track) + '</div></div><div class="rank-score">' + (e.composite||0) + '</div></div>';
-    }).join('');
+    renderRankList(data.individual || [], 'rankingListIndividual');
+    renderRankList(data.team || [], 'rankingListTeam');
   } catch(e) { console.error('Ranking error:', e); }
 }
 
@@ -722,10 +737,12 @@ async function checkLucky() {
 }
 
 function renderLoginPrompt() {
-  const list = document.getElementById('rankingList');
-  if (list) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">🔒</div><p>查看作品排名需先登录</p><button class="btn btn-primary" onclick="ddLogin()" style="margin-top:16px;">钉钉登录</button></div>';
-  }
+  ['rankingListIndividual', 'rankingListTeam'].forEach(function(id) {
+    const list = document.getElementById(id);
+    if (list) {
+      list.innerHTML = '<div class="empty-state"><div class="icon">🔒</div><p>查看作品排名需先登录</p><button class="btn btn-primary" onclick="ddLogin()" style="margin-top:16px;">钉钉登录</button></div>';
+    }
+  });
   const stats = document.getElementById('rankingStats');
   if (stats) stats.innerHTML = '';
 }

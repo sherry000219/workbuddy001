@@ -813,13 +813,14 @@ app.get('/api/ranking', requireAuth, (req, res) => {
     entries = db.entries.filter(e => e.status === 'approved');
   }
   if (track) entries = entries.filter(e => e.track === track);
-  const enriched = entries.map(e => {
+  const enrich = (list) => list.map(e => {
     const sd = getEntryStageScores(e.id, stage);
     const composite = getCompositeScore(e.id, stage);
     return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, judgeAvg: sd.avgScore, composite };
-  });
-  enriched.sort((a, b) => b.composite - a.composite);
-  res.json({ ranking: enriched.slice(0, 30), currentStage: stage });
+  }).sort((a, b) => b.composite - a.composite).slice(0, 30);
+  const individual = enrich(entries.filter(e => e.entryType !== 'team'));
+  const team = enrich(entries.filter(e => e.entryType === 'team'));
+  res.json({ individual, team, currentStage: stage });
 });
 
 // ========== API: STATS ==========
