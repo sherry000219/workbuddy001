@@ -1135,6 +1135,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T09:04:57.790Z"
+    },
+    {
+      "entryId": "entry_1786340551344_uzahth",
+      "voterId": "KvRq5HgFDO3qkIPCNV0nRwiEiE",
+      "voterName": "吴彬",
+      "voterMobile": "15755362637",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T09:05:30.232Z"
     }
   ],
   "judgeScores": [],
