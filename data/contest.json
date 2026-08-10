@@ -1315,6 +1315,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5C3_5cm9aXNAs_NAtCwKUWHsRnNgnEIgMXpY7DEAA_720_719.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-10T09:09:54.286Z"
+    },
+    {
+      "entryId": "entry_1786334382444_r429gr",
+      "voterId": "7tRTiiiSiP8vo5ViPxQEzbiiGUAiEiE",
+      "voterName": "高喜军",
+      "voterMobile": "18088001761",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPD0eJy2fKP0DNAW3NAW0_365_365.png",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T09:12:57.289Z"
     }
   ],
   "judgeScores": [],
@@ -1328,9 +1337,13 @@
     "drawConfig": {
       "enabled": false,
       "rules": "1. 每赛程每位用户最多投 5 票。\n2. 赛程结算后，押中晋级/获奖作品即可获得抽奖次数（押中 1 个作品 = 1 次抽奖机会）。\n3. 点击抽奖后按奖品权重随机抽取，奖品库存为 0 时不再抽中。\n4. 中奖后请联系管理员兑奖。",
-      "contact": "刘相丞（刘木目）",
-      "noWinWeight": 100
+      "contact": "刘相丞（刘木目）"
     },
-    "prizes": []
+    "prizes": {
+      "preliminary": [],
+      "semi_final": [],
+      "final": [],
+      "awarded": []
+    }
   }
 }
