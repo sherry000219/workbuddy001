@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786340551344_uzahth",
+      "name": "朱梦瑶",
+      "mobile": "15000939186",
+      "dept": "产研中心",
+      "dept1": "产研中心",
+      "dept2": "税务专家部",
+      "dept3": "",
+      "subdept": "税务专家部",
+      "entryType": "team",
+      "teamName": "产研中心 / 税务专家部",
+      "teamMembers": "部门/团队参赛",
+      "track": "efficiency",
+      "title": "AI工单智能处理",
+      "scene": "创建工单后， AI 解析工单提单信息，自动执行\"读工单 → 定位真实任务 → 查日志 → 查知识库 →查代码仓 → 给出结论 → 税务确认→ 生成回复\"全流程，全流程操作留痕可追溯，大幅压缩人工处置耗时，缩短客户等待时长，提升工单处理效率。",
+      "process_text": "一、把工单链接发给 AI\n只需要把工单链接或者工单 ID 发给 AI，发送\"处理一下这个工单\"\n\n二、AI 读取工单信息\n1、工单结构信息：企业名称、账号、税种、地区等\n2、工单详情：标题、正文、截图、附件、流转记录\n3、这一步会把工单里谁是当前处理人、谁转过来的记下来，后面指派的时候要用。\n\n三、找到真正出问题的任务\n1、AI 会从工单的报文链接里提取真正的任务 ID 和流水号，然后用这些去查后台系统。\n2、如果工单里没有任务 ID，AI 会用企业名称和时间范围去搜索，找到最匹配的那个任务。\n3、判断提单内容非任务问题，直接查询知识库。\n\n四、查运行日志\n1、根据任务先查任务的 XML 报文（记录了执行了哪些接口）\n2、用流水号查登录日志（看是不是登录就失败了）\n3、登录没问题时，再查业务日志（看具体哪一步出的错）\n4、这样就能画出一条完整的时间线：任务下发 → 登录 → 走到最后成功的步骤 → 在哪一步报错了 → 最终结果是什么。\n\n五、查知识库\nAI 会根据任务的地区、税种、报表类型等关键词，去钉钉知识库里搜索相关规则并给出结论。\n\n六、查代码仓\n任务问题无法通过知识库解决的，进入rpa工单池，AI自动排查输出结果。\n\n七、税务人员核对AI结论\n税务人员核对AI结论是否准确简洁，确认后ai以【税务产品专员】身份进行回复。\n\n八、生成回复\n1、【问题排查结论】用大白话说清楚问题是什么、为什么这样\n2、【客户处理建议]】告诉客户需要做什么，或者明确说不需要客户处理\n3、客户有其他疑问进入工单回复。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/YndMj49yWjPmPleOhRgZ965jJ3pmz5aA?utm_scene=team_space",
+      "result_text": "自动回复工单：\n1、https://manualtask.yunzhangfang.com/workBench/2?taskId=2085287417480351744&projectId=2&moduleId=3\n2、https://manualtask.yunzhangfang.com/workBench/2?taskId=2084812452020752384&projectId=2&moduleId=3\n3、https://manualtask.yunzhangfang.com/workBench/2?taskId=2084823472151859200&projectId=2&moduleId=3",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/YndMj49yWjPmPleOhRgZ965jJ3pmz5aA?utm_scene=team_space",
+      "extra": "",
+      "posterUrl": "https://codebuddy.work/agents/share/vv0t1r8yGoG4Gtha-i-1IcgTNOl1bJ3CvY1aarLt3MRzBeKHnXx0TclSR0u-Cz_9?platform=workbuddy&ext2=copy_link",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/YndMj49yWjPmPleOhRgZ965jJ3pmz5aA?utm_scene=team_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-10T05:42:31.344Z"
+    },
+    {
       "id": "entry_1786338333096_ik561c",
       "name": "杨绵绵",
       "mobile": "18068393979",
