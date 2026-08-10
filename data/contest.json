@@ -2443,6 +2443,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPM4rHmVmHVDnNAbDNAbA_432_432.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-10T10:53:34.005Z"
+    },
+    {
+      "entryId": "entry_1785124018451_kk1g17",
+      "voterId": "MYN2W4Cf1mesWBQhciPQMfAiEiE",
+      "voterName": "宋陆凤",
+      "voterMobile": "18355096871",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T10:53:37.260Z"
     }
   ],
   "judgeScores": [],
