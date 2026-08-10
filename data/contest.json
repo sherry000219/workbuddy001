@@ -2722,6 +2722,24 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T11:07:08.983Z"
+    },
+    {
+      "entryId": "entry_1786355645419_jc8uii",
+      "voterId": "5OdXBjoyQ0iPTXvbR9iS5CDwiEiE",
+      "voterName": "曹璐",
+      "voterMobile": "13115013577",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3qOArfUI0fNAcbNAciwBAl2LqCrn28Hm7LgfYIbAA_456_454.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T11:07:23.127Z"
+    },
+    {
+      "entryId": "entry_1786355645419_jc8uii",
+      "voterId": "MYN2W4Cf1mesWBQhciPQMfAiEiE",
+      "voterName": "宋陆凤",
+      "voterMobile": "18355096871",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T11:07:23.747Z"
     }
   ],
   "judgeScores": [],
