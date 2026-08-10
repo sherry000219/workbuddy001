@@ -2740,6 +2740,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T11:07:23.747Z"
+    },
+    {
+      "entryId": "entry_1786359942777_etq9ft",
+      "voterId": "Hs1lfHRo5qSXYzje1j6eGgiEiE",
+      "voterName": "吕玲",
+      "voterMobile": "18133445181",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4G4HH-1-43NB-XNB-Cw0MKL12cZSS0JgTyvV3lcAA_2016_2021.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T11:07:36.034Z"
     }
   ],
   "judgeScores": [],
