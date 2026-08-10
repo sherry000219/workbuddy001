@@ -3100,6 +3100,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T13:30:16.145Z"
+    },
+    {
+      "entryId": "entry_1786340551344_uzahth",
+      "voterId": "iPZzzUxbUtZXhuoCrGUaaiPAiEiE",
+      "voterName": "周强",
+      "voterMobile": "17712515112",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPDeC21NSmqTPNAyDNAyA_800_800.png",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T14:15:12.308Z"
     }
   ],
   "judgeScores": [],
