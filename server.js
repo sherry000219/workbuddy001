@@ -308,7 +308,7 @@ function getEntryStageScores(entryId, stage) {
 // Calculate composite score for an entry in a specific stage
 function getCompositeScore(entryId, stage) {
   const { avgScore, voteCount } = getEntryStageScores(entryId, stage);
-  if (stage === 'final') {
+  if (stage === 'final' || stage === 'awarded') {
     return avgScore; // 100% judge score, no voting
   }
   // For preliminary and semi_final: 80% judge + 20% votes
@@ -892,23 +892,28 @@ app.get('/api/export/json', verifyAdminToken, (req, res) => {
 });
 
 app.get('/api/export/csv', verifyAdminToken, (req, res) => {
-  const trackLabel = { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' };
-  const stage = getCurrentStage();
-  let csv = '\uFEFFID,状态,轮次状态,姓名,部门,子部门,赛道,标题,场景描述,使用过程简介,使用过程链接,效果呈现简介,效果呈现链接,作品链接,海报链接,详情文档链接,提交时间,当前阶段投票数,当前阶段评委均分,当前阶段综合分\n';
-  const votable = getVotableEntries(stage);
-  const allVoteCounts = votable.map(e => getEntryStageScores(e.id, stage).voteCount);
-  const maxVotes = Math.max(1, ...allVoteCounts);
-  db.entries.forEach(e => {
-    const sd = getEntryStageScores(e.id, stage);
-    const voteScore = Math.round((sd.voteCount / maxVotes) * 100);
-    const composite = stage === 'final' ? sd.avgScore : Math.round(sd.avgScore * 0.8 + voteScore * 0.2);
-    const roundLabel = { approved: '初赛', semi_finalist: '复赛晋级', eliminated_semi: '复赛淘汰', finalist: '决赛晋级', eliminated_final: '决赛淘汰', awarded: '已获奖' }[e.roundStatus] || '初赛';
-    const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
-    csv += `${esc(e.id)},${esc(e.status === 'approved' ? '已收录' : '待审核')},${esc(roundLabel)},${esc(e.name)},${esc(e.dept)},${esc(e.subdept)},${esc(trackLabel[e.track] || e.track)},${esc(e.title)},${esc(e.scene)},${esc(e.process_text)},${esc(e.process_link || '')},${esc(e.result_text)},${esc(e.result_link || '')},${esc(e.extra)},${esc(e.posterUrl || '')},${esc(e.docUrl || '')},${esc(e.createdAt)},${sd.voteCount},${sd.avgScore},${composite}\n`;
-  });
-  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="WorkBuddy-entries.csv"');
-  res.send(csv);
+  try {
+    const trackLabel = { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' };
+    const stage = getCurrentStage();
+    let csv = '\uFEFFID,状态,轮次状态,姓名,部门,子部门,赛道,标题,场景描述,使用过程简介,使用过程链接,效果呈现简介,效果呈现链接,作品链接,海报链接,详情文档链接,提交时间,当前阶段投票数,当前阶段评委均分,当前阶段综合分\n';
+    const votable = getVotableEntries(stage);
+    const allVoteCounts = votable.map(e => getEntryStageScores(e.id, stage).voteCount);
+    const maxVotes = Math.max(1, ...allVoteCounts);
+    db.entries.forEach(e => {
+      const sd = getEntryStageScores(e.id, stage);
+      const voteScore = Math.round((sd.voteCount / maxVotes) * 100);
+      const composite = (stage === 'final' || stage === 'awarded') ? sd.avgScore : Math.round(sd.avgScore * 0.8 + voteScore * 0.2);
+      const roundLabel = { approved: '初赛', semi_finalist: '复赛晋级', eliminated_semi: '复赛淘汰', finalist: '决赛晋级', eliminated_final: '决赛淘汰', awarded: '已获奖' }[e.roundStatus] || '初赛';
+      const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
+      csv += `${esc(e.id)},${esc(e.status === 'approved' ? '已收录' : '待审核')},${esc(roundLabel)},${esc(e.name)},${esc(e.dept)},${esc(e.subdep)},${esc(trackLabel[e.track] || e.track)},${esc(e.title)},${esc(e.scene)},${esc(e.process_text)},${esc(e.process_link || '')},${esc(e.result_text)},${esc(e.result_link || '')},${esc(e.extra)},${esc(e.posterUrl || '')},${esc(e.docUrl || '')},${esc(e.createdAt)},${sd.voteCount},${sd.avgScore},${composite}\n`;
+    });
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="WorkBuddy-entries.csv"');
+    res.send(csv);
+  } catch (err) {
+    console.error('[export/csv] Error:', err);
+    res.status(500).json({ error: '导出失败：' + err.message });
+  }
 });
 
 // ========== API: SETTINGS ==========
@@ -1475,54 +1480,59 @@ app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
 });
 
 app.get('/api/admin/export/csv', verifyAdminToken, (req, res) => {
-  const stage = getCurrentStage();
-  const entries = getJudgableEntries(stage);
-  const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
-  const allJudges = [...new Set(stageScores.map(s => s.judgeName))].sort();
-  const trackLabel = { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' };
-  const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
+  try {
+    const stage = getCurrentStage();
+    const entries = getJudgableEntries(stage);
+    const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
+    const allJudges = [...new Set(stageScores.map(s => s.judgeName))].sort();
+    const trackLabel = { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' };
+    const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
 
-  let csv = '\uFEFF';
-  let headers = ['作品ID', '标题', '姓名', '部门', '子部门', '赛道', '轮次', '提交时间', '投票数', '评委数', '评委均分', '综合分'];
-  if (stage === 'awarded') headers.push('获奖等级');
-  allJudges.forEach(j => {
-    headers.push(`${j}-总分`, `${j}-实用性(/50)`, `${j}-创新性(/20)`, `${j}-可推广性(/15)`, `${j}-效果呈现(/15)`);
-  });
-  csv += headers.map(esc).join(',') + '\n';
-
-  entries.forEach(e => {
-    const scores = stageScores.filter(s => s.entryId === e.id);
-    const avg = scores.length > 0
-      ? Math.round(scores.reduce((sum, s) => sum + s.practicality + s.innovation + s.scalability + s.presentation, 0) / scores.length)
-      : 0;
-    const sd = getEntryStageScores(e.id, stage);
-    const composite = getCompositeScore(e.id, stage);
-    const roundLabel = { approved: '初赛', semi_finalist: '复赛', finalist: '决赛', awarded: '获奖' }[e.roundStatus] || '初赛';
-
-    let row = [
-      e.id, e.title, e.name, e.dept, e.subdept || '',
-      trackLabel[e.track] || e.track, roundLabel, e.createdAt,
-      sd.voteCount, scores.length, avg, composite
-    ];
-    if (stage === 'awarded') {
-      const awardLabel = { first: '一等奖', second: '二等奖', third: '三等奖', excellence: '优秀奖' }[e.award] || '';
-      row.push(awardLabel);
-    }
-    allJudges.forEach(judge => {
-      const s = scores.find(sc => sc.judgeName === judge);
-      if (s) {
-        row.push(s.practicality + s.innovation + s.scalability + s.presentation, s.practicality, s.innovation, s.scalability, s.presentation);
-      } else {
-        row.push('', '', '', '', '');
-      }
+    let csv = '\uFEFF';
+    let headers = ['作品ID', '标题', '姓名', '部门', '子部门', '赛道', '轮次', '提交时间', '投票数', '评委数', '评委均分', '综合分'];
+    if (stage === 'awarded') headers.push('获奖等级');
+    allJudges.forEach(j => {
+      headers.push(`${j}-总分`, `${j}-实用性(/50)`, `${j}-创新性(/20)`, `${j}-可推广性(/15)`, `${j}-效果呈现(/15)`);
     });
-    csv += row.map(esc).join(',') + '\n';
-  });
+    csv += headers.map(esc).join(',') + '\n';
 
-  const stageLabel = STAGE_LABELS[stage] || 'contest';
-  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="WorkBuddy-${stageLabel}-scores.csv"`);
-  res.send(csv);
+    entries.forEach(e => {
+      const scores = stageScores.filter(s => s.entryId === e.id);
+      const avg = scores.length > 0
+        ? Math.round(scores.reduce((sum, s) => sum + s.practicality + s.innovation + s.scalability + s.presentation, 0) / scores.length)
+        : 0;
+      const sd = getEntryStageScores(e.id, stage);
+      const composite = getCompositeScore(e.id, stage);
+      const roundLabel = { approved: '初赛', semi_finalist: '复赛', finalist: '决赛', awarded: '获奖' }[e.roundStatus] || '初赛';
+
+      let row = [
+        e.id, e.title, e.name, e.dept, e.subdept || '',
+        trackLabel[e.track] || e.track, roundLabel, e.createdAt,
+        sd.voteCount, scores.length, avg, composite
+      ];
+      if (stage === 'awarded') {
+        const awardLabel = { first: '一等奖', second: '二等奖', third: '三等奖', excellence: '优秀奖' }[e.award] || '';
+        row.push(awardLabel);
+      }
+      allJudges.forEach(judge => {
+        const s = scores.find(sc => sc.judgeName === judge);
+        if (s) {
+          row.push(s.practicality + s.innovation + s.scalability + s.presentation, s.practicality, s.innovation, s.scalability, s.presentation);
+        } else {
+          row.push('', '', '', '', '');
+        }
+      });
+      csv += row.map(esc).join(',') + '\n';
+    });
+
+    const stageLabel = STAGE_LABELS[stage] || 'contest';
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="WorkBuddy-${stageLabel}-scores.csv"`);
+    res.send(csv);
+  } catch (err) {
+    console.error('[export/csv] Error:', err);
+    res.status(500).json({ error: '导出失败：' + err.message });
+  }
 });
 
 app.post('/api/admin/clear', verifyAdminToken, (req, res) => {
