@@ -2848,6 +2848,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5HiUAqtE8vNA-DNA-CwmLK3QsZiDXUJQwZNLLYzAA_992_992.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-10T11:18:24.588Z"
+    },
+    {
+      "entryId": "entry_1786359942777_etq9ft",
+      "voterId": "1RpvYNWCqiPLG9nfU2WvmUgiEiE",
+      "voterName": "叶彤",
+      "voterMobile": "18572783238",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3QEinRuwaXNAhzNAhywUUFo_4HJQwkJvwD80Q14AA_540_540.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T11:20:19.407Z"
     }
   ],
   "judgeScores": [],
