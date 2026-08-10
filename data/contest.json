@@ -2002,6 +2002,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T10:29:46.123Z"
+    },
+    {
+      "entryId": "entry_1786355645419_jc8uii",
+      "voterId": "gYHt7JXYzoX6fsPZ9RvXvwiEiE",
+      "voterName": "王晔",
+      "voterMobile": "15251750886",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPD3W5TmEADZTNBNrNBNo_1242_1242.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T10:29:50.043Z"
     }
   ],
   "judgeScores": [],
