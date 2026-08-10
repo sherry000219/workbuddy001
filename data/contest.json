@@ -1687,6 +1687,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T10:09:43.015Z"
+    },
+    {
+      "entryId": "entry_1785933777405_l85dpc",
+      "voterId": "4ptiS7WRAZt0q7C1qbyiif7wiEiE",
+      "voterName": "许恒琪",
+      "voterMobile": "18761177715",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4OPOqz8MQvNAkfNAruwfDwnSQeY8oIKPjxKjwTFAA_699_583.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T10:12:25.616Z"
     }
   ],
   "judgeScores": [],
