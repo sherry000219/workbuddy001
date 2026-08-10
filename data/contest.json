@@ -1243,6 +1243,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T09:06:40.351Z"
+    },
+    {
+      "entryId": "entry_1786340551344_uzahth",
+      "voterId": "msGFlWiP19T9ViPxQEzbiiGUAiEiE",
+      "voterName": "杨文强",
+      "voterMobile": "13813851249",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3q7fErhoU_NBPnNBPmw_YtW-xyPrRAJOKwW_6sbAA_1273_1273.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T09:06:45.612Z"
     }
   ],
   "judgeScores": [],
