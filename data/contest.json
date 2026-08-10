@@ -910,14 +910,31 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T05:43:52.193Z"
+    },
+    {
+      "entryId": "entry_1786334382444_r429gr",
+      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
+      "voterName": "刘木目",
+      "voterMobile": "15205203629",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD2lMmFFsfKvNBaDNBaCwFANmWcO0qsUKADgdqEqYAA_1440_1440.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T08:16:07.240Z"
     }
   ],
   "judgeScores": [],
+  "drawRecords": [],
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
     "votingEnabled": true,
     "currentStage": "preliminary",
-    "luckyListEnabled": false
+    "luckyListEnabled": false,
+    "drawConfig": {
+      "enabled": false,
+      "rules": "1. 每赛程每位用户最多投 5 票。\n2. 赛程结算后，押中晋级/获奖作品即可获得抽奖次数（押中 1 个作品 = 1 次抽奖机会）。\n3. 点击抽奖后按奖品权重随机抽取，奖品库存为 0 时不再抽中。\n4. 中奖后请联系管理员兑奖。",
+      "contact": "刘相丞（刘木目）",
+      "noWinWeight": 100
+    },
+    "prizes": []
   }
 }
