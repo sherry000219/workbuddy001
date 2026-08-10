@@ -898,7 +898,17 @@
       "createdAt": "2026-07-16T08:32:03.267Z"
     }
   ],
-  "votes": [],
+  "votes": [
+    {
+      "entryId": "entry_1786340551344_uzahth",
+      "voterId": "UiSE3MEYziSI2xf9RD0xJyawiEiE",
+      "voterName": "朱梦瑶",
+      "voterMobile": "15000939186",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T05:43:52.193Z"
+    }
+  ],
   "judgeScores": [],
   "settings": {
     "judgePassword": "wb2026",
