@@ -1063,6 +1063,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T09:02:59.463Z"
+    },
+    {
+      "entryId": "entry_1786340551344_uzahth",
+      "voterId": "3KyqRiSXkx4jqkIPCNV0nRwiEiE",
+      "voterName": "丁新新",
+      "voterMobile": "13951894495",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQLPM5HlClvixx_NAyDNAyCw6HX2IcozzT0KD9rqdY-IAA_800_800.png",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T09:03:04.857Z"
     }
   ],
   "judgeScores": [],
