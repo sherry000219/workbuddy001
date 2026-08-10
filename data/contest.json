@@ -1660,6 +1660,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4be4QICIPnNBJTNBJKw6sHLVCnYSUAIcQAomQ3OAA_1170_1172.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-10T10:04:58.121Z"
+    },
+    {
+      "entryId": "entry_1785933777405_l85dpc",
+      "voterId": "8f8wzii630wxBQ32FiilaP3AiEiE",
+      "voterName": "徐航",
+      "voterMobile": "18344818667",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T10:08:32.148Z"
     }
   ],
   "judgeScores": [],
