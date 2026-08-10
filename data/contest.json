@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786351346788_dvmzme",
+      "name": "郭彦柳",
+      "mobile": "18832880265",
+      "dept": "中小微事业群",
+      "dept1": "中小微事业群",
+      "dept2": "运营中心",
+      "dept3": "",
+      "subdept": "运营中心",
+      "entryType": "team",
+      "teamName": "中小微事业群 / 运营中心",
+      "teamMembers": "部门/团队参赛",
+      "track": "creative",
+      "title": "数据哨兵——基于 Skill 的实时动态看板",
+      "scene": "产品推广期，商业运营团队每周要回答老板三问：上线了多少？用得好不好？产生了多少消耗？但周度明细动辄 20 万+ 行、横跨多张 Excel，人工透视半天出图还易错；只能看静态汇总、看不到趋势下钻；上线与消耗数据各管各的，没人把\"上线→使用→消耗\"串成一条线，\"上线很多却没用\"的虚火被掩盖；等问题暴露往往滞后一个月，最佳干预窗口早已错过。",
+      "process_text": "STEP 1 按自研的Skill字段口径整理源数据\n消耗量看板：至少含 gs_id 代账公司ID、gsmc 名称、rq 开票日期、company 分公司、xhl 消耗量。\n上线&使用看板：上线数据 + 任务明细 ，按 Skill 字段对齐（端口、状态、耗时等）。\n分公司字段为空时，生成会自动归入「未标注」，不影响统计与图表。\nSTEP 2 · 自然语言描述生成动态看板\n对话触发自研设定的Skill：在 WorkBuddy 里直接说一句话即可调起对应 Skill，Python 负责清洗 + 建立「周 / 分公司 / 代账公司」三级索引，并把数据压缩内嵌进 HTML，秒出单文件。\nSTEP 3 · 打开即看\n浏览器打开，三维筛选实时联动；双击 HTML 即可在浏览器查看，页面分三段：顶部 KPI 区 → 中部图表区 → 底部明细 Tab，无需任何配置。\n周度时间范围：起始周→结束周双下拉，外加「全部 / 近1周 / 近2周 / 近4周 / 仅完整周」快捷键。第一周常为不完整周，做环比建议选「仅完整周」。\n分公司：可搜索多选，支持「仅选搜索结果」。\n代账公司：按消耗量降序，支持搜索多选、一键选中 Top20。\n看图技巧：「分公司周度趋势对比」悬停某条线可聚焦、其余淡出；想看清中小分公司节奏，用筛选勾掉河北等大头。\n明细矩阵：可排序、搜索、导出 CSV，用于客户拜访前准备。\nSTEP 4 · 刷新零成本\n新数据落固定路径，重跑同一条命令即可刷新看板，全程不改一行代码。可接入定时任务（如每月 5 号），实现「到点自动出最新看板」。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/amweZ92PV6vyvD2NhMBr0jDZVxEKBD6p?doc_type=wiki_doc&iframeQuery=utm_source=portal&utm_medium=portal_main_colum_create&rnd=0.8442280243419846",
+      "result_text": "1、实现全链路闭环：两块动态看板覆盖「上线—使用—消耗」全链路，专治假繁荣与滞后跟进。\n2、极致提效：从几小时手工透视表 → 一条命令出可交互看板，零编码，运营同学自己就能跑。\n3、可复制：Skill 化沉淀，换数据源一键复用，团队任何人、任何新数据集都能直接套用。\n两个看板可一眼看出「上线端口涨了但活跃率没跟上」「任务漏斗卡在超时/取消」「新增与流失客户」等信号，把运营动作从「拍脑袋」变成「看数据」。\n消耗量周度动态看板链接：\nhttps://f269de5c3cb545daa320bbd5a53f2776.bj5.agentos-app.net/\n上线&使用动态看板链接：\nhttps://cff9c94132d34c5e94ce25428f4479ee.sh1.agentos-app.net/",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/amweZ92PV6vyvD2NhMBr0jDZVxEKBD6p?doc_type=wiki_doc&iframeQuery=utm_source=portal&utm_medium=portal_main_colum_create&rnd=0.8442280243419846",
+      "extra": "",
+      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/6LeBq413JAzez9xRh3jnZ9198DOnGvpb?utm_scene=person_space",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/amweZ92PV6vyvD2NhMBr0jDZVxEKBD6p?doc_type=wiki_doc&iframeQuery=utm_source=portal&utm_medium=portal_main_colum_create&rnd=0.8442280243419846",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-10T08:42:26.788Z"
+    },
+    {
       "id": "entry_1786340551344_uzahth",
       "name": "朱梦瑶",
       "mobile": "15000939186",
