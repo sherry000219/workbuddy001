@@ -3,98 +3,258 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎁 幸运投票人名单 · 云帐房 WorkBuddy 实战应用大赛</title>
+<title>🎁 投票抽奖 · 云帐房 WorkBuddy 实战应用大赛</title>
+<script src="https://g.alicdn.com/dingding/dingtalk-jsapi/3.1.0/dingtalk.open.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f3f4f6; color: #1f2937; }
-  .topbar { background: linear-gradient(135deg, #ff6b35, #e55d2b); color: #fff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f3f4f6; color: #1f2937; min-height: 100vh; }
+  .topbar { background: linear-gradient(135deg, #ff6b35, #e55d2b); color: #fff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
   .topbar h1 { font-size: 18px; font-weight: 700; }
   .topbar a { color: #fff; text-decoration: none; font-size: 13px; background: rgba(255,255,255,.18); padding: 6px 14px; border-radius: 16px; }
-  .wrap { max-width: 1040px; margin: 22px auto; padding: 0 16px; }
-  .summary { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
-  .stat { background: #fff; border-radius: 12px; padding: 16px 20px; flex: 1; min-width: 150px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-  .stat .num { font-size: 26px; font-weight: 800; color: #ff6b35; }
-  .stat .lab { font-size: 12px; color: #6b7280; margin-top: 2px; }
-  .round { background: #fff; border-radius: 14px; padding: 20px 22px; margin-bottom: 22px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-  .round h2 { font-size: 16px; margin-bottom: 4px; }
-  .round .sub { font-size: 12px; color: #6b7280; margin-bottom: 16px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
-  .card { border: 1px solid #eef0f3; border-radius: 12px; padding: 14px; display: flex; gap: 12px; align-items: flex-start; }
-  .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #ffe6da; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #e55d2b; font-size: 16px; }
-  .card .info { flex: 1; min-width: 0; }
-  .card .name { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-  .ticket { background: #fff3e0; color: #e55d2b; font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: 600; }
-  .tail { background: #eef2f7; color: #64748b; font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: 600; }
-  .entries { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
-  .entry { font-size: 12px; color: #374151; display: flex; align-items: center; gap: 6px; }
-  .badge { font-size: 10px; padding: 1px 7px; border-radius: 8px; background: #eef2ff; color: #4338ca; font-weight: 600; white-space: nowrap; }
-  .badge.award { background: #fff3e0; color: #b45309; }
-  .empty { text-align: center; padding: 70px 20px; color: #6b7280; }
+  .wrap { max-width: 800px; margin: 22px auto; padding: 0 16px; padding-bottom: 60px; }
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 22px; }
+  .stat { background: #fff; border-radius: 12px; padding: 18px 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .stat .num { font-size: 28px; font-weight: 800; color: #ff6b35; }
+  .stat .lab { font-size: 12px; color: #6b7280; margin-top: 4px; }
+  .card { background: #fff; border-radius: 14px; padding: 20px 22px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .card h2 { font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .rules { font-size: 13px; color: #4b5563; line-height: 1.8; white-space: pre-wrap; }
+  .stage-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .stage-tab { padding: 8px 16px; border-radius: 20px; border: 1px solid #e5e7eb; background: #fff; color: #6b7280; font-size: 13px; cursor: pointer; }
+  .stage-tab.active { background: #ff6b35; color: #fff; border-color: #ff6b35; }
+  .stage-tab:disabled { opacity: .5; cursor: not-allowed; }
+  .stage-info { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; font-size: 13px; color: #6b7280; }
+  .stage-info span { background: #f9fafb; padding: 6px 12px; border-radius: 8px; }
+  .draw-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #ff6b35, #e55d2b); color: #fff; border: none; padding: 14px 36px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 24px rgba(255,107,53,.25); transition: transform .15s; }
+  .draw-btn:hover:not(:disabled) { transform: translateY(-2px); }
+  .draw-btn:disabled { background: #d1d5db; box-shadow: none; cursor: not-allowed; }
+  .records { margin-top: 16px; }
+  .record-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
+  .record-item:last-child { border-bottom: none; }
+  .record-item .time { color: #9ca3af; font-size: 12px; margin-left: auto; }
+  .win { color: #e55d2b; font-weight: 700; }
+  .empty { text-align: center; padding: 50px 20px; color: #6b7280; }
   .empty .big { font-size: 40px; margin-bottom: 12px; }
   .loading { text-align: center; padding: 60px; color: #9ca3af; }
+  .login-box { text-align: center; padding: 60px 20px; }
+  .login-box button { background: #ff6b35; color: #fff; border: none; padding: 12px 28px; border-radius: 10px; font-size: 15px; cursor: pointer; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(17,24,39,.55); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal { background: #fff; border-radius: 20px; max-width: 360px; width: 100%; padding: 32px 24px; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,.2); }
+  .modal .icon { font-size: 56px; margin-bottom: 12px; }
+  .modal h3 { font-size: 20px; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: #6b7280; margin-bottom: 20px; line-height: 1.6; }
+  .modal .prize-name { font-size: 24px; font-weight: 800; color: #ff6b35; margin-bottom: 16px; }
+  .modal button { background: #ff6b35; color: #fff; border: none; padding: 10px 28px; border-radius: 10px; font-size: 14px; cursor: pointer; }
 </style>
 </head>
 <body>
   <div class="topbar">
-    <h1>🎁 幸运投票人名单</h1>
-    <a href="index.html">← 返回首页</a>
+    <h1>🎁 投票抽奖</h1>
+    <a href="index.html">← 返回竞赛大厅</a>
   </div>
   <div class="wrap">
     <div id="root"><div class="loading">加载中…</div></div>
   </div>
 
+  <div class="modal-overlay" id="resultModal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="icon" id="resultIcon">🎉</div>
+      <h3 id="resultTitle">恭喜中奖</h3>
+      <div class="prize-name" id="resultPrize"></div>
+      <p id="resultDesc"></p>
+      <button onclick="closeModal()">知道了</button>
+    </div>
+  </div>
+
 <script>
 const ESC = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛' };
 
-function avatarHtml(v) {
-  if (v.voterAvatar) return `<img class="avatar" src="${ESC(v.voterAvatar)}" alt="">`;
-  const ch = (v.voterName || '?').trim().charAt(0) || '?';
-  return `<div class="avatar">${ESC(ch)}</div>`;
+let drawData = null;
+let currentStageTab = '';
+
+async function api(url, options) {
+  options = options || {};
+  options.credentials = 'include';
+  const resp = await fetch(url, options);
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) throw new Error(data.error || '请求失败');
+  return data;
 }
 
-function entryHtml(e) {
-  const award = e.award ? ` · ${ESC(e.award)}` : '';
-  const cls = e.result && e.result.indexOf('获奖') >= 0 ? 'badge award' : 'badge';
-  return `<div class="entry">· ${ESC(e.title)} <span class="${cls}">${ESC(e.result)}${award}</span></div>`;
+function isInDingTalk() {
+  try { return typeof dd !== 'undefined' && dd.env && dd.env.platform && dd.env.platform !== 'notInDingTalk'; } catch(e) { return false; }
 }
-
-function render(data) {
-  const root = document.getElementById('root');
-  if (!data.enabled) {
-    root.innerHTML = `<div class="empty"><div class="big">🎁</div><div>幸运名单公布中，敬请期待</div><div style="font-size:12px;margin-top:8px;color:#9ca3af;">各赛程晋级作品的支持者名单，将由管理员在对应赛程开启公示</div></div>`;
+function getCorpId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('corpId') || params.get('corpid') || '';
+}
+async function ddLogin() {
+  const corpId = isInDingTalk() ? getCorpId() : '';
+  if (corpId) {
+    dd.ready(function() {
+      dd.runtime.permission.requestAuthCode({
+        corpId: corpId,
+        onSuccess: function(result) { exchangeCode(result.code); },
+        onFail: function(err) { console.error(err); alert('获取钉钉授权失败，请重试'); }
+      });
+    });
     return;
   }
-  const s = data.summary || {};
+  try {
+    const resp = await fetch('/api/auth/dd-url?redirect=' + encodeURIComponent(window.location.pathname + window.location.search));
+    const data = await resp.json();
+    window.location.href = data.url;
+  } catch(e) { alert('无法发起钉钉登录，请重试'); }
+}
+async function exchangeCode(code) {
+  try {
+    await api('/api/auth/dd-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+    load();
+  } catch(e) { alert('登录失败：' + e.message); }
+}
+async function checkAuth() {
+  try {
+    const data = await api('/api/auth/me');
+    return !!data.user;
+  } catch(e) { return false; }
+}
+
+function formatTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function render() {
+  const root = document.getElementById('root');
+  if (!drawData) {
+    root.innerHTML = '<div class="loading">加载中…</div>';
+    return;
+  }
+  if (!drawData.enabled) {
+    root.innerHTML = '<div class="empty"><div class="big">🎁</div><div>抽奖尚未开启，敬请期待</div></div>';
+    return;
+  }
+  const openStages = drawData.openStages || [];
+  if (openStages.length === 0) {
+    root.innerHTML = '<div class="empty"><div class="big">🎁</div><div>当前赛程尚未结算，抽奖将在赛段结束后开放</div></div>';
+    return;
+  }
+
+  const stages = drawData.stages || {};
+  let totalVoted = 0, totalHits = 0, totalRemaining = drawData.totalRemaining || 0;
+  Object.values(stages).forEach(s => { totalVoted += s.voted || 0; totalHits += s.hits || 0; });
+
   let html = `<div class="summary">
-    <div class="stat"><div class="num">${s.rounds || 0}</div><div class="lab">已公示赛程轮次</div></div>
-    <div class="stat"><div class="num">${s.totalVoters || 0}</div><div class="lab">幸运支持者（人次）</div></div>
-    <div class="stat"><div class="num">${s.totalTickets || 0}</div><div class="lab">抽奖票数（每轮 1 票）</div></div>
+    <div class="stat"><div class="num">${totalVoted}</div><div class="lab">累计已投票</div></div>
+    <div class="stat"><div class="num">${totalHits}</div><div class="lab">累计押中次数</div></div>
+    <div class="stat"><div class="num">${totalRemaining}</div><div class="lab">剩余抽奖次数</div></div>
   </div>`;
-  (data.rounds || []).forEach(r => {
-    html += `<div class="round">
-      <h2>🎁 ${ESC(r.roundLabel || r.label || '')} · 幸运支持者</h2>
-      <div class="sub">本赛程投票支持晋级/获奖作品的小伙伴，均参与本赛程抽奖（各计 1 票）。奖池及最终获奖情况见员工社区公布。</div>
-      <div class="grid">`;
-    (r.voters || []).forEach(v => {
-      html += `<div class="card">
-        ${avatarHtml(v)}
-        <div class="info">
-          <div class="name">${ESC(v.voterName)}${v.mobileLast4 ? ` <span class="tail">尾号${ESC(v.mobileLast4)}</span>` : ''} <span class="ticket">${v.tickets || 1} 票</span></div>
-          <div class="entries">${(v.entries || []).map(entryHtml).join('')}</div>
-        </div>
-      </div>`;
-    });
-    html += `</div></div>`;
+
+  html += `<div class="card"><h2>📋 游戏规则</h2><div class="rules">${ESC(drawData.config.rules || '')}</div><div style="margin-top:12px;font-size:13px;color:#6b7280;">兑奖联系人：<strong style="color:#ff6b35;">${ESC(drawData.config.contact || '')}</strong></div></div>`;
+
+  html += `<div class="card"><h2>🎰 选择赛程抽奖</h2>`;
+  html += `<div class="stage-tabs">`;
+  openStages.forEach(stage => {
+    const s = stages[stage];
+    const active = currentStageTab === stage ? 'active' : '';
+    html += `<button class="stage-tab ${active}" onclick="switchStage('${stage}')">${STAGE_LABELS[stage] || stage}（剩余 ${s.remaining || 0}）</button>`;
   });
+  html += `</div>`;
+
+  const activeStage = currentStageTab && openStages.includes(currentStageTab) ? currentStageTab : openStages[0];
+  currentStageTab = activeStage;
+  const s = stages[activeStage] || {};
+  html += `<div class="stage-info">
+    <span>已投票：${s.voted || 0} / 5</span>
+    <span>押中：${s.hits || 0}</span>
+    <span>剩余抽奖：${s.remaining || 0}</span>
+  </div>`;
+  html += `<button class="draw-btn" id="drawBtn" onclick="doDraw('${activeStage}')" ${(s.remaining || 0) <= 0 ? 'disabled' : ''}>🎁 立即抽奖</button>`;
+
+  html += `<div class="records">`;
+  const records = (s.records || []).slice().reverse();
+  if (records.length === 0) {
+    html += `<div style="color:#9ca3af;font-size:13px;margin-top:12px;">暂无本赛程抽奖记录</div>`;
+  } else {
+    html += `<div style="font-size:13px;font-weight:600;color:#374151;margin-bottom:8px;">本赛程中奖记录</div>`;
+    records.forEach(r => {
+      html += `<div class="record-item"><span>${r.isWin ? '🎉' : '💨'}</span><span class="${r.isWin?'win':''}">${ESC(r.prizeName)}</span><span class="time">${formatTime(r.drawnAt)}</span></div>`;
+    });
+  }
+  html += `</div></div>`;
+
   root.innerHTML = html;
 }
 
-fetch('/api/lucky/list')
-  .then(r => r.json())
-  .then(render)
-  .catch(() => {
-    document.getElementById('root').innerHTML = '<div class="empty">加载失败，请稍后刷新</div>';
-  });
+function switchStage(stage) {
+  currentStageTab = stage;
+  render();
+}
+
+async function doDraw(stage) {
+  const btn = document.getElementById('drawBtn');
+  if (btn) btn.disabled = true;
+  try {
+    const data = await api('/api/draw', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stage }) });
+    // 更新本地数据
+    const s = drawData.stages[stage];
+    if (s) {
+      s.remaining = data.remaining;
+      s.records.push(data.record);
+    }
+    drawData.totalRemaining = Math.max(0, (drawData.totalRemaining || 0) - 1);
+    render();
+    showResult(data.result);
+  } catch(e) {
+    alert(e.message);
+    render();
+  }
+}
+
+function showResult(result) {
+  const modal = document.getElementById('resultModal');
+  const icon = document.getElementById('resultIcon');
+  const title = document.getElementById('resultTitle');
+  const prize = document.getElementById('resultPrize');
+  const desc = document.getElementById('resultDesc');
+  if (result.isWin) {
+    icon.textContent = '🎉';
+    title.textContent = '恭喜中奖';
+    prize.textContent = result.name;
+    desc.innerHTML = `请钉钉联系 <strong>${ESC(drawData.config.contact || '')}</strong> 兑奖。`;
+  } else {
+    icon.textContent = '💨';
+    title.textContent = '谢谢参与';
+    prize.textContent = '';
+    desc.textContent = '别灰心，继续支持优秀作品，下次好运！';
+  }
+  modal.style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('resultModal').style.display = 'none';
+}
+
+async function load() {
+  const authed = await checkAuth();
+  const root = document.getElementById('root');
+  if (!authed) {
+    root.innerHTML = '<div class="login-box"><div class="big" style="font-size:48px;margin-bottom:16px;">🔒</div><p style="margin-bottom:20px;color:#6b7280;">查看抽奖信息需先登录</p><button onclick="ddLogin()">钉钉登录</button></div>';
+    return;
+  }
+  try {
+    drawData = await api('/api/draw/status');
+    render();
+  } catch(e) {
+    root.innerHTML = '<div class="empty"><div class="big">⚠️</div><div>加载失败：' + ESC(e.message) + '</div></div>';
+  }
+}
+
+load();
 </script>
 </body>
 </html>

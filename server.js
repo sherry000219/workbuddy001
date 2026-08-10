@@ -148,7 +148,21 @@ const DEFAULT_DB = {
   entries: [],
   votes: [],
   judgeScores: [],
-  settings: { judgePassword: 'wb2026', adminPassword: 'yzfwb2016', votingEnabled: false, currentStage: 'preliminary', luckyListEnabled: false }
+  drawRecords: [],
+  settings: {
+    judgePassword: 'wb2026',
+    adminPassword: 'yzfwb2016',
+    votingEnabled: false,
+    currentStage: 'preliminary',
+    luckyListEnabled: false,
+    drawConfig: {
+      enabled: false,
+      rules: '1. 每赛程每位用户最多投 5 票。\n2. 赛程结算后，押中晋级/获奖作品即可获得抽奖次数（押中 1 个作品 = 1 次抽奖机会）。\n3. 点击抽奖后按奖品权重随机抽取，奖品库存为 0 时不再抽中。\n4. 中奖后请联系管理员兑奖。',
+      contact: '刘相丞（刘木目）',
+      noWinWeight: 100
+    },
+    prizes: []
+  }
 };
 
 function loadDB() {
@@ -175,6 +189,18 @@ function loadDB() {
     (merged.judgeScores || []).forEach(s => {
       if (!s.stage) s.stage = 'preliminary';
     });
+    // 迁移：确保抽奖配置、奖品池、抽奖记录存在
+    if (!merged.settings.drawConfig) {
+      merged.settings.drawConfig = { ...DEFAULT_DB.settings.drawConfig };
+    } else {
+      const dc = merged.settings.drawConfig;
+      if (dc.enabled === undefined) dc.enabled = false;
+      if (!dc.rules) dc.rules = DEFAULT_DB.settings.drawConfig.rules;
+      if (!dc.contact) dc.contact = DEFAULT_DB.settings.drawConfig.contact;
+      if (dc.noWinWeight === undefined) dc.noWinWeight = DEFAULT_DB.settings.drawConfig.noWinWeight;
+    }
+    if (!merged.settings.prizes) merged.settings.prizes = [];
+    if (!merged.drawRecords) merged.drawRecords = [];
     return merged;
   } catch (e) {
     return JSON.parse(JSON.stringify(DEFAULT_DB));
@@ -973,6 +999,140 @@ app.get('/api/lucky/list', (req, res) => {
   });
 });
 
+// ========== API: DRAW（投票抽奖） ==========
+// 每赛程结算后开放抽奖：用户在已结算赛程中投过的票，押中晋级/获奖作品即获得抽奖次数
+const DRAW_STAGE_ADV = {
+  preliminary: ['semi_finalist', 'finalist', 'eliminated_final', 'awarded'],
+  semi_final: ['finalist', 'eliminated_final', 'awarded'],
+  final: ['awarded']
+};
+const DRAW_STAGE_LABEL = { preliminary: '初赛', semi_final: '复赛', final: '决赛' };
+const DRAW_STAGE_ORDER = ['preliminary', 'semi_final', 'final'];
+
+// 根据当前赛程返回已开放抽奖的历史赛程
+function getOpenDrawStages() {
+  const current = getCurrentStage();
+  if (current === 'preliminary') return [];
+  if (current === 'semi_final') return ['preliminary'];
+  if (current === 'final') return ['preliminary', 'semi_final'];
+  if (current === 'awarded') return ['preliminary', 'semi_final', 'final'];
+  return [];
+}
+
+function getUserStageVotes(userId, stage) {
+  return db.votes.filter(v => v.voterId === userId && (v.stage || 'preliminary') === stage);
+}
+
+// 计算某用户在指定赛程的押中次数（投过的票中，作品最终进入更高轮次的数量）
+function getUserStageHits(userId, stage) {
+  const votes = getUserStageVotes(userId, stage);
+  const advanced = DRAW_STAGE_ADV[stage] || [];
+  let hits = 0;
+  const hitEntryIds = new Set();
+  for (const v of votes) {
+    const e = db.entries.find(x => x.id === v.entryId);
+    if (e && advanced.includes(e.roundStatus) && !hitEntryIds.has(e.id)) {
+      hits++;
+      hitEntryIds.add(e.id);
+    }
+  }
+  return { hits, hitEntryIds: [...hitEntryIds] };
+}
+
+function getUserStageDrawRecords(userId, stage) {
+  return db.drawRecords.filter(r => r.userId === userId && r.stage === stage);
+}
+
+function getUserStageRemainingDraws(userId, stage) {
+  const { hits } = getUserStageHits(userId, stage);
+  const used = getUserStageDrawRecords(userId, stage).length;
+  return Math.max(0, hits - used);
+}
+
+// 按权重抽奖：奖品 weight 越高中奖概率越大；库存为 0 自动跳过
+function drawPrize() {
+  const prizes = (db.settings.prizes || []).filter(p => p.stock > 0 && p.weight > 0);
+  const noWinWeight = Math.max(0, Number(db.settings.drawConfig.noWinWeight) || 0);
+  const totalWeight = prizes.reduce((s, p) => s + Number(p.weight), 0) + noWinWeight;
+  if (totalWeight <= 0) return { isWin: false, name: '谢谢参与' };
+  const rnd = Math.random() * totalWeight;
+  let acc = 0;
+  for (const p of prizes) {
+    acc += Number(p.weight);
+    if (rnd <= acc) {
+      p.stock = Math.max(0, p.stock - 1);
+      return { isWin: true, id: p.id, name: p.name };
+    }
+  }
+  return { isWin: false, name: '谢谢参与' };
+}
+
+app.get('/api/draw/status', requireAuth, (req, res) => {
+  const userId = req.ddUser.openId;
+  const config = db.settings.drawConfig || DEFAULT_DB.settings.drawConfig;
+  const openStages = getOpenDrawStages();
+  const stages = {};
+  let totalRemaining = 0;
+  for (const stage of DRAW_STAGE_ORDER) {
+    const votes = getUserStageVotes(userId, stage);
+    const { hits, hitEntryIds } = getUserStageHits(userId, stage);
+    const records = getUserStageDrawRecords(userId, stage).map(r => ({
+      prizeName: r.prizeName,
+      isWin: r.isWin,
+      drawnAt: r.drawnAt
+    }));
+    stages[stage] = {
+      label: DRAW_STAGE_LABEL[stage],
+      isOpen: openStages.includes(stage),
+      voted: votes.length,
+      hits,
+      hitEntryIds,
+      remaining: getUserStageRemainingDraws(userId, stage),
+      records
+    };
+    if (openStages.includes(stage)) totalRemaining += stages[stage].remaining;
+  }
+  res.json({
+    enabled: !!config.enabled,
+    currentStage: getCurrentStage(),
+    openStages,
+    totalRemaining,
+    stages,
+    config: {
+      rules: config.rules,
+      contact: config.contact
+    }
+  });
+});
+
+app.post('/api/draw', requireAuth, (req, res) => {
+  const config = db.settings.drawConfig || DEFAULT_DB.settings.drawConfig;
+  if (!config.enabled) return res.status(403).json({ error: '抽奖尚未开启' });
+  const userId = req.ddUser.openId;
+  const stage = req.body.stage;
+  if (!DRAW_STAGE_ORDER.includes(stage)) return res.status(400).json({ error: '无效的赛程' });
+  const openStages = getOpenDrawStages();
+  if (!openStages.includes(stage)) return res.status(403).json({ error: '该赛程抽奖尚未开放' });
+  const remaining = getUserStageRemainingDraws(userId, stage);
+  if (remaining <= 0) return res.status(403).json({ error: '本赛程抽奖次数已用完' });
+
+  const result = drawPrize();
+  const record = {
+    id: 'dr_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8),
+    userId,
+    userName: req.ddUser.nick || '',
+    stage,
+    prizeId: result.id || null,
+    prizeName: result.name,
+    isWin: result.isWin,
+    drawnAt: new Date().toISOString()
+  };
+  db.drawRecords.push(record);
+  saveDB();
+  ghPush().catch(e => console.error('[draw] GitHub push failed:', e.message));
+  res.json({ success: true, result, remaining: remaining - 1, record: { prizeName: record.prizeName, isWin: record.isWin, drawnAt: record.drawnAt } });
+});
+
 // ========== ADMIN TOKEN STORE ==========
 const adminTokens = new Map();
 
@@ -1105,6 +1265,68 @@ app.post('/api/admin/auth', (req, res) => {
   }
   const token = generateAdminToken();
   res.json({ success: true, token, message: '管理员已验证' });
+});
+
+// 抽奖配置与奖品管理
+app.get('/api/admin/draw-config', verifyAdminToken, (req, res) => {
+  const config = db.settings.drawConfig || DEFAULT_DB.settings.drawConfig;
+  res.json({
+    enabled: !!config.enabled,
+    rules: config.rules,
+    contact: config.contact,
+    noWinWeight: config.noWinWeight,
+    prizes: db.settings.prizes || []
+  });
+});
+
+app.post('/api/admin/draw-config', verifyAdminToken, (req, res) => {
+  const config = db.settings.drawConfig || DEFAULT_DB.settings.drawConfig;
+  if (req.body.enabled !== undefined) config.enabled = Boolean(req.body.enabled);
+  if (req.body.rules !== undefined) config.rules = String(req.body.rules || '');
+  if (req.body.contact !== undefined) config.contact = String(req.body.contact || '');
+  if (req.body.noWinWeight !== undefined) config.noWinWeight = Math.max(0, Number(req.body.noWinWeight) || 0);
+  db.settings.drawConfig = config;
+  saveDB();
+  ghPush().catch(e => console.error('[admin draw-config] GitHub push failed:', e.message));
+  res.json({ success: true, config: { enabled: config.enabled, rules: config.rules, contact: config.contact, noWinWeight: config.noWinWeight } });
+});
+
+app.post('/api/admin/prizes', verifyAdminToken, (req, res) => {
+  const { id, name, stock, weight } = req.body;
+  if (!name || String(name).trim() === '') return res.status(400).json({ error: '奖品名称不能为空' });
+  const prizes = db.settings.prizes || [];
+  const stockNum = Math.max(0, Number(stock) || 0);
+  const weightNum = Math.max(0, Number(weight) || 0);
+  if (id) {
+    const idx = prizes.findIndex(p => p.id === id);
+    if (idx === -1) return res.status(404).json({ error: '奖品不存在' });
+    prizes[idx] = { ...prizes[idx], name: String(name).trim(), stock: stockNum, weight: weightNum };
+  } else {
+    prizes.push({
+      id: 'prize_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8),
+      name: String(name).trim(),
+      stock: stockNum,
+      weight: weightNum,
+      total: stockNum,
+      createdAt: new Date().toISOString()
+    });
+  }
+  db.settings.prizes = prizes;
+  saveDB();
+  ghPush().catch(e => console.error('[admin prizes] GitHub push failed:', e.message));
+  res.json({ success: true, prizes });
+});
+
+app.delete('/api/admin/prizes/:id', verifyAdminToken, (req, res) => {
+  const prizes = (db.settings.prizes || []).filter(p => p.id !== req.params.id);
+  db.settings.prizes = prizes;
+  saveDB();
+  ghPush().catch(e => console.error('[admin prizes] GitHub push failed:', e.message));
+  res.json({ success: true, prizes });
+});
+
+app.get('/api/admin/draw-records', verifyAdminToken, (req, res) => {
+  res.json({ records: db.drawRecords || [] });
 });
 
 app.get('/api/admin/scores', verifyAdminToken, (req, res) => {

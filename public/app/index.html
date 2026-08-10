@@ -202,6 +202,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     <a href="/app/judge.html" class="nav-link"><span class="nl-icon">⚖️</span> 评委入口</a>
     <a href="/app/admin.html" class="nav-link"><span class="nl-icon">⚙️</span> 管理后台</a>
     <a href="/app/lucky.html" id="luckyNavLink" class="nav-link" style="display:none;"><span class="nl-icon">🎁</span> 幸运投票人名单</a>
+    <a href="/app/lucky.html" id="drawNavLink" class="nav-link" style="display:none;"><span class="nl-icon">🎁</span> 投票抽奖</a>
+    <span id="drawNavDisabled" class="nav-link" style="display:none;opacity:.6;cursor:default;"><span class="nl-icon">🎁</span> 尚未开启，敬请期待</span>
   </div>
 </div>
 
@@ -371,6 +373,7 @@ async function exchangeCode(code) {
     updateStageUI();
     showToast('钉钉登录成功，欢迎 ' + ddUser.nick + '！', 'success');
     renderRanking();
+    checkDrawStatus();
   } catch(e) {
     showToast('登录失败：' + e.message, 'error');
   }
@@ -388,11 +391,13 @@ async function checkAuth() {
       isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage);
       updateUserUI();
       updateStageUI();
+      checkDrawStatus();
     } else {
       ddAuthed = false;
       ddUser = null;
       ddRemaining = 5;
       updateUserUI();
+      checkDrawStatus();
     }
   } catch(e) {
     ddAuthed = false;
@@ -736,6 +741,32 @@ async function checkLucky() {
   } catch(e) { /* 忽略 */ }
 }
 
+async function checkDrawStatus() {
+  const link = document.getElementById('drawNavLink');
+  const disabled = document.getElementById('drawNavDisabled');
+  if (!link || !disabled) return;
+  if (!ddAuthed) {
+    link.style.display = 'none';
+    disabled.style.display = 'none';
+    return;
+  }
+  try {
+    const data = await api('/api/draw/status');
+    const hasOpen = data.enabled && (data.openStages || []).length > 0;
+    if (hasOpen) {
+      link.style.display = '';
+      disabled.style.display = 'none';
+      link.querySelector('.nl-icon').nextSibling.textContent = ' 投票抽奖' + (data.totalRemaining > 0 ? ' (' + data.totalRemaining + ')' : '');
+    } else {
+      link.style.display = 'none';
+      disabled.style.display = '';
+    }
+  } catch(e) {
+    link.style.display = 'none';
+    disabled.style.display = 'none';
+  }
+}
+
 function renderLoginPrompt() {
   ['rankingListIndividual', 'rankingListTeam'].forEach(function(id) {
     const list = document.getElementById(id);
@@ -756,6 +787,7 @@ async function init() {
     await renderRanking();
   }
   await checkLucky();
+  await checkDrawStatus();
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') { closeDetail(); }
   });
