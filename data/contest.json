@@ -2425,6 +2425,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPM4rHmVmHVDnNAbDNAbA_432_432.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-10T10:53:20.263Z"
+    },
+    {
+      "entryId": "entry_1785348752114_picbqa",
+      "voterId": "MYN2W4Cf1mesWBQhciPQMfAiEiE",
+      "voterName": "宋陆凤",
+      "voterMobile": "18355096871",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T10:53:28.840Z"
     }
   ],
   "judgeScores": [],
