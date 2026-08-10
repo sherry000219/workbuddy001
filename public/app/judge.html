@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>评委评审 — 云帐房头号玩家第三季</title>
 <script src="https://g.alicdn.com/dingding/dingtalk-jsapi/3.1.0/dingtalk.open.js"></script>
-<script src="poster.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -187,8 +186,13 @@ function escapeHtml(text) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[m];
   });
 }
-function renderPosterCard(url) { return PosterHelper.renderPosterCard(url); }
-function renderPosterDetail(url) { return PosterHelper.renderPosterDetail(url); }
+function renderPosterDetail(url) {
+  if (!url) return '';
+  if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
+    return '<div class="dvalue"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">🖼️ 查看作品海报（钉盘）</a></div>';
+  }
+  return '<div class="dvalue"><img src="' + escapeHtml(url) + '" style="max-width:100%;max-height:300px;border-radius:8px;" alt="作品海报" onerror="this.style.display=\'none\'"></div>';
+}
 
 
 // ========== API ==========

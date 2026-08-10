@@ -3,9 +3,6 @@ const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const crypto = require('crypto');
-let sharp;
-try { sharp = require('sharp'); } catch (_) { sharp = null; }
 
 // ========== CONFIG ==========
 const PORT = process.env.PORT || 3000;
@@ -26,35 +23,6 @@ if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
 const SESSION_MAX_AGE = 24 * 60 * 60 * 1000;
 const SESSION_FILE = path.join(DB_DIR, 'sessions.json');
 const sessions = loadSessions();
-
-// 缩略图缓存目录（按 URL md5 缓存到磁盘）
-const THUMBS_DIR = path.join(DB_DIR, 'thumbs');
-if (!fs.existsSync(THUMBS_DIR)) fs.mkdirSync(THUMBS_DIR, { recursive: true });
-
-// 内存缩略图缓存（Buffer 数组），减少磁盘 IO
-const thumbCache = new Map(); // md5 -> Buffer
-const THUMB_MAX_WIDTH = 400;
-const THUMB_JPEG_QUALITY = 70;
-const THUMB_HTTP_TIMEOUT_MS = 8000;
-const THUMB_MAX_SIZE_BYTES = 5 * 1024 * 1024; // 不抓超过 5MB 的源图
-
-// 不抓的域名（内网/钉钉/钉盘等需要鉴权无法公网访问）
-function isUnsupportedHost(urlStr) {
-  try {
-    const h = new URL(urlStr).hostname.toLowerCase();
-    const blocked = [
-      'alidocs.dingtalk.com',
-      'dingtalk.com',
-      'dingding.com',
-      'doc.dingtalk.com',
-      'space.dingtalk.com',
-      'qr.dingtalk.com',
-      'feishu.cn', 'larksuite.com', 'bytedance.com',
-      'docs.qq.com', 'cloud.tencent.com',
-    ];
-    return blocked.some(b => h === b || h.endsWith('.' + b) || h.includes(b));
-  } catch (_) { return true; }
-}
 
 function loadSessions() {
   try {
@@ -783,97 +751,6 @@ app.get('/api/entries/:id', requireAuth, (req, res) => {
     }
   });
 });
-
-// ========== API: POSTER THUMBNAIL ==========
-// 服务端代理抓取作品海报链接，压缩成缩略图后返回。
-// - 钉钉/钉盘等内网链接直接 415，前端 fallback 到「查看作品海报」按钮
-// - 公网图片链接 → 抓取 → sharp 压缩到 ≤400px 宽 JPEG → 缓存到磁盘
-app.get('/api/poster-thumb', async (req, res) => {
-  if (!sharp) return res.status(503).json({ error: '服务端未安装 sharp' });
-  let url = (req.query.url || '').toString().trim();
-  if (!url) return res.status(400).json({ error: '缺少 url 参数' });
-  if (!/^https?:\/\//i.test(url)) return res.status(400).json({ error: 'url 必须以 http/https 开头' });
-  if (isUnsupportedHost(url)) return res.status(415).json({ error: '该链接不支持生成缩略图' });
-
-  const md5 = crypto.createHash('md5').update(url).digest('hex');
-  const cached = thumbCache.get(md5);
-  if (cached) {
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.setHeader('Cache-Control', 'public, max-age=86400');
-    res.setHeader('X-Cache', 'HIT-MEM');
-    return res.end(cached);
-  }
-  const filePath = path.join(THUMBS_DIR, md5 + '.jpg');
-  try {
-    if (fs.existsSync(filePath)) {
-      const buf = fs.readFileSync(filePath);
-      thumbCache.set(md5, buf);
-      res.setHeader('Content-Type', 'image/jpeg');
-      res.setHeader('Cache-Control', 'public, max-age=86400');
-      res.setHeader('X-Cache', 'HIT-DISK');
-      return res.end(buf);
-    }
-  } catch (_) {}
-
-  // 抓取并压缩
-  let sourceBuf;
-  try {
-    sourceBuf = await fetchUrlAsBuffer(url);
-  } catch (e) {
-    return res.status(502).json({ error: '抓取原图失败: ' + (e.message || 'unknown') });
-  }
-  if (!sourceBuf || sourceBuf.length === 0) {
-    return res.status(502).json({ error: '原图为空' });
-  }
-  if (sourceBuf.length > THUMB_MAX_SIZE_BYTES) {
-    return res.status(413).json({ error: '原图超过 5MB 限制' });
-  }
-
-  let thumbBuf;
-  try {
-    thumbBuf = await sharp(sourceBuf)
-      .rotate()                          // 修正 EXIF 方向
-      .resize({ width: THUMB_MAX_WIDTH, withoutEnlargement: true })
-      .jpeg({ quality: THUMB_JPEG_QUALITY, progressive: true, mozjpeg: false })
-      .toBuffer();
-  } catch (e) {
-    return res.status(422).json({ error: '图片处理失败: ' + (e.message || 'unknown') });
-  }
-
-  try {
-    fs.writeFileSync(filePath, thumbBuf);
-  } catch (_) { /* 写盘失败也不要紧，内存缓存仍可用 */ }
-  thumbCache.set(md5, thumbBuf);
-
-  res.setHeader('Content-Type', 'image/jpeg');
-  res.setHeader('Cache-Control', 'public, max-age=86400');
-  res.setHeader('X-Cache', 'MISS');
-  res.end(thumbBuf);
-});
-
-// 用 Node 22 内置 fetch 抓 URL 返回 Buffer
-async function fetchUrlAsBuffer(url) {
-  const ac = new AbortController();
-  const timer = setTimeout(() => ac.abort(), THUMB_HTTP_TIMEOUT_MS);
-  try {
-    const resp = await fetch(url, {
-      signal: ac.signal,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (WorkBuddy-Thumb/1.0)',
-        'Accept': 'image/avif,image/webp,image/png,image/jpeg,image/*;q=0.8,*/*;q=0.5',
-      },
-    });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const lenHeader = resp.headers.get('content-length');
-    if (lenHeader && parseInt(lenHeader, 10) > THUMB_MAX_SIZE_BYTES) {
-      throw new Error('原图超过大小限制');
-    }
-    const ab = await resp.arrayBuffer();
-    return Buffer.from(ab);
-  } finally {
-    clearTimeout(timer);
-  }
-}
 
 // ========== API: ATTACHMENTS ==========
 app.get('/api/attachments/:entryId', requireAuth, (req, res) => {
