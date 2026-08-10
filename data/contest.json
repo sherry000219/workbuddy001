@@ -3145,6 +3145,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPDeC21NSmqTPNAyDNAyA_800_800.png",
       "stage": "preliminary",
       "createdAt": "2026-08-10T14:15:35.214Z"
+    },
+    {
+      "entryId": "entry_1786374088143_40x0ai",
+      "voterId": "Zs7TYP9ojLYq7C1qbyiif7wiEiE",
+      "voterName": "李铭铖",
+      "voterMobile": "15926351506",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T15:02:31.030Z"
     }
   ],
   "judgeScores": [],
