@@ -157,11 +157,14 @@ const DEFAULT_DB = {
     luckyListEnabled: false,
     drawConfig: {
       enabled: false,
-      rules: '1. 每赛程每位用户最多投 5 票。\n2. 赛程结算后，押中晋级/获奖作品即可获得抽奖次数（押中 1 个作品 = 1 次抽奖机会）。\n3. 点击抽奖后按奖品权重随机抽取，奖品库存为 0 时不再抽中。\n4. 中奖后请联系管理员兑奖。',
-      contact: '刘相丞（刘木目）',
-      noWinWeight: 100
+      rules: '1. 每赛程每位用户最多投 5 票。\n2. 赛程结算后，押中晋级/获奖作品即可获得抽奖次数（押中 1 个作品 = 1 次抽奖机会）。\n3. 点击抽奖后按剩余奖品数与剩余抽奖次数自动计算中奖概率，奖品库存为 0 时不再抽中。\n4. 中奖后请联系管理员兑奖。',
+      contact: '刘相丞（刘木目）'
     },
-    prizes: []
+    prizes: {
+      preliminary: [],
+      semi_final: [],
+      final: []
+    }
   }
 };
 
@@ -197,9 +200,26 @@ function loadDB() {
       if (dc.enabled === undefined) dc.enabled = false;
       if (!dc.rules) dc.rules = DEFAULT_DB.settings.drawConfig.rules;
       if (!dc.contact) dc.contact = DEFAULT_DB.settings.drawConfig.contact;
-      if (dc.noWinWeight === undefined) dc.noWinWeight = DEFAULT_DB.settings.drawConfig.noWinWeight;
+      // 旧版 noWinWeight 已废弃：概率改为按剩余奖品/剩余抽奖次数动态计算
+      delete dc.noWinWeight;
     }
-    if (!merged.settings.prizes) merged.settings.prizes = [];
+    // 迁移：旧版 prizes 是全局数组，新版改为按赛段映射
+    if (Array.isArray(merged.settings.prizes)) {
+      const old = merged.settings.prizes || [];
+      merged.settings.prizes = {
+        preliminary: old,
+        semi_final: [],
+        final: [],
+        awarded: []
+      };
+    } else if (!merged.settings.prizes || typeof merged.settings.prizes !== 'object') {
+      merged.settings.prizes = { ...DEFAULT_DB.settings.prizes };
+    } else {
+      // 确保三个抽奖赛段键都存在
+      for (const s of DRAW_STAGE_ORDER) {
+        if (!Array.isArray(merged.settings.prizes[s])) merged.settings.prizes[s] = [];
+      }
+    }
     if (!merged.drawRecords) merged.drawRecords = [];
     return merged;
   } catch (e) {
@@ -1049,16 +1069,53 @@ function getUserStageRemainingDraws(userId, stage) {
   return Math.max(0, hits - used);
 }
 
-// 按权重抽奖：奖品 weight 越高中奖概率越大；库存为 0 自动跳过
-function drawPrize() {
-  const prizes = (db.settings.prizes || []).filter(p => p.stock > 0 && p.weight > 0);
-  const noWinWeight = Math.max(0, Number(db.settings.drawConfig.noWinWeight) || 0);
-  const totalWeight = prizes.reduce((s, p) => s + Number(p.weight), 0) + noWinWeight;
-  if (totalWeight <= 0) return { isWin: false, name: '谢谢参与' };
-  const rnd = Math.random() * totalWeight;
+// 计算某赛段全部用户可抽奖次数之和（即押中总次数）
+function getStageTotalAllowedDraws(stage) {
+  const advanced = DRAW_STAGE_ADV[stage] || [];
+  let total = 0;
+  for (const e of db.entries) {
+    if (!advanced.includes(e.roundStatus)) continue;
+    const voters = new Set();
+    for (const v of db.votes) {
+      if ((v.stage || 'preliminary') === stage && v.entryId === e.id) voters.add(v.voterId);
+    }
+    total += voters.size;
+  }
+  return total;
+}
+
+function getStageUsedDraws(stage) {
+  return db.drawRecords.filter(r => r.stage === stage).length;
+}
+
+function getStagePrizes(stage) {
+  const map = db.settings.prizes || {};
+  return Array.isArray(map[stage]) ? map[stage] : [];
+}
+
+// 按赛段库存抽奖：动态概率 = 剩余奖品数 / 剩余抽奖次数；中奖后按库存权重挑选具体奖品
+function drawPrize(stage) {
+  const prizes = getStagePrizes(stage).filter(p => p.stock > 0);
+  const totalAllowed = getStageTotalAllowedDraws(stage);
+  const usedDraws = getStageUsedDraws(stage);
+  const remainingDraws = Math.max(0, totalAllowed - usedDraws);
+  const remainingPrizes = prizes.reduce((s, p) => s + p.stock, 0);
+
+  if (remainingDraws <= 0 || remainingPrizes <= 0) {
+    return { isWin: false, name: '谢谢参与' };
+  }
+
+  const winProb = Math.min(1, remainingPrizes / remainingDraws);
+  if (Math.random() > winProb) {
+    return { isWin: false, name: '谢谢参与' };
+  }
+
+  // 已中奖，按库存数量权重挑选具体奖品
+  const totalStock = prizes.reduce((s, p) => s + p.stock, 0);
+  const rnd = Math.random() * totalStock;
   let acc = 0;
   for (const p of prizes) {
-    acc += Number(p.weight);
+    acc += p.stock;
     if (rnd <= acc) {
       p.stock = Math.max(0, p.stock - 1);
       return { isWin: true, id: p.id, name: p.name };
@@ -1081,6 +1138,12 @@ app.get('/api/draw/status', requireAuth, (req, res) => {
       isWin: r.isWin,
       drawnAt: r.drawnAt
     }));
+    const stagePrizes = getStagePrizes(stage).filter(p => p.stock > 0);
+    const remainingPrizes = stagePrizes.reduce((s, p) => s + p.stock, 0);
+    const totalAllowed = getStageTotalAllowedDraws(stage);
+    const usedDraws = getStageUsedDraws(stage);
+    const remainingDraws = Math.max(0, totalAllowed - usedDraws);
+    const winProb = remainingDraws > 0 ? Math.min(1, remainingPrizes / remainingDraws) : 0;
     stages[stage] = {
       label: DRAW_STAGE_LABEL[stage],
       isOpen: openStages.includes(stage),
@@ -1088,7 +1151,13 @@ app.get('/api/draw/status', requireAuth, (req, res) => {
       hits,
       hitEntryIds,
       remaining: getUserStageRemainingDraws(userId, stage),
-      records
+      records,
+      prizes: stagePrizes.map(p => ({ id: p.id, name: p.name, stock: p.stock })),
+      totalPrizes: remainingPrizes,
+      totalAllowed,
+      usedDraws,
+      remainingDraws,
+      winProbability: Number(winProb.toFixed(4))
     };
     if (openStages.includes(stage)) totalRemaining += stages[stage].remaining;
   }
@@ -1116,7 +1185,7 @@ app.post('/api/draw', requireAuth, (req, res) => {
   const remaining = getUserStageRemainingDraws(userId, stage);
   if (remaining <= 0) return res.status(403).json({ error: '本赛程抽奖次数已用完' });
 
-  const result = drawPrize();
+  const result = drawPrize(stage);
   const record = {
     id: 'dr_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8),
     userId,
@@ -1270,12 +1339,27 @@ app.post('/api/admin/auth', (req, res) => {
 // 抽奖配置与奖品管理
 app.get('/api/admin/draw-config', verifyAdminToken, (req, res) => {
   const config = db.settings.drawConfig || DEFAULT_DB.settings.drawConfig;
+  const stageStats = {};
+  for (const stage of DRAW_STAGE_ORDER) {
+    const prizes = getStagePrizes(stage);
+    const remainingPrizes = prizes.reduce((s, p) => s + p.stock, 0);
+    const totalAllowed = getStageTotalAllowedDraws(stage);
+    const usedDraws = getStageUsedDraws(stage);
+    stageStats[stage] = {
+      label: DRAW_STAGE_LABEL[stage],
+      prizeCount: prizes.length,
+      remainingPrizes,
+      totalAllowed,
+      usedDraws,
+      remainingDraws: Math.max(0, totalAllowed - usedDraws)
+    };
+  }
   res.json({
     enabled: !!config.enabled,
     rules: config.rules,
     contact: config.contact,
-    noWinWeight: config.noWinWeight,
-    prizes: db.settings.prizes || []
+    prizes: db.settings.prizes || DEFAULT_DB.settings.prizes,
+    stageStats
   });
 });
 
@@ -1284,45 +1368,49 @@ app.post('/api/admin/draw-config', verifyAdminToken, (req, res) => {
   if (req.body.enabled !== undefined) config.enabled = Boolean(req.body.enabled);
   if (req.body.rules !== undefined) config.rules = String(req.body.rules || '');
   if (req.body.contact !== undefined) config.contact = String(req.body.contact || '');
-  if (req.body.noWinWeight !== undefined) config.noWinWeight = Math.max(0, Number(req.body.noWinWeight) || 0);
+  delete config.noWinWeight;
   db.settings.drawConfig = config;
   saveDB();
   ghPush().catch(e => console.error('[admin draw-config] GitHub push failed:', e.message));
-  res.json({ success: true, config: { enabled: config.enabled, rules: config.rules, contact: config.contact, noWinWeight: config.noWinWeight } });
+  res.json({ success: true, config: { enabled: config.enabled, rules: config.rules, contact: config.contact } });
 });
 
 app.post('/api/admin/prizes', verifyAdminToken, (req, res) => {
-  const { id, name, stock, weight } = req.body;
+  const { stage, id, name, stock } = req.body;
+  if (!DRAW_STAGE_ORDER.includes(stage)) return res.status(400).json({ error: '无效的赛段' });
   if (!name || String(name).trim() === '') return res.status(400).json({ error: '奖品名称不能为空' });
-  const prizes = db.settings.prizes || [];
+  const prizeMap = db.settings.prizes || DEFAULT_DB.settings.prizes;
+  const prizes = Array.isArray(prizeMap[stage]) ? prizeMap[stage] : [];
   const stockNum = Math.max(0, Number(stock) || 0);
-  const weightNum = Math.max(0, Number(weight) || 0);
   if (id) {
     const idx = prizes.findIndex(p => p.id === id);
     if (idx === -1) return res.status(404).json({ error: '奖品不存在' });
-    prizes[idx] = { ...prizes[idx], name: String(name).trim(), stock: stockNum, weight: weightNum };
+    prizes[idx] = { ...prizes[idx], name: String(name).trim(), stock: stockNum };
   } else {
     prizes.push({
       id: 'prize_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8),
       name: String(name).trim(),
       stock: stockNum,
-      weight: weightNum,
       total: stockNum,
       createdAt: new Date().toISOString()
     });
   }
-  db.settings.prizes = prizes;
+  prizeMap[stage] = prizes;
+  db.settings.prizes = prizeMap;
   saveDB();
   ghPush().catch(e => console.error('[admin prizes] GitHub push failed:', e.message));
-  res.json({ success: true, prizes });
+  res.json({ success: true, prizes: prizeMap });
 });
 
 app.delete('/api/admin/prizes/:id', verifyAdminToken, (req, res) => {
-  const prizes = (db.settings.prizes || []).filter(p => p.id !== req.params.id);
-  db.settings.prizes = prizes;
+  const stage = req.query.stage;
+  if (!DRAW_STAGE_ORDER.includes(stage)) return res.status(400).json({ error: '无效的赛段' });
+  const prizeMap = db.settings.prizes || DEFAULT_DB.settings.prizes;
+  prizeMap[stage] = (prizeMap[stage] || []).filter(p => p.id !== req.params.id);
+  db.settings.prizes = prizeMap;
   saveDB();
   ghPush().catch(e => console.error('[admin prizes] GitHub push failed:', e.message));
-  res.json({ success: true, prizes });
+  res.json({ success: true, prizes: prizeMap });
 });
 
 app.get('/api/admin/draw-records', verifyAdminToken, (req, res) => {

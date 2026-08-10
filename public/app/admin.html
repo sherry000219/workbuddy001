@@ -226,36 +226,33 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
             <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px;">兑奖联系人</label>
             <input type="text" id="adminDrawContact" onchange="saveDrawConfig()" placeholder="例如：刘相丞（刘木目）" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;">
           </div>
-          <div>
-            <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px;">谢谢参与权重（越高越难中奖）</label>
-            <input type="number" id="adminDrawNoWinWeight" onchange="saveDrawConfig()" min="0" placeholder="例如：100" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;">
-          </div>
         </div>
         <div style="margin-bottom:16px;">
           <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px;">游戏规则（用户端展示）</label>
           <textarea id="adminDrawRules" onchange="saveDrawConfig()" rows="4" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;resize:vertical;"></textarea>
         </div>
 
+        <div style="margin-bottom:12px;">
+          <div style="font-weight:600;font-size:14px;margin-bottom:10px;">按赛段配置奖品池</div>
+          <div id="drawStageTabs" style="display:flex;gap:8px;margin-bottom:12px;"></div>
+          <div id="drawStageStats" style="font-size:13px;color:var(--text-dim);margin-bottom:12px;padding:10px 12px;background:#f9fafb;border-radius:8px;"></div>
+        </div>
+
         <div style="margin-bottom:16px;">
-          <div style="font-weight:600;font-size:14px;margin-bottom:10px;">奖品池</div>
           <div id="drawPrizesList"></div>
         </div>
 
         <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px;">
-          <div style="font-weight:600;font-size:14px;margin-bottom:10px;">新增 / 编辑奖品</div>
-          <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end;">
+          <div style="font-weight:600;font-size:14px;margin-bottom:10px;">新增 / 编辑奖品（<span id="prizeStageLabel">初赛</span>）</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end;">
             <div>
               <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px;">奖品名称</label>
               <input type="text" id="prizeEditId" style="display:none;">
               <input type="text" id="prizeName" placeholder="例如： WorkBuddy 周边礼盒" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;">
             </div>
             <div>
-              <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px;">剩余数量</label>
+              <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px;">奖品数量（库存）</label>
               <input type="number" id="prizeStock" min="0" placeholder="0" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;">
-            </div>
-            <div>
-              <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px;">中奖权重</label>
-              <input type="number" id="prizeWeight" min="0" placeholder="越高概率越大" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;">
             </div>
             <div>
               <button class="btn btn-primary btn-sm" onclick="savePrize()">保存奖品</button>
@@ -313,6 +310,8 @@ let votingEnabled = false;
 let ddAuthed = false;
 let ddUser = null;
 let loginState = null;
+let currentDrawStage = 'preliminary';
+const DRAW_STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛' };
 const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
 const ROUND_LABELS = { approved: '初赛', semi_finalist: '复赛晋级', eliminated_semi: '复赛淘汰', finalist: '决赛晋级', eliminated_final: '决赛淘汰', awarded: '已获奖' };
 const AWARD_LABELS = { first: '🥇 一等奖', second: '🥈 二等奖', third: '🥉 三等奖', excellence: '🎖️ 优秀奖' };
@@ -634,6 +633,9 @@ async function exportLuckyCSV() {
 }
 
 // ========== DRAW ADMIN ==========
+let cachedDrawPrizes = {};
+let cachedDrawStageStats = {};
+
 async function loadDrawConfig() {
   if (!adminToken) return;
   try {
@@ -641,8 +643,11 @@ async function loadDrawConfig() {
     document.getElementById('adminDrawEnabled').checked = !!data.enabled;
     document.getElementById('adminDrawContact').value = data.contact || '';
     document.getElementById('adminDrawRules').value = data.rules || '';
-    document.getElementById('adminDrawNoWinWeight').value = data.noWinWeight || 0;
-    renderDrawPrizes(data.prizes || []);
+    cachedDrawPrizes = data.prizes || {};
+    cachedDrawStageStats = data.stageStats || {};
+    renderDrawStageTabs();
+    renderDrawStageStats();
+    renderDrawPrizes();
     loadDrawRecords();
   } catch(e) { showToast('加载抽奖配置失败：' + e.message, 'error'); }
 }
@@ -652,8 +657,7 @@ async function saveDrawConfig() {
   const body = {
     enabled: document.getElementById('adminDrawEnabled').checked,
     contact: document.getElementById('adminDrawContact').value,
-    rules: document.getElementById('adminDrawRules').value,
-    noWinWeight: Number(document.getElementById('adminDrawNoWinWeight').value) || 0
+    rules: document.getElementById('adminDrawRules').value
   };
   try {
     await api('/api/admin/draw-config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify(body) });
@@ -661,19 +665,50 @@ async function saveDrawConfig() {
   } catch(e) { showToast(e.message, 'error'); }
 }
 
-function renderDrawPrizes(prizes) {
+function renderDrawStageTabs() {
+  const el = document.getElementById('drawStageTabs');
+  if (!el) return;
+  let html = '';
+  for (const stage of Object.keys(DRAW_STAGE_LABELS)) {
+    const active = stage === currentDrawStage ? 'background:var(--accent);color:#fff;border-color:var(--accent);' : 'background:#fff;color:var(--text);border-color:#d1d5db;';
+    html += `<button onclick="switchDrawStage('${stage}')" style="padding:6px 14px;border-radius:6px;border:1px solid;font-size:13px;cursor:pointer;${active}">${DRAW_STAGE_LABELS[stage]}</button>`;
+  }
+  el.innerHTML = html;
+  const label = document.getElementById('prizeStageLabel');
+  if (label) label.textContent = DRAW_STAGE_LABELS[currentDrawStage] || currentDrawStage;
+}
+
+function switchDrawStage(stage) {
+  currentDrawStage = stage;
+  document.getElementById('prizeEditId').value = '';
+  document.getElementById('prizeName').value = '';
+  document.getElementById('prizeStock').value = '';
+  renderDrawStageTabs();
+  renderDrawStageStats();
+  renderDrawPrizes();
+}
+
+function renderDrawStageStats() {
+  const el = document.getElementById('drawStageStats');
+  if (!el) return;
+  const s = cachedDrawStageStats[currentDrawStage] || {};
+  const prob = s.remainingDraws > 0 ? Math.min(100, Math.round((s.remainingPrizes || 0) / s.remainingDraws * 100)) : 0;
+  el.innerHTML = `当前赛段：<strong>${s.label || DRAW_STAGE_LABELS[currentDrawStage]}</strong>｜奖品种类：<strong>${s.prizeCount || 0}</strong>｜剩余奖品：<strong>${s.remainingPrizes || 0}</strong>｜已抽次数：<strong>${s.usedDraws || 0}</strong>｜剩余抽奖次数：<strong>${s.remainingDraws || 0}</strong>｜当前综合中奖率约：<strong>${prob}%</strong>`;
+}
+
+function renderDrawPrizes() {
   const el = document.getElementById('drawPrizesList');
   if (!el) return;
+  const prizes = cachedDrawPrizes[currentDrawStage] || [];
   if (prizes.length === 0) {
-    el.innerHTML = '<p style="color:var(--text-dim);font-size:13px;">暂无奖品，请在下方面板添加。</p>';
+    el.innerHTML = '<p style="color:var(--text-dim);font-size:13px;">当前赛段暂无奖品，请在下方面板添加。</p>';
     return;
   }
-  let html = '<table style="width:100%;font-size:13px;border-collapse:collapse;"><thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;">奖品名称</th><th style="text-align:center;padding:8px;border-bottom:1px solid #e5e7eb;">剩余/总量</th><th style="text-align:center;padding:8px;border-bottom:1px solid #e5e7eb;">权重</th><th style="text-align:right;padding:8px;border-bottom:1px solid #e5e7eb;">操作</th></tr></thead><tbody>';
+  let html = '<table style="width:100%;font-size:13px;border-collapse:collapse;"><thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;">奖品名称</th><th style="text-align:center;padding:8px;border-bottom:1px solid #e5e7eb;">剩余/总量</th><th style="text-align:right;padding:8px;border-bottom:1px solid #e5e7eb;">操作</th></tr></thead><tbody>';
   prizes.forEach(p => {
     html += `<tr>
       <td style="padding:8px;border-bottom:1px solid #f3f4f6;">${escHtml(p.name)}</td>
       <td style="padding:8px;border-bottom:1px solid #f3f4f6;text-align:center;">${p.stock || 0} / ${p.total || p.stock || 0}</td>
-      <td style="padding:8px;border-bottom:1px solid #f3f4f6;text-align:center;">${p.weight || 0}</td>
       <td style="padding:8px;border-bottom:1px solid #f3f4f6;text-align:right;">
         <button class="btn btn-outline btn-sm" onclick="editPrize('${escHtml(p.id)}')">编辑</button>
         <button class="btn btn-danger btn-sm" onclick="deletePrize('${escHtml(p.id)}')">删除</button>
@@ -689,15 +724,13 @@ async function savePrize() {
   const id = document.getElementById('prizeEditId').value;
   const name = document.getElementById('prizeName').value.trim();
   const stock = Number(document.getElementById('prizeStock').value) || 0;
-  const weight = Number(document.getElementById('prizeWeight').value) || 0;
   if (!name) return showToast('奖品名称不能为空', 'error');
   try {
-    await api('/api/admin/prizes', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ id, name, stock, weight }) });
+    await api('/api/admin/prizes', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ stage: currentDrawStage, id, name, stock }) });
     showToast('奖品已保存', 'success');
     document.getElementById('prizeEditId').value = '';
     document.getElementById('prizeName').value = '';
     document.getElementById('prizeStock').value = '';
-    document.getElementById('prizeWeight').value = '';
     loadDrawConfig();
   } catch(e) { showToast(e.message, 'error'); }
 }
@@ -705,13 +738,12 @@ async function savePrize() {
 async function editPrize(id) {
   if (!adminToken) return;
   try {
-    const data = await api('/api/admin/draw-config', { headers: { 'x-admin-token': adminToken } });
-    const p = (data.prizes || []).find(x => x.id === id);
+    const prizes = cachedDrawPrizes[currentDrawStage] || [];
+    const p = prizes.find(x => x.id === id);
     if (!p) return showToast('奖品不存在', 'error');
     document.getElementById('prizeEditId').value = p.id;
     document.getElementById('prizeName').value = p.name;
     document.getElementById('prizeStock').value = p.stock;
-    document.getElementById('prizeWeight').value = p.weight;
   } catch(e) { showToast(e.message, 'error'); }
 }
 
@@ -719,7 +751,7 @@ async function deletePrize(id) {
   if (!adminToken) return showToast('请先登录管理后台', 'error');
   if (!confirm('确定删除该奖品吗？')) return;
   try {
-    await api('/api/admin/prizes/' + id, { method: 'DELETE', headers: { 'x-admin-token': adminToken } });
+    await api('/api/admin/prizes/' + id + '?stage=' + encodeURIComponent(currentDrawStage), { method: 'DELETE', headers: { 'x-admin-token': adminToken } });
     showToast('奖品已删除', 'success');
     loadDrawConfig();
   } catch(e) { showToast(e.message, 'error'); }
