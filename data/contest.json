@@ -1261,6 +1261,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM59lHuVmgEPNBJzNBJuwb2UXKS2_JsgI5phCqoHUAA_1179_1180.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-10T09:06:51.750Z"
+    },
+    {
+      "entryId": "entry_1786340551344_uzahth",
+      "voterId": "FJPFzOo4jjqyGgvgXVpDDwiEiE",
+      "voterName": "张炎炎",
+      "voterMobile": "17601543502",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPM3yRoJe-GabNBkDNBkA_1600_1600.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T09:07:07.761Z"
     }
   ],
   "judgeScores": [],
