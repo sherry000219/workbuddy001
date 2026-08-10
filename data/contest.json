@@ -1207,6 +1207,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T09:06:17.929Z"
+    },
+    {
+      "entryId": "entry_1785325566960_99axb6",
+      "voterId": "wI3D9z9WRLqrNgIiSVDjY9giEiE",
+      "voterName": "陈晨",
+      "voterMobile": "18772367621",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4c50-qseOPNBE7NBE6we42oE3O_ywoJJ7Si0kouAA_1102_1102.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T09:06:19.969Z"
     }
   ],
   "judgeScores": [],
