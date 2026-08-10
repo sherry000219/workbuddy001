@@ -25,7 +25,10 @@
       "status": "approved",
       "roundStatus": "approved",
       "award": null,
-      "createdAt": "2026-08-10T10:06:33.193Z"
+      "createdAt": "2026-08-10T10:06:33.193Z",
+      "updatedAt": "2026-08-10T10:07:04.574Z",
+      "lastEditedAt": "2026-08-10T10:07:04.574Z",
+      "editNotice": true
     },
     {
       "id": "entry_1786355645419_jc8uii",
