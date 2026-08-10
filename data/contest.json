@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786338333096_ik561c",
+      "name": "杨绵绵",
+      "mobile": "18068393979",
+      "dept": "产研中心",
+      "dept1": "产研中心",
+      "dept2": "产品部",
+      "dept3": "",
+      "subdept": "产品部",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "creative",
+      "title": "需求上线日历",
+      "scene": "现有需求计划以创建时间逐条罗列，无法按实际上线日期直观查看或筛选。当需要跟进进度、复盘版本或拉取功能数据时，难以快速确认某项需求的正式上线节点。需求上线日历通过周/月视图集中展示需求发布日期，并支持手动维护和钉钉文档同步，帮助用户按上线时间快速定位需求。",
+      "process_text": "打开需求上线日历后，可手动新建需求并填写编号、名称和上线日期；也可点击“立即同步”，从钉钉“我的文档”中自动读取需求标题和正式发布日期。需求会按周或按月显示，用户可搜索、筛选、编辑或删除记录，并导出备份。人工修改后的日期会锁定，不会被后续同步覆盖。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/Obva6QBXJw969xwgfMx3KjoXWn4qY5Pr?doc_type=wiki_doc",
+      "result_text": "将分散、按创建时间罗列的需求计划，转换为按正式上线日期展示的周/月日历。用户可快速查看每项需求的上线节点，筛选和搜索需求，并通过钉钉同步或手动维护持续更新日期，方便进度跟进、版本复盘和数据分析。",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/dpYLaezmVNLgLRNBhPR1dXGY8rMqPxX6?doc_type=wiki_doc",
+      "extra": "",
+      "posterUrl": "https://qr.dingtalk.com/page/yunpan?route=previewDentry&spaceId=29128768378&fileId=231762768811&type=file",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/Obva6QBXJw969xwgfMx3XgnxWn4qY5Pr?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-10T05:05:33.096Z"
+    },
+    {
       "id": "entry_1786334382444_r429gr",
       "name": "徐聪明",
       "mobile": "18952230018",
