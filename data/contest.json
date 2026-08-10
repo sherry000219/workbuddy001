@@ -2218,6 +2218,24 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-10T10:38:26.508Z"
+    },
+    {
+      "entryId": "entry_1786014745788_j70nld",
+      "voterId": "AjxDiSxACbTkshBqyrnMKiPgiEiE",
+      "voterName": "仲旭",
+      "voterMobile": "13142992707",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T10:38:45.984Z"
+    },
+    {
+      "entryId": "entry_1785933777405_l85dpc",
+      "voterId": "hA86lEd6diiLqkIPCNV0nRwiEiE",
+      "voterName": "王顺泽",
+      "voterMobile": "18551605664",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-10T10:38:46.350Z"
     }
   ],
   "judgeScores": [],
