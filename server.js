@@ -367,6 +367,7 @@ const VOTE_LIMIT_PER_STAGE = 5;
 // ========== GITHUB SYNC ==========
 let _ghSha = null;
 let _ghTimer = null;
+let _ghPushing = false; // 互斥锁，防止并发 push
 const GH_TIMEOUT = 10000; // 10s timeout for GitHub API calls
 
 function ghReq(method, apiPath, body) {
@@ -610,6 +611,8 @@ async function forceSyncBeforeExit() {
   _shuttingDown = true;
   console.log('[gh] Force sync before exit...');
   try {
+    // 先确保内存中的最新数据写入磁盘
+    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
     await ghPush();
     await ghPushSessions();
     console.log('[gh] Force sync complete');
@@ -621,23 +624,48 @@ process.on('SIGTERM', () => { forceSyncBeforeExit().then(() => process.exit(0));
 process.on('SIGINT', () => { forceSyncBeforeExit().then(() => process.exit(0)); });
 
 async function ghPush() {
-  const maxAttempts = 3;
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      const buf = fs.readFileSync(DB_FILE);
-      const body = { message: 'auto: sync data', content: buf.toString('base64'), branch: GITHUB_DATA_BRANCH };
-      if (_ghSha) body.sha = _ghSha;
-      const { status, data } = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest.json`, body);
-      if (status >= 400) throw new Error(data.message || status);
-      _ghSha = data.content.sha;
-      console.log('[gh] Pushed data — sha:', _ghSha.slice(0, 7));
-      return;
-    } catch (e) {
-      console.error(`[gh] Push attempt ${attempt}/${maxAttempts} failed:`, e.message);
-      if (attempt < maxAttempts) await new Promise(r => setTimeout(r, 1500 * attempt));
-    }
+  if (_ghPushing) {
+    console.log('[gh] Push already in progress, scheduling retry...');
+    ghPushSchedule(); // 延迟重试
+    return;
   }
-  console.error('[gh] Push data FAILED after retries — local file remains source of truth until next save');
+  _ghPushing = true;
+  const maxAttempts = 3;
+  try {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const buf = fs.readFileSync(DB_FILE);
+        const body = { message: 'auto: sync data', content: buf.toString('base64'), branch: GITHUB_DATA_BRANCH };
+        if (_ghSha) body.sha = _ghSha;
+        const { status, data } = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest.json`, body);
+        if (status === 409 || (status === 422 && data.message && data.message.includes('SHA'))) {
+          // 409 Conflict / 422 SHA mismatch：远程数据被其他人更新了
+          // 先 pull 合并最新数据，再 push
+          console.log(`[gh] Push conflict (attempt ${attempt}), pulling latest before retry...`);
+          await ghPull();
+          // 重新 loadDB 到内存，确保合并后的数据写入磁盘
+          const refreshed = loadDB();
+          db.entries = refreshed.entries;
+          db.votes = refreshed.votes;
+          db.judgeScores = refreshed.judgeScores;
+          db.settings = refreshed.settings;
+          // 重新写入磁盘（合并后的数据）
+          fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
+          continue; // 重试 push
+        }
+        if (status >= 400) throw new Error(data.message || status);
+        _ghSha = data.content.sha;
+        console.log('[gh] Pushed data — sha:', _ghSha.slice(0, 7));
+        return;
+      } catch (e) {
+        console.error(`[gh] Push attempt ${attempt}/${maxAttempts} failed:`, e.message);
+        if (attempt < maxAttempts) await new Promise(r => setTimeout(r, 1500 * attempt));
+      }
+    }
+    console.error('[gh] Push data FAILED after retries — local file remains source of truth until next save');
+  } finally {
+    _ghPushing = false;
+  }
 }
 
 // ===== SESSIONS GITHUB SYNC =====
@@ -971,6 +999,8 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
   saveDB();
   _voteRL.set(userId, Date.now()); // 记录本次投票时间用于频率限制
   const remaining = VOTE_LIMIT_PER_STAGE - userVoteCount - 1;
+  // 投票后立即 push，不等延迟，确保数据不丢失
+  ghPush().catch(e => console.error('[vote] Immediate push failed:', e.message));
   res.json({ success: true, voteCount: db.votes.filter(v => v.entryId === req.params.entryId && (v.stage || 'preliminary') === stage).length, remaining });
 });
 
@@ -2171,4 +2201,25 @@ app.post('/api/force-sync', async (req, res) => {
   // Pull sessions from GitHub
   if (GITHUB_TOKEN) await ghPullSessions().catch(() => {});
   console.log('[session] Loaded — count:', sessions.size);
+
+  // 定期 pull 合并（每 5 分钟），防止数据漂移
+  // 确保 Render 休眠唤醒后、或多个实例时数据不会丢失
+  if (GITHUB_TOKEN) {
+    setInterval(async () => {
+      try {
+        await ghPull();
+        const refreshed = loadDB();
+        // 只在远程有新数据时更新内存
+        if (refreshed.votes.length > db.votes.length || refreshed.entries.length > db.entries.length || refreshed.judgeScores.length > db.judgeScores.length) {
+          console.log('[gh-periodic] Remote has newer data, updating memory — votes:', db.votes.length, '→', refreshed.votes.length, 'entries:', db.entries.length, '→', refreshed.entries.length);
+          db.entries = refreshed.entries;
+          db.votes = refreshed.votes;
+          db.judgeScores = refreshed.judgeScores;
+          db.settings = refreshed.settings;
+        }
+      } catch (e) {
+        console.error('[gh-periodic] Pull failed:', e.message);
+      }
+    }, 5 * 60 * 1000); // 5 分钟
+  }
 })().catch(e => { console.error('[fatal]', e); process.exit(1); });
