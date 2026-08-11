@@ -5140,6 +5140,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPD0P8QkSskJzNAyDNAyA_800_800.png",
       "stage": "preliminary",
       "createdAt": "2026-08-11T05:46:21.028Z"
+    },
+    {
+      "entryId": "entry_1785316018922_s1rkqh",
+      "voterId": "iPeyHTh8iS8Wr6fsPZ9RvXvwiEiE",
+      "voterName": "杨磊",
+      "voterMobile": "15950572972",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T05:47:44.018Z"
     }
   ],
   "judgeScores": [],
