@@ -165,7 +165,8 @@ const DEFAULT_DB = {
       semi_final: [],
       final: []
     },
-    judges: []  // 评委名单，由管理员设置，只有名单内的人才能打分
+    judges: [],  // 旧字段，兼容保留，新数据使用 judgesByStage
+    judgesByStage: { preliminary: [], semi_final: [], final: [] }  // 按赛段评委名单
   }
 };
 
@@ -201,6 +202,20 @@ function loadDB() {
     (merged.judgeScores || []).forEach(s => {
       if (!s.stage) s.stage = 'preliminary';
     });
+    // 迁移：旧版 judges 是全局数组，新版改为按赛段 judgesByStage
+    if (!merged.settings.judgesByStage) {
+      const oldJudges = merged.settings.judges || [];
+      merged.settings.judgesByStage = {
+        preliminary: [...oldJudges],
+        semi_final: [...oldJudges],
+        final: [...oldJudges]
+      };
+    } else {
+      // 确保三个赛段键都存在
+      if (!merged.settings.judgesByStage.preliminary) merged.settings.judgesByStage.preliminary = [];
+      if (!merged.settings.judgesByStage.semi_final) merged.settings.judgesByStage.semi_final = [];
+      if (!merged.settings.judgesByStage.final) merged.settings.judgesByStage.final = [];
+    }
     // 迁移：确保抽奖配置、奖品池、抽奖记录存在
     if (!merged.settings.drawConfig) {
       merged.settings.drawConfig = { ...DEFAULT_DB.settings.drawConfig };
@@ -271,6 +286,20 @@ const STAGE_LABELS = {
 
 function getCurrentStage() {
   return db.settings.currentStage || 'preliminary';
+}
+
+// 获取指定赛段的评委名单（空数组表示不限制）
+function getStageJudges(stage) {
+  const jbs = db.settings.judgesByStage;
+  if (!jbs) return db.settings.judges || []; // 旧数据兼容
+  return jbs[stage] || [];
+}
+
+// 判断评委是否在指定赛段的名单中
+function isJudgeInList(judgeName, stage) {
+  const list = getStageJudges(stage);
+  if (list.length === 0) return true; // 名单为空时任何人都可以打分
+  return list.includes(judgeName);
 }
 
 function isVotingStage(stage) {
@@ -491,29 +520,34 @@ async function ghPull() {
     const localSettings = localData.settings || {};
     const remoteSettings = remoteData.settings || {};
     const mergedSettings = { ...localSettings, ...remoteSettings };
-    // judges 数组智能合并：本地优先（管理员操作以本地为准）
-    // - 本地名单非空 → 使用本地名单（保证管理员添加/删除都生效）
-    // - 本地名单为空 → 使用远程名单（首次启动或名单被清空的情况）
-    if (localSettings.judges || remoteSettings.judges) {
-      const localJudges = localSettings.judges || [];
-      const remoteJudges = remoteSettings.judges || [];
-      if (localJudges.length > 0) {
-        // 本地有名单 → 以本地为准，但补充远程独有的（本地从未有过的评委）
-        // 这处理了"另一个实例添加了评委"的情况
-        const localSet = new Set(localJudges);
-        const remoteSet = new Set(remoteJudges);
-        // 只添加远程中本地没有的（且本地没有该评委的打分记录 → 非本地删除）
-        const localScoreNames = new Set((localData.judgeScores || []).map(s => s.judgeName));
-        for (const j of remoteSet) {
-          if (!localSet.has(j) && !localScoreNames.has(j)) {
-            localJudges.push(j); // 远程新增，本地没有打分记录 → 保留
+    // judgesByStage 按赛段合并：每个赛段本地优先，补充远程独有的新增评委
+    if (localSettings.judgesByStage || remoteSettings.judgesByStage) {
+      const localJbs = localSettings.judgesByStage || {};
+      const remoteJbs = remoteSettings.judgesByStage || {};
+      const mergedJbs = {};
+      const localScoreNames = new Set((localData.judgeScores || []).map(s => s.judgeName));
+      for (const st of ['preliminary', 'semi_final', 'final']) {
+        const localList = localJbs[st] || [];
+        const remoteList = remoteJbs[st] || [];
+        if (localList.length > 0) {
+          // 本地有名单 → 以本地为准，补充远程独有的新增评委
+          const localSet = new Set(localList);
+          for (const j of remoteList) {
+            if (!localSet.has(j) && !localScoreNames.has(j)) {
+              localList.push(j); // 远程新增，本地没有打分记录 → 保留
+            }
           }
+          mergedJbs[st] = localList;
+        } else {
+          mergedJbs[st] = remoteList; // 本地为空 → 使用远程
         }
-        mergedSettings.judges = localJudges;
-      } else {
-        // 本地名单为空 → 使用远程名单
-        mergedSettings.judges = remoteJudges;
       }
+      mergedSettings.judgesByStage = mergedJbs;
+    }
+    // 旧 judges 字段兼容保留
+    if (localSettings.judges || remoteSettings.judges) {
+      mergedSettings.judges = localSettings.judges && localSettings.judges.length > 0
+        ? localSettings.judges : (remoteSettings.judges || []);
     }
     // prizes 数组：按赛段取并集（每个赛段内的奖品按 name 去重）
     if (localSettings.prizes || remoteSettings.prizes) {
@@ -947,12 +981,11 @@ app.post('/api/judge/scores/:entryId', (req, res) => {
   if (judgePassword !== getJudgePassword()) {
     return res.status(403).json({ error: '评委密码错误' });
   }
-  // 评委名单校验：如果名单非空，则只有名单内的评委可以打分
-  const judgeList = db.settings.judges || [];
-  if (judgeList.length > 0 && !judgeList.includes(judgeName)) {
-    return res.status(403).json({ error: '您不在评委名单中，请联系管理员添加' });
-  }
   const stage = getCurrentStage();
+  // 评委名单校验：按当前赛段校验
+  if (!isJudgeInList(judgeName, stage)) {
+    return res.status(403).json({ error: '您不在当前赛段评委名单中，请联系管理员添加' });
+  }
   // Check entry is judgable in current stage
   const judgable = getJudgableEntries(stage);
   const entry = judgable.find(e => e.id === req.params.entryId);
@@ -974,12 +1007,11 @@ app.get('/api/judge/my-scores', (req, res) => {
   if (judgePassword !== getJudgePassword()) {
     return res.status(403).json({ error: '评委密码错误' });
   }
-  // 评委名单校验
-  const judgeList = db.settings.judges || [];
-  if (judgeList.length > 0 && !judgeList.includes(judgeName)) {
-    return res.status(403).json({ error: '您不在评委名单中，请联系管理员添加' });
-  }
+  // 评委名单校验：按当前赛段校验
   const stage = getCurrentStage();
+  if (!isJudgeInList(judgeName, stage)) {
+    return res.status(403).json({ error: '您不在当前赛段评委名单中，请联系管理员添加' });
+  }
   const scores = db.judgeScores
     .filter(s => s.judgeName === judgeName && (s.stage || 'preliminary') === stage)
     .map(s => ({ entryId: s.entryId, practicality: s.practicality, innovation: s.innovation, scalability: s.scalability, presentation: s.presentation, total: s.practicality + s.innovation + s.scalability + s.presentation }));
@@ -1224,38 +1256,48 @@ app.post('/api/settings', verifyAdminToken, async (req, res) => {
   res.json({ success: true, currentStage: getCurrentStage() });
 });
 
-// ========== API: JUDGES（评委名单管理） ==========
-// 评委名单由管理员设置，只有名单内的人才能打分
+// ========== API: JUDGES（评委名单管理 — 按赛段） ==========
+// 评委名单由管理员设置，按赛段管理，只有名单内的人才能打分
 app.get('/api/admin/judges', verifyAdminToken, (req, res) => {
-  res.json({ judges: db.settings.judges || [] });
+  res.json({ judgesByStage: db.settings.judgesByStage || { preliminary: [], semi_final: [], final: [] } });
 });
 
 app.post('/api/admin/judges', verifyAdminToken, (req, res) => {
-  const { name } = req.body;
+  const { name, stage } = req.body;
   if (!name || !name.trim()) return res.status(400).json({ error: '请输入评委姓名' });
-  if (!db.settings.judges) db.settings.judges = [];
+  const validStages = ['preliminary', 'semi_final', 'final'];
+  if (!stage || !validStages.includes(stage)) return res.status(400).json({ error: '请指定赛段：preliminary/semi_final/final' });
+  if (!db.settings.judgesByStage) db.settings.judgesByStage = { preliminary: [], semi_final: [], final: [] };
   const trimmed = name.trim();
-  if (db.settings.judges.includes(trimmed)) return res.status(400).json({ error: '该评委已存在' });
-  db.settings.judges.push(trimmed);
+  const list = db.settings.judgesByStage[stage];
+  if (list.includes(trimmed)) return res.status(400).json({ error: `该评委已在${STAGE_LABELS[stage]}名单中` });
+  list.push(trimmed);
   saveDB();
   ghPush().catch(e => console.error('[judges] GitHub push failed:', e.message));
-  res.json({ success: true, judges: db.settings.judges });
+  res.json({ success: true, judgesByStage: db.settings.judgesByStage });
 });
 
-app.delete('/api/admin/judges/:name', verifyAdminToken, (req, res) => {
-  if (!db.settings.judges) db.settings.judges = [];
+app.delete('/api/admin/judges/:stage/:name', verifyAdminToken, (req, res) => {
+  const { stage } = req.params;
   const name = decodeURIComponent(req.params.name);
-  const idx = db.settings.judges.indexOf(name);
-  if (idx === -1) return res.status(404).json({ error: '该评委不存在' });
-  db.settings.judges.splice(idx, 1);
+  const validStages = ['preliminary', 'semi_final', 'final'];
+  if (!validStages.includes(stage)) return res.status(400).json({ error: '无效赛段' });
+  if (!db.settings.judgesByStage) db.settings.judgesByStage = { preliminary: [], semi_final: [], final: [] };
+  const list = db.settings.judgesByStage[stage];
+  const idx = list.indexOf(name);
+  if (idx === -1) return res.status(404).json({ error: `该评委不在${STAGE_LABELS[stage]}名单中` });
+  list.splice(idx, 1);
   saveDB();
   ghPush().catch(e => console.error('[judges] GitHub push failed:', e.message));
-  res.json({ success: true, judges: db.settings.judges });
+  res.json({ success: true, judgesByStage: db.settings.judgesByStage });
 });
 
 // 公开接口：前端校验评委是否在名单中
+// 公开接口：前端校验评委是否在当前赛段名单中
 app.get('/api/judges', (req, res) => {
-  res.json({ judges: db.settings.judges || [] });
+  const stage = getCurrentStage();
+  const list = getStageJudges(stage);
+  res.json({ judges: list, stage, judgesByStage: db.settings.judgesByStage || {} });
 });
 
 // ========== API: LUCKY VOTER LIST（幸运投票人名单 / 各赛程抽奖资格） ==========

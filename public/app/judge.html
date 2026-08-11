@@ -254,13 +254,15 @@ async function startJudgeLogin() {
 async function enterJudge() {
   if (!ddAuthed || !ddUser) return showToast('请先通过钉钉认证', 'error');
   const name = ddUser.nick;
-  // 先检查评委名单
+  // 先检查当前赛段评委名单
   try {
     const judgeListResp = await fetch('/api/judges');
     const judgeListData = await judgeListResp.json();
     const judges = judgeListData.judges || [];
+    const stage = judgeListData.stage || currentStage;
+    const stageLabels = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
     if (judges.length > 0 && !judges.includes(name)) {
-      showToast('您不在评委名单中，请联系管理员添加', 'error');
+      showToast('您不在' + (stageLabels[stage] || stage) + '评委名单中，请联系管理员添加', 'error');
       return;
     }
   } catch(e) { /* 评委名单接口失败时放行，由后端再次校验 */ }
