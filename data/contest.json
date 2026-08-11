@@ -1,6 +1,33 @@
 {
   "entries": [
     {
+      "id": "entry_1786418743612_h5sx2m",
+      "name": "周韦昊",
+      "mobile": "15051845530",
+      "dept": "职能中台",
+      "dept1": "职能中台",
+      "dept2": "人力资源",
+      "dept3": "",
+      "subdept": "人力资源",
+      "entryType": "individual",
+      "teamName": "",
+      "teamMembers": "",
+      "track": "efficiency",
+      "title": "合同风险智能预警平台：风险先知，提前预警合同到期与风险，实现用工管理提效。",
+      "scene": "本平台打通钉钉 OA 续签审批、部门报备 Excel 附件与员工合同档案三方数据，自动按 180/120/90/60 天分级预警，区分续签报备与审批状态，实时输出异常清单与处置提醒，实现合同全生命周期风险前置管控，显著提升管理效率。",
+      "process_text": "1、数据接入（一次配置）：依次运行三个脚本——fetch_filing_attachment.py 抓取部门报备 Excel 附件、sync_dingtalk_renewal.py 拉取钉钉 OA 续签审批、gen_data.py 合并生成 data.js；钉钉有更新时重跑即可刷新。\n2、打开平台：浏览器打开 index.html，顶部查看 180/120/90/60 天四档到期预警概览。\n3、到期预警：按 180 天内分档查看临期人员，点击卡片下钻明细。\n4、合同类型分布：看板查看合同分布与到期分布。\n5、异常监控：查看异常总数、类型分布与人员清单，按提醒推进报备/审批闭环。",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/kDnRL6jAJM3D3Ljlsq0mlXvpWyMoPYe1?utm_scene=person_space",
+      "result_text": "1、打通钉钉 OA 续签审批、部门报备 Excel 附件与员工合同档案三方数据，替代手工台账，告别漏提醒、漏报备。\n2、合同到期按 180/120/90/60 天四档自动分级预警，越紧迫越红，风险一眼掌控。\n3、续签报备与审批状态分离管控，临期未报备、审批未完成、疑似漏报自动标记并定位到人、HRBP 与所属组织，异常人员清单与处置提醒一键呈现。",
+      "result_link": "https://alidocs.dingtalk.com/i/nodes/kDnRL6jAJM3D3Ljlsq0mlXvpWyMoPYe1?utm_scene=person_space",
+      "extra": "",
+      "posterUrl": "https://05caeec989a749b8aa8a084515633842.gz1.agentos-app.net/poster.png",
+      "docUrl": "https://alidocs.dingtalk.com/i/nodes/kDnRL6jAJM3D3Ljlsq0mlXvpWyMoPYe1?utm_scene=person_space",
+      "status": "approved",
+      "roundStatus": "approved",
+      "award": null,
+      "createdAt": "2026-08-11T03:25:43.612Z"
+    },
+    {
       "id": "entry_1786374088143_40x0ai",
       "name": "李铭铖",
       "mobile": "15926351506",
