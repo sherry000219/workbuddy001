@@ -206,6 +206,32 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
         <div id="judgeListContainer" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
       </div>
     </details>
+    <details style="margin-bottom:20px;" open>
+      <summary>📊 实名制投票详情</summary>
+      <div style="background:var(--bg-card);border:1px solid #e5e7eb;border-radius:var(--radius);padding:24px;margin-top:12px;box-shadow:var(--shadow);">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <label style="font-size:13px;color:var(--text-dim);">赛段筛选：</label>
+            <select id="voteDetailStage" onchange="loadVoteDetails()" style="padding:6px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;background:#fff;color:var(--text);">
+              <option value="">当前赛段</option>
+              <option value="preliminary">初赛</option>
+              <option value="semi_final">复赛</option>
+              <option value="all">全部赛段</option>
+            </select>
+            <span id="voteDetailStats" style="font-size:13px;color:var(--text-dim);"></span>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" onclick="loadVoteDetails()">🔄 刷新</button>
+            <button class="btn btn-outline btn-sm" onclick="exportVoteDetailsCSV()">📥 导出投票详情 CSV</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:14px;">
+          <button class="btn btn-outline btn-sm" id="voteViewByVoter" onclick="switchVoteView('voter')" style="border-color:var(--accent);color:var(--accent);">按投票人</button>
+          <button class="btn btn-outline btn-sm" id="voteViewByEntry" onclick="switchVoteView('entry')">按作品</button>
+        </div>
+        <div id="voteDetailContent" style="max-height:500px;overflow:auto;"></div>
+      </div>
+    </details>
     <details style="margin-bottom:20px;">
       <summary>🎁 幸运投票人名单（奖池瓜分 / 抽奖资格）</summary>
       <div style="background:var(--bg-card);border:1px solid #e5e7eb;border-radius:var(--radius);padding:24px;margin-top:12px;box-shadow:var(--shadow);">
@@ -435,6 +461,7 @@ async function adminLogin() {
     loadLucky();
     loadDrawConfig();
     loadJudges();
+    loadVoteDetails();
   } catch(e) { showToast(e.message, 'error'); }
 }
 
@@ -949,6 +976,71 @@ async function ackEdit(id) {
   } catch(e) {
     showToast('操作失败：' + e.message, 'error');
   }
+}
+
+// ========== VOTE DETAIL ==========
+let voteViewMode = 'voter'; // 'voter' or 'entry'
+let cachedVoteData = null;
+
+function switchVoteView(mode) {
+  voteViewMode = mode;
+  document.getElementById('voteViewByVoter').style.borderColor = mode === 'voter' ? 'var(--accent)' : '#d1d5db';
+  document.getElementById('voteViewByVoter').style.color = mode === 'voter' ? 'var(--accent)' : 'var(--text-dim)';
+  document.getElementById('voteViewByEntry').style.borderColor = mode === 'entry' ? 'var(--accent)' : '#d1d5db';
+  document.getElementById('voteViewByEntry').style.color = mode === 'entry' ? 'var(--accent)' : 'var(--text-dim)';
+  if (cachedVoteData) renderVoteDetails(cachedVoteData);
+}
+
+async function loadVoteDetails() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  const stage = document.getElementById('voteDetailStage').value || currentStage;
+  try {
+    const data = await api('/api/admin/votes?stage=' + encodeURIComponent(stage), { headers: { 'x-admin-token': adminToken } });
+    cachedVoteData = data;
+    document.getElementById('voteDetailStats').textContent = '共 ' + data.totalVotes + ' 票，' + data.uniqueVoters + ' 人参与投票';
+    renderVoteDetails(data);
+  } catch(e) { showToast('加载投票详情失败：' + e.message, 'error'); }
+}
+
+function renderVoteDetails(data) {
+  const el = document.getElementById('voteDetailContent');
+  if (!el) return;
+
+  if (voteViewMode === 'voter') {
+    // 按投票人视图
+    const voters = data.voters || [];
+    if (voters.length === 0) {
+      el.innerHTML = '<p style="color:var(--text-dim);font-size:13px;">暂无投票数据</p>';
+      return;
+    }
+    let html = '<table style="width:100%;font-size:13px;border-collapse:collapse;"><thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;">投票人</th><th style="text-align:center;padding:8px;border-bottom:1px solid #e5e7eb;">手机号</th><th style="text-align:center;padding:8px;border-bottom:1px solid #e5e7eb;">票数</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;">投给作品</th></tr></thead><tbody>';
+    voters.forEach(v => {
+      const voteList = v.votes.map(vt => escHtml(vt.entryTitle) + '<small style="color:var(--text-dim);">(' + escHtml(vt.stageLabel) + ')</small>').join('、');
+      html += '<tr><td style="padding:8px;border-bottom:1px solid #f3f4f6;font-weight:500;">' + escHtml(v.voterName) + '</td><td style="padding:8px;border-bottom:1px solid #f3f4f6;text-align:center;color:var(--text-dim);">' + (v.voterMobile ? escHtml(v.voterMobile.slice(0,3) + '****' + v.voterMobile.slice(-4)) : '-') + '</td><td style="padding:8px;border-bottom:1px solid #f3f4f6;text-align:center;font-weight:600;color:var(--accent);">' + v.voteCount + '</td><td style="padding:8px;border-bottom:1px solid #f3f4f6;line-height:1.6;">' + voteList + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  } else {
+    // 按作品视图
+    const entries = data.entryVotes || [];
+    if (entries.length === 0) {
+      el.innerHTML = '<p style="color:var(--text-dim);font-size:13px;">暂无投票数据</p>';
+      return;
+    }
+    let html = '<table style="width:100%;font-size:13px;border-collapse:collapse;"><thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;">作品</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;">作者</th><th style="text-align:center;padding:8px;border-bottom:1px solid #e5e7eb;">票数</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;">投票人</th></tr></thead><tbody>';
+    entries.forEach(e => {
+      const voterList = e.voters.map(vt => escHtml(vt.voterName) + (vt.voterMobile ? '<small style="color:var(--text-dim);">(尾号' + vt.voterMobile.slice(-4) + ')</small>' : '')).join('、');
+      html += '<tr><td style="padding:8px;border-bottom:1px solid #f3f4f6;font-weight:500;">' + escHtml(e.entryTitle) + '</td><td style="padding:8px;border-bottom:1px solid #f3f4f6;color:var(--text-dim);">' + escHtml(e.entryName) + '</td><td style="padding:8px;border-bottom:1px solid #f3f4f6;text-align:center;font-weight:600;color:var(--accent);">' + e.voteCount + '</td><td style="padding:8px;border-bottom:1px solid #f3f4f6;line-height:1.6;">' + voterList + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+}
+
+async function exportVoteDetailsCSV() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  const stage = document.getElementById('voteDetailStage').value || currentStage;
+  window.open('/api/admin/votes/export/csv?stage=' + encodeURIComponent(stage) + '&adminToken=' + encodeURIComponent(adminToken), '_blank');
 }
 
 // ========== INIT ==========

@@ -190,6 +190,14 @@ function loadDB() {
     (merged.votes || []).forEach(v => {
       if (!v.stage) v.stage = 'preliminary';
     });
+    // 投票去重：同一用户对同一作品在同一赛段只能投一次
+    const voteSet = new Set();
+    merged.votes = merged.votes.filter(v => {
+      const key = v.voterId + '|' + v.entryId + '|' + (v.stage || 'preliminary');
+      if (voteSet.has(key)) return false;
+      voteSet.add(key);
+      return true;
+    });
     (merged.judgeScores || []).forEach(s => {
       if (!s.stage) s.stage = 'preliminary';
     });
@@ -411,23 +419,38 @@ async function ghPull() {
   const buf = Buffer.from(data.content, data.encoding || 'base64');
   const remoteData = JSON.parse(buf.toString('utf8'));
   const remoteCount = (remoteData.entries || []).length;
+  const remoteVotes = (remoteData.votes || []).length;
+  const remoteScores = (remoteData.judgeScores || []).length;
+  const remoteTotal = remoteCount + remoteVotes + remoteScores;
   _syncStatus.githubEntries = remoteCount;
   const localExists = fs.existsSync(DB_FILE);
   if (localExists) {
     const localData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     const localCount = (localData.entries || []).length;
-    if (remoteCount > localCount || (remoteCount === localCount && remoteCount === 0 && localCount === 0)) {
+    const localVotes = (localData.votes || []).length;
+    const localScores = (localData.judgeScores || []).length;
+    const localTotal = localCount + localVotes + localScores;
+    // 综合比较：entries + votes + scores 总量，而非仅比较 entries
+    // 避免远程 entries 多但 votes 少时覆盖本地导致投票丢失
+    if (remoteTotal > localTotal || (remoteTotal === localTotal && remoteCount === 0 && localCount === 0)) {
       fs.writeFileSync(DB_FILE, buf, 'utf8');
-      console.log('[gh] Pulled data (GitHub newer) — entries:', remoteCount, '> local:', localCount, 'sha:', _ghSha.slice(0, 7));
-    } else if (localCount > remoteCount) {
-      console.log('[gh] Local data newer — entries:', localCount, '> GitHub:', remoteCount, '— will push on next save');
+      console.log('[gh] Pulled data (GitHub newer) — entries:', remoteCount, 'votes:', remoteVotes, 'scores:', remoteScores, '> local entries:', localCount, 'votes:', localVotes, 'scores:', localScores, 'sha:', _ghSha.slice(0, 7));
+    } else if (localTotal > remoteTotal) {
+      console.log('[gh] Local data newer — entries:', localCount, 'votes:', localVotes, 'scores:', localScores, '> GitHub entries:', remoteCount, 'votes:', remoteVotes, 'scores:', remoteScores, '— will push on next save');
       _ghSha = data.sha;
     } else {
-      console.log('[gh] Data in sync — entries:', localCount, 'sha:', _ghSha.slice(0, 7));
+      // 总量相同时，比较 votes 数量（投票数据更关键）
+      if (remoteVotes >= localVotes) {
+        fs.writeFileSync(DB_FILE, buf, 'utf8');
+        console.log('[gh] Pulled data (same total, GitHub has more/equal votes) — entries:', remoteCount, 'votes:', remoteVotes, 'sha:', _ghSha.slice(0, 7));
+      } else {
+        console.log('[gh] Local data has more votes — entries:', localCount, 'votes:', localVotes, '> GitHub votes:', remoteVotes, '— will push on next save');
+        _ghSha = data.sha;
+      }
     }
   } else {
     fs.writeFileSync(DB_FILE, buf, 'utf8');
-    console.log('[gh] Pulled data (no local file) — entries:', remoteCount, 'sha:', _ghSha.slice(0, 7));
+    console.log('[gh] Pulled data (no local file) — entries:', remoteCount, 'votes:', remoteVotes, 'sha:', _ghSha.slice(0, 7));
   }
 }
 
@@ -926,6 +949,141 @@ app.get('/api/export/csv', verifyAdminToken, (req, res) => {
     res.status(500).json({ error: '导出失败：' + err.message });
   }
 });
+
+// ========== API: ADMIN VOTES（实名制投票详情） ==========
+app.get('/api/admin/votes', verifyAdminToken, (req, res) => {
+  const stage = req.query.stage || getCurrentStage();
+  const entryMap = {};
+  db.entries.forEach(e => { entryMap[e.id] = e; });
+
+  // 按投票人聚合
+  const voterMap = {};
+  db.votes.forEach(v => {
+    const vStage = v.stage || 'preliminary';
+    if (stage !== 'all' && vStage !== stage) return;
+    const key = v.voterId || v.voterName || '?';
+    if (!voterMap[key]) {
+      voterMap[key] = {
+        voterId: v.voterId,
+        voterName: v.voterName,
+        voterMobile: v.voterMobile || '',
+        votes: []
+      };
+    }
+    const entry = entryMap[v.entryId];
+    voterMap[key].votes.push({
+      entryId: v.entryId,
+      entryTitle: entry ? entry.title : '(已删除)',
+      entryName: entry ? entry.name : '',
+      stage: vStage,
+      stageLabel: STAGE_LABELS[vStage] || vStage,
+      createdAt: v.createdAt
+    });
+  });
+
+  // 转为数组并排序
+  const voters = Object.values(voterMap).map(v => ({
+    voterId: v.voterId,
+    voterName: v.voterName,
+    voterMobile: v.voterMobile,
+    voteCount: v.votes.length,
+    votes: v.votes.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+  })).sort((a, b) => b.voteCount - a.voteCount);
+
+  // 按作品聚合
+  const entryVoteMap = {};
+  db.votes.forEach(v => {
+    const vStage = v.stage || 'preliminary';
+    if (stage !== 'all' && vStage !== stage) return;
+    if (!entryVoteMap[v.entryId]) {
+      const entry = entryMap[v.entryId];
+      entryVoteMap[v.entryId] = {
+        entryId: v.entryId,
+        entryTitle: entry ? entry.title : '(已删除)',
+        entryName: entry ? entry.name : '',
+        voters: []
+      };
+    }
+    entryVoteMap[v.entryId].voters.push({
+      voterName: v.voterName,
+      voterMobile: v.voterMobile || '',
+      stage: vStage,
+      stageLabel: STAGE_LABELS[vStage] || vStage,
+      createdAt: v.createdAt
+    });
+  });
+  const entryVotes = Object.values(entryVoteMap).map(e => ({
+    ...e,
+    voteCount: e.voters.length,
+    voters: e.voters.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+  })).sort((a, b) => b.voteCount - a.voteCount);
+
+  // 统计
+  const stageVotes = stage === 'all' ? db.votes : db.votes.filter(v => (v.stage || 'preliminary') === stage);
+  const uniqueVoters = new Set(stageVotes.map(v => v.voterId)).size;
+
+  res.json({
+    currentStage: getCurrentStage(),
+    filterStage: stage,
+    totalVotes: stageVotes.length,
+    uniqueVoters,
+    voters,
+    entryVotes
+  });
+});
+
+// 导出投票详情 CSV
+app.get('/api/admin/votes/export/csv', verifyAdminToken, (req, res) => {
+  try {
+    const stage = req.query.stage || getCurrentStage();
+    const entryMap = {};
+    db.entries.forEach(e => { entryMap[e.id] = e; });
+    const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
+
+    let csv = '\uFEFF';
+    // 按投票人维度
+    csv += '=== 按投票人统计 ===\n';
+    csv += '投票人,手机号,投票数,投给作品(赛段)\n';
+    const voterMap = {};
+    db.votes.forEach(v => {
+      const vStage = v.stage || 'preliminary';
+      if (stage !== 'all' && vStage !== stage) return;
+      const key = v.voterId || v.voterName;
+      if (!voterMap[key]) voterMap[key] = { name: v.voterName, mobile: v.voterMobile || '', votes: [] };
+      const entry = entryMap[v.entryId];
+      voterMap[key].votes.push((entry ? entry.title : '(已删除)') + '(' + (STAGE_LABELS[vStage] || vStage) + ')');
+    });
+    Object.values(voterMap).forEach(v => {
+      csv += `${esc(v.name)},${esc(v.mobile)},${v.votes.length},${esc(v.votes.join('、'))}\n`;
+    });
+
+    csv += '\n=== 按作品统计 ===\n';
+    csv += '作品标题,作者,投票数,投票人\n';
+    const entryVoteMap = {};
+    db.votes.forEach(v => {
+      const vStage = v.stage || 'preliminary';
+      if (stage !== 'all' && vStage !== stage) return;
+      if (!entryVoteMap[v.entryId]) {
+        const entry = entryMap[v.entryId];
+        entryVoteMap[v.entryId] = { title: entry ? entry.title : '(已删除)', name: entry ? entry.name : '', voters: [] };
+      }
+      entryVoteMap[v.entryId].voters.push(v.voterName + (v.voterMobile ? '(尾号' + v.voterMobile.slice(-4) + ')' : ''));
+    });
+    Object.values(entryVoteMap).forEach(e => {
+      csv += `${esc(e.title)},${esc(e.name)},${e.voters.length},${esc(e.voters.join('、'))}\n`;
+    });
+
+    const stageLabel = stage === 'all' ? '全部' : (STAGE_LABELS[stage] || stage);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="WorkBuddy-${stageLabel}-投票详情.csv"`);
+    res.send(csv);
+  } catch (err) {
+    console.error('[export/votes/csv] Error:', err);
+    res.status(500).json({ error: '导出失败：' + err.message });
+  }
+});
+
+// ========== API: ADMIN VOTES（实名制投票详情） END ==========
 
 // ========== API: SETTINGS ==========
 app.get('/api/settings', verifyAdminToken, (req, res) => {
