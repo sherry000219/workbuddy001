@@ -6,7 +6,7 @@ const https = require('https');
 
 // ========== CONFIG ==========
 const PORT = process.env.PORT || 3000;
-const DEPLOY_VERSION = 'v4.2';
+const DEPLOY_VERSION = 'v4.3';
 
 // DingTalk OAuth config
 const DINGTALK = {
@@ -2178,12 +2178,59 @@ app.post('/api/force-sync', async (req, res) => {
     console.log('[gh] No GITHUB_TOKEN — using local file only');
   }
 
-  // Load DB (either from GitHub sync or local file)
-  const refreshed = loadDB();
-  db.entries = refreshed.entries;
-  db.votes = refreshed.votes;
-  db.judgeScores = refreshed.judgeScores;
-  db.settings = refreshed.settings;
+  // ===== 等待数据稳定：防止蓝绿部署时旧容器还没 push，新容器拿到旧快照 =====
+  // 原理：连续两次 pull 结果一致，说明旧容器已退出且 push 完毕，数据稳定
+  if (GITHUB_TOKEN) {
+    const STABLE_ROUNDS = 2;       // 连续 2 次一致即认为稳定
+    const MAX_WAIT_ROUNDS = 12;     // 最多等 12 轮（约 2 分钟）
+    const POLL_INTERVAL = 10000;    // 每 10 秒拉一次
+
+    let stableCount = 0;
+    let lastSnapshot = '';
+
+    for (let round = 1; round <= MAX_WAIT_ROUNDS; round++) {
+      await new Promise(r => setTimeout(r, POLL_INTERVAL));
+      try {
+        await ghPull();
+        const refreshed = loadDB();
+        const snapshot = `e:${refreshed.entries.length}|v:${refreshed.votes.length}|s:${refreshed.judgeScores.length}`;
+
+        if (snapshot === lastSnapshot) {
+          stableCount++;
+          console.log(`[gh-stable] Round ${round}/${MAX_WAIT_ROUNDS}: data stable (${stableCount}/${STABLE_ROUNDS}) — ${snapshot}`);
+          if (stableCount >= STABLE_ROUNDS) {
+            console.log('[gh-stable] ✅ Data is stable, safe to accept writes');
+            break;
+          }
+        } else {
+          stableCount = 0;
+          console.log(`[gh-stable] Round ${round}/${MAX_WAIT_ROUNDS}: data changed — ${lastSnapshot || '(first)'} → ${snapshot}`);
+          lastSnapshot = snapshot;
+        }
+      } catch (e) {
+        console.error(`[gh-stable] Round ${round} pull failed:`, e.message);
+      }
+
+      if (round === MAX_WAIT_ROUNDS) {
+        console.warn('[gh-stable] ⚠️ Max wait rounds reached, opening writes with current data (may not be latest)');
+      }
+    }
+
+    // 用最终稳定的数据更新内存
+    const refreshed = loadDB();
+    db.entries = refreshed.entries;
+    db.votes = refreshed.votes;
+    db.judgeScores = refreshed.judgeScores;
+    db.settings = refreshed.settings;
+  } else {
+    // 无 GitHub 同步，直接用本地数据
+    const refreshed = loadDB();
+    db.entries = refreshed.entries;
+    db.votes = refreshed.votes;
+    db.judgeScores = refreshed.judgeScores;
+    db.settings = refreshed.settings;
+  }
+
   _syncStatus.githubEntries = db.entries.length;
   _ready = true; // 数据载入完成，开放写入
   console.log('[db] Loaded — entries:', db.entries.length, 'votes:', db.votes.length, 'scores:', db.judgeScores.length, 'stage:', getCurrentStage());
