@@ -3442,6 +3442,24 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-11T01:39:47.893Z"
+    },
+    {
+      "entryId": "entry_1785348752114_picbqa",
+      "voterId": "8IDLPEiP10uiPsWBQhciPQMfAiEiE",
+      "voterName": "陈西成",
+      "voterMobile": "15689782052",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T01:39:51.445Z"
+    },
+    {
+      "entryId": "entry_1786340551344_uzahth",
+      "voterId": "Ov1QiSgb4iSBiisWBQhciPQMfAiEiE",
+      "voterName": "王中浩",
+      "voterMobile": "15365011352",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5u5nMQIeFvNAnPNAnOw069zTAANZ_wKOz7HHiV5AA_627_627.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T01:39:52.028Z"
     }
   ],
   "judgeScores": [],
