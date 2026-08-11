@@ -4261,6 +4261,24 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPD4PvJ6gD9iTNAfTNAfQ_500_500.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-11T03:07:43.140Z"
+    },
+    {
+      "entryId": "entry_1785124018451_kk1g17",
+      "voterId": "3Bx5D2ucqFy0wvfVzkiSvIgiEiE",
+      "voterName": "刘凯",
+      "voterMobile": "17612580513",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQLPM5znkJj1kGPNAyDNAyCwsxw5pU7jJdsIygl3QikGAA_800_800.png",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T03:07:46.704Z"
+    },
+    {
+      "entryId": "entry_1786359942777_etq9ft",
+      "voterId": "kAmysoYcupiS2bEiSyLtOAeQiEiE",
+      "voterName": "褚建康",
+      "voterMobile": "18056238521",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPD4PvJ6gD9iTNAfTNAfQ_500_500.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T03:07:46.722Z"
     }
   ],
   "judgeScores": [],
