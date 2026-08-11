@@ -5529,6 +5529,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-11T06:44:22.085Z"
+    },
+    {
+      "entryId": "entry_1785325566960_99axb6",
+      "voterId": "w53u3waB8fzLjsIZuwWnpAiEiE",
+      "voterName": "陈亚玲",
+      "voterMobile": "15951722071",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3dtp9qjnj_NA9nNA9mwRRck--KMDp0J-zCfTTTvAA_985_985.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T06:45:00.475Z"
     }
   ],
   "judgeScores": [
