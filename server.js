@@ -974,6 +974,39 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
   res.json({ success: true, voteCount: db.votes.filter(v => v.entryId === req.params.entryId && (v.stage || 'preliminary') === stage).length, remaining });
 });
 
+// ========== API: MY VOTES ==========
+app.get('/api/my-votes', requireAuth, (req, res) => {
+  const userId = req.ddUser.openId;
+  const stage = getCurrentStage();
+  const myVotes = db.votes.filter(v => v.voterId === userId);
+  // 按赛段分组
+  const byStage = {};
+  const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '结算' };
+  for (const v of myVotes) {
+    const s = v.stage || 'preliminary';
+    if (!byStage[s]) byStage[s] = [];
+    const entry = db.entries.find(e => e.id === v.entryId);
+    byStage[s].push({
+      entryId: v.entryId,
+      entryTitle: entry ? entry.title : '（已删除）',
+      entryDept: entry ? (entry.dept1 || entry.dept || '') : '',
+      entryTrack: entry ? (entry.track || '') : '',
+      votedAt: v.createdAt
+    });
+  }
+  // 汇总
+  const summary = {};
+  for (const [s, votes] of Object.entries(byStage)) {
+    summary[s] = {
+      count: votes.length,
+      limit: VOTE_LIMIT_PER_STAGE,
+      remaining: Math.max(0, VOTE_LIMIT_PER_STAGE - votes.length),
+      label: STAGE_LABELS[s] || s
+    };
+  }
+  res.json({ byStage, summary, currentStage: stage });
+});
+
 // ========== API: JUDGE ==========
 app.post('/api/judge/scores/:entryId', (req, res) => {
   const { judgeName, practicality, innovation, scalability, presentation, judgePassword } = req.body;
