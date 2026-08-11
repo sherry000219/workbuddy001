@@ -6078,7 +6078,15 @@
       "contact": "@刘相丞（刘木目）"
     },
     "prizes": {
-      "preliminary": [],
+      "preliminary": [
+        {
+          "id": "prize_msofsgiu_bdbpu8",
+          "name": "云帐房LOGO款黑色双肩包",
+          "stock": 1,
+          "total": 1,
+          "createdAt": "2026-08-11T09:07:05.766Z"
+        }
+      ],
       "semi_final": [],
       "final": [],
       "awarded": []
