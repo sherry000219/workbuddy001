@@ -329,12 +329,14 @@ function escapeHtml(text) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[m];
   });
 }
-function renderPosterDetail(url) {
+function renderPosterDetail(url, updatedAt) {
   if (!url) return '';
+  var bust = updatedAt || Date.now();
+  var src = url + (url.indexOf('?') === -1 ? '?' : '&') + 't=' + bust;
   if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
     return '<div class="dvalue"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">🖼️ 查看作品海报（钉盘）</a></div>';
   }
-  return '<div class="dvalue"><img src="' + escapeHtml(url) + '" style="max-width:100%;max-height:300px;border-radius:8px;" alt="作品海报" onerror="this.style.display=\'none\'"></div>';
+  return '<div class="dvalue"><img src="' + escapeHtml(src) + '" style="max-width:100%;max-height:300px;border-radius:8px;" alt="作品海报" onerror="this.style.display=\'none\'"></div>';
 }
 
 
@@ -842,7 +844,7 @@ async function openDetail(entryId) {
     const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
     var extraHtml = '';
     if (e.extra) extraHtml = '<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">' + linkify(e.extra) + '</div></div>';
-    var posterHtml = e.posterUrl ? '<div class="detail-row"><div class="dlabel">🖼️ 海报</div>' + renderPosterDetail(e.posterUrl) + '</div>' : '';
+    var posterHtml = e.posterUrl ? '<div class="detail-row"><div class="dlabel">🖼️ 海报</div>' + renderPosterDetail(e.posterUrl, e.updatedAt || e.createdAt) + '</div>' : '';
     var docHtml = e.docUrl ? '<div class="detail-row"><div class="dlabel">📎 详情文档</div><div class="dvalue"><a href="' + e.docUrl + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.docUrl + '</a></div></div>' : '';
     const isNewFormat = e.process_link || e.result_link;
     var sceneHtml = '';

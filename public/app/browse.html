@@ -318,20 +318,25 @@ function escapeHtml(text) {
 
 // ========== HELPERS ==========
 function escAttr(s) { return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-function renderPosterCard(url) {
+function renderPosterCard(url, updatedAt) {
   if (!url) return '';
+  // 加时间戳防浏览器缓存，更新海报后能立即看到新图
+  var bust = updatedAt || Date.now();
+  var src = url + (url.indexOf('?') === -1 ? '?' : '&') + 't=' + bust;
   // 钉钉文档/钉盘链接无法被 <img> 直接加载，显示为按钮
   if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
     return '<div style="width:100%;height:160px;border-radius:8px;margin-bottom:12px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;"><a href="' + escAttr(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;font-size:14px;text-decoration:none;">🖼️ 查看作品海报</a></div>';
   }
-  return '<img src="' + escAttr(url) + '" style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:12px;" alt="作品海报" onerror="this.onerror=null;this.style.display=\'none\';this.insertAdjacentHTML(\'afterend\',\'<div style=&quot;width:100%;height:160px;border-radius:8px;margin-bottom:12px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;&quot;><a href=&quot;'+escAttr(url)+'&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; style=&quot;color:#ff6b35;font-size:14px;text-decoration:none;&quot;>🖼️ 查看作品海报</a></div>\')">';
+  return '<img src="' + escAttr(src) + '" style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:12px;" alt="作品海报" onerror="this.onerror=null;this.style.display=\'none\';this.insertAdjacentHTML(\'afterend\',\'<div style=&quot;width:100%;height:160px;border-radius:8px;margin-bottom:12px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;&quot;><a href=&quot;'+escAttr(url)+'&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; style=&quot;color:#ff6b35;font-size:14px;text-decoration:none;&quot;>🖼️ 查看作品海报</a></div>\')">';
 }
-function renderPosterDetail(url) {
+function renderPosterDetail(url, updatedAt) {
   if (!url) return '';
+  var bust = updatedAt || Date.now();
+  var src = url + (url.indexOf('?') === -1 ? '?' : '&') + 't=' + bust;
   if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
     return '<div class="dvalue"><a href="' + escAttr(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">🖼️ 查看作品海报（钉盘）</a></div>';
   }
-  return '<div class="dvalue"><img src="' + escAttr(url) + '" style="max-width:100%;max-height:300px;border-radius:8px;" alt="作品海报" onerror="this.onerror=null;this.style.display=\'none\';this.insertAdjacentHTML(\'afterend\',\'<a href=&quot;'+escAttr(url)+'&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; style=&quot;color:#ff6b35;word-break:break-all;&quot;>🖼️ 查看作品海报</a>\')"></div>';
+  return '<div class="dvalue"><img src="' + escAttr(src) + '" style="max-width:100%;max-height:300px;border-radius:8px;" alt="作品海报" onerror="this.onerror=null;this.style.display=\'none\';this.insertAdjacentHTML(\'afterend\',\'<a href=&quot;'+escAttr(url)+'&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; style=&quot;color:#ff6b35;word-break:break-all;&quot;>🖼️ 查看作品海报</a>\')"></div>';
 }
 
 // ========== API ==========
@@ -407,7 +412,7 @@ async function renderGallery() {
       editNoticeHtml = '<div style="background:rgba(255,215,64,0.12);border:1px solid rgba(255,215,64,0.35);color:#b45309;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;">📝 作者于 ' + new Date(e.lastEditedAt || e.updatedAt || e.createdAt).toLocaleString('zh-CN') + ' 编辑过本作品，内容可能有更新，请留意。</div>';
     }
 var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-      var cardPoster = e.posterUrl ? renderPosterCard(e.posterUrl) : '';
+      var cardPoster = e.posterUrl ? renderPosterCard(e.posterUrl, e.updatedAt || e.createdAt) : '';
       var teamBadge = e.entryType === 'team' ? '<span class="team-badge">👥 团队</span>' : '';
       return '<div class="entry-card ' + rsClass + '" onclick="openDetail(\'' + e.id + '\')"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + (e.docUrl ? ' 📎' : '') + '</span>' + cardPoster + badge + '<h3>' + e.title + teamBadge + '</h3><div class="meta">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleDateString('zh-CN') + '</div><div class="desc">' + e.scene + '</div>' + extraHtml + '<div class="card-footer"><div style="display:flex;align-items:center;gap:16px;"><span class="score-display">' + (e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分') + '</span><span class="votes">👍 ' + (e.voteCount||0) + ' 票</span></div>' + voteBtn + '</div></div>';
     }).join('');
@@ -468,7 +473,7 @@ async function openDetail(entryId) {
     if (isVotingStage && canVote) voteBtnHtml = '<button class="btn btn-outline btn-sm" onclick="voteEntry(\'' + e.id + '\')">👍 投票</button>';
     var extraHtml = '';
     if (e.extra) extraHtml = '<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">' + linkify(e.extra) + '</div></div>';
-    var posterHtml = e.posterUrl ? '<div class="detail-row"><div class="dlabel">🖼️ 海报</div>' + renderPosterDetail(e.posterUrl) + '</div>' : '';
+    var posterHtml = e.posterUrl ? '<div class="detail-row"><div class="dlabel">🖼️ 海报</div>' + renderPosterDetail(e.posterUrl, e.updatedAt || e.createdAt) + '</div>' : '';
     var docHtml = e.docUrl ? '<div class="detail-row"><div class="dlabel">📎 详情文档</div><div class="dvalue"><a href="' + e.docUrl + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + e.docUrl + '</a></div></div>' : '';
     const isNewFormat = e.process_link || e.result_link;
     var sceneHtml = '';
