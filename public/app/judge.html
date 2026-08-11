@@ -114,7 +114,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     <h2 style="margin-bottom:8px;">评委登录</h2>
     <p id="judgeDDName" style="color:var(--accent);font-size:14px;font-weight:600;margin-bottom:16px;"></p>
     <input type="password" id="judgePwInput" placeholder="评审密码" autocomplete="off">
-    <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="enterJudge()">进入评审</button>
+    <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="enterJudge(event)">进入评审</button>
   </div>
   <div class="judge-panel" id="judgePanel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
@@ -251,7 +251,7 @@ async function startJudgeLogin() {
   }
 }
 
-async function enterJudge() {
+async function enterJudge(evt) {
   if (!ddAuthed || !ddUser) return showToast('请先通过钉钉认证', 'error');
   const name = ddUser.nick;
   // 先检查当前赛段评委名单
@@ -268,9 +268,8 @@ async function enterJudge() {
   } catch(e) { /* 评委名单接口失败时放行，由后端再次校验 */ }
   const pw = document.getElementById('judgePwInput').value.trim();
   if (!pw) return showToast('请输入评审密码', 'error');
-  const btn = event.target;
-  btn.disabled = true;
-  btn.textContent = '验证中...';
+  const btn = evt ? evt.currentTarget || evt.target : null;
+  if (btn) { btn.disabled = true; btn.textContent = '验证中...'; }
   try {
     const resp = await fetch('/api/judge/my-scores?judgeName=' + encodeURIComponent(name) + '&judgePassword=' + encodeURIComponent(pw));
     if (!resp.ok) {
@@ -287,8 +286,7 @@ async function enterJudge() {
   } catch(e) {
     showToast(e.message, 'error');
   } finally {
-    btn.disabled = false;
-    btn.textContent = '进入评审';
+    if (btn) { btn.disabled = false; btn.textContent = '进入评审'; }
   }
 }
 
