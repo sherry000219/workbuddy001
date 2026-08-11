@@ -3526,6 +3526,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD2lMmFFsfKvNBaDNBaCwFANmWcO0qsUKADgdqEqYAA_1440_1440.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-11T02:00:08.250Z"
+    },
+    {
+      "entryId": "entry_1786014745788_j70nld",
+      "voterId": "Q7Ne8X3ciiyXeiSYziS1BEGRQiEiE",
+      "voterName": "王悦",
+      "voterMobile": "13937663141",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDhmOyL4lREXNAfHNAfE_497_497.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T02:02:00.888Z"
     }
   ],
   "judgeScores": [],
