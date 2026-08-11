@@ -4315,6 +4315,24 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQLPM5znkJj1kGPNAyDNAyCwsxw5pU7jJdsIygl3QikGAA_800_800.png",
       "stage": "preliminary",
       "createdAt": "2026-08-11T03:08:09.942Z"
+    },
+    {
+      "entryId": "entry_1785348752114_picbqa",
+      "voterId": "h9fZ3B0OvfDhuoCrGUaaiPAiEiE",
+      "voterName": "宋佳义",
+      "voterMobile": "13613857549",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPGoGu-QLiujPNArzNArw_700_700.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T03:08:38.091Z"
+    },
+    {
+      "entryId": "entry_1786295169144_ilkpwc",
+      "voterId": "IqIIEyFnPvj2bEiSyLtOAeQiEiE",
+      "voterName": "殷志敏",
+      "voterMobile": "15651781772",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T03:08:38.540Z"
     }
   ],
   "judgeScores": [],
