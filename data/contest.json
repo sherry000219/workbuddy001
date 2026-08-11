@@ -6501,6 +6501,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPGpqNY6aev7LNAafNAag_424_423.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-11T10:19:16.380Z"
+    },
+    {
+      "entryId": "entry_1785136604075_9xogv4",
+      "voterId": "6TUp7KsMZHsq7C1qbyiif7wiEiE",
+      "voterName": "张国松",
+      "voterMobile": "15824801566",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T10:21:13.210Z"
     }
   ],
   "judgeScores": [
