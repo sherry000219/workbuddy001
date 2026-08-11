@@ -4180,6 +4180,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-11T03:06:16.156Z"
+    },
+    {
+      "entryId": "entry_1785325566960_99axb6",
+      "voterId": "iixcR5DOpktGyGgvgXVpDDwiEiE",
+      "voterName": "吴涵",
+      "voterMobile": "15150539697",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4XXIAHNMrnNBIPNBIOwGaHFPFzAlnsJidcEm54gAA_1155_1155.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T03:06:38.331Z"
     }
   ],
   "judgeScores": [],
