@@ -421,32 +421,97 @@ async function ghPull() {
   const remoteCount = (remoteData.entries || []).length;
   const remoteVotes = (remoteData.votes || []).length;
   const remoteScores = (remoteData.judgeScores || []).length;
-  const remoteTotal = remoteCount + remoteVotes + remoteScores;
   _syncStatus.githubEntries = remoteCount;
+
+  // ===== 合并策略（替代旧的全量替换策略）=====
+  // 旧方案：比较 entries+votes+scores 总量，总量大的覆盖小的 → 仍有掉票风险
+  // 新方案：合并本地和远程数据，取两者并集，任何数据都不会丢失
   const localExists = fs.existsSync(DB_FILE);
   if (localExists) {
     const localData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-    const localCount = (localData.entries || []).length;
-    const localVotes = (localData.votes || []).length;
-    const localScores = (localData.judgeScores || []).length;
-    const localTotal = localCount + localVotes + localScores;
-    // 综合比较：entries + votes + scores 总量，而非仅比较 entries
-    // 避免远程 entries 多但 votes 少时覆盖本地导致投票丢失
-    if (remoteTotal > localTotal || (remoteTotal === localTotal && remoteCount === 0 && localCount === 0)) {
-      fs.writeFileSync(DB_FILE, buf, 'utf8');
-      console.log('[gh] Pulled data (GitHub newer) — entries:', remoteCount, 'votes:', remoteVotes, 'scores:', remoteScores, '> local entries:', localCount, 'votes:', localVotes, 'scores:', localScores, 'sha:', _ghSha.slice(0, 7));
-    } else if (localTotal > remoteTotal) {
-      console.log('[gh] Local data newer — entries:', localCount, 'votes:', localVotes, 'scores:', localScores, '> GitHub entries:', remoteCount, 'votes:', remoteVotes, 'scores:', remoteScores, '— will push on next save');
-      _ghSha = data.sha;
-    } else {
-      // 总量相同时，比较 votes 数量（投票数据更关键）
-      if (remoteVotes >= localVotes) {
-        fs.writeFileSync(DB_FILE, buf, 'utf8');
-        console.log('[gh] Pulled data (same total, GitHub has more/equal votes) — entries:', remoteCount, 'votes:', remoteVotes, 'sha:', _ghSha.slice(0, 7));
+
+    // 1. 合并 entries：按 id 去重，重复的保留较新的
+    const localEntries = localData.entries || [];
+    const remoteEntries = remoteData.entries || [];
+    const entryMap = new Map();
+    for (const e of localEntries) entryMap.set(e.id, e);
+    for (const e of remoteEntries) {
+      if (!entryMap.has(e.id)) {
+        entryMap.set(e.id, e);
       } else {
-        console.log('[gh] Local data has more votes — entries:', localCount, 'votes:', localVotes, '> GitHub votes:', remoteVotes, '— will push on next save');
-        _ghSha = data.sha;
+        // 保留 updatedAt 更新的
+        const existing = entryMap.get(e.id);
+        const existingTime = existing.updatedAt || existing.createdAt || '';
+        const remoteTime = e.updatedAt || e.createdAt || '';
+        if (remoteTime > existingTime) entryMap.set(e.id, e);
       }
+    }
+    const mergedEntries = [...entryMap.values()];
+
+    // 2. 合并 votes：按 voterId+entryId+stage 去重，重复的保留较新的
+    const localVotes = localData.votes || [];
+    const remoteVotesArr = remoteData.votes || [];
+    const voteMap = new Map();
+    for (const v of localVotes) {
+      const key = v.voterId + '|' + v.entryId + '|' + (v.stage || 'preliminary');
+      if (!voteMap.has(key)) voteMap.set(key, v);
+    }
+    for (const v of remoteVotesArr) {
+      const key = v.voterId + '|' + v.entryId + '|' + (v.stage || 'preliminary');
+      if (!voteMap.has(key)) {
+        voteMap.set(key, v);
+      } else {
+        // 保留 createdAt 更新的
+        const existing = voteMap.get(key);
+        if ((v.createdAt || '') > (existing.createdAt || '')) voteMap.set(key, v);
+      }
+    }
+    const mergedVotes = [...voteMap.values()];
+
+    // 3. 合并 judgeScores：按 entryId+judgeName+stage 去重
+    const localScores = localData.judgeScores || [];
+    const remoteScoresArr = remoteData.judgeScores || [];
+    const scoreMap = new Map();
+    for (const s of localScores) {
+      const key = s.entryId + '|' + s.judgeName + '|' + (s.stage || 'preliminary');
+      if (!scoreMap.has(key)) scoreMap.set(key, s);
+    }
+    for (const s of remoteScoresArr) {
+      const key = s.entryId + '|' + s.judgeName + '|' + (s.stage || 'preliminary');
+      if (!scoreMap.has(key)) {
+        scoreMap.set(key, s);
+      } else {
+        const existing = scoreMap.get(key);
+        if ((s.updatedAt || '') > (existing.updatedAt || '')) scoreMap.set(key, s);
+      }
+    }
+    const mergedScores = [...scoreMap.values()];
+
+    // 4. settings：远程优先（管理员在后台改的设置应该同步过来）
+    const mergedSettings = { ...(localData.settings || {}), ...(remoteData.settings || {}) };
+
+    // 5. 构建合并后的数据
+    const mergedData = {
+      ...localData,
+      entries: mergedEntries,
+      votes: mergedVotes,
+      judgeScores: mergedScores,
+      settings: mergedSettings
+    };
+
+    const localCount = localEntries.length;
+    const localVoteCount = localVotes.length;
+    const localScoreCount = localScores.length;
+    const hadChanges = mergedEntries.length !== localCount || mergedVotes.length !== localVoteCount || mergedScores.length !== localScoreCount;
+
+    if (hadChanges) {
+      fs.writeFileSync(DB_FILE, JSON.stringify(mergedData, null, 2), 'utf8');
+      console.log('[gh] Merged data — entries:', localCount, '→', mergedEntries.length,
+        '| votes:', localVoteCount, '→', mergedVotes.length,
+        '| scores:', localScoreCount, '→', mergedScores.length,
+        'sha:', _ghSha.slice(0, 7));
+    } else {
+      console.log('[gh] Data in sync — entries:', localCount, 'votes:', localVoteCount, 'scores:', localScoreCount, 'sha:', _ghSha.slice(0, 7));
     }
   } else {
     fs.writeFileSync(DB_FILE, buf, 'utf8');
