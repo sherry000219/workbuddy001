@@ -6573,6 +6573,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-11T10:34:26.962Z"
+    },
+    {
+      "entryId": "entry_1786338333096_ik561c",
+      "voterId": "Pd8dzTupB38uQcHvkUTdNAiEiE",
+      "voterName": "杨绵绵",
+      "voterMobile": "18068393979",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM50KIDFj8MfNAbDNAbCwDKOddTGCTIoHu2wMIXXSAA_432_432.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T10:39:24.951Z"
     }
   ],
   "judgeScores": [
