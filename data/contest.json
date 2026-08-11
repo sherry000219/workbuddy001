@@ -6510,6 +6510,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-11T10:21:13.210Z"
+    },
+    {
+      "entryId": "entry_1785136604075_9xogv4",
+      "voterId": "WhD4gzszAgD2bEiSyLtOAeQiEiE",
+      "voterName": "谷慧聪",
+      "voterMobile": "15649036201",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5Zz7BkaBBnNAgzNAhiwzThyFckI73AGOn6WXpjHAA_536_524.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T10:21:14.890Z"
     }
   ],
   "judgeScores": [
