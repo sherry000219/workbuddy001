@@ -6420,6 +6420,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-11T10:15:09.407Z"
+    },
+    {
+      "entryId": "entry_1785136604075_9xogv4",
+      "voterId": "gMAYJhUHdIPqkIPCNV0nRwiEiE",
+      "voterName": "陈晓",
+      "voterMobile": "18137840850",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDhmOx9GGW93NA8DNA6k_937_960.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T10:15:50.975Z"
     }
   ],
   "judgeScores": [
