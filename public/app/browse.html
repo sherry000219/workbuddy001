@@ -318,25 +318,34 @@ function escapeHtml(text) {
 
 // ========== HELPERS ==========
 function escAttr(s) { return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+// 判断 URL 是否指向图片文件（后缀为 png/jpg/jpeg/gif/webp/svg/bmp/ico）
+function isImageUrl(url) {
+  // 去掉查询参数后判断后缀
+  var path = url.split('?')[0].split('#')[0].toLowerCase();
+  return /\.(png|jpe?g|gif|webp|svg|bmp|ico)$/.test(path);
+}
+// 判断 URL 是否为非图片页面链接（WorkBuddy / 金山文档 / 钉钉等）
+function isNonImageLink(url) {
+  return !isImageUrl(url);
+}
 function renderPosterCard(url, updatedAt) {
   if (!url) return '';
-  var bust = updatedAt || Date.now();
-  var src = url + (url.indexOf('?') === -1 ? '?' : '&') + 't=' + bust;
-  // 钉钉链接无法直接加载图片，只显示按钮
-  if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
+  // 非图片链接（WorkBuddy/金山文档/钉钉等）：显示查看按钮
+  if (isNonImageLink(url)) {
     return '<div style="width:100%;height:160px;border-radius:8px;margin-bottom:12px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;"><a href="' + escAttr(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;font-size:14px;text-decoration:none;">🖼️ 查看作品海报</a></div>';
   }
-  // 公网图片：展示缩略图 + 链接（点击可看原图大图）
+  // 图片链接：展示缩略图 + 可点击看原图
+  var bust = updatedAt || Date.now();
+  var src = url + (url.indexOf('?') === -1 ? '?' : '&') + 't=' + bust;
   return '<a href="' + escAttr(url) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none;"><img src="' + escAttr(src) + '" style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:4px;" alt="作品海报" onerror="this.onerror=null;this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div style="width:100%;height:40px;border-radius:8px;background:#f3f4f6;display:none;align-items:center;justify-content:center;margin-bottom:12px;color:#ff6b35;font-size:13px;">🖼️ 点击查看作品海报</div></a>';
 }
 function renderPosterDetail(url, updatedAt) {
   if (!url) return '';
+  if (isNonImageLink(url)) {
+    return '<div class="dvalue"><a href="' + escAttr(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">🖼️ 查看作品海报</a></div>';
+  }
   var bust = updatedAt || Date.now();
   var src = url + (url.indexOf('?') === -1 ? '?' : '&') + 't=' + bust;
-  if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
-    return '<div class="dvalue"><a href="' + escAttr(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">🖼️ 查看作品海报（钉盘）</a></div>';
-  }
-  // 公网图片：展示图片 + 链接
   return '<div class="dvalue"><a href="' + escAttr(url) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none;"><img src="' + escAttr(src) + '" style="max-width:100%;max-height:300px;border-radius:8px;display:block;" alt="作品海报" onerror="this.onerror=null;this.style.display=\'none\'"></a><a href="' + escAttr(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;font-size:13px;word-break:break-all;margin-top:6px;display:inline-block;">🔗 点击查看原图大图</a></div>';
 }
 
