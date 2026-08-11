@@ -114,8 +114,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 @media (max-width: 640px) {
   .gallery-grid { grid-template-columns: 1fr; }
   .main-container { padding: 0 12px; }
-  .entry-card .card-footer { flex-direction: column; gap: 10px; align-items: stretch; }
-  .entry-card .card-footer .btn { width: 100%; text-align: center; justify-content: center; }
 }
 </style>
 </head>
@@ -413,13 +411,6 @@ async function renderGallery() {
       const rsClass = 'rs-' + rs;
       const badge = awardBadge(e.award) || roundBadge(rs);
       const isEliminated = rs === 'eliminated_semi' || rs === 'eliminated_final';
-      const canVote = isVotingStage && !isEliminated && rs !== 'awarded' && rs !== 'finalist';
-      let voteBtn = '';
-      if (isVotingStage && canVote) {
-        voteBtn = '<button class="btn btn-primary" style="padding:10px 24px;font-size:15px;border-radius:12px;font-weight:700;min-width:80px;" onclick="event.stopPropagation();voteEntry(\'' + e.id + '\')">👍 投票</button>';
-      } else if (!isVotingStage) {
-        voteBtn = '<span style="font-size:12px;color:var(--text-dim);">' + (STAGE_LABELS[currentStage] || '') + '阶段</span>';
-      }
       var extraHtml = '';
       if (e.extra) {
         extraHtml = '<div style="font-size:13px;color:var(--accent);margin-top:8px;word-break:break-all;">' + linkify(e.extra.substring(0,100)) + (e.extra.length>100?'...':'') + '</div>';
@@ -431,7 +422,7 @@ async function renderGallery() {
 var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
       var cardPoster = e.posterUrl ? renderPosterCard(e.posterUrl, e.updatedAt || e.createdAt) : '';
       var teamBadge = e.entryType === 'team' ? '<span class="team-badge">👥 团队</span>' : '';
-      return '<div class="entry-card ' + rsClass + '" onclick="openDetail(\'' + e.id + '\')"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + (e.docUrl ? ' 📎' : '') + '</span>' + cardPoster + badge + '<h3>' + e.title + teamBadge + '</h3><div class="meta">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleDateString('zh-CN') + '</div><div class="desc">' + e.scene + '</div>' + extraHtml + '<div class="card-footer"><div style="display:flex;align-items:center;gap:16px;"><span class="score-display">' + (e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分') + '</span><span class="votes">👍 ' + (e.voteCount||0) + ' 票</span></div>' + voteBtn + '</div></div>';
+      return '<div class="entry-card ' + rsClass + '" onclick="openDetail(\'' + e.id + '\')"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + (e.docUrl ? ' 📎' : '') + '</span>' + cardPoster + badge + '<h3>' + e.title + teamBadge + '</h3><div class="meta">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleDateString('zh-CN') + '</div><div class="desc">' + e.scene + '</div>' + extraHtml + '<div class="card-footer"><div style="display:flex;align-items:center;gap:16px;"><span class="score-display">' + (e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分') + '</span><span class="votes">👍 ' + (e.voteCount||0) + ' 票</span></div></div></div>';
     }).join('');
   } catch(e) { console.error('Gallery error:', e); }
 }
@@ -448,6 +439,8 @@ async function voteEntry(entryId) {
     ddRemaining = data.remaining; updateUserUI();
     showToast('👍 投票成功！剩余 ' + ddRemaining + ' 票', 'success');
     renderGallery();
+    // 刷新详情弹窗中的票数
+    openDetail(entryId);
   } catch(e) { showToast(e.message, 'error'); }
 }
 
@@ -487,7 +480,7 @@ async function openDetail(entryId) {
       editNoticeHtml = '<div style="background:rgba(255,215,64,0.12);border:1px solid rgba(255,215,64,0.35);color:#b45309;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;">📝 作者于 ' + new Date(e.lastEditedAt || e.updatedAt || e.createdAt).toLocaleString('zh-CN') + ' 编辑过本作品，内容可能有更新，请留意。</div>';
     }
     let voteBtnHtml = '';
-    if (isVotingStage && canVote) voteBtnHtml = '<button class="btn btn-primary" style="padding:10px 28px;font-size:15px;border-radius:12px;font-weight:700;" onclick="voteEntry(\'' + e.id + '\')">👍 投票</button>';
+    if (isVotingStage && canVote) voteBtnHtml = '<button class="btn btn-primary" style="padding:8px 20px;font-size:14px;border-radius:10px;font-weight:700;margin-left:8px;" onclick="voteEntry(\'' + e.id + '\')">👍 投票</button>';
     var extraHtml = '';
     if (e.extra) extraHtml = '<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">' + linkify(e.extra) + '</div></div>';
     var posterHtml = e.posterUrl ? '<div class="detail-row"><div class="dlabel">🖼️ 海报</div>' + renderPosterDetail(e.posterUrl, e.updatedAt || e.createdAt) + '</div>' : '';
@@ -512,7 +505,7 @@ async function openDetail(entryId) {
       }
     }
     var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-    document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + posterHtml + processHtml + resultHtml + extraHtml + docHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span></div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions">' + voteBtnHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+    document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + posterHtml + processHtml + resultHtml + extraHtml + docHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span>' + voteBtnHtml + '</div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
   } catch(e) {
     clearTimeout(detailLoadingTimer);
     const isAuthError = e.message && (e.message.indexOf('登录') !== -1 || e.message.indexOf('请先') !== -1 || e.message.indexOf('unauthorized') !== -1 || e.message.indexOf('Unauthorized') !== -1);
