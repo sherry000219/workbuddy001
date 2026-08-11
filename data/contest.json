@@ -6179,6 +6179,13 @@
           "stock": 1,
           "total": 1,
           "createdAt": "2026-08-11T09:10:28.267Z"
+        },
+        {
+          "id": "prize_msofx0kt_78jl02",
+          "name": "云帐房LOGO款餐具礼盒",
+          "stock": 3,
+          "total": 3,
+          "createdAt": "2026-08-11T09:10:38.381Z"
         }
       ],
       "final": [],
