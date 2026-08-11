@@ -164,7 +164,8 @@ const DEFAULT_DB = {
       preliminary: [],
       semi_final: [],
       final: []
-    }
+    },
+    judges: []  // 评委名单，由管理员设置，只有名单内的人才能打分
   }
 };
 
@@ -814,6 +815,11 @@ app.post('/api/judge/scores/:entryId', (req, res) => {
   if (judgePassword !== getJudgePassword()) {
     return res.status(403).json({ error: '评委密码错误' });
   }
+  // 评委名单校验：如果名单非空，则只有名单内的评委可以打分
+  const judgeList = db.settings.judges || [];
+  if (judgeList.length > 0 && !judgeList.includes(judgeName)) {
+    return res.status(403).json({ error: '您不在评委名单中，请联系管理员添加' });
+  }
   const stage = getCurrentStage();
   // Check entry is judgable in current stage
   const judgable = getJudgableEntries(stage);
@@ -835,6 +841,11 @@ app.get('/api/judge/my-scores', (req, res) => {
   if (!judgeName) return res.status(400).json({ error: '缺少评委姓名' });
   if (judgePassword !== getJudgePassword()) {
     return res.status(403).json({ error: '评委密码错误' });
+  }
+  // 评委名单校验
+  const judgeList = db.settings.judges || [];
+  if (judgeList.length > 0 && !judgeList.includes(judgeName)) {
+    return res.status(403).json({ error: '您不在评委名单中，请联系管理员添加' });
   }
   const stage = getCurrentStage();
   const scores = db.judgeScores
@@ -944,6 +955,40 @@ app.post('/api/settings', verifyAdminToken, async (req, res) => {
   saveDB();
   ghPush().catch(e => console.error('[settings] GitHub push failed:', e.message));
   res.json({ success: true, currentStage: getCurrentStage() });
+});
+
+// ========== API: JUDGES（评委名单管理） ==========
+// 评委名单由管理员设置，只有名单内的人才能打分
+app.get('/api/admin/judges', verifyAdminToken, (req, res) => {
+  res.json({ judges: db.settings.judges || [] });
+});
+
+app.post('/api/admin/judges', verifyAdminToken, (req, res) => {
+  const { name } = req.body;
+  if (!name || !name.trim()) return res.status(400).json({ error: '请输入评委姓名' });
+  if (!db.settings.judges) db.settings.judges = [];
+  const trimmed = name.trim();
+  if (db.settings.judges.includes(trimmed)) return res.status(400).json({ error: '该评委已存在' });
+  db.settings.judges.push(trimmed);
+  saveDB();
+  ghPush().catch(e => console.error('[judges] GitHub push failed:', e.message));
+  res.json({ success: true, judges: db.settings.judges });
+});
+
+app.delete('/api/admin/judges/:name', verifyAdminToken, (req, res) => {
+  if (!db.settings.judges) db.settings.judges = [];
+  const name = decodeURIComponent(req.params.name);
+  const idx = db.settings.judges.indexOf(name);
+  if (idx === -1) return res.status(404).json({ error: '该评委不存在' });
+  db.settings.judges.splice(idx, 1);
+  saveDB();
+  ghPush().catch(e => console.error('[judges] GitHub push failed:', e.message));
+  res.json({ success: true, judges: db.settings.judges });
+});
+
+// 公开接口：前端校验评委是否在名单中
+app.get('/api/judges', (req, res) => {
+  res.json({ judges: db.settings.judges || [] });
 });
 
 // ========== API: LUCKY VOTER LIST（幸运投票人名单 / 各赛程抽奖资格） ==========

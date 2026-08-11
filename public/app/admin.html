@@ -195,6 +195,17 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
         </div>
       </div>
     </details>
+    <details style="margin-bottom:20px;" open>
+      <summary>⚖️ 评委名单管理</summary>
+      <div style="background:var(--bg-card);border:1px solid #e5e7eb;border-radius:var(--radius);padding:24px;margin-top:12px;box-shadow:var(--shadow);">
+        <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">只有名单内的评委才能打分。名单为空时，任何知道密码的人都可以打分。</p>
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <input type="text" id="addJudgeInput" placeholder="输入评委姓名" style="flex:1;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:#fff;color:var(--text);">
+          <button class="btn btn-primary btn-sm" onclick="addJudge()">添加</button>
+        </div>
+        <div id="judgeListContainer" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+    </details>
     <details style="margin-bottom:20px;">
       <summary>🎁 幸运投票人名单（奖池瓜分 / 抽奖资格）</summary>
       <div style="background:var(--bg-card);border:1px solid #e5e7eb;border-radius:var(--radius);padding:24px;margin-top:12px;box-shadow:var(--shadow);">
@@ -423,6 +434,7 @@ async function adminLogin() {
     updateAdminStageLabel();
     loadLucky();
     loadDrawConfig();
+    loadJudges();
   } catch(e) { showToast(e.message, 'error'); }
 }
 
@@ -577,6 +589,53 @@ async function saveVotingToggle() {
     await api('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ votingEnabled: on }) });
     votingEnabled = on;
     showToast(on ? '✅ 投票已开启' : '⏸️ 投票已暂停', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ========== JUDGE LIST MANAGEMENT ==========
+async function loadJudges() {
+  if (!adminToken) return;
+  try {
+    const data = await api('/api/admin/judges', { headers: { 'x-admin-token': adminToken } });
+    renderJudgeList(data.judges || []);
+  } catch(e) { console.error('loadJudges:', e); }
+}
+
+function renderJudgeList(judges) {
+  const container = document.getElementById('judgeListContainer');
+  if (!container) return;
+  if (!judges.length) {
+    container.innerHTML = '<p style="color:var(--text-dim);font-size:13px;">暂无评委，名单为空时任何知道密码的人都可以打分</p>';
+    return;
+  }
+  container.innerHTML = judges.map(function(name) {
+    return '<div style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;">' +
+      '<span style="color:var(--text);">' + escapeHtml(name) + '</span>' +
+      '<button onclick="removeJudge(\'' + escapeHtml(name).replace(/'/g, "\\'") + '\')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px;padding:0 2px;line-height:1;" title="移除">✕</button>' +
+    '</div>';
+  }).join('');
+}
+
+async function addJudge() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  const input = document.getElementById('addJudgeInput');
+  const name = input.value.trim();
+  if (!name) return showToast('请输入评委姓名', 'error');
+  try {
+    const data = await api('/api/admin/judges', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ name }) });
+    input.value = '';
+    renderJudgeList(data.judges || []);
+    showToast('已添加评委：' + name, 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function removeJudge(name) {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  if (!confirm('确定要移除评委「' + name + '」吗？')) return;
+  try {
+    const data = await api('/api/admin/judges/' + encodeURIComponent(name), { method: 'DELETE', headers: { 'x-admin-token': adminToken } });
+    renderJudgeList(data.judges || []);
+    showToast('已移除评委：' + name, 'success');
   } catch(e) { showToast(e.message, 'error'); }
 }
 

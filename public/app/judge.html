@@ -254,6 +254,16 @@ async function startJudgeLogin() {
 async function enterJudge() {
   if (!ddAuthed || !ddUser) return showToast('请先通过钉钉认证', 'error');
   const name = ddUser.nick;
+  // 先检查评委名单
+  try {
+    const judgeListResp = await fetch('/api/judges');
+    const judgeListData = await judgeListResp.json();
+    const judges = judgeListData.judges || [];
+    if (judges.length > 0 && !judges.includes(name)) {
+      showToast('您不在评委名单中，请联系管理员添加', 'error');
+      return;
+    }
+  } catch(e) { /* 评委名单接口失败时放行，由后端再次校验 */ }
   const pw = document.getElementById('judgePwInput').value.trim();
   if (!pw) return showToast('请输入评审密码', 'error');
   const btn = event.target;
