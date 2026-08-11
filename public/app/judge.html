@@ -193,7 +193,7 @@ function renderPosterDetail(url, updatedAt) {
   if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
     return '<div class="dvalue"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">🖼️ 查看作品海报（钉盘）</a></div>';
   }
-  return '<div class="dvalue"><img src="' + escapeHtml(src) + '" style="max-width:100%;max-height:300px;border-radius:8px;" alt="作品海报" onerror="this.style.display=\'none\'"></div>';
+  return '<div class="dvalue"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none;"><img src="' + escapeHtml(src) + '" style="max-width:100%;max-height:300px;border-radius:8px;display:block;" alt="作品海报" onerror="this.style.display=\'none\'"></a><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;font-size:13px;word-break:break-all;margin-top:6px;display:inline-block;">🔗 点击查看原图大图</a></div>';
 }
 
 

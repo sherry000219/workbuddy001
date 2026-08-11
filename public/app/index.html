@@ -553,7 +553,7 @@ function renderPosterCard(url, updatedAt) {
   if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
     return '<div style="width:100%;height:160px;border-radius:8px;margin-bottom:12px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;font-size:14px;text-decoration:none;">🖼️ 查看作品海报</a></div>';
   }
-  return '<img src="' + escapeHtml(src) + '" style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:12px;" alt="作品海报" onerror="this.onerror=null;this.style.display=\'none\';this.insertAdjacentHTML(\'afterend\',\'<div style=&quot;width:100%;height:160px;border-radius:8px;margin-bottom:12px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;&quot;><a href=&quot;'+escapeHtml(url)+'&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; style=&quot;color:#ff6b35;font-size:14px;text-decoration:none;&quot;>🖼️ 查看作品海报</a></div>\')">';
+  return '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none;"><img src="' + escapeHtml(src) + '" style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:4px;" alt="作品海报" onerror="this.onerror=null;this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div style="width:100%;height:40px;border-radius:8px;background:#f3f4f6;display:none;align-items:center;justify-content:center;margin-bottom:12px;color:#ff6b35;font-size:13px;">🖼️ 点击查看作品海报</div></a>';
 }
 function renderPosterDetail(url, updatedAt) {
   if (!url) return '';
@@ -562,7 +562,7 @@ function renderPosterDetail(url, updatedAt) {
   if (url.indexOf('alidocs.dingtalk.com') !== -1 || url.indexOf('dingtalk.com') !== -1) {
     return '<div class="dvalue"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">🖼️ 查看作品海报（钉盘）</a></div>';
   }
-  return '<div class="dvalue"><img src="' + escapeHtml(src) + '" style="max-width:100%;max-height:300px;border-radius:8px;" alt="作品海报" onerror="this.onerror=null;this.style.display=\'none\';this.insertAdjacentHTML(\'afterend\',\'<a href=&quot;'+escapeHtml(url)+'&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; style=&quot;color:#ff6b35;word-break:break-all;&quot;>🖼️ 查看作品海报</a>\')"></div>';
+  return '<div class="dvalue"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none;"><img src="' + escapeHtml(src) + '" style="max-width:100%;max-height:300px;border-radius:8px;display:block;" alt="作品海报" onerror="this.onerror=null;this.style.display=\'none\'"></a><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" style="color:#ff6b35;font-size:13px;word-break:break-all;margin-top:6px;display:inline-block;">🔗 点击查看原图大图</a></div>';
 }
 
 // ========== API CALLS ==========
