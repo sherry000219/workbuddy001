@@ -6244,6 +6244,13 @@
           "stock": 1,
           "total": 1,
           "createdAt": "2026-08-11T09:11:35.077Z"
+        },
+        {
+          "id": "prize_msofyqvu_s8pi5h",
+          "name": "小米手持挂烫机2代",
+          "stock": 1,
+          "total": 1,
+          "createdAt": "2026-08-11T09:11:59.130Z"
         }
       ],
       "final": [],
