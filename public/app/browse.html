@@ -411,6 +411,13 @@ async function renderGallery() {
       const rsClass = 'rs-' + rs;
       const badge = awardBadge(e.award) || roundBadge(rs);
       const isEliminated = rs === 'eliminated_semi' || rs === 'eliminated_final';
+      const canVote = isVotingStage && !isEliminated && rs !== 'awarded' && rs !== 'finalist';
+      let voteBtn = '';
+      if (isVotingStage && canVote) {
+        voteBtn = '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();voteEntry(\'' + e.id + '\')">👍 投票</button>';
+      } else if (!isVotingStage) {
+        voteBtn = '<span style="font-size:12px;color:var(--text-dim);">' + (STAGE_LABELS[currentStage] || '') + '阶段</span>';
+      }
       var extraHtml = '';
       if (e.extra) {
         extraHtml = '<div style="font-size:13px;color:var(--accent);margin-top:8px;word-break:break-all;">' + linkify(e.extra.substring(0,100)) + (e.extra.length>100?'...':'') + '</div>';
@@ -422,7 +429,7 @@ async function renderGallery() {
 var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
       var cardPoster = e.posterUrl ? renderPosterCard(e.posterUrl, e.updatedAt || e.createdAt) : '';
       var teamBadge = e.entryType === 'team' ? '<span class="team-badge">👥 团队</span>' : '';
-      return '<div class="entry-card ' + rsClass + '" onclick="openDetail(\'' + e.id + '\')"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + (e.docUrl ? ' 📎' : '') + '</span>' + cardPoster + badge + '<h3>' + e.title + teamBadge + '</h3><div class="meta">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleDateString('zh-CN') + '</div><div class="desc">' + e.scene + '</div>' + extraHtml + '<div class="card-footer"><div style="display:flex;align-items:center;gap:16px;"><span class="score-display">' + (e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分') + '</span><span class="votes">👍 ' + (e.voteCount||0) + ' 票</span></div></div></div>';
+      return '<div class="entry-card ' + rsClass + '" onclick="openDetail(\'' + e.id + '\')"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + (e.docUrl ? ' 📎' : '') + '</span>' + cardPoster + badge + '<h3>' + e.title + teamBadge + '</h3><div class="meta">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleDateString('zh-CN') + '</div><div class="desc">' + e.scene + '</div>' + extraHtml + '<div class="card-footer"><div style="display:flex;align-items:center;gap:16px;"><span class="score-display">' + (e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分') + '</span><span class="votes">👍 ' + (e.voteCount||0) + ' 票</span></div>' + voteBtn + '</div></div>';
     }).join('');
   } catch(e) { console.error('Gallery error:', e); }
 }
