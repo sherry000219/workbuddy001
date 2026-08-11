@@ -487,8 +487,52 @@ async function ghPull() {
     }
     const mergedScores = [...scoreMap.values()];
 
-    // 4. settings：远程优先（管理员在后台改的设置应该同步过来）
-    const mergedSettings = { ...(localData.settings || {}), ...(remoteData.settings || {}) };
+    // 4. settings：标量字段远程优先，数组字段（judges/prizes）取并集
+    const localSettings = localData.settings || {};
+    const remoteSettings = remoteData.settings || {};
+    const mergedSettings = { ...localSettings, ...remoteSettings };
+    // judges 数组智能合并：本地优先（管理员操作以本地为准）
+    // - 本地名单非空 → 使用本地名单（保证管理员添加/删除都生效）
+    // - 本地名单为空 → 使用远程名单（首次启动或名单被清空的情况）
+    if (localSettings.judges || remoteSettings.judges) {
+      const localJudges = localSettings.judges || [];
+      const remoteJudges = remoteSettings.judges || [];
+      if (localJudges.length > 0) {
+        // 本地有名单 → 以本地为准，但补充远程独有的（本地从未有过的评委）
+        // 这处理了"另一个实例添加了评委"的情况
+        const localSet = new Set(localJudges);
+        const remoteSet = new Set(remoteJudges);
+        // 只添加远程中本地没有的（且本地没有该评委的打分记录 → 非本地删除）
+        const localScoreNames = new Set((localData.judgeScores || []).map(s => s.judgeName));
+        for (const j of remoteSet) {
+          if (!localSet.has(j) && !localScoreNames.has(j)) {
+            localJudges.push(j); // 远程新增，本地没有打分记录 → 保留
+          }
+        }
+        mergedSettings.judges = localJudges;
+      } else {
+        // 本地名单为空 → 使用远程名单
+        mergedSettings.judges = remoteJudges;
+      }
+    }
+    // prizes 数组：按赛段取并集（每个赛段内的奖品按 name 去重）
+    if (localSettings.prizes || remoteSettings.prizes) {
+      const lp = localSettings.prizes || {};
+      const rp = remoteSettings.prizes || {};
+      const mergedPrizes = {};
+      const stages = new Set([...Object.keys(lp), ...Object.keys(rp)]);
+      for (const st of stages) {
+        const localItems = lp[st] || [];
+        const remoteItems = rp[st] || [];
+        const seen = new Set();
+        mergedPrizes[st] = [];
+        for (const item of [...localItems, ...remoteItems]) {
+          const key = item.name || item.label || JSON.stringify(item);
+          if (!seen.has(key)) { seen.add(key); mergedPrizes[st].push(item); }
+        }
+      }
+      mergedSettings.prizes = mergedPrizes;
+    }
 
     // 5. 构建合并后的数据
     const mergedData = {
