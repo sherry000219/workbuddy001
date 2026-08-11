@@ -5259,7 +5259,18 @@
       "createdAt": "2026-08-11T06:25:39.805Z"
     }
   ],
-  "judgeScores": [],
+  "judgeScores": [
+    {
+      "entryId": "entry_1786418743612_h5sx2m",
+      "judgeName": "朱海燕",
+      "practicality": 0,
+      "innovation": 0,
+      "scalability": 0,
+      "presentation": 0,
+      "stage": "preliminary",
+      "updatedAt": "2026-08-11T06:27:02.190Z"
+    }
+  ],
   "drawRecords": [],
   "settings": {
     "judgePassword": "wb2026",
