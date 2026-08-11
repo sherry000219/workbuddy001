@@ -28,7 +28,9 @@
       "createdAt": "2026-08-11T03:25:43.612Z",
       "updatedAt": "2026-08-11T04:09:43.807Z",
       "lastEditedAt": "2026-08-11T04:09:43.807Z",
-      "editNotice": true
+      "editNotice": false,
+      "editNoticeAckBy": "朱海燕",
+      "editNoticeAckAt": "2026-08-11T06:27:17.500Z"
     },
     {
       "id": "entry_1786374088143_40x0ai",
