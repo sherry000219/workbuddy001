@@ -4486,6 +4486,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-11T03:13:07.447Z"
+    },
+    {
+      "entryId": "entry_1786067302411_rdbwma",
+      "voterId": "gnxNWbHhMYWFUrWP6VnNPwiEiE",
+      "voterName": "小红豆",
+      "voterMobile": "15298392042",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPDhuywtUNW0bNA5vNA5uwYsS1W-E1I1cC9Y4pR0D-AA_923_923.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-11T03:14:04.534Z"
     }
   ],
   "judgeScores": [],
