@@ -114,6 +114,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 @media (max-width: 640px) {
   .gallery-grid { grid-template-columns: 1fr; }
   .main-container { padding: 0 12px; }
+  .entry-card .card-footer { flex-direction: column; gap: 10px; align-items: stretch; }
+  .entry-card .card-footer .btn { width: 100%; text-align: center; justify-content: center; }
 }
 </style>
 </head>
@@ -414,7 +416,7 @@ async function renderGallery() {
       const canVote = isVotingStage && !isEliminated && rs !== 'awarded' && rs !== 'finalist';
       let voteBtn = '';
       if (isVotingStage && canVote) {
-        voteBtn = '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();voteEntry(\'' + e.id + '\')">👍 投票</button>';
+        voteBtn = '<button class="btn btn-primary" style="padding:10px 24px;font-size:15px;border-radius:12px;font-weight:700;min-width:80px;" onclick="event.stopPropagation();voteEntry(\'' + e.id + '\')">👍 投票</button>';
       } else if (!isVotingStage) {
         voteBtn = '<span style="font-size:12px;color:var(--text-dim);">' + (STAGE_LABELS[currentStage] || '') + '阶段</span>';
       }
@@ -485,7 +487,7 @@ async function openDetail(entryId) {
       editNoticeHtml = '<div style="background:rgba(255,215,64,0.12);border:1px solid rgba(255,215,64,0.35);color:#b45309;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;">📝 作者于 ' + new Date(e.lastEditedAt || e.updatedAt || e.createdAt).toLocaleString('zh-CN') + ' 编辑过本作品，内容可能有更新，请留意。</div>';
     }
     let voteBtnHtml = '';
-    if (isVotingStage && canVote) voteBtnHtml = '<button class="btn btn-outline btn-sm" onclick="voteEntry(\'' + e.id + '\')">👍 投票</button>';
+    if (isVotingStage && canVote) voteBtnHtml = '<button class="btn btn-primary" style="padding:10px 28px;font-size:15px;border-radius:12px;font-weight:700;" onclick="voteEntry(\'' + e.id + '\')">👍 投票</button>';
     var extraHtml = '';
     if (e.extra) extraHtml = '<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">' + linkify(e.extra) + '</div></div>';
     var posterHtml = e.posterUrl ? '<div class="detail-row"><div class="dlabel">🖼️ 海报</div>' + renderPosterDetail(e.posterUrl, e.updatedAt || e.createdAt) + '</div>' : '';
