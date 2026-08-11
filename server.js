@@ -1023,6 +1023,10 @@ app.post('/api/judge/scores/:entryId', (req, res) => {
   const judgable = getJudgableEntries(stage);
   const entry = judgable.find(e => e.id === req.params.entryId);
   if (!entry) return res.status(404).json({ error: '该作品在当前阶段不可打分' });
+  // 评委回避：不能给自己的作品打分
+  if (entry.name === judgeName || (entry.teamMembers && entry.teamMembers.includes(judgeName))) {
+    return res.status(403).json({ error: '评委不能给自己的作品打分，已自动回避' });
+  }
   const p = parseInt(practicality) || 0, c = parseInt(innovation) || 0, s = parseInt(scalability) || 0, r = parseInt(presentation) || 0;
   if (p > 50 || c > 20 || s > 15 || r > 15) return res.status(400).json({ error: '分数超出上限' });
   const idx = db.judgeScores.findIndex(sc => sc.entryId === req.params.entryId && sc.judgeName === judgeName && (sc.stage || 'preliminary') === stage);
