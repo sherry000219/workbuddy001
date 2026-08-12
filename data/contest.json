@@ -8300,6 +8300,26 @@
       "presentation": 10,
       "stage": "preliminary",
       "updatedAt": "2026-08-12T08:00:19.801Z"
+    },
+    {
+      "entryId": "entry_1786356393193_79m4rk",
+      "judgeName": "美娜",
+      "practicality": 40,
+      "innovation": 10,
+      "scalability": 7,
+      "presentation": 7,
+      "stage": "preliminary",
+      "updatedAt": "2026-08-12T08:02:35.903Z"
+    },
+    {
+      "entryId": "entry_1786356393193_79m4rk",
+      "judgeName": "朱海燕",
+      "practicality": 40,
+      "innovation": 10,
+      "scalability": 7,
+      "presentation": 7,
+      "stage": "preliminary",
+      "updatedAt": "2026-08-12T08:02:36.471Z"
     }
   ],
   "drawRecords": [],
