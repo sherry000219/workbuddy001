@@ -7805,6 +7805,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-12T08:04:56.788Z"
+    },
+    {
+      "entryId": "entry_1786359942777_etq9ft",
+      "voterId": "zcXe2cJYvXr6fsPZ9RvXvwiEiE",
+      "voterName": "樊静",
+      "voterMobile": "15996378528",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDiQ3UCMwAJHNA7_NA78_959_959.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-12T08:06:44.781Z"
     }
   ],
   "judgeScores": [
