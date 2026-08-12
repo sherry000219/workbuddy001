@@ -137,7 +137,7 @@
       "title": "客户画像",
       "scene": "按群聊咨询问题类型进行分析统计，数据用于服务中心VIP方面：大客户群问题回复提效，集中高频问题做专题培训，方便快速了解群人员类型，进行交接，以及和跨部门协作沟通，维护客户；省区方面，方便客成了解客户软件使用情况，便于挖掘客户新需求点，增加客户使用粘性和后续软件续费。客户方面，可直观了解客户使用情况，分析客户是否达成降本增效的需求。",
       "process_text": "上传咨询表格，或者是接入群聊信息进行画像信息实时更新",
-      "process_link": "https://www.workbuddy.cn/space/d/uMs9XVeIqjyoDMCk9yyO1p?ext2=copy_link",
+      "process_link": "https://alidocs.dingtalk.com/i/nodes/AR4GpnMqJzMYMKvNIkexgop6VKe0xjE3?utm_scene=person_space",
       "result_text": "可以按群聊进行直观展示软件使用情况，咨询高频类型，咨询较多的人员进行分析，展示群聊客户群体画像。服务中心VIP方面：大客户群问题回复提效，集中高频问题做专题培训，方便快速了解群人员类型，进行交接，以及和跨部门协作沟通，维护客户；省区方面，方便客成了解客户软件使用情况，便于挖掘客户新需求点，增加客户使用粘性和后续软件续费。客户方面，可直观了解客户使用情况，分析客户是否达成降本增效的需求。",
       "result_link": "https://www.workbuddy.cn/space/d/uMs9XVeIqjyoDMCk9yyO1p?ext2=copy_link",
       "extra": "",
@@ -146,7 +146,10 @@
       "status": "approved",
       "roundStatus": "approved",
       "award": null,
-      "createdAt": "2026-08-10T09:54:05.419Z"
+      "createdAt": "2026-08-10T09:54:05.419Z",
+      "updatedAt": "2026-08-12T10:16:56.171Z",
+      "lastEditedAt": "2026-08-12T10:16:56.171Z",
+      "editNotice": true
     },
     {
       "id": "entry_1786351346788_dvmzme",
