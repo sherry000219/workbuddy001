@@ -7766,12 +7766,12 @@
     {
       "entryId": "entry_1786418743612_h5sx2m",
       "judgeName": "朱海燕",
-      "practicality": 0,
-      "innovation": 0,
-      "scalability": 0,
-      "presentation": 0,
+      "practicality": 45,
+      "innovation": 10,
+      "scalability": 5,
+      "presentation": 5,
       "stage": "preliminary",
-      "updatedAt": "2026-08-11T06:27:02.190Z"
+      "updatedAt": "2026-08-12T07:53:43.500Z"
     },
     {
       "entryId": "entry_1786359942777_etq9ft",
@@ -8212,6 +8212,16 @@
       "presentation": 10,
       "stage": "preliminary",
       "updatedAt": "2026-08-12T07:53:00.033Z"
+    },
+    {
+      "entryId": "entry_1786418743612_h5sx2m",
+      "judgeName": "美娜",
+      "practicality": 40,
+      "innovation": 10,
+      "scalability": 5,
+      "presentation": 5,
+      "stage": "preliminary",
+      "updatedAt": "2026-08-12T07:53:43.352Z"
     }
   ],
   "drawRecords": [],
