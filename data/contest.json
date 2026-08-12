@@ -8476,6 +8476,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPD1Gzu0MstsXNBQDNBQA_1280_1280.png",
       "stage": "preliminary",
       "createdAt": "2026-08-12T11:54:35.765Z"
+    },
+    {
+      "entryId": "entry_1784280815114_69d8de",
+      "voterId": "73uhOw1Kcwj1A7nMzMii3DQiEiE",
+      "voterName": "李亮",
+      "voterMobile": "15735046658",
+      "voterAvatar": "",
+      "stage": "preliminary",
+      "createdAt": "2026-08-12T12:00:13.446Z"
     }
   ],
   "judgeScores": [
