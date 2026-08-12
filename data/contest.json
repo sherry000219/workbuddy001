@@ -459,7 +459,9 @@
       "createdAt": "2026-08-07T01:48:22.411Z",
       "updatedAt": "2026-08-09T08:53:17.193Z",
       "lastEditedAt": "2026-08-09T08:53:17.193Z",
-      "editNotice": true
+      "editNotice": false,
+      "editNoticeAckBy": "赵冰艳",
+      "editNoticeAckAt": "2026-08-12T07:32:08.182Z"
     },
     {
       "id": "entry_1786014745788_j70nld",
@@ -7711,6 +7713,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5NYHWI1h2_NArbNArawLDlXTCussz0KD3laftFgAA_694_694.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-12T07:32:08.061Z"
+    },
+    {
+      "entryId": "entry_1786295169144_ilkpwc",
+      "voterId": "a9Cv0koTRlgIHKdAZmGWBwiEiE",
+      "voterName": "曹博岩",
+      "voterMobile": "18601402726",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3AlMP1j0R3NAgLNAhywd-80DFeUeVcJvSbtR2FIAA_540_514.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-12T07:32:08.965Z"
     }
   ],
   "judgeScores": [
