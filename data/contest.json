@@ -7338,6 +7338,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-12T05:40:12.689Z"
+    },
+    {
+      "entryId": "entry_1786295169144_ilkpwc",
+      "voterId": "Ct8AuPHwiSuiShuoCrGUaaiPAiEiE",
+      "voterName": "丁颖",
+      "voterMobile": "18403839601",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD2lT3vtlcTnNBwjNBwiwj89SAO0GDTAJiIkm7ezkAA_1800_1800.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-12T05:41:09.654Z"
     }
   ],
   "judgeScores": [
