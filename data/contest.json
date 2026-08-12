@@ -7731,6 +7731,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDg7mLf8gMdLNAR_NAWI_354_287.jpg",
       "stage": "preliminary",
       "createdAt": "2026-08-12T07:36:19.666Z"
+    },
+    {
+      "entryId": "entry_1786295169144_ilkpwc",
+      "voterId": "TrErMNJZORsq7C1qbyiif7wiEiE",
+      "voterName": "张娅",
+      "voterMobile": "18712016927",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3zB5d8xQA_NAmbNAmawfPafXB0_SDYJOK0tnSUvAA_614_614.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-12T07:38:58.814Z"
     }
   ],
   "judgeScores": [
@@ -8113,6 +8122,16 @@
       "presentation": 13,
       "stage": "preliminary",
       "updatedAt": "2026-08-12T07:38:50.109Z"
+    },
+    {
+      "entryId": "entry_1785909222508_t01wgt",
+      "judgeName": "赵冰艳",
+      "practicality": 0,
+      "innovation": 12,
+      "scalability": 13,
+      "presentation": 12,
+      "stage": "preliminary",
+      "updatedAt": "2026-08-12T07:38:57.911Z"
     }
   ],
   "drawRecords": [],
