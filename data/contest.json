@@ -662,7 +662,9 @@
       "createdAt": "2026-08-04T03:01:25.108Z",
       "updatedAt": "2026-08-04T03:14:28.284Z",
       "lastEditedAt": "2026-08-04T03:14:28.284Z",
-      "editNotice": true
+      "editNotice": false,
+      "editNoticeAckBy": "徐聪明",
+      "editNoticeAckAt": "2026-08-12T08:19:21.830Z"
     },
     {
       "id": "entry_1785751983953_jddr0p",
