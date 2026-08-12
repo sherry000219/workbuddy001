@@ -1012,8 +1012,10 @@
       "result_link": "",
       "updatedAt": "2026-07-23T10:08:47.772Z",
       "lastEditedAt": "2026-07-23T10:08:47.772Z",
-      "editNotice": true,
-      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/yQod3RxJKQNeYQvGcolGxanmWkb4Mw9r?_fid=yQod3RxJKQNeYQvGcolGxanmWkb4Mw9r"
+      "editNotice": false,
+      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/yQod3RxJKQNeYQvGcolGxanmWkb4Mw9r?_fid=yQod3RxJKQNeYQvGcolGxanmWkb4Mw9r",
+      "editNoticeAckBy": "徐聪明",
+      "editNoticeAckAt": "2026-08-12T08:41:20.766Z"
     },
     {
       "id": "entry_1784282940329_0a4b26",
