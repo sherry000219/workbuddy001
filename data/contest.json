@@ -957,8 +957,10 @@
       "createdAt": "2026-07-27T07:16:44.075Z",
       "updatedAt": "2026-07-27T10:09:57.242Z",
       "lastEditedAt": "2026-07-27T10:09:57.242Z",
-      "editNotice": true,
-      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/P0MALyR8knNzBnblSYD4wmYDJ3bzYmDO?_fid=P0MALyR8knNzBnblSYD4wmYDJ3bzYmDO"
+      "editNotice": false,
+      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/P0MALyR8knNzBnblSYD4wmYDJ3bzYmDO?_fid=P0MALyR8knNzBnblSYD4wmYDJ3bzYmDO",
+      "editNoticeAckBy": "徐聪明",
+      "editNoticeAckAt": "2026-08-12T08:43:03.384Z"
     },
     {
       "id": "entry_1785124018451_kk1g17",
