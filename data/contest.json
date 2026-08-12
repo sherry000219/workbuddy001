@@ -7527,6 +7527,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-12T07:11:35.781Z"
+    },
+    {
+      "entryId": "entry_1786356393193_79m4rk",
+      "voterId": "O9ThOP7sWCiShuoCrGUaaiPAiEiE",
+      "voterName": "程爽",
+      "voterMobile": "15738359003",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD333IDwKJdPNAiLNAiKwipV4SsWtBa4KAfXxza5KAA_546_546.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-12T07:12:26.429Z"
     }
   ],
   "judgeScores": [
