@@ -117,7 +117,9 @@
       "createdAt": "2026-08-10T10:06:33.193Z",
       "updatedAt": "2026-08-10T10:07:04.574Z",
       "lastEditedAt": "2026-08-10T10:07:04.574Z",
-      "editNotice": true
+      "editNotice": false,
+      "editNoticeAckBy": "徐聪明",
+      "editNoticeAckAt": "2026-08-12T07:52:14.621Z"
     },
     {
       "id": "entry_1786355645419_jc8uii",
