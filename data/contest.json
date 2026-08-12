@@ -7491,6 +7491,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-12T07:08:52.149Z"
+    },
+    {
+      "entryId": "entry_1786287685562_ypa37h",
+      "voterId": "4VcWaRrgR0P2bEiSyLtOAeQiEiE",
+      "voterName": "许岩",
+      "voterMobile": "13409201483",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3To0wjKPKPNBFzNBFywh_o0-txMNFoHqaiFhCzhAA_1116_1116.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-12T07:09:23.312Z"
     }
   ],
   "judgeScores": [
