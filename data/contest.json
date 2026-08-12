@@ -7249,12 +7249,12 @@
     {
       "entryId": "entry_1786338333096_ik561c",
       "judgeName": "赵冰艳",
-      "practicality": 0,
-      "innovation": 0,
-      "scalability": 0,
-      "presentation": 0,
+      "practicality": 35,
+      "innovation": 15,
+      "scalability": 12,
+      "presentation": 13,
       "stage": "preliminary",
-      "updatedAt": "2026-08-12T03:35:37.015Z"
+      "updatedAt": "2026-08-12T03:37:23.277Z"
     }
   ],
   "drawRecords": [],
