@@ -9300,12 +9300,12 @@
     {
       "entryId": "entry_1786067302411_rdbwma",
       "judgeName": "李铭铖",
-      "practicality": 0,
-      "innovation": 0,
-      "scalability": 0,
-      "presentation": 0,
+      "practicality": 30,
+      "innovation": 15,
+      "scalability": 5,
+      "presentation": 9,
       "stage": "preliminary",
-      "updatedAt": "2026-08-12T09:07:08.529Z"
+      "updatedAt": "2026-08-12T09:34:21.197Z"
     },
     {
       "entryId": "entry_1786351346788_dvmzme",
