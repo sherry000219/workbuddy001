@@ -628,7 +628,9 @@
       "createdAt": "2026-08-04T09:04:33.411Z",
       "updatedAt": "2026-08-05T02:34:03.017Z",
       "lastEditedAt": "2026-08-05T02:34:03.017Z",
-      "editNotice": true
+      "editNotice": false,
+      "editNoticeAckBy": "徐聪明",
+      "editNoticeAckAt": "2026-08-12T08:16:07.609Z"
     },
     {
       "id": "entry_1785812485108_zegq9a",
