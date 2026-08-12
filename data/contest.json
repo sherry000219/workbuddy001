@@ -8449,6 +8449,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-12T11:54:06.848Z"
+    },
+    {
+      "entryId": "entry_1784280815114_69d8de",
+      "voterId": "4IncduTxPsfqkIPCNV0nRwiEiE",
+      "voterName": "师烽森",
+      "voterMobile": "13546737227",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPD26eMSHw1wrNA-jNA-g_1000_1000.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-12T11:54:18.251Z"
     }
   ],
   "judgeScores": [
