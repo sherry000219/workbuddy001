@@ -6834,6 +6834,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-12T03:14:08.768Z"
+    },
+    {
+      "entryId": "entry_1785325566960_99axb6",
+      "voterId": "GZ5XiPUAhqe1Dgy67LxemJQiEiE",
+      "voterName": "孙嘉琪",
+      "voterMobile": "15195970729",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPM3H9x0-Fjd_NBQDNBQA_1280_1280.png",
+      "stage": "preliminary",
+      "createdAt": "2026-08-12T03:14:14.485Z"
     }
   ],
   "judgeScores": [
