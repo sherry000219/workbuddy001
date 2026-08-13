@@ -502,7 +502,9 @@
       "createdAt": "2026-08-06T11:12:25.788Z",
       "updatedAt": "2026-08-12T09:39:15.535Z",
       "lastEditedAt": "2026-08-12T09:39:15.535Z",
-      "editNotice": true
+      "editNotice": false,
+      "editNoticeAckBy": "朱海燕",
+      "editNoticeAckAt": "2026-08-13T03:11:56.131Z"
     },
     {
       "id": "entry_1785933777405_l85dpc",
