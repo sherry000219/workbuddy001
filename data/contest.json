@@ -856,7 +856,9 @@
       "createdAt": "2026-07-30T03:23:23.845Z",
       "updatedAt": "2026-08-05T09:50:39.261Z",
       "lastEditedAt": "2026-08-05T09:50:39.261Z",
-      "editNotice": true
+      "editNotice": false,
+      "editNoticeAckBy": "美娜",
+      "editNoticeAckAt": "2026-08-13T03:19:26.967Z"
     },
     {
       "id": "entry_1785348752114_picbqa",
