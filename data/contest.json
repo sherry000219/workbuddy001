@@ -888,7 +888,9 @@
       "createdAt": "2026-07-29T18:12:32.114Z",
       "updatedAt": "2026-07-29T18:51:18.437Z",
       "lastEditedAt": "2026-07-29T18:51:18.437Z",
-      "editNotice": true
+      "editNotice": false,
+      "editNoticeAckBy": "朱海燕",
+      "editNoticeAckAt": "2026-08-13T03:35:12.393Z"
     },
     {
       "id": "entry_1785325566960_99axb6",
