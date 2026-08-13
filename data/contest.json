@@ -9012,6 +9012,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-13T02:58:04.748Z"
+    },
+    {
+      "entryId": "entry_1786287685562_ypa37h",
+      "voterId": "0b8iSVD1PtGh0NTSPVJ3E7giEiE",
+      "voterName": "刘嘉欣",
+      "voterMobile": "19161714485",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3wD0DkG0dfNAh7NAhuwMWhmJrIKq0MGyI2qagksAA_539_542.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-13T03:29:06.544Z"
     }
   ],
   "judgeScores": [
