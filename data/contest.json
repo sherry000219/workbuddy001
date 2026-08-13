@@ -11020,6 +11020,26 @@
       "presentation": 10,
       "stage": "preliminary",
       "updatedAt": "2026-08-13T07:45:31.809Z"
+    },
+    {
+      "entryId": "entry_1784284342845_dzvql7",
+      "judgeName": "张旭睿",
+      "practicality": 25,
+      "innovation": 5,
+      "scalability": 5,
+      "presentation": 5,
+      "stage": "preliminary",
+      "updatedAt": "2026-08-13T07:45:47.935Z"
+    },
+    {
+      "entryId": "entry_1785136604075_9xogv4",
+      "judgeName": "张旭睿",
+      "practicality": 25,
+      "innovation": 5,
+      "scalability": 5,
+      "presentation": 5,
+      "stage": "preliminary",
+      "updatedAt": "2026-08-13T07:45:47.035Z"
     }
   ],
   "drawRecords": [],
