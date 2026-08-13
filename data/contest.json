@@ -8944,6 +8944,15 @@
       "voterAvatar": "",
       "stage": "preliminary",
       "createdAt": "2026-08-13T02:50:58.528Z"
+    },
+    {
+      "entryId": "entry_1786014745788_j70nld",
+      "voterId": "dqlP6iiqKPMSsWBQhciPQMfAiEiE",
+      "voterName": "邓家伟",
+      "voterMobile": "13813016583",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD4pxRYn4kqvNA6zNA6yw8BM8r3aooc4IApyoJmD5AA_940_940.jpg",
+      "stage": "preliminary",
+      "createdAt": "2026-08-13T02:51:42.920Z"
     }
   ],
   "judgeScores": [
