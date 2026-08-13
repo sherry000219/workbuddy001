@@ -1082,7 +1082,31 @@ app.get('/api/judge/my-scores', (req, res) => {
   const scores = db.judgeScores
     .filter(s => s.judgeName === judgeName && (s.stage || 'preliminary') === stage)
     .map(s => ({ entryId: s.entryId, practicality: s.practicality, innovation: s.innovation, scalability: s.scalability, presentation: s.presentation, total: s.practicality + s.innovation + s.scalability + s.presentation }));
-  res.json({ scores, stage });
+
+  // 赛段晋级时，若同一位评委在上个赛段已打分且本赛段尚未打分，默认继承上一赛段分数
+  const inherited = [];
+  if (stage === 'semi_final' || stage === 'final') {
+    const prevStage = stage === 'semi_final' ? 'preliminary' : 'semi_final';
+    const judgable = getJudgableEntries(stage);
+    const judgableIds = new Set(judgable.map(e => e.id));
+    const existingIds = new Set(scores.map(s => s.entryId));
+    const prevScores = db.judgeScores.filter(s => s.judgeName === judgeName && (s.stage || 'preliminary') === prevStage);
+    prevScores.forEach(s => {
+      if (!existingIds.has(s.entryId) && judgableIds.has(s.entryId)) {
+        inherited.push({
+          entryId: s.entryId,
+          practicality: s.practicality,
+          innovation: s.innovation,
+          scalability: s.scalability,
+          presentation: s.presentation,
+          total: s.practicality + s.innovation + s.scalability + s.presentation,
+          inheritedFrom: prevStage
+        });
+      }
+    });
+  }
+
+  res.json({ scores, inherited, stage });
 });
 
 // ========== API: RANKING ==========
