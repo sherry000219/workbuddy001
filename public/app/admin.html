@@ -354,6 +354,8 @@ let ddAuthed = false;
 let ddUser = null;
 let loginState = null;
 let currentDrawStage = 'preliminary';
+let entryScores = [];
+let allJudges = [];
 const DRAW_STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛' };
 const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
 const ROUND_LABELS = { approved: '初赛', semi_finalist: '复赛晋级', eliminated_semi: '复赛淘汰', finalist: '决赛晋级', eliminated_final: '决赛淘汰', awarded: '已获奖' };
@@ -483,8 +485,8 @@ async function renderAdminDashboard() {
   try {
     const data = await api('/api/admin/scores', { headers: { 'x-admin-token': adminToken } });
     if (data.summary && data.summary.currentStage) { currentStage = data.summary.currentStage; isVotingStage = isStageVoting(currentStage); updateAdminStageLabel(); }
-    const entryScores = data.entryScores;
-    const allJudges = data.allJudges;
+    entryScores = data.entryScores;
+    allJudges = data.allJudges;
     const summary = data.summary;
 
     const statsBar = document.getElementById('adminStatsBar');
@@ -547,19 +549,19 @@ function renderStageManagePanel(entryScores) {
   if (!panel) return;
   if (currentStage === 'preliminary') {
     var sorted = entryScores.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
-    panel.innerHTML = '<div class="promote-panel"><h3>🔄 晋级复赛管理</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">勾选需要晋级复赛的作品，未勾选的将标记为淘汰。点击"确认晋级复赛"后阶段将切换到复赛。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted.map(function(e) { return '<div class="promote-entry"><input type="checkbox" id="promote_' + e.id + '" ' + (e.roundStatus === 'semi_finalist' ? 'checked' : '') + '><span class="pe-title">' + e.title + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center;"><button class="btn btn-success btn-sm" onclick="adminPromote(\'semi_final\')">✅ 确认晋级复赛</button><span style="font-size:12px;color:var(--text-dim);">已勾选 <strong id="promoteCount">0</strong> 个作品</span></div></div>';
+    panel.innerHTML = '<div class="promote-panel"><h3>🔄 晋级复赛管理</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">勾选需要晋级复赛的作品，未勾选的将标记为淘汰。点击"确认晋级复赛"后阶段将切换到复赛。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted.map(function(e) { return '<div class="promote-entry"><input type="checkbox" id="promote_' + e.id + '" ' + (e.roundStatus === 'semi_finalist' ? 'checked' : '') + '><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center;"><button class="btn btn-success btn-sm" onclick="adminPromote(\'semi_final\')">✅ 确认晋级复赛</button><span style="font-size:12px;color:var(--text-dim);">已勾选 <strong id="promoteCount">0</strong> 个作品</span></div></div>';
     document.querySelectorAll('input[id^="promote_"]').forEach(function(cb) { cb.addEventListener('change', updatePromoteCount); });
     updatePromoteCount();
   } else if (currentStage === 'semi_final') {
     var semiEntries = entryScores.filter(function(e) { return e.roundStatus === 'semi_finalist'; });
     var sorted2 = semiEntries.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
-    panel.innerHTML = '<div class="promote-panel"><h3>🏆 晋级决赛管理</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">勾选需要晋级决赛的作品，未勾选的将标记为淘汰。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted2.map(function(e) { return '<div class="promote-entry"><input type="checkbox" id="promote_' + e.id + '" ' + (e.roundStatus === 'finalist' ? 'checked' : '') + '><span class="pe-title">' + e.title + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center;"><button class="btn btn-primary btn-sm" onclick="adminPromote(\'final\')">✅ 确认晋级决赛</button><span style="font-size:12px;color:var(--text-dim);">已勾选 <strong id="promoteCount">0</strong> 个作品</span></div></div>';
+    panel.innerHTML = '<div class="promote-panel"><h3>🏆 晋级决赛管理</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">勾选需要晋级决赛的作品，未勾选的将标记为淘汰。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted2.map(function(e) { return '<div class="promote-entry"><input type="checkbox" id="promote_' + e.id + '" ' + (e.roundStatus === 'finalist' ? 'checked' : '') + '><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center;"><button class="btn btn-primary btn-sm" onclick="adminPromote(\'final\')">✅ 确认晋级决赛</button><span style="font-size:12px;color:var(--text-dim);">已勾选 <strong id="promoteCount">0</strong> 个作品</span></div></div>';
     document.querySelectorAll('input[id^="promote_"]').forEach(function(cb) { cb.addEventListener('change', updatePromoteCount); });
     updatePromoteCount();
   } else if (currentStage === 'final') {
     var finalEntries = entryScores.filter(function(e) { return e.roundStatus === 'finalist'; });
     var sorted3 = finalEntries.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
-    panel.innerHTML = '<div class="promote-panel"><h3>🏆 结算获奖</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">为决赛作品设置获奖等级。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted3.map(function(e) { return '<div class="promote-entry"><select class="award-select" id="award_' + e.id + '"><option value="">未获奖</option><option value="first" ' + (e.award === 'first' ? 'selected' : '') + '>🥇 一等奖</option><option value="second" ' + (e.award === 'second' ? 'selected' : '') + '>🥈 二等奖</option><option value="third" ' + (e.award === 'third' ? 'selected' : '') + '>🥉 三等奖</option><option value="excellence" ' + (e.award === 'excellence' ? 'selected' : '') + '>🎖️ 优秀奖</option></select><span class="pe-title">' + e.title + '</span><span class="pe-score">评委均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;"><button class="btn btn-gold btn-sm" onclick="adminSettle()">🏆 确认结算</button></div></div>';
+    panel.innerHTML = '<div class="promote-panel"><h3>🏆 结算获奖</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">为决赛作品设置获奖等级。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted3.map(function(e) { return '<div class="promote-entry"><select class="award-select" id="award_' + e.id + '"><option value="">未获奖</option><option value="first" ' + (e.award === 'first' ? 'selected' : '') + '>🥇 一等奖</option><option value="second" ' + (e.award === 'second' ? 'selected' : '') + '>🥈 二等奖</option><option value="third" ' + (e.award === 'third' ? 'selected' : '') + '>🥉 三等奖</option><option value="excellence" ' + (e.award === 'excellence' ? 'selected' : '') + '>🎖️ 优秀奖</option></select><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + '</span><span class="pe-score">评委均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;"><button class="btn btn-gold btn-sm" onclick="adminSettle()">🏆 确认结算</button></div></div>';
   } else if (currentStage === 'awarded') {
     panel.innerHTML = '<div class="promote-panel" style="background:linear-gradient(135deg,rgba(255,215,64,0.08),transparent);border:1px solid rgba(255,215,64,0.2);"><h3>🏆 比赛已结算</h3><p style="color:var(--text-dim);font-size:13px;">获奖结果已公布。</p></div>';
   } else {
@@ -973,7 +975,35 @@ async function openDetail(entryId) {
       }
     }
     var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-    document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + posterHtml + processHtml + resultHtml + extraHtml + docHtml + '<div class="modal-actions">' + ackHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+
+    // 编辑提示与已知悉按钮（用当前 entry 自己计算，避免依赖外部作用域）
+    var editNoticeHtml = '';
+    var ackHtml = '';
+    if (e.editNotice) {
+      editNoticeHtml = '<div style="background:rgba(255,215,64,0.12);border:1px solid rgba(255,215,64,0.35);color:#b45309;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;">📝 作者于 ' + new Date(e.lastEditedAt || e.updatedAt || e.createdAt).toLocaleString('zh-CN') + ' 编辑过本作品，内容可能有更新，请留意。</div>';
+      ackHtml = '<button class="btn btn-outline btn-sm" onclick="ackEdit(\'' + e.id + '\')">已知悉更新</button>';
+    }
+
+    // 得分情况 + 排名情况（取管理后台已加载的 entryScores）
+    var es = entryScores && entryScores.find(function(x) { return x.id === entryId; });
+    var scoreHtml = '';
+    var rankHtml = '';
+    if (es) {
+      if (es.scores && es.scores.length > 0) {
+        var rows = es.scores.map(function(s) {
+          return '<tr><td style="padding:6px;border-bottom:1px solid #f0f0f0;">' + escapeHtml(s.judgeName) + '</td><td style="padding:6px;border-bottom:1px solid #f0f0f0;text-align:center;">' + (s.practicality || 0) + '</td><td style="padding:6px;border-bottom:1px solid #f0f0f0;text-align:center;">' + (s.innovation || 0) + '</td><td style="padding:6px;border-bottom:1px solid #f0f0f0;text-align:center;">' + (s.scalability || 0) + '</td><td style="padding:6px;border-bottom:1px solid #f0f0f0;text-align:center;">' + (s.presentation || 0) + '</td><td style="padding:6px;border-bottom:1px solid #f0f0f0;text-align:center;font-weight:700;color:#ff6b35;">' + (s.total || 0) + '</td></tr>';
+        }).join('');
+        scoreHtml = '<div class="detail-row"><div class="dlabel">📊 评委得分（' + es.scores.length + ' 人）</div><div class="dvalue"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:#f9fafb;text-align:left;"><th style="padding:6px;border-bottom:1px solid #e5e7eb;">评委</th><th style="padding:6px;border-bottom:1px solid #e5e7eb;text-align:center;">实用</th><th style="padding:6px;border-bottom:1px solid #e5e7eb;text-align:center;">创新</th><th style="padding:6px;border-bottom:1px solid #e5e7eb;text-align:center;">推广</th><th style="padding:6px;border-bottom:1px solid #e5e7eb;text-align:center;">呈现</th><th style="padding:6px;border-bottom:1px solid #e5e7eb;text-align:center;">总分</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+      } else {
+        scoreHtml = '<div class="detail-row"><div class="dlabel">📊 评委得分</div><div class="dvalue" style="color:var(--text-dim);">暂无评委打分</div></div>';
+      }
+      var sorted = entryScores.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
+      var rank = 0;
+      for (var i = 0; i < sorted.length; i++) { if (sorted[i].id === entryId) { rank = i + 1; break; } }
+      rankHtml = '<div class="detail-row"><div class="dlabel">🏅 排名情况</div><div class="dvalue">当前阶段综合分排名：<strong style="color:#ff6b35;font-size:16px;">第 ' + rank + ' 名</strong> / 共 ' + sorted.length + ' 个作品<br>综合分：<strong>' + (es.composite || '—') + '</strong> ｜ 评委均分：<strong>' + (es.avgScore || '—') + '</strong> ｜ 评委数：' + (es.judgeCount || 0) + ' ｜ 得票数：' + (es.voteCount || 0) + '</div></div>';
+    }
+
+    document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + posterHtml + processHtml + resultHtml + extraHtml + docHtml + scoreHtml + rankHtml + '<div class="modal-actions">' + ackHtml + '<button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
     document.getElementById('detailModal').style.display = 'flex';
   } catch(e) { showToast('加载失败：' + e.message, 'error'); }
 }
