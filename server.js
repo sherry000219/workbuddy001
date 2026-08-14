@@ -1111,28 +1111,39 @@ app.get('/api/judge/my-scores', (req, res) => {
 
 // ========== API: RANKING ==========
 app.get('/api/ranking', requireAuth, (req, res) => {
-  const { track } = req.query;
-  const stage = getCurrentStage();
-  // Determine which entries to rank based on stage
+  const { track, stage } = req.query;
+  const currentStage = getCurrentStage();
+  const allowedStages = ['preliminary', 'semi_final', 'final', 'awarded'];
+  const stageOrder = { preliminary: 0, semi_final: 1, final: 2, awarded: 3 };
+  let targetStage = stage || currentStage;
+  if (!allowedStages.includes(targetStage)) {
+    return res.status(400).json({ error: '无效的赛段参数' });
+  }
+  // 不允许查看超过当前赛段的历史（未来赛段）
+  if (stageOrder[targetStage] > stageOrder[currentStage]) {
+    targetStage = currentStage;
+  }
+
+  // Determine which entries to rank based on targetStage
   let entries;
-  if (stage === 'preliminary') {
+  if (targetStage === 'preliminary') {
     entries = db.entries.filter(e => e.status === 'approved');
-  } else if (stage === 'semi_final') {
-    entries = db.entries.filter(e => e.roundStatus === 'semi_finalist');
-  } else if (stage === 'final' || stage === 'awarded') {
-    entries = db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
+  } else if (targetStage === 'semi_final') {
+    entries = db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded' || e.roundStatus === 'eliminated_final');
+  } else if (targetStage === 'final' || targetStage === 'awarded') {
+    entries = db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded' || e.roundStatus === 'eliminated_final');
   } else {
     entries = db.entries.filter(e => e.status === 'approved');
   }
   if (track) entries = entries.filter(e => e.track === track);
   const enrich = (list) => list.map(e => {
-    const sd = getEntryStageScores(e.id, stage);
-    const composite = getCompositeScore(e.id, stage);
+    const sd = getEntryStageScores(e.id, targetStage);
+    const composite = getCompositeScore(e.id, targetStage);
     return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, judgeAvg: sd.avgScore, composite };
   }).sort((a, b) => b.composite - a.composite).slice(0, 30);
   const individual = enrich(entries.filter(e => e.entryType !== 'team'));
   const team = enrich(entries.filter(e => e.entryType === 'team'));
-  res.json({ individual, team, currentStage: stage });
+  res.json({ individual, team, currentStage: targetStage });
 });
 
 // ========== API: STATS ==========

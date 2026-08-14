@@ -243,13 +243,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   <div class="section-title">🏆 <span id="rankingTitle">初赛 — 综合排名 Top 30</span></div>
   <div class="stats-bar" id="rankingStats"></div>
   <p id="rankingDesc" style="color:var(--text-dim);margin-bottom:16px;font-size:13px;">按专家评审分（80%）+ 全员投票分（20%）合并计算<br><strong style="color:#ef4444;font-size:13px;">得票率会引起分数变动，参与投票的人越多，得票分数会降低，不属于异常</strong></p>
-  <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+  <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+    <select id="rankStage" onchange="renderRanking()" style="padding:8px 14px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;background:#fff;color:var(--text);">
+      <option value="preliminary">初赛</option>
+      <option value="semi_final">复赛</option>
+      <option value="final">决赛</option>
+      <option value="awarded">已结算</option>
+    </select>
     <select id="rankTrack" onchange="renderRanking()" style="padding:8px 14px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;background:#fff;color:var(--text);">
       <option value="">全部赛道</option>
       <option value="efficiency">效率提升</option>
       <option value="creative">创意应用</option>
       <option value="business">业务赋能</option>
     </select>
+    <span id="rankStageHint" style="font-size:12px;color:var(--text-dim);"></span>
   </div>
   <div class="rank-section-title">👤 个人参赛</div>
   <div class="ranking-list" id="rankingListIndividual"></div>
@@ -431,7 +438,8 @@ function updateUserUI() {
   }
 }
 
-function updateStageUI() {
+function updateStageUI(targetStage) {
+  targetStage = targetStage || currentStage;
   const label = document.getElementById('stageLabel');
   if (label) {
     label.textContent = '📍 ' + (STAGE_LABELS[currentStage] || '初赛') + '阶段';
@@ -446,9 +454,21 @@ function updateStageUI() {
       else if (i === currentIdx) dot.classList.add('active');
     }
   });
+  // 同步赛段选择器
+  const stageSel = document.getElementById('rankStage');
+  if (stageSel && stageSel.value !== targetStage) {
+    stageSel.value = targetStage;
+  }
+  // 禁用未来赛段选项
+  if (stageSel) {
+    const stageOrder = { preliminary: 0, semi_final: 1, final: 2, awarded: 3 };
+    Array.from(stageSel.options).forEach(function(opt) {
+      opt.disabled = stageOrder[opt.value] > stageOrder[currentStage];
+    });
+  }
   const desc = document.getElementById('rankingDesc');
   if (desc) {
-    if (currentStage === 'final' || currentStage === 'awarded') {
+    if (targetStage === 'final' || targetStage === 'awarded') {
       desc.innerHTML = '决赛阶段：按评委打分（100%）排名';
     } else {
       desc.innerHTML = '按专家评审分（80%）+ 全员投票分（20%）合并计算<br><strong style="color:#ef4444;font-size:13px;">得票率会引起分数变动，参与投票的人越多，得票分数会降低，不属于异常</strong>';
@@ -456,8 +476,12 @@ function updateStageUI() {
   }
   const title = document.getElementById('rankingTitle');
   if (title) {
-    const stageText = STAGE_LABELS[currentStage] || '初赛';
+    const stageText = STAGE_LABELS[targetStage] || '初赛';
     title.textContent = stageText + ' — 综合排名 Top 30';
+  }
+  const hint = document.getElementById('rankStageHint');
+  if (hint) {
+    hint.textContent = targetStage === currentStage ? '（当前赛段）' : '（历史赛段回顾）';
   }
 }
 
@@ -642,15 +666,15 @@ function renderRankList(list, containerId) {
 async function renderRanking() {
   const stats = await loadStats();
   renderStatsBar('rankingStats', stats);
-  updateStageUI();
+  const stage = document.getElementById('rankStage').value || currentStage;
+  updateStageUI(stage);
   const track = document.getElementById('rankTrack').value;
-  let url = '/api/ranking';
-  if (track) url += '?track=' + track;
+  let url = '/api/ranking?stage=' + encodeURIComponent(stage);
+  if (track) url += '&track=' + encodeURIComponent(track);
   try {
     const data = await api(url);
     if (data.currentStage) {
-      currentStage = data.currentStage;
-      updateStageUI();
+      updateStageUI(data.currentStage);
     }
     renderRankList(data.individual || [], 'rankingListIndividual');
     renderRankList(data.team || [], 'rankingListTeam');
