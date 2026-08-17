@@ -17597,6 +17597,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:22:19.752Z"
+    },
+    {
+      "id": "dr_mswwovn3_0dhgg2",
+      "userId": "Hs1lfHRo5qSXYzje1j6eGgiEiE",
+      "userName": "吕玲",
+      "stage": "preliminary",
+      "prizeId": "prize_mswm7ljy_i0jjgj",
+      "prizeName": "云社区50积分",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:22:21.615Z"
     }
   ],
   "settings": {
@@ -17685,7 +17695,7 @@
         {
           "id": "prize_mswm7ljy_i0jjgj",
           "name": "云社区50积分",
-          "stock": 15,
+          "stock": 14,
           "total": 20,
           "createdAt": "2026-08-17T02:28:59.230Z"
         },
