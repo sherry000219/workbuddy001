@@ -18379,6 +18379,46 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:29:11.947Z"
+    },
+    {
+      "id": "dr_mswwxp1j_d6gsdo",
+      "userId": "GZ5XiPUAhqe1Dgy67LxemJQiEiE",
+      "userName": "孙嘉琪",
+      "stage": "preliminary",
+      "prizeId": "prize_mswm7chf_3tibc5",
+      "prizeName": "云社区10积分",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:29:12.967Z"
+    },
+    {
+      "id": "dr_mswwxpx6_bzouwc",
+      "userId": "Oo98CscUPwWxf9RD0xJyawiEiE",
+      "userName": "张寒",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:29:14.106Z"
+    },
+    {
+      "id": "dr_mswwxq8o_1krytu",
+      "userId": "xkxTRpbvDWO1rzw2QuHbOQiEiE",
+      "userName": "孙超杰",
+      "stage": "preliminary",
+      "prizeId": "prize_msoftaaw_5yv0qk",
+      "prizeName": "小财神盲盒",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:29:14.520Z"
+    },
+    {
+      "id": "dr_mswwxqn5_179v1i",
+      "userId": "GZ5XiPUAhqe1Dgy67LxemJQiEiE",
+      "userName": "孙嘉琪",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:29:15.041Z"
     }
   ],
   "settings": {
@@ -18418,7 +18458,7 @@
         {
           "id": "prize_msoftaaw_5yv0qk",
           "name": "小财神盲盒",
-          "stock": 13,
+          "stock": 12,
           "total": 3,
           "createdAt": "2026-08-11T09:07:44.360Z"
         },
@@ -18460,7 +18500,7 @@
         {
           "id": "prize_mswm7chf_3tibc5",
           "name": "云社区10积分",
-          "stock": 27,
+          "stock": 26,
           "total": 20,
           "createdAt": "2026-08-17T02:28:47.475Z"
         },
