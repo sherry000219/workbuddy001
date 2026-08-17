@@ -287,7 +287,7 @@ function renderWinnerTicker() {
   const list = [...weighted, ...weighted];
   itemsEl.innerHTML = list.map(w => `<div class="item"${w.rare ? ' style="color:#c2410c;"' : ''}>${w.rare ? '✨ ' : ''}恭喜 <span>${ESC(w.userName)}</span> 抽中 <span>${ESC(w.prizeName)}</span> · ${ESC(w.stageLabel || STAGE_LABELS[w.stage] || w.stage || '')}</div>`).join('');
   // 内容变多时适当加长滚动周期，保持可读速度
-  const duration = Math.max(30, Math.round(list.length * 2.2));
+  const duration = Math.max(48, Math.round(list.length * 3.5));
   itemsEl.style.animationDuration = duration + 's';
   ticker.style.display = 'flex';
 }
