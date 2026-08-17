@@ -11673,6 +11673,7 @@
       "updatedAt": "2026-08-14T03:00:30.452Z"
     }
   ],
+  "bets": [],
   "drawRecords": [],
   "settings": {
     "judgePassword": "wb2026",
@@ -11704,7 +11705,7 @@
         {
           "id": "prize_msoft563_c3l6ql",
           "name": "云帐房LOGO款64G优盘",
-          "stock": 2,
+          "stock": 3,
           "total": 3,
           "createdAt": "2026-08-11T09:07:37.707Z"
         },
