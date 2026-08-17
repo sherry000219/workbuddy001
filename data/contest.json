@@ -20473,6 +20473,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T08:00:12.964Z"
+    },
+    {
+      "id": "dr_mswy1pbc_1nmzea",
+      "userId": "7Q7b9P1C28fLjsIZuwWnpAiEiE",
+      "userName": "崔博",
+      "stage": "preliminary",
+      "prizeId": "prize_msofuejy_wl4v27",
+      "prizeName": "20元以下饮品任选1杯",
+      "isWin": true,
+      "drawnAt": "2026-08-17T08:00:19.560Z"
     }
   ],
   "settings": {
@@ -20526,7 +20536,7 @@
         {
           "id": "prize_msofuejy_wl4v27",
           "name": "20元以下饮品任选1杯",
-          "stock": 1,
+          "stock": 0,
           "total": 5,
           "createdAt": "2026-08-11T09:08:36.526Z"
         },
