@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎁 幸运投票人名单 · 云帐房 WorkBuddy 实战应用大赛</title>
+<script src="https://g.alicdn.com/dingding/dingtalk-jsapi/3.1.0/dingtalk.open.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f3f4f6; color: #1f2937; min-height: 100vh; }
+  .topbar { background: linear-gradient(135deg, #ff6b35, #e55d2b); color: #fff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .topbar h1 { font-size: 18px; font-weight: 700; }
+  .topbar a { color: #fff; text-decoration: none; font-size: 13px; background: rgba(255,255,255,.18); padding: 6px 14px; border-radius: 16px; }
+  .wrap { max-width: 800px; margin: 22px auto; padding: 0 16px; padding-bottom: 60px; }
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 22px; }
+  .stat { background: #fff; border-radius: 12px; padding: 18px 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .stat .num { font-size: 28px; font-weight: 800; color: #ff6b35; }
+  .stat .lab { font-size: 12px; color: #6b7280; margin-top: 4px; }
+  .card { background: #fff; border-radius: 14px; padding: 20px 22px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .card h2 { font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .card h2 .count { font-size: 13px; color: #6b7280; font-weight: 400; margin-left: auto; }
+  .voter-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+  .voter-item:last-child { border-bottom: none; }
+  .voter-avatar { width: 40px; height: 40px; border-radius: 50%; background: #f3f4f6; flex-shrink: 0; object-fit: cover; }
+  .voter-main { flex: 1; min-width: 0; }
+  .voter-name { font-size: 15px; font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .voter-mobile { font-size: 12px; color: #6b7280; background: #f3f4f6; padding: 1px 6px; border-radius: 4px; }
+  .voter-entries { font-size: 13px; color: #4b5563; margin-top: 6px; line-height: 1.6; }
+  .entry-tag { display: inline-block; background: rgba(255,107,53,.08); color: #ff6b35; padding: 2px 8px; border-radius: 6px; margin-right: 6px; margin-bottom: 4px; font-size: 12px; }
+  .entry-result { color: #6b7280; font-size: 12px; }
+  .empty { text-align: center; padding: 50px 20px; color: #6b7280; }
+  .empty .big { font-size: 40px; margin-bottom: 12px; }
+  .loading { text-align: center; padding: 60px; color: #9ca3af; }
+  .login-box { text-align: center; padding: 60px 20px; }
+  .login-box button { background: #ff6b35; color: #fff; border: none; padding: 12px 28px; border-radius: 10px; font-size: 15px; cursor: pointer; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>🎁 幸运投票人名单</h1>
+    <a href="index.html">← 返回竞赛大厅</a>
+  </div>
+  <div class="wrap">
+    <div id="root"><div class="loading">加载中…</div></div>
+  </div>
+
+<script>
+const ESC = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛' };
+
+let listData = null;
+
+async function api(url, options) {
+  options = options || {};
+  options.credentials = 'include';
+  const resp = await fetch(url, options);
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) throw new Error(data.error || '请求失败');
+  return data;
+}
+
+function isInDingTalk() {
+  try { return typeof dd !== 'undefined' && dd.env && dd.env.platform && dd.env.platform !== 'notInDingTalk'; } catch(e) { return false; }
+}
+function getCorpId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('corpId') || params.get('corpid') || '';
+}
+async function ddLogin() {
+  const corpId = isInDingTalk() ? getCorpId() : '';
+  if (corpId) {
+    dd.ready(function() {
+      dd.runtime.permission.requestAuthCode({
+        corpId: corpId,
+        onSuccess: function(result) { exchangeCode(result.code); },
+        onFail: function(err) { console.error(err); alert('获取钉钉授权失败，请重试'); }
+      });
+    });
+    return;
+  }
+  try {
+    const resp = await fetch('/api/auth/dd-url?redirect=' + encodeURIComponent(window.location.pathname + window.location.search));
+    const data = await resp.json();
+    window.location.href = data.url;
+  } catch(e) { alert('无法发起钉钉登录，请重试'); }
+}
+async function exchangeCode(code) {
+  try {
+    await api('/api/auth/dd-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+    load();
+  } catch(e) { alert('登录失败：' + e.message); }
+}
+async function checkAuth() {
+  try {
+    const data = await api('/api/auth/me');
+    return !!data.user;
+  } catch(e) { return false; }
+}
+
+function render() {
+  const root = document.getElementById('root');
+  if (!listData) {
+    root.innerHTML = '<div class="loading">加载中…</div>';
+    return;
+  }
+  if (!listData.enabled) {
+    root.innerHTML = '<div class="empty"><div class="big">🎁</div><div>幸运投票人名单尚未开启，敬请期待</div></div>';
+    return;
+  }
+  const rounds = listData.rounds || [];
+  if (rounds.length === 0) {
+    root.innerHTML = '<div class="empty"><div class="big">🎁</div><div>暂无幸运投票人数据</div></div>';
+    return;
+  }
+
+  const summary = listData.summary || {};
+  let html = `<div class="summary">
+    <div class="stat"><div class="num">${summary.rounds || rounds.length}</div><div class="lab">已开奖轮次</div></div>
+    <div class="stat"><div class="num">${summary.totalVoters || 0}</div><div class="lab">幸运投票人</div></div>
+    <div class="stat"><div class="num">${summary.totalTickets || 0}</div><div class="lab">总抽奖次数</div></div>
+  </div>`;
+
+  html += `<div class="card"><div style="font-size:13px;color:#6b7280;line-height:1.7;">名单说明：以下用户在该赛程中投过票，且所支持的作品成功晋级或获奖，获得对应轮次抽奖资格。每行展示一位投票人及其点赞的作品。</div></div>`;
+
+  rounds.forEach(r => {
+    html += `<div class="card">
+      <h2><span>🏅 ${ESC(r.label || STAGE_LABELS[r.stage] || r.stage)}</span><span class="count">${r.total || (r.voters || []).length} 人</span></h2>`;
+    (r.voters || []).forEach(v => {
+      const name = ESC(v.voterName || '匿名');
+      const mobile = v.mobileLast4 ? `<span class="voter-mobile">尾号 ${ESC(v.mobileLast4)}</span>` : '';
+      const avatar = v.voterAvatar ? `<img class="voter-avatar" src="${ESC(v.voterAvatar)}" alt="">` : `<div class="voter-avatar" style="display:flex;align-items:center;justify-content:center;font-size:16px;">👤</div>`;
+      const entries = (v.entries || []).map(e => {
+        const result = e.result ? `<span class="entry-result">(${ESC(e.result)})</span>` : '';
+        return `<span class="entry-tag">${ESC(e.title)} ${result}</span>`;
+      }).join('');
+      html += `<div class="voter-item">
+        ${avatar}
+        <div class="voter-main">
+          <div class="voter-name">${name} ${mobile}</div>
+          <div class="voter-entries">${entries || '<span style="color:#9ca3af;">无作品信息</span>'}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  root.innerHTML = html;
+}
+
+async function load() {
+  const authed = await checkAuth();
+  const root = document.getElementById('root');
+  if (!authed) {
+    root.innerHTML = '<div class="login-box"><div class="big" style="font-size:48px;margin-bottom:16px;">🔒</div><p style="margin-bottom:20px;color:#6b7280;">查看幸运投票人名单需先登录</p><button onclick="ddLogin()">钉钉登录</button></div>';
+    return;
+  }
+  try {
+    listData = await api('/api/lucky/list');
+    render();
+  } catch(e) {
+    root.innerHTML = '<div class="empty"><div class="big">⚠️</div><div>加载失败：' + ESC(e.message) + '</div></div>';
+  }
+}
+
+load();
+</script>
+</body>
+</html>
