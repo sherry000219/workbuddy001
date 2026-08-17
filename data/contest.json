@@ -12614,6 +12614,16 @@
       "prizeName": "云社区50积分",
       "isWin": true,
       "drawnAt": "2026-08-17T05:39:47.299Z"
+    },
+    {
+      "id": "dr_mswt11by_sp6607",
+      "userId": "mSdjSSP3EJ20wvfVzkiSvIgiEiE",
+      "userName": "陈龙海",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T05:39:50.398Z"
     }
   ],
   "settings": {
