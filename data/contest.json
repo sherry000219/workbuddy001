@@ -18349,6 +18349,26 @@
       "prizeName": "云社区10积分",
       "isWin": true,
       "drawnAt": "2026-08-17T07:29:07.339Z"
+    },
+    {
+      "id": "dr_mswwxmv9_ey8sg3",
+      "userId": "Oo98CscUPwWxf9RD0xJyawiEiE",
+      "userName": "张寒",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:29:10.149Z"
+    },
+    {
+      "id": "dr_mswwxnjc_ws86tj",
+      "userId": "GZ5XiPUAhqe1Dgy67LxemJQiEiE",
+      "userName": "孙嘉琪",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:29:11.016Z"
     }
   ],
   "settings": {
