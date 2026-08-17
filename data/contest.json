@@ -9617,6 +9617,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPD4d84sV-l2PNAd_NAd8_479_479.jpg",
       "stage": "semi_final",
       "createdAt": "2026-08-17T04:06:51.151Z"
+    },
+    {
+      "entryId": "entry_1786374088143_40x0ai",
+      "voterId": "8g94m3JGBtdNal9r6iPAAGAiEiE",
+      "voterName": "张沐禾",
+      "voterMobile": "19975549306",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPD4d84sV-l2PNAd_NAd8_479_479.jpg",
+      "stage": "semi_final",
+      "createdAt": "2026-08-17T04:06:54.548Z"
     }
   ],
   "judgeScores": [
@@ -12511,6 +12520,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T04:06:52.974Z"
+    },
+    {
+      "id": "dr_mswppiv4_2uk2cu",
+      "userId": "MYN2W4Cf1mesWBQhciPQMfAiEiE",
+      "userName": "宋陆凤",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T04:06:54.400Z"
     }
   ],
   "settings": {
