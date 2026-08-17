@@ -19746,6 +19746,16 @@
       "prizeName": "小财神盲盒",
       "isWin": true,
       "drawnAt": "2026-08-17T07:51:01.066Z"
+    },
+    {
+      "id": "dr_mswxpxiw_qraijk",
+      "userId": "qXuZDFn0iPaFnHJs4DsiSIHwiEiE",
+      "userName": "刘艳",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:51:10.328Z"
     }
   ],
   "settings": {
