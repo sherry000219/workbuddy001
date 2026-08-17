@@ -1077,12 +1077,13 @@ function getEntryBetTrack(entry) {
 }
 
 function isBettingOpen() {
-  const stage = getCurrentStage();
-  return stage === 'final' || stage === 'awarded';
+  // 押宝仅在复赛阶段开放，决赛不再开放投票/押宝
+  return getCurrentStage() === 'semi_final';
 }
 
 function getBettableEntries() {
-  return db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
+  // 复赛阶段可押宝：所有晋级复赛的作品
+  return db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
 }
 
 // POST /api/bet/:entryId — 押宝某个作品
