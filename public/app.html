@@ -646,6 +646,7 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
 let ddAuthed = false;
 let ddUser = null;
 let ddRemaining = 5;
+let ddTotalVotes = 5;
 let votingEnabled = false;
 let currentStage = 'preliminary';
 let isVotingStage = true;
@@ -729,6 +730,7 @@ async function exchangeCode(code) {
     ddAuthed = true;
     ddUser = data.user;
     ddRemaining = data.remainingVotes;
+    ddTotalVotes = data.totalVotes || 5;
     currentStage = data.currentStage || 'preliminary';
     isVotingStage = isStageVoting(currentStage);
     updateUserUI();
@@ -748,6 +750,7 @@ async function checkAuth() {
       ddAuthed = true;
       ddUser = data.user;
       ddRemaining = data.remainingVotes;
+      ddTotalVotes = data.totalVotes || 5;
       currentStage = data.currentStage || 'preliminary';
       isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage);
       updateUserUI();
@@ -756,6 +759,7 @@ async function checkAuth() {
       ddAuthed = false;
       ddUser = null;
       ddRemaining = 5;
+      ddTotalVotes = 5;
       updateUserUI();
     }
   } catch(e) {
@@ -857,6 +861,7 @@ async function ddLogout() {
   ddAuthed = false;
   ddUser = null;
   ddRemaining = 5;
+  ddTotalVotes = 5;
   updateUserUI();
   refreshCurrentPage();
   showToast('已退出登录');
@@ -1146,7 +1151,7 @@ async function voteEntry(entryId) {
     return;
   }
   if (ddRemaining <= 0) {
-    showToast('你的' + (STAGE_LABELS[currentStage] || '') + '5票已用完', 'error');
+    showToast('你的' + (STAGE_LABELS[currentStage] || '') + ddTotalVotes + '票已用完', 'error');
     return;
   }
   try {

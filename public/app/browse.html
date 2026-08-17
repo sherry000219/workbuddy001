@@ -200,6 +200,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 let ddAuthed = false;
 let ddUser = null;
 let ddRemaining = 5;
+let ddTotalVotes = 5;
 let votingEnabled = false;
 let currentStage = 'preliminary';
 let isVotingStage = true;
@@ -245,7 +246,7 @@ async function exchangeCode(code) {
     const resp = await fetch('/api/auth/dd-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }), credentials: 'include' });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || '登录失败');
-    ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes;
+    ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5;
     currentStage = data.currentStage || 'preliminary'; isVotingStage = isStageVoting(currentStage);
     updateUserUI(); updateStageUI();
     showToast('钉钉登录成功，欢迎 ' + ddUser.nick + '！', 'success');
@@ -257,8 +258,8 @@ async function checkAuth() {
   try {
     const resp = await fetch('/api/auth/me', { credentials: 'include' });
     const data = await resp.json();
-    if (data.user) { ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; currentStage = data.currentStage || 'preliminary'; isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage); updateUserUI(); updateStageUI(); }
-    else { ddAuthed = false; ddUser = null; ddRemaining = 5; updateUserUI(); }
+    if (data.user) { ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5; currentStage = data.currentStage || 'preliminary'; isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage); updateUserUI(); updateStageUI(); }
+    else { ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; updateUserUI(); }
   } catch(e) { ddAuthed = false; updateUserUI(); }
 }
 
@@ -303,7 +304,7 @@ function updateVotingUI() {
 
 async function ddLogout() {
   try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch(e) {}
-  ddAuthed = false; ddUser = null; ddRemaining = 5; updateUserUI(); renderGallery(); showToast('已退出登录');
+  ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; updateUserUI(); renderGallery(); showToast('已退出登录');
 }
 
 // ========== HELPERS ==========
@@ -438,7 +439,7 @@ async function voteEntry(entryId) {
   if (!ddAuthed) return showToast('请先通过钉钉登录后再投票', 'error');
   if (!votingEnabled) return showToast('投票暂未开启，请等待管理员开放投票通道', 'error');
   if (!isVotingStage) return showToast('当前阶段不支持投票', 'error');
-  if (ddRemaining <= 0) return showToast('你的' + (STAGE_LABELS[currentStage] || '') + '5票已用完', 'error');
+  if (ddRemaining <= 0) return showToast('你的' + (STAGE_LABELS[currentStage] || '') + ddTotalVotes + '票已用完', 'error');
   try {
     const resp = await fetch('/api/votes/' + entryId, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), credentials: 'include' });
     const data = await resp.json();

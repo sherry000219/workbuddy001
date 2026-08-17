@@ -375,7 +375,10 @@ function getUserStageVoteCount(userId, stage) {
   return db.votes.filter(v => v.voterId === userId && (v.stage || 'preliminary') === stage).length;
 }
 
-const VOTE_LIMIT_PER_STAGE = 5;
+const VOTE_LIMIT_BY_STAGE = { preliminary: 5, semi_final: 3, final: 0, awarded: 0 };
+function getVoteLimit(stage) {
+  return VOTE_LIMIT_BY_STAGE[stage] ?? 5;
+}
 
 // ========== GITHUB SYNC ==========
 let _ghSha = null;
@@ -999,7 +1002,8 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
     return res.status(400).json({ error: '你在本阶段已经投过这个作品了' });
   }
   const userVoteCount = getUserStageVoteCount(userId, stage);
-  if (userVoteCount >= VOTE_LIMIT_PER_STAGE) return res.status(400).json({ error: '本阶段每人最多投5个作品' });
+  const voteLimit = getVoteLimit(stage);
+  if (userVoteCount >= voteLimit) return res.status(400).json({ error: '本阶段每人最多投' + voteLimit + '个作品' });
   db.votes.push({
     entryId: req.params.entryId,
     voterId: userId,
@@ -1011,7 +1015,7 @@ app.post('/api/votes/:entryId', requireAuth, (req, res) => {
   });
   saveDB();
   _voteRL.set(userId, Date.now()); // 记录本次投票时间用于频率限制
-  const remaining = VOTE_LIMIT_PER_STAGE - userVoteCount - 1;
+  const remaining = voteLimit - userVoteCount - 1;
   // 投票后立即 push，不等延迟，确保数据不丢失
   ghPush().catch(e => console.error('[vote] Immediate push failed:', e.message));
   res.json({ success: true, voteCount: db.votes.filter(v => v.entryId === req.params.entryId && (v.stage || 'preliminary') === stage).length, remaining });
@@ -1040,10 +1044,11 @@ app.get('/api/my-votes', requireAuth, (req, res) => {
   // 汇总
   const summary = {};
   for (const [s, votes] of Object.entries(byStage)) {
+    const stageLimit = getVoteLimit(s);
     summary[s] = {
       count: votes.length,
-      limit: VOTE_LIMIT_PER_STAGE,
-      remaining: Math.max(0, VOTE_LIMIT_PER_STAGE - votes.length),
+      limit: stageLimit,
+      remaining: Math.max(0, stageLimit - votes.length),
       label: STAGE_LABELS[s] || s
     };
   }
@@ -1724,7 +1729,7 @@ app.post('/api/auth/dd-code', async (req, res) => {
     });
     const stage = getCurrentStage();
     const voteCount = getUserStageVoteCount(userInfo.openId, stage);
-    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, mobile: userInfo.mobile, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, VOTE_LIMIT_PER_STAGE - voteCount), currentStage: stage });
+    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, mobile: userInfo.mobile, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, getVoteLimit(stage) - voteCount), currentStage: stage });
   } catch (e) {
     console.error('DingTalk auth error:', e.message);
     res.status(400).json({ error: e.message || '钉钉授权失败' });
@@ -1784,10 +1789,11 @@ app.get('/api/auth/me', (req, res) => {
   }
   const stage = getCurrentStage();
   const voteCount = getUserStageVoteCount(session.openId, stage);
+  const authLimit = getVoteLimit(stage);
   res.json({
     user: { nick: session.nick, openId: session.openId, mobile: session.mobile || '', avatarUrl: session.avatarUrl },
-    remainingVotes: Math.max(0, VOTE_LIMIT_PER_STAGE - voteCount),
-    totalVotes: VOTE_LIMIT_PER_STAGE,
+    remainingVotes: Math.max(0, authLimit - voteCount),
+    totalVotes: authLimit,
     currentStage: stage,
     isVotingStage: isVotingStage(stage),
   });
