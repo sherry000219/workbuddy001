@@ -11756,6 +11756,13 @@
           "stock": 20,
           "total": 20,
           "createdAt": "2026-08-17T02:28:47.475Z"
+        },
+        {
+          "id": "prize_mswm7ljy_i0jjgj",
+          "name": "云社区50积分",
+          "stock": 20,
+          "total": 20,
+          "createdAt": "2026-08-17T02:28:59.230Z"
         }
       ],
       "semi_final": [
