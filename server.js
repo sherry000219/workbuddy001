@@ -1568,7 +1568,7 @@ function getLuckyRounds() {
       voterName: v.voterName,
       voterAvatar: v.voterAvatar,
       mobileLast4: (dupNames[v.voterName] && v.mobileLast4) ? v.mobileLast4 : null,
-      tickets: 1,
+      tickets: v.tickets,
       entries: v.entries
     }));
     return { stage: r.stage, label: r.label, roundLabel: r.roundLabel, total: voters.length, voters };
