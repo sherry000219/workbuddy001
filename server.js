@@ -362,14 +362,14 @@ function getCompositeScore(entryId, stage) {
     currentComposite = Math.round(avgScore * 0.8 + voteScore * 0.2);
   }
 
-  // 赛段晋级时，上一赛段综合分按 30% 权重继承到本赛段
+  // 赛段晋级时，上一赛段综合分按 40% 权重继承到本赛段（当前赛段 60%）
   if (stage === 'semi_final') {
     const prevComposite = getCompositeScore(entryId, 'preliminary');
-    return Math.round(prevComposite * 0.3 + currentComposite * 0.7);
+    return Math.round(prevComposite * 0.4 + currentComposite * 0.6);
   }
   if (stage === 'final' || stage === 'awarded') {
     const prevComposite = getCompositeScore(entryId, 'semi_final');
-    return Math.round(prevComposite * 0.3 + currentComposite * 0.7);
+    return Math.round(prevComposite * 0.4 + currentComposite * 0.6);
   }
   return currentComposite;
 }
