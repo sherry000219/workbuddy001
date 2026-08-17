@@ -11753,6 +11753,19 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "createdAt": "2026-08-17T03:39:15.432Z"
+    },
+    {
+      "id": "bet_mswosp6u_238me4",
+      "voterId": "Un8r69FPcxb2bEiSyLtOAeQiEiE",
+      "voterName": "汝丽丽",
+      "voterMobile": "18745737261",
+      "voterAvatar": "",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "createdAt": "2026-08-17T03:41:22.950Z"
     }
   ],
   "drawRecords": [],
