@@ -9590,6 +9590,15 @@
       "voterAvatar": "",
       "stage": "semi_final",
       "createdAt": "2026-08-17T04:02:29.620Z"
+    },
+    {
+      "entryId": "entry_1786340551344_uzahth",
+      "voterId": "8g94m3JGBtdNal9r6iPAAGAiEiE",
+      "voterName": "张沐禾",
+      "voterMobile": "19975549306",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPD4d84sV-l2PNAd_NAd8_479_479.jpg",
+      "stage": "semi_final",
+      "createdAt": "2026-08-17T04:06:38.590Z"
     }
   ],
   "judgeScores": [
