@@ -13647,6 +13647,16 @@
       "prizeName": "云社区10积分",
       "isWin": true,
       "drawnAt": "2026-08-17T05:53:45.697Z"
+    },
+    {
+      "id": "dr_mswtiz5t_b7aoc3",
+      "userId": "AjxDiSxACbTkshBqyrnMKiPgiEiE",
+      "userName": "仲旭",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T05:53:47.393Z"
     }
   ],
   "settings": {
