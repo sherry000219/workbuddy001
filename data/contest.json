@@ -13416,6 +13416,16 @@
       "prizeName": "MBTI小徽章（非南京补50积分）",
       "isWin": true,
       "drawnAt": "2026-08-17T06:23:52.154Z"
+    },
+    {
+      "id": "dr_mswulqzz_wh59ao",
+      "userId": "Zs7TYP9ojLYq7C1qbyiif7wiEiE",
+      "userName": "李铭铖",
+      "stage": "preliminary",
+      "prizeId": "prize_mswm7chf_3tibc5",
+      "prizeName": "云社区10积分",
+      "isWin": true,
+      "drawnAt": "2026-08-17T06:23:56.399Z"
     }
   ],
   "settings": {
@@ -13497,7 +13507,7 @@
         {
           "id": "prize_mswm7chf_3tibc5",
           "name": "云社区10积分",
-          "stock": 43,
+          "stock": 42,
           "total": 20,
           "createdAt": "2026-08-17T02:28:47.475Z"
         },
