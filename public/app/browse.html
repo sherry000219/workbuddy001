@@ -153,6 +153,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   ⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道
 </div>
 
+<!-- Betting banner -->
+<div id="betting-banner" style="display:none;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:12px 24px;margin:12px 16px;text-align:center;color:#f59e0b;font-size:14px;">
+  🎯 <strong>决赛押宝进行中</strong> — 每人仅限押宝 1 个作品，预测它为某赛道冠军。押中人数越少，获奖概率越大！
+</div>
+
 <!-- ===== MAIN CONTENT ===== -->
 <div class="main-container">
   <div class="section-title">🎨 作品展示</div>
@@ -201,6 +206,8 @@ let ddAuthed = false;
 let ddUser = null;
 let ddRemaining = 5;
 let ddTotalVotes = 5;
+let myBet = null;
+let isBettingOpen = false;
 let votingEnabled = false;
 let currentStage = 'preliminary';
 let isVotingStage = true;
@@ -246,7 +253,7 @@ async function exchangeCode(code) {
     const resp = await fetch('/api/auth/dd-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }), credentials: 'include' });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || '登录失败');
-    ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5;
+    ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5; myBet = data.myBet || null; isBettingOpen = data.isBettingOpen || false;
     currentStage = data.currentStage || 'preliminary'; isVotingStage = isStageVoting(currentStage);
     updateUserUI(); updateStageUI();
     showToast('钉钉登录成功，欢迎 ' + ddUser.nick + '！', 'success');
@@ -258,8 +265,8 @@ async function checkAuth() {
   try {
     const resp = await fetch('/api/auth/me', { credentials: 'include' });
     const data = await resp.json();
-    if (data.user) { ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5; currentStage = data.currentStage || 'preliminary'; isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage); updateUserUI(); updateStageUI(); }
-    else { ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; updateUserUI(); }
+    if (data.user) { ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5; myBet = data.myBet || null; isBettingOpen = data.isBettingOpen || false; currentStage = data.currentStage || 'preliminary'; isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage); updateUserUI(); updateStageUI(); }
+    else { ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; myBet = null; isBettingOpen = false; updateUserUI(); }
   } catch(e) { ddAuthed = false; updateUserUI(); }
 }
 
@@ -297,14 +304,16 @@ async function checkVotingStatus() {
 
 function updateVotingUI() {
   const banner = document.getElementById('voting-banner');
+  const betBanner = document.getElementById('betting-banner');
   if (votingEnabled && isVotingStage) { banner.style.display = 'none'; }
   else if (!isVotingStage) { banner.style.display = 'block'; banner.innerHTML = '📋 当前为<strong>' + STAGE_LABELS[currentStage] + '</strong>阶段，不支持投票'; banner.style.background = 'rgba(37,99,235,0.06)'; banner.style.borderColor = 'rgba(37,99,235,0.15)'; banner.style.color = '#2563eb'; }
   else { banner.style.display = 'block'; banner.innerHTML = '⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道'; banner.style.background = 'rgba(255,215,64,0.08)'; banner.style.borderColor = 'rgba(255,215,64,0.2)'; banner.style.color = '#ffd740'; }
+  if (betBanner) betBanner.style.display = (isBettingOpen && ddAuthed) ? 'block' : 'none';
 }
 
 async function ddLogout() {
   try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch(e) {}
-  ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; updateUserUI(); renderGallery(); showToast('已退出登录');
+  ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; myBet = null; isBettingOpen = false; updateUserUI(); renderGallery(); showToast('已退出登录');
 }
 
 // ========== HELPERS ==========
@@ -413,11 +422,23 @@ async function renderGallery() {
       const badge = awardBadge(e.award) || roundBadge(rs);
       const isEliminated = rs === 'eliminated_semi' || rs === 'eliminated_final';
       const canVote = isVotingStage && !isEliminated && rs !== 'awarded' && rs !== 'finalist';
+      const canBet = isBettingOpen && (rs === 'finalist' || rs === 'awarded');
+      const isMyBet = myBet && myBet.entryId === e.id;
       let voteBtn = '';
       if (isVotingStage && canVote) {
         voteBtn = '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();voteEntry(\'' + e.id + '\')">👍 投票</button>';
       } else if (!isVotingStage) {
         voteBtn = '<span style="font-size:12px;color:var(--text-dim);">' + (STAGE_LABELS[currentStage] || '') + '阶段</span>';
+      }
+      let betBtn = '';
+      if (canBet) {
+        if (isMyBet) {
+          betBtn = '<span style="font-size:12px;color:#f59e0b;font-weight:600;">🎯 已押宝（' + (myBet.trackLabel || '') + '）</span>';
+        } else if (!myBet) {
+          betBtn = '<button class="btn btn-sm" style="background:#f59e0b;color:#fff;border:none;" onclick="event.stopPropagation();placeBet(\'' + e.id + '\')">🎯 押宝</button>';
+        } else {
+          betBtn = '<span style="font-size:12px;color:var(--text-dim);">已押其他作品</span>';
+        }
       }
       var extraHtml = '';
       if (e.extra) {
@@ -430,7 +451,7 @@ async function renderGallery() {
 var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
       var cardPoster = e.posterUrl ? renderPosterCard(e.posterUrl, e.updatedAt || e.createdAt) : '';
       var teamBadge = e.entryType === 'team' ? '<span class="team-badge">👥 团队</span>' : '';
-      return '<div class="entry-card ' + rsClass + '" onclick="openDetail(\'' + e.id + '\')"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + (e.docUrl ? ' 📎' : '') + '</span>' + cardPoster + badge + '<h3>' + e.title + teamBadge + '</h3><div class="meta">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleDateString('zh-CN') + '</div><div class="desc">' + e.scene + '</div>' + extraHtml + '<div class="card-footer"><div style="display:flex;align-items:center;gap:16px;"><span class="score-display">' + (e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分') + '</span><span class="votes">👍 ' + (e.voteCount||0) + ' 票</span></div>' + voteBtn + '</div></div>';
+      return '<div class="entry-card ' + rsClass + '" onclick="openDetail(\'' + e.id + '\')"><span class="track-tag ' + trackClass(e.track) + '">' + trackLabel(e.track) + (e.docUrl ? ' 📎' : '') + '</span>' + cardPoster + badge + '<h3>' + e.title + teamBadge + '</h3><div class="meta">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleDateString('zh-CN') + '</div><div class="desc">' + e.scene + '</div>' + extraHtml + '<div class="card-footer"><div style="display:flex;align-items:center;gap:16px;"><span class="score-display">' + (e.avgScore > 0 ? '⭐'.repeat(Math.min(5, Math.ceil(e.avgScore/20))) + ' ' + e.avgScore : '暂无评分') + '</span><span class="votes">👍 ' + (e.voteCount||0) + ' 票</span></div><div style="display:flex;align-items:center;gap:8px;">' + betBtn + voteBtn + '</div></div></div>';
     }).join('');
   } catch(e) { console.error('Gallery error:', e); }
 }
@@ -449,6 +470,20 @@ async function voteEntry(entryId) {
     renderGallery();
     // 刷新详情弹窗中的票数
     openDetail(entryId);
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function placeBet(entryId) {
+  if (!ddAuthed) return showToast('请先通过钉钉登录后再押宝', 'error');
+  if (!isBettingOpen) return showToast('当前赛段未开放押宝', 'error');
+  if (myBet) return showToast('您已押宝「' + myBet.entryTitle + '」，每人仅限押宝 1 个作品', 'error');
+  try {
+    const resp = await fetch('/api/bet/' + entryId, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), credentials: 'include' });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '押宝失败');
+    myBet = data.bet;
+    showToast('🎯 押宝成功！您预测「' + myBet.entryTitle + '」为 ' + myBet.trackLabel + ' 冠军', 'success');
+    renderGallery();
   } catch(e) { showToast(e.message, 'error'); }
 }
 
@@ -483,12 +518,22 @@ async function openDetail(entryId) {
     const badge = awardBadge(e.award) || roundBadge(rs);
     const stageText = STAGE_LABELS[currentStage] || '初赛';
     const canVote = isVotingStage && rs !== 'eliminated_semi' && rs !== 'eliminated_final' && rs !== 'awarded' && rs !== 'finalist';
+    const canBetDetail = isBettingOpen && (rs === 'finalist' || rs === 'awarded');
+    const isMyBetDetail = myBet && myBet.entryId === e.id;
     var editNoticeHtml = '';
     if (e.editNotice) {
       editNoticeHtml = '<div style="background:rgba(255,215,64,0.12);border:1px solid rgba(255,215,64,0.35);color:#b45309;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;">📝 作者于 ' + new Date(e.lastEditedAt || e.updatedAt || e.createdAt).toLocaleString('zh-CN') + ' 编辑过本作品，内容可能有更新，请留意。</div>';
     }
     let voteBtnHtml = '';
     if (isVotingStage && canVote) voteBtnHtml = '<button class="btn btn-primary" style="padding:8px 20px;font-size:14px;border-radius:10px;font-weight:700;margin-left:8px;" onclick="voteEntry(\'' + e.id + '\')">👍 投票</button>';
+    let betBtnHtml = '';
+    if (canBetDetail) {
+      if (isMyBetDetail) {
+        betBtnHtml = '<span style="font-size:13px;color:#f59e0b;font-weight:600;margin-left:8px;">🎯 已押宝（' + (myBet.trackLabel || '') + '）</span>';
+      } else if (!myBet) {
+        betBtnHtml = '<button class="btn btn-primary" style="padding:8px 20px;font-size:14px;border-radius:10px;font-weight:700;margin-left:8px;background:#f59e0b;border-color:#f59e0b;" onclick="placeBet(\'' + e.id + '\')">🎯 押宝</button>';
+      }
+    }
     var extraHtml = '';
     if (e.extra) extraHtml = '<div class="detail-row"><div class="dlabel">🔗 作品链接 / 附加信息</div><div class="dvalue">' + linkify(e.extra) + '</div></div>';
     var posterHtml = e.posterUrl ? '<div class="detail-row"><div class="dlabel">🖼️ 海报</div>' + renderPosterDetail(e.posterUrl, e.updatedAt || e.createdAt) + '</div>' : '';
@@ -513,7 +558,7 @@ async function openDetail(entryId) {
       }
     }
     var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-    document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + posterHtml + processHtml + resultHtml + extraHtml + docHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span>' + voteBtnHtml + '</div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div><div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+    document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + posterHtml + processHtml + resultHtml + extraHtml + docHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span>' + voteBtnHtml + '</div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div>' + (canBetDetail ? '<div style="margin-top:14px;padding:12px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;font-size:13px;color:#92400e;line-height:1.6;">🎯 <strong>决赛押宝</strong>：每人仅限押宝 1 个作品，预测它为某赛道冠军。押中人数越少，获奖概率越大！' + betBtnHtml + '</div>' : '') + '<div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
   } catch(e) {
     clearTimeout(detailLoadingTimer);
     const isAuthError = e.message && (e.message.indexOf('登录') !== -1 || e.message.indexOf('请先') !== -1 || e.message.indexOf('unauthorized') !== -1 || e.message.indexOf('Unauthorized') !== -1);

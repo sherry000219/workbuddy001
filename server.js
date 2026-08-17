@@ -148,6 +148,7 @@ const DEFAULT_DB = {
   entries: [],
   votes: [],
   judgeScores: [],
+  bets: [],       // 决赛押宝：每人限押 1 个作品，预测其为某赛道冠军
   drawRecords: [],
   settings: {
     judgePassword: 'wb2026',
@@ -201,6 +202,13 @@ function loadDB() {
     });
     (merged.judgeScores || []).forEach(s => {
       if (!s.stage) s.stage = 'preliminary';
+    });
+    // 押宝去重：每个用户只能有 1 条押宝记录，保留最新
+    const betSet = new Set();
+    merged.bets = (merged.bets || []).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).filter(b => {
+      if (betSet.has(b.voterId)) return false;
+      betSet.add(b.voterId);
+      return true;
     });
     // 迁移：旧版 judges 是全局数组，新版改为按赛段 judgesByStage
     if (!merged.settings.judgesByStage) {
@@ -375,7 +383,7 @@ function getUserStageVoteCount(userId, stage) {
   return db.votes.filter(v => v.voterId === userId && (v.stage || 'preliminary') === stage).length;
 }
 
-const VOTE_LIMIT_BY_STAGE = { preliminary: 5, semi_final: 3, final: 0, awarded: 0 };
+const VOTE_LIMIT_BY_STAGE = { preliminary: 5, semi_final: 4, final: 0, awarded: 0 };
 function getVoteLimit(stage) {
   return VOTE_LIMIT_BY_STAGE[stage] ?? 5;
 }
@@ -1055,6 +1063,86 @@ app.get('/api/my-votes', requireAuth, (req, res) => {
   res.json({ byStage, summary, currentStage: stage });
 });
 
+// ========== API: FINAL BET（决赛押宝）==========
+const BET_TRACK_LABEL = {
+  efficiency: '效率提升',
+  creative: '创意应用',
+  business: '业务赋能',
+  team: '团队赛道'
+};
+
+function getEntryBetTrack(entry) {
+  if (entry.entryType === 'team') return 'team';
+  return entry.track || 'efficiency';
+}
+
+function isBettingOpen() {
+  const stage = getCurrentStage();
+  return stage === 'final' || stage === 'awarded';
+}
+
+function getBettableEntries() {
+  return db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
+}
+
+// POST /api/bet/:entryId — 押宝某个作品
+app.post('/api/bet/:entryId', requireAuth, (req, res) => {
+  if (!isBettingOpen()) {
+    return res.status(400).json({ error: '当前赛段未开放押宝' });
+  }
+  const userId = req.ddUser.openId;
+  const existing = db.bets.find(b => b.voterId === userId);
+  if (existing) {
+    return res.status(400).json({ error: '每人仅限押宝 1 个作品，您已押宝「' + existing.entryTitle + '」' });
+  }
+  const entry = getBettableEntries().find(e => e.id === req.params.entryId);
+  if (!entry) return res.status(404).json({ error: '该作品不可押宝' });
+  const track = getEntryBetTrack(entry);
+  const bet = {
+    id: 'bet_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8),
+    voterId: userId,
+    voterName: req.ddUser.nick,
+    voterMobile: req.ddUser.mobile || '',
+    voterAvatar: req.ddUser.avatarUrl || '',
+    entryId: entry.id,
+    entryTitle: entry.title,
+    entryDept: entry.dept1 || entry.dept || '',
+    track,
+    trackLabel: BET_TRACK_LABEL[track] || track,
+    createdAt: new Date().toISOString()
+  };
+  db.bets.push(bet);
+  saveDB();
+  ghPush().catch(e => console.error('[bet] Immediate push failed:', e.message));
+  res.json({ success: true, bet });
+});
+
+// GET /api/my-bet — 当前用户押宝记录
+app.get('/api/my-bet', requireAuth, (req, res) => {
+  const userId = req.ddUser.openId;
+  const bet = db.bets.find(b => b.voterId === userId) || null;
+  res.json({ bet, isBettingOpen: isBettingOpen(), currentStage: getCurrentStage() });
+});
+
+// GET /api/bets/summary — 押宝统计（公开）
+app.get('/api/bets/summary', (req, res) => {
+  const bettable = getBettableEntries();
+  const summary = bettable.map(e => {
+    const track = getEntryBetTrack(e);
+    const count = db.bets.filter(b => b.entryId === e.id).length;
+    return {
+      entryId: e.id,
+      title: e.title,
+      name: e.name,
+      track,
+      trackLabel: BET_TRACK_LABEL[track] || track,
+      betCount: count
+    };
+  }).filter(s => s.betCount > 0).sort((a, b) => b.betCount - a.betCount);
+  const totalBettors = new Set(db.bets.map(b => b.voterId)).size;
+  res.json({ summary, totalBettors, isBettingOpen: isBettingOpen(), currentStage: getCurrentStage() });
+});
+
 // ========== API: JUDGE ==========
 app.post('/api/judge/scores/:entryId', (req, res) => {
   const { judgeName, practicality, innovation, scalability, presentation, judgePassword } = req.body;
@@ -1729,7 +1817,9 @@ app.post('/api/auth/dd-code', async (req, res) => {
     });
     const stage = getCurrentStage();
     const voteCount = getUserStageVoteCount(userInfo.openId, stage);
-    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, mobile: userInfo.mobile, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, getVoteLimit(stage) - voteCount), currentStage: stage });
+    const ddCodeLimit = getVoteLimit(stage);
+    const myBet = db.bets.find(b => b.voterId === userInfo.openId) || null;
+    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, mobile: userInfo.mobile, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, ddCodeLimit - voteCount), totalVotes: ddCodeLimit, currentStage: stage, myBet, isBettingOpen: isBettingOpen() });
   } catch (e) {
     console.error('DingTalk auth error:', e.message);
     res.status(400).json({ error: e.message || '钉钉授权失败' });
@@ -1790,12 +1880,15 @@ app.get('/api/auth/me', (req, res) => {
   const stage = getCurrentStage();
   const voteCount = getUserStageVoteCount(session.openId, stage);
   const authLimit = getVoteLimit(stage);
+  const myBet = db.bets.find(b => b.voterId === session.openId) || null;
   res.json({
     user: { nick: session.nick, openId: session.openId, mobile: session.mobile || '', avatarUrl: session.avatarUrl },
     remainingVotes: Math.max(0, authLimit - voteCount),
     totalVotes: authLimit,
     currentStage: stage,
     isVotingStage: isVotingStage(stage),
+    myBet,
+    isBettingOpen: isBettingOpen()
   });
 });
 
