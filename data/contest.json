@@ -15704,6 +15704,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:12:46.043Z"
+    },
+    {
+      "id": "dr_mswwckmj_f1jf22",
+      "userId": "IqIIEyFnPvj2bEiSyLtOAeQiEiE",
+      "userName": "殷志敏",
+      "stage": "preliminary",
+      "prizeId": "prize_msoftaaw_5yv0qk",
+      "prizeName": "小财神盲盒",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:12:47.467Z"
     }
   ],
   "settings": {
@@ -15743,7 +15753,7 @@
         {
           "id": "prize_msoftaaw_5yv0qk",
           "name": "小财神盲盒",
-          "stock": 18,
+          "stock": 17,
           "total": 3,
           "createdAt": "2026-08-11T09:07:44.360Z"
         },
