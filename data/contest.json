@@ -22150,6 +22150,16 @@
       "prizeName": "云社区10积分",
       "isWin": true,
       "drawnAt": "2026-08-17T14:21:24.930Z"
+    },
+    {
+      "id": "dr_msxbnvta_d7fenh",
+      "userId": "kc439kvnwR1wehyxFJgMwwiEiE",
+      "userName": "丁煜",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T14:21:29.422Z"
     }
   ],
   "settings": {
