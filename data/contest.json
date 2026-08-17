@@ -14311,6 +14311,34 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-17T07:17:05.662Z"
+    },
+    {
+      "id": "bet_mswwi4mx_rx5srn",
+      "voterId": "uc9j71zGCkS31vvaTC7VngiEiE",
+      "voterName": "付仕达",
+      "voterMobile": "13476209565",
+      "voterAvatar": "",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-17T07:17:06.681Z"
+    },
+    {
+      "id": "bet_mswwi4va_tb5fog",
+      "voterId": "Ibriizg3un5A7devFziP5AkAiEiE",
+      "voterName": "李楠",
+      "voterMobile": "13683699245",
+      "voterAvatar": "",
+      "entryId": "entry_1786359942777_etq9ft",
+      "entryTitle": "C盘爆红不用慌！Windows精准瘦身指南",
+      "entryDept": "福鹿事业部",
+      "track": "creative",
+      "trackLabel": "创意应用",
+      "revoked": false,
+      "createdAt": "2026-08-17T07:17:06.982Z"
     }
   ],
   "drawRecords": [
