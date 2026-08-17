@@ -18693,6 +18693,36 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:31:07.539Z"
+    },
+    {
+      "id": "dr_mswx05gf_nv2dsj",
+      "userId": "iP533MvtFECJnHJs4DsiSIHwiEiE",
+      "userName": "罗静思翼",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:31:07.551Z"
+    },
+    {
+      "id": "dr_mswx05it_8x9cc4",
+      "userId": "XvUYA2q1WIe0wvfVzkiSvIgiEiE",
+      "userName": "荣鹏",
+      "stage": "preliminary",
+      "prizeId": "prize_msofuejy_wl4v27",
+      "prizeName": "20元以下饮品任选1杯",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:31:07.637Z"
+    },
+    {
+      "id": "dr_mswx05ow_godt4h",
+      "userId": "iPgPEIVzgoTQiSCCT8iPOxxygiEiE",
+      "userName": "啊坤",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:31:07.856Z"
     }
   ],
   "settings": {
@@ -18746,7 +18776,7 @@
         {
           "id": "prize_msofuejy_wl4v27",
           "name": "20元以下饮品任选1杯",
-          "stock": 2,
+          "stock": 1,
           "total": 5,
           "createdAt": "2026-08-11T09:08:36.526Z"
         },
