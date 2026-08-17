@@ -11749,6 +11749,13 @@
           "stock": 1,
           "total": 2,
           "createdAt": "2026-08-12T07:14:02.623Z"
+        },
+        {
+          "id": "prize_mswm7chf_3tibc5",
+          "name": "云社区10积分",
+          "stock": 20,
+          "total": 20,
+          "createdAt": "2026-08-17T02:28:47.475Z"
         }
       ],
       "semi_final": [
