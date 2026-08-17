@@ -11708,6 +11708,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4X8af_BDifNBADNBACwqvLgkfxzYj0JOgznuFWhAA_1024_1024.jpg",
       "stage": "semi_final",
       "createdAt": "2026-08-17T07:19:17.277Z"
+    },
+    {
+      "entryId": "entry_1785909222508_t01wgt",
+      "voterId": "vvQntiSD7Q6uxf9RD0xJyawiEiE",
+      "voterName": "潘鑫玲",
+      "voterMobile": "18284359325",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD4iYVW0XspXNA8DNA8CwZfl24xdJaO0Iw0boEvADAA_960_960.jpg",
+      "stage": "semi_final",
+      "createdAt": "2026-08-17T07:19:19.813Z"
     }
   ],
   "judgeScores": [
@@ -14466,6 +14475,20 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-17T07:18:47.398Z"
+    },
+    {
+      "id": "bet_mswwkyom_zfqbo2",
+      "voterId": "LjHsSeg5GJjqkIPCNV0nRwiEiE",
+      "voterName": "贲进华",
+      "voterMobile": "18260348121",
+      "voterAvatar": "",
+      "entryId": "entry_1785325566960_99axb6",
+      "entryTitle": "客户不改接口，260家必须手报：一个 Skill 进去，1分钟一张表",
+      "entryDept": "有度税智",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-17T07:19:18.934Z"
     }
   ],
   "drawRecords": [
