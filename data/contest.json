@@ -14612,6 +14612,46 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:09:45.117Z"
+    },
+    {
+      "id": "dr_msww8oyp_ubqadw",
+      "userId": "ABzCmqgqjfTLjsIZuwWnpAiEiE",
+      "userName": "冯万齐",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:09:46.465Z"
+    },
+    {
+      "id": "dr_msww8p94_pmxes1",
+      "userId": "BB11VFswiSzRQHntbiinVhRQiEiE",
+      "userName": "赵冰艳",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:09:46.840Z"
+    },
+    {
+      "id": "dr_msww8pd6_ob71t3",
+      "userId": "rbxxSgDhwpU4jLmIKAgBNAiEiE",
+      "userName": "刘学伟",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:09:46.986Z"
+    },
+    {
+      "id": "dr_msww8pll_3q6hx8",
+      "userId": "5MvCX0gPDUn6fsPZ9RvXvwiEiE",
+      "userName": "马世坤",
+      "stage": "preliminary",
+      "prizeId": "prize_mswt7jjv_0z7njk",
+      "prizeName": "校招透明A4文件夹（非南京补50积分）",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:09:47.289Z"
     }
   ],
   "settings": {
@@ -14721,7 +14761,7 @@
         {
           "id": "prize_mswt7jjv_0z7njk",
           "name": "校招透明A4文件夹（非南京补50积分）",
-          "stock": 9,
+          "stock": 8,
           "total": 10,
           "createdAt": "2026-08-17T05:44:53.947Z"
         }
