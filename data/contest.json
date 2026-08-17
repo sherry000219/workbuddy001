@@ -12331,6 +12331,16 @@
       "prizeName": "20元以下饮品任选1杯",
       "isWin": true,
       "drawnAt": "2026-08-17T04:04:25.931Z"
+    },
+    {
+      "id": "dr_mswpmvdp_dlsy9z",
+      "userId": "8g94m3JGBtdNal9r6iPAAGAiEiE",
+      "userName": "张沐禾",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T04:04:50.653Z"
     }
   ],
   "settings": {
