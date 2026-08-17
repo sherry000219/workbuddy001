@@ -62,6 +62,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 .nav-link { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; color: var(--text); text-decoration: none; box-shadow: var(--shadow); transition: all 0.25s; }
 .nav-link:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: var(--shadow-lg); color: var(--accent); }
 .nav-link .nl-icon { font-size: 20px; }
+.nav-link.nav-draw { background: linear-gradient(135deg, #fef3c7, #fff7ed); border-color: #f59e0b; color: #b45309; box-shadow: 0 4px 16px rgba(245,158,11,0.22); position: relative; overflow: hidden; }
+.nav-link.nav-draw::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent); animation: drawShine 2.5s infinite; }
+.nav-link.nav-draw:hover { transform: translateY(-3px) scale(1.02); border-color: #ea580c; color: #ea580c; box-shadow: 0 8px 24px rgba(245,158,11,0.32); }
+.nav-link.nav-draw .nl-icon { animation: drawWiggle 1.2s infinite; }
+@keyframes drawShine { 0% { left: -100%; } 100% { left: 100%; } }
+@keyframes drawWiggle { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
 
 /* ===== STAGE BAR ===== */
 .stage-bar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
@@ -185,7 +191,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     </div>
     <h1 class="hero-title">云帐房头号玩家第三季</h1>
     <p class="hero-sub">解决一个真实工作难题，秀出你的 AI 实战力，做云厂头号玩家。</p>
-    <a href="/app/submit.html" class="hero-cta">立即投稿</a>
+    <a href="/app/lucky.html" class="hero-cta" style="background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 8px 28px rgba(245,158,11,0.35);">🎁 投票抽奖</a>
   </div>
   <div class="kb-container">
     <div class="kb-key" style="animation-delay:0s">Q</div><div class="kb-key" style="animation-delay:0.1s">W</div><div class="kb-key" style="animation-delay:0.2s">E</div><div class="kb-key" style="animation-delay:0.3s">R</div><div class="kb-key" style="animation-delay:0.4s">T</div><div class="kb-key" style="animation-delay:0.5s">Y</div>
@@ -197,12 +203,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 <!-- ===== NAVIGATION LINKS ===== -->
 <div class="nav-section">
   <div class="nav-links">
-    <a href="/app/submit.html" class="nav-link"><span class="nl-icon">✍️</span> 报名投稿</a>
+    <a href="/app/lucky.html" id="drawNavLink" class="nav-link nav-draw" style="display:none;"><span class="nl-icon">🎁</span> <span class="draw-text">投票抽奖</span></a>
     <a href="/app/browse.html" class="nav-link"><span class="nl-icon">🎨</span> 作品展示</a>
     <a href="/app/judge.html" class="nav-link"><span class="nl-icon">⚖️</span> 评委入口</a>
     <a href="/app/admin.html" class="nav-link"><span class="nl-icon">⚙️</span> 管理后台</a>
     <a href="/app/lucky-list.html" id="luckyNavLink" class="nav-link" style="display:none;"><span class="nl-icon">🎁</span> 幸运投票人名单</a>
-    <a href="/app/lucky.html" id="drawNavLink" class="nav-link" style="display:none;"><span class="nl-icon">🎁</span> 投票抽奖</a>
     <span id="drawNavDisabled" class="nav-link" style="display:none;opacity:.6;cursor:default;"><span class="nl-icon">🎁</span> 尚未开启，敬请期待</span>
   </div>
 </div>
@@ -835,9 +840,11 @@ async function checkDrawStatus() {
   const link = document.getElementById('drawNavLink');
   const disabled = document.getElementById('drawNavDisabled');
   if (!link || !disabled) return;
+  // 未登录时也展示抽奖入口，点击后跳转登录
   if (!ddAuthed) {
-    link.style.display = 'none';
+    link.style.display = '';
     disabled.style.display = 'none';
+    link.querySelector('.draw-text').textContent = ' 投票抽奖';
     return;
   }
   try {
@@ -846,14 +853,15 @@ async function checkDrawStatus() {
     if (hasOpen) {
       link.style.display = '';
       disabled.style.display = 'none';
-      link.querySelector('.nl-icon').nextSibling.textContent = ' 投票抽奖' + (data.totalRemaining > 0 ? ' (' + data.totalRemaining + ')' : '');
+      link.querySelector('.draw-text').textContent = ' 投票抽奖' + (data.totalRemaining > 0 ? ' (' + data.totalRemaining + ')' : '');
     } else {
       link.style.display = 'none';
       disabled.style.display = '';
     }
   } catch(e) {
-    link.style.display = 'none';
+    link.style.display = '';
     disabled.style.display = 'none';
+    link.querySelector('.draw-text').textContent = ' 投票抽奖';
   }
 }
 
