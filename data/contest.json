@@ -16295,6 +16295,20 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-17T08:15:18.384Z"
+    },
+    {
+      "id": "bet_mswypqan_9gt5o6",
+      "voterId": "WhD4gzszAgD2bEiSyLtOAeQiEiE",
+      "voterName": "谷慧聪",
+      "voterMobile": "15649036201",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5Zz7BkaBBnNAgzNAhiwzThyFckI73AGOn6WXpjHAA_536_524.jpg",
+      "entryId": "entry_1786295169144_ilkpwc",
+      "entryTitle": "岗位校准Agent：让招聘从经验判断，走向标准化人才定义",
+      "entryDept": "职能中台",
+      "track": "creative",
+      "trackLabel": "创意应用",
+      "revoked": false,
+      "createdAt": "2026-08-17T08:19:00.575Z"
     }
   ],
   "drawRecords": [
