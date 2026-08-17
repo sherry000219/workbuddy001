@@ -15039,6 +15039,20 @@
       "trackLabel": "业务赋能",
       "revoked": false,
       "createdAt": "2026-08-17T07:30:28.637Z"
+    },
+    {
+      "id": "bet_mswwzwmk_isipdq",
+      "voterId": "6T8iPYbRHqv3wbNpiPGExVZAiEiE",
+      "voterName": "吴以休",
+      "voterMobile": "18361417071",
+      "voterAvatar": "",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-17T07:30:56.108Z"
     }
   ],
   "drawRecords": [
