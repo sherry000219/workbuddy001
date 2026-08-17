@@ -87,6 +87,8 @@ const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决�
 let drawData = null;
 let currentStageTab = '';
 let recentWins = [];
+let tickerPrizeStats = {};
+let tickerSignature = '';
 
 async function api(url, options) {
   options = options || {};
@@ -222,6 +224,8 @@ async function doDraw(stage) {
     drawData.totalRemaining = Math.max(0, (drawData.totalRemaining || 0) - 1);
     render();
     showResult(data.result);
+    // 中奖时立即刷新滚动公告
+    if (data.result && data.result.isWin) loadWinnerTicker();
   } catch(e) {
     alert(e.message);
     render();
@@ -252,6 +256,14 @@ function closeModal() {
   document.getElementById('resultModal').style.display = 'none';
 }
 
+// 稀有度权重：累计中奖次数越少的奖品越稀有，滚动中出现次数越多
+function prizeWeight(prizeName) {
+  const count = tickerPrizeStats[prizeName] || 1;
+  if (count <= 2) return 3;   // 稀有奖品：重复 3 次
+  if (count <= 5) return 2;   // 较稀有：重复 2 次
+  return 1;                    // 常见奖品：出现 1 次
+}
+
 function renderWinnerTicker() {
   const ticker = document.getElementById('winnerTicker');
   const itemsEl = document.getElementById('winnerItems');
@@ -260,17 +272,38 @@ function renderWinnerTicker() {
     ticker.style.display = 'none';
     return;
   }
+  // 按稀有度加权展开
+  const weighted = [];
+  for (const w of recentWins) {
+    const n = prizeWeight(w.prizeName);
+    for (let i = 0; i < n; i++) weighted.push({ ...w, rare: n >= 3 });
+  }
+  // 打散排列，避免同一稀有奖品连成一串
+  for (let i = weighted.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [weighted[i], weighted[j]] = [weighted[j], weighted[i]];
+  }
   // 复制一份实现无缝滚动
-  const list = [...recentWins, ...recentWins];
-  itemsEl.innerHTML = list.map(w => `<div class="item">恭喜 <span>${ESC(w.userName)}</span> 抽中 <span>${ESC(w.prizeName)}</span> · ${ESC(w.stageLabel || STAGE_LABELS[w.stage] || w.stage || '')}</div>`).join('');
+  const list = [...weighted, ...weighted];
+  itemsEl.innerHTML = list.map(w => `<div class="item"${w.rare ? ' style="color:#c2410c;"' : ''}>${w.rare ? '✨ ' : ''}恭喜 <span>${ESC(w.userName)}</span> 抽中 <span>${ESC(w.prizeName)}</span> · ${ESC(w.stageLabel || STAGE_LABELS[w.stage] || w.stage || '')}</div>`).join('');
+  // 内容变多时适当加长滚动周期，保持可读速度
+  const duration = Math.max(30, Math.round(list.length * 2.2));
+  itemsEl.style.animationDuration = duration + 's';
   ticker.style.display = 'flex';
 }
 
 async function loadWinnerTicker() {
   try {
     const data = await api('/api/draw/recent-wins?limit=20');
-    recentWins = data.wins || [];
-    renderWinnerTicker();
+    const wins = data.wins || [];
+    // 只有出现新中奖记录时才重建滚动（签名变化），避免动画每 15 秒重启
+    const sig = wins.length ? (wins[0].userName + '|' + wins[0].prizeName + '|' + wins[0].drawnAt) + '#' + wins.length : '';
+    if (sig !== tickerSignature) {
+      tickerSignature = sig;
+      recentWins = wins;
+      tickerPrizeStats = data.prizeStats || {};
+      renderWinnerTicker();
+    }
   } catch(e) { console.error('loadWinnerTicker error:', e); }
 }
 
@@ -285,6 +318,8 @@ async function load() {
     drawData = await api('/api/draw/status');
     render();
     loadWinnerTicker();
+    // 实时刷新滚动公告：每 15 秒检查一次新中奖记录
+    setInterval(loadWinnerTicker, 15000);
   } catch(e) {
     root.innerHTML = '<div class="empty"><div class="big">⚠️</div><div>加载失败：' + ESC(e.message) + '</div></div>';
   }

@@ -1844,10 +1844,11 @@ app.get('/api/draw/status', requireAuth, (req, res) => {
 });
 
 // GET /api/draw/recent-wins — 公开：最近中奖滚动公告
+// prizeStats：各奖品累计中奖次数（越小越稀有，前端据此加权展示）
 app.get('/api/draw/recent-wins', (req, res) => {
   const limit = Math.min(50, parseInt(req.query.limit, 10) || 20);
-  const wins = (db.drawRecords || [])
-    .filter(r => r.isWin)
+  const allWins = (db.drawRecords || []).filter(r => r.isWin);
+  const wins = [...allWins]
     .sort((a, b) => new Date(b.drawnAt) - new Date(a.drawnAt))
     .slice(0, limit)
     .map(r => {
@@ -1861,7 +1862,12 @@ app.get('/api/draw/recent-wins', (req, res) => {
         drawnAt: r.drawnAt
       };
     });
-  res.json({ wins });
+  const prizeStats = {};
+  for (const r of allWins) {
+    if (!r.prizeName || r.prizeName === '谢谢参与') continue;
+    prizeStats[r.prizeName] = (prizeStats[r.prizeName] || 0) + 1;
+  }
+  res.json({ wins, prizeStats });
 });
 
 app.post('/api/draw', requireAuth, (req, res) => {
