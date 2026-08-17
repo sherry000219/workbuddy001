@@ -1545,7 +1545,7 @@ function getLuckyRounds() {
       voterAvatar: b.avatar,
       _mobile: b.mobile, // 内部用于跨轮重名判定，不返回前端
       mobileLast4: b.mobile ? b.mobile.slice(-4) : null,
-      tickets: 1, // 每赛程参与 1 次抽奖
+      tickets: b.entries.size, // 抽奖次数 = 本赛程命中作品数
       entries: [...b.entries].map(eid => {
         const e = idMap[eid] || {};
         return { title: e.title || eid, result: (ROUND_LABEL[e.roundStatus] || e.roundStatus || ''), award: e.award || null };
