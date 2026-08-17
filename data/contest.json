@@ -20093,6 +20093,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:55:33.613Z"
+    },
+    {
+      "id": "dr_mswxvlaa_vjbwxr",
+      "userId": "eHGOFiSnUhY6CGR9aYhZGiPAiEiE",
+      "userName": "陈梦妮",
+      "stage": "preliminary",
+      "prizeId": "prize_msofsrbr_54285q",
+      "prizeName": "云帐房LOGO款餐具礼盒",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:55:34.402Z"
     }
   ],
   "settings": {
@@ -20118,7 +20128,7 @@
         {
           "id": "prize_msofsrbr_54285q",
           "name": "云帐房LOGO款餐具礼盒",
-          "stock": 2,
+          "stock": 1,
           "total": 3,
           "createdAt": "2026-08-11T09:07:19.767Z"
         },
