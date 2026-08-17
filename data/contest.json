@@ -20689,6 +20689,16 @@
       "prizeName": "云社区10积分",
       "isWin": true,
       "drawnAt": "2026-08-17T08:06:50.207Z"
+    },
+    {
+      "id": "dr_mswyevum_wx5fml",
+      "userId": "7SrAn1DIpDiP0wvfVzkiSvIgiEiE",
+      "userName": "朱振华",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T08:10:34.558Z"
     }
   ],
   "settings": {
