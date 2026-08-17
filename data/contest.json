@@ -12988,7 +12988,18 @@
     }
   ],
   "bets": [],
-  "drawRecords": [],
+  "drawRecords": [
+    {
+      "id": "dr_mswv4xd9_8682ol",
+      "userId": "1XTE0Hs7ZWfqkIPCNV0nRwiEiE",
+      "userName": "任歆迪",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T06:38:51.117Z"
+    }
+  ],
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
