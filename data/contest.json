@@ -13406,6 +13406,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T06:23:49.543Z"
+    },
+    {
+      "id": "dr_mswulnq2_uk0ixe",
+      "userId": "Zs7TYP9ojLYq7C1qbyiif7wiEiE",
+      "userName": "李铭铖",
+      "stage": "preliminary",
+      "prizeId": "prize_mswm8clg_8m87zz",
+      "prizeName": "MBTI小徽章（非南京补50积分）",
+      "isWin": true,
+      "drawnAt": "2026-08-17T06:23:52.154Z"
     }
   ],
   "settings": {
@@ -13501,7 +13511,7 @@
         {
           "id": "prize_mswm8clg_8m87zz",
           "name": "MBTI小徽章（非南京补50积分）",
-          "stock": 13,
+          "stock": 12,
           "total": 8,
           "createdAt": "2026-08-17T02:29:34.276Z"
         },
