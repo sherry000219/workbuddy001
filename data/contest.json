@@ -17021,6 +17021,16 @@
       "prizeName": "小财神盲盒",
       "isWin": true,
       "drawnAt": "2026-08-17T07:18:41.623Z"
+    },
+    {
+      "id": "dr_mswwkc7z_o1t2y9",
+      "userId": "JCh4iSviSr2zr6fsPZ9RvXvwiEiE",
+      "userName": "徐瑞",
+      "stage": "preliminary",
+      "prizeId": "prize_mswm7chf_3tibc5",
+      "prizeName": "云社区10积分",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:18:49.823Z"
     }
   ],
   "settings": {
@@ -17102,7 +17112,7 @@
         {
           "id": "prize_mswm7chf_3tibc5",
           "name": "云社区10积分",
-          "stock": 31,
+          "stock": 30,
           "total": 20,
           "createdAt": "2026-08-17T02:28:47.475Z"
         },
