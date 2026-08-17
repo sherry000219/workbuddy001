@@ -155,7 +155,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 
 <!-- Betting banner -->
 <div id="betting-banner" style="display:none;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:12px 24px;margin:12px 16px;text-align:center;color:#f59e0b;font-size:14px;">
-  🎯 <strong>复赛押宝进行中</strong> — 每人仅限押宝 1 个作品，预测它为某赛道冠军。押中人数越少，获奖概率越大！决赛阶段不再开放投票/押宝。
+  🎯 <strong>复赛押宝进行中</strong> — 每人仅限押宝 1 个作品，预测它为某赛道冠军；押宝后可撤销 1 次并重新选择。押中人数越少，获奖概率越大！决赛阶段不再开放投票/押宝。
 </div>
 
 <!-- ===== MAIN CONTENT ===== -->
@@ -207,6 +207,8 @@ let ddUser = null;
 let ddRemaining = 5;
 let ddTotalVotes = 5;
 let myBet = null;
+let canRevokeBet = false;
+let hasRevokedBet = false;
 let isBettingOpen = false;
 let votingEnabled = false;
 let currentStage = 'preliminary';
@@ -255,6 +257,7 @@ async function exchangeCode(code) {
     if (!resp.ok) throw new Error(data.error || '登录失败');
     ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5; myBet = data.myBet || null; isBettingOpen = data.isBettingOpen || false;
     currentStage = data.currentStage || 'preliminary'; isVotingStage = isStageVoting(currentStage);
+    await loadMyBet();
     updateUserUI(); updateStageUI();
     showToast('钉钉登录成功，欢迎 ' + ddUser.nick + '！', 'success');
     renderGallery();
@@ -265,12 +268,23 @@ async function checkAuth() {
   try {
     const resp = await fetch('/api/auth/me', { credentials: 'include' });
     const data = await resp.json();
-    if (data.user) { ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5; myBet = data.myBet || null; isBettingOpen = data.isBettingOpen || false; currentStage = data.currentStage || 'preliminary'; isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage); updateUserUI(); updateStageUI(); }
-    else { ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; myBet = null; isBettingOpen = false; updateUserUI(); }
+    if (data.user) { ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5; myBet = data.myBet || null; isBettingOpen = data.isBettingOpen || false; currentStage = data.currentStage || 'preliminary'; isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage); await loadMyBet(); updateUserUI(); updateStageUI(); }
+    else { ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; myBet = null; canRevokeBet = false; hasRevokedBet = false; isBettingOpen = false; updateUserUI(); }
   } catch(e) { ddAuthed = false; updateUserUI(); }
 }
 
 function isStageVoting(stage) { return stage === 'preliminary' || stage === 'semi_final'; }
+
+async function loadMyBet() {
+  if (!ddAuthed) return;
+  try {
+    const resp = await fetch('/api/my-bet', { credentials: 'include' });
+    const data = await resp.json();
+    myBet = data.bet || null;
+    canRevokeBet = data.canRevoke || false;
+    hasRevokedBet = data.hasRevoked || false;
+  } catch(e) { console.error('loadMyBet error:', e); }
+}
 
 function updateUserUI() {
   const userArea = document.getElementById('dd-user-area');
@@ -313,7 +327,7 @@ function updateVotingUI() {
 
 async function ddLogout() {
   try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch(e) {}
-  ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; myBet = null; isBettingOpen = false; updateUserUI(); renderGallery(); showToast('已退出登录');
+  ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; myBet = null; canRevokeBet = false; hasRevokedBet = false; isBettingOpen = false; updateUserUI(); renderGallery(); showToast('已退出登录');
 }
 
 // ========== HELPERS ==========
@@ -434,6 +448,9 @@ async function renderGallery() {
       if (canBet) {
         if (isMyBet) {
           betBtn = '<span style="font-size:12px;color:#f59e0b;font-weight:600;">🎯 已押宝（' + (myBet.trackLabel || '') + '）</span>';
+          if (canRevokeBet) {
+            betBtn += ' <button class="btn btn-sm" style="background:#ef4444;color:#fff;border:none;margin-left:4px;" onclick="event.stopPropagation();revokeBet()">撤销</button>';
+          }
         } else if (!myBet) {
           betBtn = '<button class="btn btn-sm" style="background:#f59e0b;color:#fff;border:none;" onclick="event.stopPropagation();placeBet(\'' + e.id + '\')">🎯 押宝</button>';
         } else {
@@ -482,17 +499,43 @@ async function placeBet(entryId) {
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || '押宝失败');
     myBet = data.bet;
+    canRevokeBet = true;
     showToast('🎯 押宝成功！您预测「' + myBet.entryTitle + '」为 ' + myBet.trackLabel + ' 冠军', 'success');
     renderGallery();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function revokeBet() {
+  if (!ddAuthed) return showToast('请先通过钉钉登录后再操作', 'error');
+  if (!isBettingOpen) return showToast('当前赛段未开放押宝，无法撤销', 'error');
+  if (!myBet) return showToast('您当前没有押宝记录', 'error');
+  if (!canRevokeBet) return showToast(hasRevokedBet ? '每人仅限撤销 1 次押宝' : '当前不可撤销', 'error');
+  if (!confirm('确定撤销对「' + myBet.entryTitle + '」的押宝？撤销后可重新选择 1 个作品，但仅限 1 次。')) return;
+  try {
+    const resp = await fetch('/api/bet/revoke', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), credentials: 'include' });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '撤销失败');
+    myBet = null;
+    canRevokeBet = false;
+    hasRevokedBet = true;
+    showToast('已撤销押宝，可重新选择 1 个作品', 'success');
+    renderGallery();
+    // 刷新当前详情弹窗
+    const modal = document.getElementById('detailModal');
+    if (modal && modal.style.display === 'flex' && currentDetailId) {
+      openDetail(currentDetailId);
+    }
   } catch(e) { showToast(e.message, 'error'); }
 }
 
 // ========== DETAIL MODAL ==========
 let detailLoading = false;
 let detailLoadingTimer = null;
+let currentDetailId = null;
 
 async function openDetail(entryId) {
   if (!ddAuthed) { showToast('请先登录钉钉查看作品详情', 'error'); return; }
+  currentDetailId = entryId;
   // 防止重复点击
   if (detailLoading) return;
   detailLoading = true;
@@ -530,6 +573,9 @@ async function openDetail(entryId) {
     if (canBetDetail) {
       if (isMyBetDetail) {
         betBtnHtml = '<span style="font-size:13px;color:#f59e0b;font-weight:600;margin-left:8px;">🎯 已押宝（' + (myBet.trackLabel || '') + '）</span>';
+        if (canRevokeBet) {
+          betBtnHtml += ' <button class="btn btn-outline" style="padding:8px 20px;font-size:14px;border-radius:10px;font-weight:700;margin-left:8px;color:#ef4444;border-color:#ef4444;" onclick="revokeBet()">撤销押宝</button>';
+        }
       } else if (!myBet) {
         betBtnHtml = '<button class="btn btn-primary" style="padding:8px 20px;font-size:14px;border-radius:10px;font-weight:700;margin-left:8px;background:#f59e0b;border-color:#f59e0b;" onclick="placeBet(\'' + e.id + '\')">🎯 押宝</button>';
       }
@@ -567,7 +613,7 @@ async function openDetail(entryId) {
   detailLoading = false;
 }
 
-function closeDetail() { detailLoading = false; clearTimeout(detailLoadingTimer); document.getElementById('detailModal').style.display = 'none'; }
+function closeDetail() { detailLoading = false; clearTimeout(detailLoadingTimer); currentDetailId = null; document.getElementById('detailModal').style.display = 'none'; }
 
 // ========== MY ENTRIES (我的投稿) ==========
 async function openMyEntries() {

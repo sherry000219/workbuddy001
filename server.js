@@ -1081,6 +1081,21 @@ function isBettingOpen() {
   return getCurrentStage() === 'semi_final';
 }
 
+// 当前有效押宝（未撤销）
+function getActiveBet(userId) {
+  return db.bets.find(b => b.voterId === userId && !b.revoked) || null;
+}
+
+// 用户历史撤销次数
+function getRevokeCount(userId) {
+  return db.bets.filter(b => b.voterId === userId && b.revoked).length;
+}
+
+// 是否还能撤销（仅允许撤销 1 次）
+function canRevokeBet(userId) {
+  return isBettingOpen() && !!getActiveBet(userId) && getRevokeCount(userId) < 1;
+}
+
 function getBettableEntries() {
   // 复赛阶段可押宝：所有晋级复赛的作品
   return db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
@@ -1092,7 +1107,7 @@ app.post('/api/bet/:entryId', requireAuth, (req, res) => {
     return res.status(400).json({ error: '当前赛段未开放押宝' });
   }
   const userId = req.ddUser.openId;
-  const existing = db.bets.find(b => b.voterId === userId);
+  const existing = getActiveBet(userId);
   if (existing) {
     return res.status(400).json({ error: '每人仅限押宝 1 个作品，您已押宝「' + existing.entryTitle + '」' });
   }
@@ -1110,6 +1125,7 @@ app.post('/api/bet/:entryId', requireAuth, (req, res) => {
     entryDept: entry.dept1 || entry.dept || '',
     track,
     trackLabel: BET_TRACK_LABEL[track] || track,
+    revoked: false,
     createdAt: new Date().toISOString()
   };
   db.bets.push(bet);
@@ -1118,19 +1134,46 @@ app.post('/api/bet/:entryId', requireAuth, (req, res) => {
   res.json({ success: true, bet });
 });
 
+// POST /api/bet/revoke — 撤销当前押宝（每人限 1 次）
+app.post('/api/bet/revoke', requireAuth, (req, res) => {
+  if (!isBettingOpen()) {
+    return res.status(400).json({ error: '当前赛段未开放押宝，无法撤销' });
+  }
+  const userId = req.ddUser.openId;
+  const activeBet = getActiveBet(userId);
+  if (!activeBet) {
+    return res.status(400).json({ error: '您当前没有押宝记录' });
+  }
+  if (getRevokeCount(userId) >= 1) {
+    return res.status(400).json({ error: '每人仅限撤销 1 次押宝' });
+  }
+  activeBet.revoked = true;
+  activeBet.revokedAt = new Date().toISOString();
+  saveDB();
+  ghPush().catch(e => console.error('[bet revoke] Immediate push failed:', e.message));
+  res.json({ success: true, message: '已撤销押宝，可重新选择 1 个作品' });
+});
+
 // GET /api/my-bet — 当前用户押宝记录
 app.get('/api/my-bet', requireAuth, (req, res) => {
   const userId = req.ddUser.openId;
-  const bet = db.bets.find(b => b.voterId === userId) || null;
-  res.json({ bet, isBettingOpen: isBettingOpen(), currentStage: getCurrentStage() });
+  const bet = getActiveBet(userId);
+  res.json({
+    bet,
+    isBettingOpen: isBettingOpen(),
+    currentStage: getCurrentStage(),
+    canRevoke: canRevokeBet(userId),
+    hasRevoked: getRevokeCount(userId) >= 1
+  });
 });
 
 // GET /api/bets/summary — 押宝统计（公开）
 app.get('/api/bets/summary', (req, res) => {
   const bettable = getBettableEntries();
+  const activeBets = db.bets.filter(b => !b.revoked);
   const summary = bettable.map(e => {
     const track = getEntryBetTrack(e);
-    const count = db.bets.filter(b => b.entryId === e.id).length;
+    const count = activeBets.filter(b => b.entryId === e.id).length;
     return {
       entryId: e.id,
       title: e.title,
@@ -1140,7 +1183,7 @@ app.get('/api/bets/summary', (req, res) => {
       betCount: count
     };
   }).filter(s => s.betCount > 0).sort((a, b) => b.betCount - a.betCount);
-  const totalBettors = new Set(db.bets.map(b => b.voterId)).size;
+  const totalBettors = new Set(activeBets.map(b => b.voterId)).size;
   res.json({ summary, totalBettors, isBettingOpen: isBettingOpen(), currentStage: getCurrentStage() });
 });
 
@@ -1828,7 +1871,7 @@ app.post('/api/auth/dd-code', async (req, res) => {
     const stage = getCurrentStage();
     const voteCount = getUserStageVoteCount(userInfo.openId, stage);
     const ddCodeLimit = getVoteLimit(stage);
-    const myBet = db.bets.find(b => b.voterId === userInfo.openId) || null;
+    const myBet = getActiveBet(userInfo.openId);
     res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, mobile: userInfo.mobile, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, ddCodeLimit - voteCount), totalVotes: ddCodeLimit, currentStage: stage, myBet, isBettingOpen: isBettingOpen() });
   } catch (e) {
     console.error('DingTalk auth error:', e.message);
@@ -1890,7 +1933,7 @@ app.get('/api/auth/me', (req, res) => {
   const stage = getCurrentStage();
   const voteCount = getUserStageVoteCount(session.openId, stage);
   const authLimit = getVoteLimit(stage);
-  const myBet = db.bets.find(b => b.voterId === session.openId) || null;
+  const myBet = getActiveBet(session.openId);
   res.json({
     user: { nick: session.nick, openId: session.openId, mobile: session.mobile || '', avatarUrl: session.avatarUrl },
     remainingVotes: Math.max(0, authLimit - voteCount),
