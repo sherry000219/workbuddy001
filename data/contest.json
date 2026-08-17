@@ -16427,6 +16427,20 @@
       "trackLabel": "业务赋能",
       "revoked": false,
       "createdAt": "2026-08-17T08:45:35.932Z"
+    },
+    {
+      "id": "bet_msx18trg_dspznp",
+      "voterId": "MiP6iil0VSqViiHLMPgWMviSiPAiEiE",
+      "voterName": "王润泽",
+      "voterMobile": "13220803381",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD4Smy4e5FFHNAyXNA1KwHMtG9q-p5x8IMO5wq-yoAA_850_805.jpg",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-17T09:29:50.764Z"
     }
   ],
   "drawRecords": [
