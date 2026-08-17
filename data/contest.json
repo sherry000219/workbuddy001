@@ -13528,6 +13528,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T05:51:44.204Z"
+    },
+    {
+      "id": "dr_mswtifi5_dmy7j4",
+      "userId": "8f8wzii630wxBQ32FiilaP3AiEiE",
+      "userName": "徐航",
+      "stage": "preliminary",
+      "prizeId": "prize_msoft563_c3l6ql",
+      "prizeName": "云帐房LOGO款64G优盘",
+      "isWin": true,
+      "drawnAt": "2026-08-17T05:53:21.917Z"
     }
   ],
   "settings": {
@@ -13560,7 +13570,7 @@
         {
           "id": "prize_msoft563_c3l6ql",
           "name": "云帐房LOGO款64G优盘",
-          "stock": 2,
+          "stock": 1,
           "total": 3,
           "createdAt": "2026-08-11T09:07:37.707Z"
         },
