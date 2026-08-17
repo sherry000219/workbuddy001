@@ -203,7 +203,10 @@
       "status": "approved",
       "roundStatus": "semi_finalist",
       "award": null,
-      "createdAt": "2026-08-10T05:42:31.344Z"
+      "createdAt": "2026-08-10T05:42:31.344Z",
+      "updatedAt": "2026-08-17T06:38:58.588Z",
+      "lastEditedAt": "2026-08-17T06:38:58.588Z",
+      "editNotice": true
     },
     {
       "id": "entry_1786338333096_ik561c",
