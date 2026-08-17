@@ -12023,6 +12023,19 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "createdAt": "2026-08-17T05:38:21.694Z"
+    },
+    {
+      "id": "bet_mswszdk7_2213xn",
+      "voterId": "JFbWkd5tiSgzLjsIZuwWnpAiEiE",
+      "voterName": "刘思远",
+      "voterMobile": "13770551483",
+      "voterAvatar": "",
+      "entryId": "entry_1786334382444_r429gr",
+      "entryTitle": "workbuddy应用大赛比赛平台",
+      "entryDept": "职能中台",
+      "track": "creative",
+      "trackLabel": "创意应用",
+      "createdAt": "2026-08-17T05:38:32.935Z"
     }
   ],
   "drawRecords": [
