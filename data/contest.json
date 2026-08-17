@@ -11456,6 +11456,15 @@
       "voterAvatar": "",
       "stage": "semi_final",
       "createdAt": "2026-08-17T07:14:08.297Z"
+    },
+    {
+      "entryId": "entry_1786418743612_h5sx2m",
+      "voterId": "VMAhxkYXTeLd6psP3CUKQwiEiE",
+      "voterName": "丁阳",
+      "voterMobile": "17752895549",
+      "voterAvatar": "",
+      "stage": "semi_final",
+      "createdAt": "2026-08-17T07:14:17.057Z"
     }
   ],
   "judgeScores": [
@@ -16046,6 +16055,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:14:15.547Z"
+    },
+    {
+      "id": "dr_mswwei4m_rfqwzt",
+      "userId": "9T0vcmLwDEvqkIPCNV0nRwiEiE",
+      "userName": "赵德成",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:14:17.542Z"
     }
   ],
   "settings": {
