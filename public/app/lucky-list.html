@@ -19,14 +19,15 @@
   .card { background: #fff; border-radius: 14px; padding: 20px 22px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
   .card h2 { font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
   .card h2 .count { font-size: 13px; color: #6b7280; font-weight: 400; margin-left: auto; }
-  .voter-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
-  .voter-item:last-child { border-bottom: none; }
-  .voter-avatar { width: 40px; height: 40px; border-radius: 50%; background: #f3f4f6; flex-shrink: 0; object-fit: cover; }
+  .voter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 640px) { .voter-grid { grid-template-columns: repeat(2, 1fr); } }
+  .voter-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: #f9fafb; border-radius: 10px; }
+  .voter-avatar { width: 36px; height: 36px; border-radius: 50%; background: #f3f4f6; flex-shrink: 0; object-fit: cover; }
   .voter-main { flex: 1; min-width: 0; }
-  .voter-name { font-size: 15px; font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .voter-mobile { font-size: 12px; color: #6b7280; background: #f3f4f6; padding: 1px 6px; border-radius: 4px; }
-  .voter-hit { font-size: 13px; color: #4b5563; margin-top: 4px; }
-  .hit-num { display: inline-block; background: rgba(255,107,53,.1); color: #ff6b35; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; }
+  .voter-name { font-size: 14px; font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .voter-mobile { font-size: 11px; color: #6b7280; background: #e5e7eb; padding: 1px 5px; border-radius: 4px; }
+  .voter-hit { font-size: 12px; color: #4b5563; margin-top: 2px; }
+  .hit-num { display: inline-block; background: rgba(255,107,53,.1); color: #ff6b35; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
   .empty { text-align: center; padding: 50px 20px; color: #6b7280; }
   .empty .big { font-size: 40px; margin-bottom: 12px; }
   .loading { text-align: center; padding: 60px; color: #9ca3af; }
@@ -123,11 +124,12 @@ function render() {
 
   rounds.forEach(r => {
     html += `<div class="card">
-      <h2><span>🏅 ${ESC(r.label || STAGE_LABELS[r.stage] || r.stage)}</span><span class="count">${r.total || (r.voters || []).length} 人</span></h2>`;
-    (r.voters || []).forEach(v => {
+      <h2><span>🏅 ${ESC(r.label || STAGE_LABELS[r.stage] || r.stage)}</span><span class="count">${r.total || (r.voters || []).length} 人</span></h2>
+      <div class="voter-grid">`;
+    (r.voters || []).slice().sort((a, b) => (b.entries || []).length - (a.entries || []).length).forEach(v => {
       const name = ESC(v.voterName || '匿名');
       const mobile = v.mobileLast4 ? `<span class="voter-mobile">尾号 ${ESC(v.mobileLast4)}</span>` : '';
-      const avatar = v.voterAvatar ? `<img class="voter-avatar" src="${ESC(v.voterAvatar)}" alt="">` : `<div class="voter-avatar" style="display:flex;align-items:center;justify-content:center;font-size:16px;">👤</div>`;
+      const avatar = v.voterAvatar ? `<img class="voter-avatar" src="${ESC(v.voterAvatar)}" alt="">` : `<div class="voter-avatar" style="display:flex;align-items:center;justify-content:center;font-size:14px;">👤</div>`;
       const hitCount = (v.entries || []).length;
       const hitText = hitCount === 1 ? '命中 1 次' : `命中 ${hitCount} 次`;
       html += `<div class="voter-item">
@@ -138,7 +140,7 @@ function render() {
         </div>
       </div>`;
     });
-    html += `</div>`;
+    html += `</div></div>`;
   });
 
   root.innerHTML = html;
