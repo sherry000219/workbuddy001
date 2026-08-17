@@ -14805,6 +14805,26 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:09:57.930Z"
+    },
+    {
+      "id": "dr_msww8y43_x9vewe",
+      "userId": "fbjpNBiPW3yGyGgvgXVpDDwiEiE",
+      "userName": "程璐",
+      "stage": "preliminary",
+      "prizeId": "prize_msofvo90_vteql3",
+      "prizeName": "月度 workbuddy 标准版会员",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:09:58.323Z"
+    },
+    {
+      "id": "dr_msww8ysn_hcl8ys",
+      "userId": "Pd8dzTupB38uQcHvkUTdNAiEiE",
+      "userName": "杨绵绵",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:09:59.207Z"
     }
   ],
   "settings": {
@@ -14865,7 +14885,7 @@
         {
           "id": "prize_msofvo90_vteql3",
           "name": "月度 workbuddy 标准版会员",
-          "stock": 2,
+          "stock": 1,
           "total": 2,
           "createdAt": "2026-08-11T09:09:35.748Z"
         },
