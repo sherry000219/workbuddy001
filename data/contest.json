@@ -11861,6 +11861,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPD3zUWzqRPDXNAZzNAZw_412_412.jpg",
       "stage": "semi_final",
       "createdAt": "2026-08-17T07:23:18.051Z"
+    },
+    {
+      "entryId": "entry_1785842445675_bql67e",
+      "voterId": "j4XfW2gYAQHqkIPCNV0nRwiEiE",
+      "voterName": "邓闻倩",
+      "voterMobile": "15520755295",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPD3zUWzqRPDXNAZzNAZw_412_412.jpg",
+      "stage": "semi_final",
+      "createdAt": "2026-08-17T07:23:30.937Z"
     }
   ],
   "judgeScores": [
@@ -17773,6 +17782,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:23:29.909Z"
+    },
+    {
+      "id": "dr_mswwqdsn_tl40xp",
+      "userId": "MiP6iil0VSqViiHLMPgWMviSiPAiEiE",
+      "userName": "王润泽",
+      "stage": "preliminary",
+      "prizeId": "prize_mswma5n7_sppd4t",
+      "prizeName": "云社区1000积分",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:23:31.799Z"
     }
   ],
   "settings": {
@@ -17875,7 +17894,7 @@
         {
           "id": "prize_mswma5n7_sppd4t",
           "name": "云社区1000积分",
-          "stock": 2,
+          "stock": 1,
           "total": 2,
           "createdAt": "2026-08-17T02:30:58.579Z"
         },
