@@ -11691,7 +11691,21 @@
       "updatedAt": "2026-08-14T03:00:30.452Z"
     }
   ],
-  "bets": [],
+  "bets": [
+    {
+      "id": "bet_mswon0hs_z8fwbn",
+      "voterId": "qHFb13ALXHzhuoCrGUaaiPAiEiE",
+      "voterName": "徐聪明",
+      "voterMobile": "18952230018",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQLPM4WiX_ubU8XNAuPNAuOwUYtMaCXNdUsIggrseb-PAA_739_739.png",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "createdAt": "2026-08-17T03:36:57.665Z"
+    }
+  ],
   "drawRecords": [],
   "settings": {
     "judgePassword": "wb2026",
