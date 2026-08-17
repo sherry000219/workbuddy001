@@ -1576,8 +1576,17 @@ function getLuckyRounds() {
 
 app.get('/api/lucky/list', (req, res) => {
   const rounds = getLuckyRounds();
-  const totalVoters = rounds.reduce((s, r) => s + r.total, 0);
-  const totalTickets = rounds.reduce((s, r) => s + r.voters.length, 0);
+  // 幸运投票人 = 全局去重后的人数；总抽奖次数 = 各轮 tickets 之和
+  const globalVoterKeys = new Set();
+  let totalTickets = 0;
+  rounds.forEach(r => {
+    totalTickets += r.voters.reduce((s, v) => s + (v.tickets || 1), 0);
+    r.voters.forEach(v => {
+      const key = v.mobileLast4 ? v.voterName + '|' + v.mobileLast4 : v.voterName;
+      globalVoterKeys.add(key);
+    });
+  });
+  const totalVoters = globalVoterKeys.size;
   res.json({
     enabled: !!db.settings.luckyListEnabled,
     summary: { rounds: rounds.length, totalVoters, totalTickets },
