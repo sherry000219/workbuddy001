@@ -13919,6 +13919,20 @@
       "trackLabel": "创意应用",
       "revoked": false,
       "createdAt": "2026-08-17T07:12:43.979Z"
+    },
+    {
+      "id": "bet_mswwcirv_4au79u",
+      "voterId": "4Tzs8KCqh2zaiP6BjIKRO0QiEiE",
+      "voterName": "王婷婷",
+      "voterMobile": "18817920936",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3mHKt9aaO3NBkDNBkCwHABlqV-2Y_AJ3C-hdpU6AA_1600_1600.jpg",
+      "entryId": "entry_1785751983953_jddr0p",
+      "entryTitle": "合同税务风险检测",
+      "entryDept": "有度税智",
+      "track": "creative",
+      "trackLabel": "创意应用",
+      "revoked": false,
+      "createdAt": "2026-08-17T07:12:45.067Z"
     }
   ],
   "drawRecords": [
@@ -15671,6 +15685,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:12:43.860Z"
+    },
+    {
+      "id": "dr_mswwcjiz_pwjxw7",
+      "userId": "vpscILNqQT2xf9RD0xJyawiEiE",
+      "userName": "刘诗雨",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:12:46.043Z"
     }
   ],
   "settings": {
