@@ -19625,6 +19625,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:48:58.236Z"
+    },
+    {
+      "id": "dr_mswxolne_sv605n",
+      "userId": "sdYvlGX2WuQiE",
+      "userName": "王文波",
+      "stage": "preliminary",
+      "prizeId": "prize_mspr6xa7_h69js3",
+      "prizeName": "特步护腰坐垫椅",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:50:08.282Z"
     }
   ],
   "settings": {
@@ -19699,7 +19709,7 @@
         {
           "id": "prize_mspr6xa7_h69js3",
           "name": "特步护腰坐垫椅",
-          "stock": 2,
+          "stock": 1,
           "total": 2,
           "createdAt": "2026-08-12T07:14:02.623Z"
         },
