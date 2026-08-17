@@ -14083,6 +14083,20 @@
       "trackLabel": "业务赋能",
       "revoked": false,
       "createdAt": "2026-08-17T07:13:42.059Z"
+    },
+    {
+      "id": "bet_mswwendm_gdivp3",
+      "voterId": "6TUp7KsMZHsq7C1qbyiif7wiEiE",
+      "voterName": "张国松",
+      "voterMobile": "15824801566",
+      "voterAvatar": "",
+      "entryId": "entry_1785136604075_9xogv4",
+      "entryTitle": "库存商品科目，存货辅助核算明细账查询工具",
+      "entryDept": "中小微事业群",
+      "track": "creative",
+      "trackLabel": "创意应用",
+      "revoked": false,
+      "createdAt": "2026-08-17T07:14:24.346Z"
     }
   ],
   "drawRecords": [
@@ -16085,6 +16099,26 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:14:21.109Z"
+    },
+    {
+      "id": "dr_mswwem4l_2ytxpc",
+      "userId": "9T0vcmLwDEvqkIPCNV0nRwiEiE",
+      "userName": "赵德成",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:14:22.725Z"
+    },
+    {
+      "id": "dr_mswwenqu_v4suca",
+      "userId": "wUAVPR6eAYqxf9RD0xJyawiEiE",
+      "userName": "李陈实",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:14:24.822Z"
     }
   ],
   "settings": {
