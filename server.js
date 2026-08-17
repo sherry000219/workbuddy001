@@ -303,11 +303,12 @@ function getStageJudges(stage) {
   return jbs[stage] || [];
 }
 
-// 判断评委是否在指定赛段的名单中
+// 判断评委是否在指定赛段的名单中（支持前后空格、大小写差异）
 function isJudgeInList(judgeName, stage) {
   const list = getStageJudges(stage);
   if (list.length === 0) return true; // 名单为空时任何人都可以打分
-  return list.includes(judgeName);
+  const normalized = String(judgeName || '').trim().toLowerCase();
+  return list.some(n => String(n || '').trim().toLowerCase() === normalized);
 }
 
 function isVotingStage(stage) {
@@ -593,28 +594,73 @@ async function ghPull() {
       mergedSettings.prizes = mergedPrizes;
     }
 
-    // 5. 构建合并后的数据
+    // 5. 合并 drawRecords：按 id 去重，保留较新的（按 drawnAt）
+    const localDrawRecords = localData.drawRecords || [];
+    const remoteDrawRecords = remoteData.drawRecords || [];
+    const drawRecordMap = new Map();
+    for (const r of localDrawRecords) {
+      if (r.id) drawRecordMap.set(r.id, r);
+    }
+    for (const r of remoteDrawRecords) {
+      if (!r.id) continue;
+      if (!drawRecordMap.has(r.id)) {
+        drawRecordMap.set(r.id, r);
+      } else {
+        const existing = drawRecordMap.get(r.id);
+        if ((r.drawnAt || '') > (existing.drawnAt || '')) drawRecordMap.set(r.id, r);
+      }
+    }
+    const mergedDrawRecords = [...drawRecordMap.values()];
+
+    // 6. 合并 bets：按 voterId 去重，保留 createdAt 最新的
+    const localBets = localData.bets || [];
+    const remoteBets = remoteData.bets || [];
+    const betMap = new Map();
+    for (const b of [...localBets, ...remoteBets]) {
+      if (!b.voterId) continue;
+      if (!betMap.has(b.voterId)) {
+        betMap.set(b.voterId, b);
+      } else {
+        const existing = betMap.get(b.voterId);
+        const existingTime = existing.createdAt || '';
+        const newTime = b.createdAt || '';
+        if (newTime > existingTime) betMap.set(b.voterId, b);
+      }
+    }
+    const mergedBets = [...betMap.values()];
+
+    // 7. 构建合并后的数据
     const mergedData = {
       ...localData,
       entries: mergedEntries,
       votes: mergedVotes,
       judgeScores: mergedScores,
+      drawRecords: mergedDrawRecords,
+      bets: mergedBets,
       settings: mergedSettings
     };
 
     const localCount = localEntries.length;
     const localVoteCount = localVotes.length;
     const localScoreCount = localScores.length;
-    const hadChanges = mergedEntries.length !== localCount || mergedVotes.length !== localVoteCount || mergedScores.length !== localScoreCount;
+    const localDrawCount = localDrawRecords.length;
+    const localBetCount = localBets.length;
+    const hadChanges = mergedEntries.length !== localCount
+      || mergedVotes.length !== localVoteCount
+      || mergedScores.length !== localScoreCount
+      || mergedDrawRecords.length !== localDrawCount
+      || mergedBets.length !== localBetCount;
 
     if (hadChanges) {
       fs.writeFileSync(DB_FILE, JSON.stringify(mergedData, null, 2), 'utf8');
       console.log('[gh] Merged data — entries:', localCount, '→', mergedEntries.length,
         '| votes:', localVoteCount, '→', mergedVotes.length,
         '| scores:', localScoreCount, '→', mergedScores.length,
+        '| draws:', localDrawCount, '→', mergedDrawRecords.length,
+        '| bets:', localBetCount, '→', mergedBets.length,
         'sha:', _ghSha.slice(0, 7));
     } else {
-      console.log('[gh] Data in sync — entries:', localCount, 'votes:', localVoteCount, 'scores:', localScoreCount, 'sha:', _ghSha.slice(0, 7));
+      console.log('[gh] Data in sync — entries:', localCount, 'votes:', localVoteCount, 'scores:', localScoreCount, 'draws:', localDrawCount, 'bets:', localBetCount, 'sha:', _ghSha.slice(0, 7));
     }
   } else {
     fs.writeFileSync(DB_FILE, buf, 'utf8');
@@ -673,6 +719,8 @@ async function ghPush() {
           db.votes = refreshed.votes;
           db.judgeScores = refreshed.judgeScores;
           db.settings = refreshed.settings;
+          db.drawRecords = refreshed.drawRecords || [];
+          db.bets = refreshed.bets || [];
           // 重新写入磁盘（合并后的数据）
           fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
           continue; // 重试 push

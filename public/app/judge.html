@@ -261,8 +261,11 @@ async function enterJudge(evt) {
     const judges = judgeListData.judges || [];
     const stage = judgeListData.stage || currentStage;
     const stageLabels = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
-    if (judges.length > 0 && !judges.includes(name)) {
-      showToast('您不在' + (stageLabels[stage] || stage) + '评委名单中，请联系管理员添加', 'error');
+    const normalizedName = String(name || '').trim().toLowerCase();
+    const inList = judges.some(n => String(n || '').trim().toLowerCase() === normalizedName);
+    if (judges.length > 0 && !inList) {
+      console.log('[judge] 不在名单中。当前' + (stageLabels[stage] || stage) + '评委：', judges, '钉钉昵称：', name);
+      showToast('您不在' + (stageLabels[stage] || stage) + '评委名单中，请联系管理员添加（您的昵称：' + name + '）', 'error');
       return;
     }
   } catch(e) { /* 评委名单接口失败时放行，由后端再次校验 */ }
