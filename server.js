@@ -346,15 +346,28 @@ function getEntryStageScores(entryId, stage) {
 // Calculate composite score for an entry in a specific stage
 function getCompositeScore(entryId, stage) {
   const { avgScore, voteCount } = getEntryStageScores(entryId, stage);
+  let currentComposite;
   if (stage === 'final' || stage === 'awarded') {
-    return avgScore; // 100% judge score, no voting
+    currentComposite = avgScore; // 100% judge score, no voting
+  } else {
+    // For preliminary and semi_final: 80% judge + 20% votes
+    const votable = getVotableEntries(stage);
+    const allVoteCounts = votable.map(e => getEntryStageScores(e.id, stage).voteCount);
+    const maxVotes = Math.max(1, ...allVoteCounts, voteCount);
+    const voteScore = Math.round((voteCount / maxVotes) * 100);
+    currentComposite = Math.round(avgScore * 0.8 + voteScore * 0.2);
   }
-  // For preliminary and semi_final: 80% judge + 20% votes
-  const votable = getVotableEntries(stage);
-  const allVoteCounts = votable.map(e => getEntryStageScores(e.id, stage).voteCount);
-  const maxVotes = Math.max(1, ...allVoteCounts, voteCount);
-  const voteScore = Math.round((voteCount / maxVotes) * 100);
-  return Math.round(avgScore * 0.8 + voteScore * 0.2);
+
+  // 赛段晋级时，上一赛段综合分按 30% 权重继承到本赛段
+  if (stage === 'semi_final') {
+    const prevComposite = getCompositeScore(entryId, 'preliminary');
+    return Math.round(prevComposite * 0.3 + currentComposite * 0.7);
+  }
+  if (stage === 'final' || stage === 'awarded') {
+    const prevComposite = getCompositeScore(entryId, 'semi_final');
+    return Math.round(prevComposite * 0.3 + currentComposite * 0.7);
+  }
+  return currentComposite;
 }
 
 // Count user's votes in current stage

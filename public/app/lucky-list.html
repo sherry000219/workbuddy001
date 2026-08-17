@@ -25,9 +25,8 @@
   .voter-main { flex: 1; min-width: 0; }
   .voter-name { font-size: 15px; font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .voter-mobile { font-size: 12px; color: #6b7280; background: #f3f4f6; padding: 1px 6px; border-radius: 4px; }
-  .voter-entries { font-size: 13px; color: #4b5563; margin-top: 6px; line-height: 1.6; }
-  .entry-tag { display: inline-block; background: rgba(255,107,53,.08); color: #ff6b35; padding: 2px 8px; border-radius: 6px; margin-right: 6px; margin-bottom: 4px; font-size: 12px; }
-  .entry-result { color: #6b7280; font-size: 12px; }
+  .voter-hit { font-size: 13px; color: #4b5563; margin-top: 4px; }
+  .hit-num { display: inline-block; background: rgba(255,107,53,.1); color: #ff6b35; padding: 2px 10px; border-radius: 12px; font-size: 13px; font-weight: 600; }
   .empty { text-align: center; padding: 50px 20px; color: #6b7280; }
   .empty .big { font-size: 40px; margin-bottom: 12px; }
   .loading { text-align: center; padding: 60px; color: #9ca3af; }
@@ -120,7 +119,7 @@ function render() {
     <div class="stat"><div class="num">${summary.totalTickets || 0}</div><div class="lab">总抽奖次数</div></div>
   </div>`;
 
-  html += `<div class="card"><div style="font-size:13px;color:#6b7280;line-height:1.7;">名单说明：以下用户在该赛程中投过票，且所支持的作品成功晋级或获奖，获得对应轮次抽奖资格。每行展示一位投票人及其点赞的作品。</div></div>`;
+  html += `<div class="card"><div style="font-size:13px;color:#6b7280;line-height:1.7;">名单说明：以下用户在该赛程中投过票，且所支持的作品成功晋级或获奖，获得对应轮次抽奖资格。每行展示一位投票人及其命中次数。</div></div>`;
 
   rounds.forEach(r => {
     html += `<div class="card">
@@ -129,15 +128,13 @@ function render() {
       const name = ESC(v.voterName || '匿名');
       const mobile = v.mobileLast4 ? `<span class="voter-mobile">尾号 ${ESC(v.mobileLast4)}</span>` : '';
       const avatar = v.voterAvatar ? `<img class="voter-avatar" src="${ESC(v.voterAvatar)}" alt="">` : `<div class="voter-avatar" style="display:flex;align-items:center;justify-content:center;font-size:16px;">👤</div>`;
-      const entries = (v.entries || []).map(e => {
-        const result = e.result ? `<span class="entry-result">(${ESC(e.result)})</span>` : '';
-        return `<span class="entry-tag">${ESC(e.title)} ${result}</span>`;
-      }).join('');
+      const hitCount = (v.entries || []).length;
+      const hitText = hitCount === 1 ? '命中 1 次' : `命中 ${hitCount} 次`;
       html += `<div class="voter-item">
         ${avatar}
         <div class="voter-main">
           <div class="voter-name">${name} ${mobile}</div>
-          <div class="voter-entries">${entries || '<span style="color:#9ca3af;">无作品信息</span>'}</div>
+          <div class="voter-hit"><span class="hit-num">${ESC(hitText)}</span></div>
         </div>
       </div>`;
     });
