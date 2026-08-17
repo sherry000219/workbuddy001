@@ -16227,6 +16227,20 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-17T08:14:48.525Z"
+    },
+    {
+      "id": "bet_mswykyuo_9g0hku",
+      "voterId": "gvpWakiiiiXuHj1OyqnXJb6AiEiE",
+      "voterName": "金洪亮",
+      "voterMobile": "13203151912",
+      "voterAvatar": "",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-17T08:15:18.384Z"
     }
   ],
   "drawRecords": [
