@@ -20738,6 +20738,26 @@
       "prizeName": "小财神盲盒",
       "isWin": true,
       "drawnAt": "2026-08-17T08:11:19.280Z"
+    },
+    {
+      "id": "dr_mswyfv80_4wfj4v",
+      "userId": "7SrAn1DIpDiP0wvfVzkiSvIgiEiE",
+      "userName": "朱振华",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T08:11:20.400Z"
+    },
+    {
+      "id": "dr_mswyfwbu_z9ozo0",
+      "userId": "7SrAn1DIpDiP0wvfVzkiSvIgiEiE",
+      "userName": "朱振华",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T08:11:21.834Z"
     }
   ],
   "settings": {
