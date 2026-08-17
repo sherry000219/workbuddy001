@@ -13700,6 +13700,20 @@
       "trackLabel": "创意应用",
       "revoked": false,
       "createdAt": "2026-08-17T07:05:39.462Z"
+    },
+    {
+      "id": "bet_msww8q1z_o1j4m4",
+      "voterId": "iPLHMYjXdbNiPyGgvgXVpDDwiEiE",
+      "voterName": "宇露",
+      "voterMobile": "18651907742",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD2vAJZzpHSvNBJ3NBJuwhMRgIVHDINMGlP7xCwttAA_1179_1181.jpg",
+      "entryId": "entry_1785325566960_99axb6",
+      "entryTitle": "客户不改接口，260家必须手报：一个 Skill 进去，1分钟一张表",
+      "entryDept": "有度税智",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-17T07:09:47.879Z"
     }
   ],
   "drawRecords": [
@@ -14652,6 +14666,26 @@
       "prizeName": "校招透明A4文件夹（非南京补50积分）",
       "isWin": true,
       "drawnAt": "2026-08-17T07:09:47.289Z"
+    },
+    {
+      "id": "dr_msww8q0y_ugvv1x",
+      "userId": "mSdjSSP3EJ20wvfVzkiSvIgiEiE",
+      "userName": "陈龙海",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:09:47.842Z"
+    },
+    {
+      "id": "dr_msww8qqx_sovvuu",
+      "userId": "rbxxSgDhwpU4jLmIKAgBNAiEiE",
+      "userName": "刘学伟",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:09:48.777Z"
     }
   ],
   "settings": {
