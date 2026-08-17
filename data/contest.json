@@ -18117,6 +18117,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:26:04.605Z"
+    },
+    {
+      "id": "dr_mswwu1p1_evn12s",
+      "userId": "0b8iSVD1PtGh0NTSPVJ3E7giEiE",
+      "userName": "刘嘉欣",
+      "stage": "preliminary",
+      "prizeId": "prize_mswma5n7_sppd4t",
+      "prizeName": "云社区1000积分",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:26:22.741Z"
     }
   ],
   "settings": {
@@ -18219,7 +18229,7 @@
         {
           "id": "prize_mswma5n7_sppd4t",
           "name": "云社区1000积分",
-          "stock": 1,
+          "stock": 0,
           "total": 2,
           "createdAt": "2026-08-17T02:30:58.579Z"
         },
