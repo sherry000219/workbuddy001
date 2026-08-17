@@ -11690,6 +11690,24 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPDhuywtUNW0bNA5vNA5uwYsS1W-E1I1cC9Y4pR0D-AA_923_923.jpg",
       "stage": "semi_final",
       "createdAt": "2026-08-17T07:18:59.407Z"
+    },
+    {
+      "entryId": "entry_1786295169144_ilkpwc",
+      "voterId": "gnxNWbHhMYWFUrWP6VnNPwiEiE",
+      "voterName": "小红豆",
+      "voterMobile": "15298392042",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPDhuywtUNW0bNA5vNA5uwYsS1W-E1I1cC9Y4pR0D-AA_923_923.jpg",
+      "stage": "semi_final",
+      "createdAt": "2026-08-17T07:19:16.392Z"
+    },
+    {
+      "entryId": "entry_1785842445675_bql67e",
+      "voterId": "iSbUadHiSDs5r6fsPZ9RvXvwiEiE",
+      "voterName": "代汶岐",
+      "voterMobile": "18213432495",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4X8af_BDifNBADNBACwqvLgkfxzYj0JOgznuFWhAA_1024_1024.jpg",
+      "stage": "semi_final",
+      "createdAt": "2026-08-17T07:19:17.277Z"
     }
   ],
   "judgeScores": [
@@ -17120,6 +17138,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:19:14.591Z"
+    },
+    {
+      "id": "dr_mswwkwjy_qdp96p",
+      "userId": "3eHvMY1VIRz6fsPZ9RvXvwiEiE",
+      "userName": "戴传豪",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:19:16.174Z"
     }
   ],
   "settings": {
