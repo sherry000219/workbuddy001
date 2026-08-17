@@ -11678,7 +11678,7 @@
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
-    "votingEnabled": false,
+    "votingEnabled": true,
     "currentStage": "semi_final",
     "luckyListEnabled": true,
     "drawConfig": {
