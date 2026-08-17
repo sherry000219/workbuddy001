@@ -12790,6 +12790,16 @@
       "prizeName": "云社区50积分",
       "isWin": true,
       "drawnAt": "2026-08-17T06:17:25.119Z"
+    },
+    {
+      "id": "dr_mswudgmv_jf1e7v",
+      "userId": "qHFb13ALXHzhuoCrGUaaiPAiEiE",
+      "userName": "徐聪明",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T06:17:29.719Z"
     }
   ],
   "settings": {
