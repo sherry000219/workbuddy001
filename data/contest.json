@@ -18159,6 +18159,16 @@
       "prizeName": "云社区1000积分",
       "isWin": true,
       "drawnAt": "2026-08-17T07:26:22.741Z"
+    },
+    {
+      "id": "dr_mswwv0pg_jfwb5e",
+      "userId": "msGFlWiP19T9ViPxQEzbiiGUAiEiE",
+      "userName": "杨文强",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:27:08.116Z"
     }
   ],
   "settings": {
