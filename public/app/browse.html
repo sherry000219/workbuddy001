@@ -417,6 +417,9 @@ async function renderGallery() {
   if (search) url += '&search=' + encodeURIComponent(search);
   try {
     const data = await api(url);
+    // 淘汰的作品沉底：eliminated_semi / eliminated_final 排到最后
+    const isEliminated = function(e) { return e.roundStatus === 'eliminated_semi' || e.roundStatus === 'eliminated_final'; };
+    data.entries.sort(function(a, b) { return (isEliminated(a) ? 1 : 0) - (isEliminated(b) ? 1 : 0); });
     allEntries = data.entries;
     if (data.currentStage) { currentStage = data.currentStage; updateStageUI(); }
     const deptSelect = document.getElementById('galleryDept');
