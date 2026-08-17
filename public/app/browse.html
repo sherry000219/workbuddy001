@@ -158,6 +158,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   🎯 <strong>复赛押宝进行中</strong> — 每人仅限押宝 1 个作品，预测它为某赛道冠军；押宝后可撤销 1 次并重新选择。押中人数越少，获奖概率越大！决赛阶段不再开放投票/押宝。
 </div>
 
+<!-- My bet banner -->
+<div id="my-bet-banner" style="display:none;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:12px 24px;margin:12px 16px;text-align:center;color:#059669;font-size:14px;"></div>
+
 <!-- ===== MAIN CONTENT ===== -->
 <div class="main-container">
   <div class="section-title">🎨 作品展示</div>
@@ -258,7 +261,7 @@ async function exchangeCode(code) {
     ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5; myBet = data.myBet || null; isBettingOpen = data.isBettingOpen || false;
     currentStage = data.currentStage || 'preliminary'; isVotingStage = isStageVoting(currentStage);
     await loadMyBet();
-    updateUserUI(); updateStageUI();
+    updateUserUI(); updateStageUI(); updateMyBetBanner();
     showToast('钉钉登录成功，欢迎 ' + ddUser.nick + '！', 'success');
     renderGallery();
   } catch(e) { showToast('登录失败：' + e.message, 'error'); }
@@ -268,8 +271,8 @@ async function checkAuth() {
   try {
     const resp = await fetch('/api/auth/me', { credentials: 'include' });
     const data = await resp.json();
-    if (data.user) { ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5; myBet = data.myBet || null; isBettingOpen = data.isBettingOpen || false; currentStage = data.currentStage || 'preliminary'; isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage); await loadMyBet(); updateUserUI(); updateStageUI(); }
-    else { ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; myBet = null; canRevokeBet = false; hasRevokedBet = false; isBettingOpen = false; updateUserUI(); }
+    if (data.user) { ddAuthed = true; ddUser = data.user; ddRemaining = data.remainingVotes; ddTotalVotes = data.totalVotes || 5; myBet = data.myBet || null; isBettingOpen = data.isBettingOpen || false; currentStage = data.currentStage || 'preliminary'; isVotingStage = data.isVotingStage !== undefined ? data.isVotingStage : isStageVoting(currentStage); await loadMyBet(); updateUserUI(); updateStageUI(); updateMyBetBanner(); }
+    else { ddAuthed = false; ddUser = null; ddRemaining = 5; ddTotalVotes = 5; myBet = null; canRevokeBet = false; hasRevokedBet = false; isBettingOpen = false; updateUserUI(); updateMyBetBanner(); }
   } catch(e) { ddAuthed = false; updateUserUI(); }
 }
 
@@ -323,6 +326,29 @@ function updateVotingUI() {
   else if (!isVotingStage) { banner.style.display = 'block'; banner.innerHTML = '📋 当前为<strong>' + STAGE_LABELS[currentStage] + '</strong>阶段，不支持投票'; banner.style.background = 'rgba(37,99,235,0.06)'; banner.style.borderColor = 'rgba(37,99,235,0.15)'; banner.style.color = '#2563eb'; }
   else { banner.style.display = 'block'; banner.innerHTML = '⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道'; banner.style.background = 'rgba(255,215,64,0.08)'; banner.style.borderColor = 'rgba(255,215,64,0.2)'; banner.style.color = '#ffd740'; }
   if (betBanner) betBanner.style.display = (isBettingOpen && ddAuthed) ? 'block' : 'none';
+  updateMyBetBanner();
+}
+
+function updateMyBetBanner() {
+  const banner = document.getElementById('my-bet-banner');
+  if (!banner) return;
+  if (!ddAuthed || !isBettingOpen) { banner.style.display = 'none'; return; }
+  if (myBet) {
+    let html = '🎯 <strong>您已押宝《' + escapeHtml(myBet.entryTitle) + '》</strong>（' + (myBet.trackLabel || '') + '）';
+    if (canRevokeBet) {
+      html += ' <button class="btn btn-sm" style="background:#ef4444;color:#fff;border:none;margin-left:8px;" onclick="revokeBet()">撤销押宝</button>';
+    } else if (hasRevokedBet) {
+      html += ' <span style="color:#6b7280;margin-left:8px;">（已用掉撤销次数）</span>';
+    }
+    banner.innerHTML = html;
+    banner.style.display = 'block';
+  } else if (hasRevokedBet) {
+    banner.innerHTML = '💨 <strong>您已撤销押宝</strong>，可重新选择 1 个作品押宝（撤销次数已用完）';
+    banner.style.display = 'block';
+  } else {
+    banner.innerHTML = '🎯 <strong>您还未押宝</strong>，可在下方选择 1 个晋级复赛的作品进行押宝';
+    banner.style.display = 'block';
+  }
 }
 
 async function ddLogout() {
@@ -521,6 +547,7 @@ async function revokeBet() {
     myBet = null;
     canRevokeBet = false;
     hasRevokedBet = true;
+    updateMyBetBanner();
     showToast('已撤销押宝，可重新选择 1 个作品', 'success');
     renderGallery();
     // 刷新当前详情弹窗

@@ -203,13 +203,8 @@ function loadDB() {
     (merged.judgeScores || []).forEach(s => {
       if (!s.stage) s.stage = 'preliminary';
     });
-    // 押宝去重：每个用户只能有 1 条押宝记录，保留最新
-    const betSet = new Set();
-    merged.bets = (merged.bets || []).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).filter(b => {
-      if (betSet.has(b.voterId)) return false;
-      betSet.add(b.voterId);
-      return true;
-    });
+    // 押宝记录保留完整历史（含撤销），用于统计撤销次数；由 getActiveBet 取当前有效押宝
+    merged.bets = (merged.bets || []).map(b => ({ ...b, revoked: !!b.revoked })).filter(b => b.voterId && b.id);
     // 迁移：旧版 judges 是全局数组，新版改为按赛段 judgesByStage
     if (!merged.settings.judgesByStage) {
       const oldJudges = merged.settings.judges || [];
@@ -612,19 +607,18 @@ async function ghPull() {
     }
     const mergedDrawRecords = [...drawRecordMap.values()];
 
-    // 6. 合并 bets：按 voterId 去重，保留 createdAt 最新的
+    // 6. 合并 bets：按 id 去重，保留 createdAt 最新的；保留撤销记录用于统计
     const localBets = localData.bets || [];
     const remoteBets = remoteData.bets || [];
     const betMap = new Map();
-    for (const b of [...localBets, ...remoteBets]) {
-      if (!b.voterId) continue;
-      if (!betMap.has(b.voterId)) {
-        betMap.set(b.voterId, b);
+    for (const b of localBets) { if (b.id && b.voterId) betMap.set(b.id, b); }
+    for (const b of remoteBets) {
+      if (!b.id || !b.voterId) continue;
+      if (!betMap.has(b.id)) {
+        betMap.set(b.id, b);
       } else {
-        const existing = betMap.get(b.voterId);
-        const existingTime = existing.createdAt || '';
-        const newTime = b.createdAt || '';
-        if (newTime > existingTime) betMap.set(b.voterId, b);
+        const existing = betMap.get(b.id);
+        if ((b.createdAt || '') > (existing.createdAt || '')) betMap.set(b.id, b);
       }
     }
     const mergedBets = [...betMap.values()];
@@ -2462,7 +2456,7 @@ app.post('/api/force-sync', async (req, res) => {
       try {
         await ghPull();
         const refreshed = loadDB();
-        const snapshot = `e:${refreshed.entries.length}|v:${refreshed.votes.length}|s:${refreshed.judgeScores.length}`;
+        const snapshot = `e:${refreshed.entries.length}|v:${refreshed.votes.length}|s:${refreshed.judgeScores.length}|d:${(refreshed.drawRecords || []).length}|b:${(refreshed.bets || []).length}`;
 
         if (snapshot === lastSnapshot) {
           stableCount++;
@@ -2491,6 +2485,8 @@ app.post('/api/force-sync', async (req, res) => {
     db.votes = refreshed.votes;
     db.judgeScores = refreshed.judgeScores;
     db.settings = refreshed.settings;
+    db.drawRecords = refreshed.drawRecords || [];
+    db.bets = refreshed.bets || [];
   } else {
     // 无 GitHub 同步，直接用本地数据
     const refreshed = loadDB();
@@ -2498,6 +2494,8 @@ app.post('/api/force-sync', async (req, res) => {
     db.votes = refreshed.votes;
     db.judgeScores = refreshed.judgeScores;
     db.settings = refreshed.settings;
+    db.drawRecords = refreshed.drawRecords || [];
+    db.bets = refreshed.bets || [];
   }
 
   _syncStatus.githubEntries = db.entries.length;
@@ -2526,12 +2524,21 @@ app.post('/api/force-sync', async (req, res) => {
         await ghPull();
         const refreshed = loadDB();
         // 只在远程有新数据时更新内存
-        if (refreshed.votes.length > db.votes.length || refreshed.entries.length > db.entries.length || refreshed.judgeScores.length > db.judgeScores.length) {
-          console.log('[gh-periodic] Remote has newer data, updating memory — votes:', db.votes.length, '→', refreshed.votes.length, 'entries:', db.entries.length, '→', refreshed.entries.length);
+        const drawRecordsRefreshed = refreshed.drawRecords || [];
+        const betsRefreshed = refreshed.bets || [];
+        const hasNewer = refreshed.votes.length > db.votes.length
+          || refreshed.entries.length > db.entries.length
+          || refreshed.judgeScores.length > db.judgeScores.length
+          || drawRecordsRefreshed.length > (db.drawRecords || []).length
+          || betsRefreshed.length > (db.bets || []).length;
+        if (hasNewer) {
+          console.log('[gh-periodic] Remote has newer data, updating memory — votes:', db.votes.length, '→', refreshed.votes.length, 'entries:', db.entries.length, '→', refreshed.entries.length, 'draws:', (db.drawRecords || []).length, '→', drawRecordsRefreshed.length, 'bets:', (db.bets || []).length, '→', betsRefreshed.length);
           db.entries = refreshed.entries;
           db.votes = refreshed.votes;
           db.judgeScores = refreshed.judgeScores;
           db.settings = refreshed.settings;
+          db.drawRecords = drawRecordsRefreshed;
+          db.bets = betsRefreshed;
         }
       } catch (e) {
         console.error('[gh-periodic] Pull failed:', e.message);
