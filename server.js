@@ -1794,6 +1794,27 @@ app.get('/api/draw/status', requireAuth, (req, res) => {
   });
 });
 
+// GET /api/draw/recent-wins — 公开：最近中奖滚动公告
+app.get('/api/draw/recent-wins', (req, res) => {
+  const limit = Math.min(50, parseInt(req.query.limit, 10) || 20);
+  const wins = (db.drawRecords || [])
+    .filter(r => r.isWin)
+    .sort((a, b) => new Date(b.drawnAt) - new Date(a.drawnAt))
+    .slice(0, limit)
+    .map(r => {
+      const name = r.userName || '匿名';
+      const masked = name.length > 2 ? name[0] + '*'.repeat(name.length - 1) : name;
+      return {
+        userName: masked,
+        prizeName: r.prizeName,
+        stage: r.stage,
+        stageLabel: DRAW_STAGE_LABEL[r.stage] || r.stage,
+        drawnAt: r.drawnAt
+      };
+    });
+  res.json({ wins });
+});
+
 app.post('/api/draw', requireAuth, (req, res) => {
   const config = db.settings.drawConfig || DEFAULT_DB.settings.drawConfig;
   if (!config.enabled) return res.status(403).json({ error: '抽奖尚未开启' });

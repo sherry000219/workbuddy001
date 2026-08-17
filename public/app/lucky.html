@@ -28,6 +28,14 @@
   .draw-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #ff6b35, #e55d2b); color: #fff; border: none; padding: 14px 36px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 24px rgba(255,107,53,.25); transition: transform .15s; }
   .draw-btn:hover:not(:disabled) { transform: translateY(-2px); }
   .draw-btn:disabled { background: #d1d5db; box-shadow: none; cursor: not-allowed; }
+  .winner-ticker { background: linear-gradient(90deg, #fff7ed, #fff); border-bottom: 1px solid #fed7aa; overflow: hidden; position: relative; height: 44px; display: flex; align-items: center; }
+  .winner-ticker .label { flex: 0 0 auto; background: #ff6b35; color: #fff; font-size: 13px; font-weight: 700; padding: 0 16px; height: 100%; display: flex; align-items: center; z-index: 2; }
+  .winner-ticker .track { flex: 1; overflow: hidden; position: relative; height: 100%; }
+  .winner-ticker .items { display: inline-flex; white-space: nowrap; position: absolute; left: 100%; top: 0; height: 100%; align-items: center; animation: tickerScroll 30s linear infinite; }
+  .winner-ticker .item { display: inline-flex; align-items: center; gap: 6px; margin-right: 48px; font-size: 13px; color: #7c2d12; }
+  .winner-ticker .item span { color: #ff6b35; font-weight: 700; }
+  @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+  .winner-ticker:empty, .winner-ticker.no-wins { display: none; }
   .records { margin-top: 16px; }
   .record-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
   .record-item:last-child { border-bottom: none; }
@@ -54,6 +62,10 @@
     <h1>🎁 投票抽奖</h1>
     <a href="index.html">← 返回竞赛大厅</a>
   </div>
+  <div class="winner-ticker" id="winnerTicker" style="display:none;">
+    <div class="label">🎉 最新中奖</div>
+    <div class="track"><div class="items" id="winnerItems"></div></div>
+  </div>
   <div class="wrap">
     <div id="root"><div class="loading">加载中…</div></div>
   </div>
@@ -74,6 +86,7 @@ const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决�
 
 let drawData = null;
 let currentStageTab = '';
+let recentWins = [];
 
 async function api(url, options) {
   options = options || {};
@@ -239,6 +252,28 @@ function closeModal() {
   document.getElementById('resultModal').style.display = 'none';
 }
 
+function renderWinnerTicker() {
+  const ticker = document.getElementById('winnerTicker');
+  const itemsEl = document.getElementById('winnerItems');
+  if (!ticker || !itemsEl) return;
+  if (!recentWins || recentWins.length === 0) {
+    ticker.style.display = 'none';
+    return;
+  }
+  // 复制一份实现无缝滚动
+  const list = [...recentWins, ...recentWins];
+  itemsEl.innerHTML = list.map(w => `<div class="item">恭喜 <span>${ESC(w.userName)}</span> 抽中 <span>${ESC(w.prizeName)}</span> · ${ESC(w.stageLabel || STAGE_LABELS[w.stage] || w.stage || '')}</div>`).join('');
+  ticker.style.display = 'flex';
+}
+
+async function loadWinnerTicker() {
+  try {
+    const data = await api('/api/draw/recent-wins?limit=20');
+    recentWins = data.wins || [];
+    renderWinnerTicker();
+  } catch(e) { console.error('loadWinnerTicker error:', e); }
+}
+
 async function load() {
   const authed = await checkAuth();
   const root = document.getElementById('root');
@@ -249,6 +284,7 @@ async function load() {
   try {
     drawData = await api('/api/draw/status');
     render();
+    loadWinnerTicker();
   } catch(e) {
     root.innerHTML = '<div class="empty"><div class="big">⚠️</div><div>加载失败：' + ESC(e.message) + '</div></div>';
   }
