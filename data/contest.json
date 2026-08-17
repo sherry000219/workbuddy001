@@ -15235,6 +15235,20 @@
       "trackLabel": "创意应用",
       "revoked": false,
       "createdAt": "2026-08-17T07:34:42.480Z"
+    },
+    {
+      "id": "bet_mswx6gfx_w2222x",
+      "voterId": "7kW8MgaAq8j6fsPZ9RvXvwiEiE",
+      "voterName": "李亚飞",
+      "voterMobile": "18236078289",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM52SjLrG42HNBADNBACw3UK8-a50wwUJ3-hU5uOYAQ_1024_1024.jpg",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-17T07:36:01.725Z"
     }
   ],
   "drawRecords": [
