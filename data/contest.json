@@ -11770,6 +11770,13 @@
           "stock": 8,
           "total": 8,
           "createdAt": "2026-08-17T02:29:34.276Z"
+        },
+        {
+          "id": "prize_mswma5n7_sppd4t",
+          "name": "云社区1000积分",
+          "stock": 2,
+          "total": 2,
+          "createdAt": "2026-08-17T02:30:58.579Z"
         }
       ],
       "semi_final": [
