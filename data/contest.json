@@ -11303,6 +11303,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQLPM4qUZCE4ETvNASzNASyw14eMG8YXSSgI7i8KW_BwAA_300_300.png",
       "stage": "semi_final",
       "createdAt": "2026-08-17T07:10:27.301Z"
+    },
+    {
+      "entryId": "entry_1786295169144_ilkpwc",
+      "voterId": "Pd8dzTupB38uQcHvkUTdNAiEiE",
+      "voterName": "杨绵绵",
+      "voterMobile": "18068393979",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM50KIDFj8MfNAbDNAbCwDKOddTGCTIoHu2wMIXXSAA_432_432.jpg",
+      "stage": "semi_final",
+      "createdAt": "2026-08-17T07:10:31.131Z"
     }
   ],
   "judgeScores": [
@@ -13795,6 +13804,20 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-17T07:09:47.879Z"
+    },
+    {
+      "id": "bet_msww9nmk_c481p5",
+      "voterId": "Ov1QiSgb4iSBiisWBQhciPQMfAiEiE",
+      "voterName": "王中浩",
+      "voterMobile": "15365011352",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5u5nMQIeFvNAnPNAnOw069zTAANZ_wKOz7HHiV5AA_627_627.jpg",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-17T07:10:31.388Z"
     }
   ],
   "drawRecords": [
