@@ -11823,6 +11823,19 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "createdAt": "2026-08-17T03:45:21.100Z"
+    },
+    {
+      "id": "bet_mswozitv_zdfssd",
+      "voterId": "UiSE3MEYziSI2xf9RD0xJyawiEiE",
+      "voterName": "朱梦瑶",
+      "voterMobile": "15000939186",
+      "voterAvatar": "",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "createdAt": "2026-08-17T03:46:41.299Z"
     }
   ],
   "drawRecords": [
