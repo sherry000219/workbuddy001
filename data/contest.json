@@ -11777,7 +11777,18 @@
       "createdAt": "2026-08-17T03:41:22.950Z"
     }
   ],
-  "drawRecords": [],
+  "drawRecords": [
+    {
+      "id": "dr_mswow6mk_am5k6p",
+      "userId": "BB11VFswiSzRQHntbiinVhRQiEiE",
+      "userName": "赵冰艳",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T03:44:05.516Z"
+    }
+  ],
   "settings": {
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
