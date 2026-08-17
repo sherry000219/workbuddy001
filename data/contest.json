@@ -11988,7 +11988,21 @@
       "updatedAt": "2026-08-14T03:00:30.452Z"
     }
   ],
-  "bets": [],
+  "bets": [
+    {
+      "id": "bet_mswsxgq5_ob91b8",
+      "voterId": "xNAVC2kwyEciSCCT8iPOxxygiEiE",
+      "voterName": "周紫怡",
+      "voterMobile": "18800359635",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM59lHuVmgEPNBJzNBJuwb2UXKS2_JsgI5phCqoHUAA_1179_1180.jpg",
+      "entryId": "entry_1786295169144_ilkpwc",
+      "entryTitle": "岗位校准Agent：让招聘从经验判断，走向标准化人才定义",
+      "entryDept": "职能中台",
+      "track": "creative",
+      "trackLabel": "创意应用",
+      "createdAt": "2026-08-17T05:37:03.725Z"
+    }
+  ],
   "drawRecords": [
     {
       "id": "dr_mswss18y_agxhe5",
