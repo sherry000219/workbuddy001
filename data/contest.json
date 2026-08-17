@@ -15810,6 +15810,20 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-17T07:55:24.467Z"
+    },
+    {
+      "id": "bet_mswxvudu_mxlp5z",
+      "voterId": "wI3D9z9WRLqrNgIiSVDjY9giEiE",
+      "voterName": "陈晨",
+      "voterMobile": "18772367621",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4c50-qseOPNBE7NBE6we42oE3O_ywoJJ7Si0kouAA_1102_1102.jpg",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-17T07:55:46.194Z"
     }
   ],
   "drawRecords": [
@@ -20152,6 +20166,26 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:55:43.845Z"
+    },
+    {
+      "id": "dr_mswxvugc_q3i5ag",
+      "userId": "a9Cv0koTRlgIHKdAZmGWBwiEiE",
+      "userName": "曹博岩",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:55:46.284Z"
+    },
+    {
+      "id": "dr_mswxvw1p_bs8hcb",
+      "userId": "a9Cv0koTRlgIHKdAZmGWBwiEiE",
+      "userName": "曹博岩",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:55:48.349Z"
     }
   ],
   "settings": {
