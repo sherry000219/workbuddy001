@@ -11222,6 +11222,15 @@
       "voterAvatar": "https://static-legacy.dingtalk.com/media/lQLPD4WBEtagVWfM_sz-sFU4MTngTMXSCRIiVj50QAA_254_254.png",
       "stage": "semi_final",
       "createdAt": "2026-08-17T07:09:38.646Z"
+    },
+    {
+      "entryId": "entry_1785751983953_jddr0p",
+      "voterId": "iPLHMYjXdbNiPyGgvgXVpDDwiEiE",
+      "voterName": "宇露",
+      "voterMobile": "18651907742",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD2vAJZzpHSvNBJ3NBJuwhMRgIVHDINMGlP7xCwttAA_1179_1181.jpg",
+      "stage": "semi_final",
+      "createdAt": "2026-08-17T07:09:52.041Z"
     }
   ],
   "judgeScores": [
@@ -14726,6 +14735,46 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:09:51.405Z"
+    },
+    {
+      "id": "dr_msww8t17_befdcm",
+      "userId": "rbxxSgDhwpU4jLmIKAgBNAiEiE",
+      "userName": "刘学伟",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:09:51.739Z"
+    },
+    {
+      "id": "dr_msww8t9r_ug53c3",
+      "userId": "dgM7l9zZmiicq7C1qbyiif7wiEiE",
+      "userName": "杨靖",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:09:52.047Z"
+    },
+    {
+      "id": "dr_msww8ttw_kxv5xq",
+      "userId": "MS81ptUB0RT1A7nMzMii3DQiEiE",
+      "userName": "孙高涵",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:09:52.772Z"
+    },
+    {
+      "id": "dr_msww8u57_n160s7",
+      "userId": "mSdjSSP3EJ20wvfVzkiSvIgiEiE",
+      "userName": "陈龙海",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:09:53.179Z"
     }
   ],
   "settings": {
