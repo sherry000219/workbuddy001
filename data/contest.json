@@ -13426,6 +13426,16 @@
       "prizeName": "云社区10积分",
       "isWin": true,
       "drawnAt": "2026-08-17T06:23:56.399Z"
+    },
+    {
+      "id": "dr_mswult5g_bmeyqc",
+      "userId": "YpoScCGC6sWsWBQhciPQMfAiEiE",
+      "userName": "屈倬坤",
+      "stage": "preliminary",
+      "prizeId": "prize_mswma5n7_sppd4t",
+      "prizeName": "云社区1000积分",
+      "isWin": true,
+      "drawnAt": "2026-08-17T06:23:59.188Z"
     }
   ],
   "settings": {
@@ -13528,7 +13538,7 @@
         {
           "id": "prize_mswma5n7_sppd4t",
           "name": "云社区1000积分",
-          "stock": 10,
+          "stock": 9,
           "total": 2,
           "createdAt": "2026-08-17T02:30:58.579Z"
         },
