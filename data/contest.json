@@ -14343,6 +14343,36 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-17T07:08:53.637Z"
+    },
+    {
+      "id": "dr_msww7kfq_yoz0qm",
+      "userId": "BB11VFswiSzRQHntbiinVhRQiEiE",
+      "userName": "赵冰艳",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:08:53.942Z"
+    },
+    {
+      "id": "dr_msww7kjn_uf6l2x",
+      "userId": "Qdz2NEljqT6yGgvgXVpDDwiEiE",
+      "userName": "王燕",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-17T07:08:54.083Z"
+    },
+    {
+      "id": "dr_msww7lav_sk4cc2",
+      "userId": "AjxDiSxACbTkshBqyrnMKiPgiEiE",
+      "userName": "仲旭",
+      "stage": "preliminary",
+      "prizeId": "prize_mswm7chf_3tibc5",
+      "prizeName": "云社区10积分",
+      "isWin": true,
+      "drawnAt": "2026-08-17T07:08:55.063Z"
     }
   ],
   "settings": {
@@ -14424,7 +14454,7 @@
         {
           "id": "prize_mswm7chf_3tibc5",
           "name": "云社区10积分",
-          "stock": 37,
+          "stock": 36,
           "total": 20,
           "createdAt": "2026-08-17T02:28:47.475Z"
         },
