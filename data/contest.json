@@ -18425,6 +18425,20 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-18T06:16:23.980Z"
+    },
+    {
+      "id": "bet_msy9sn8h_97pfke",
+      "voterId": "mhGadEgjhamxf9RD0xJyawiEiE",
+      "voterName": "孙敬",
+      "voterMobile": "18940861680",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD2_MD7Jlh4XNAkTNAkywKuezOsKW2V8J2G1AsuDMAA_588_580.jpg",
+      "entryId": "entry_1786287685562_ypa37h",
+      "entryTitle": "《财税宫斗局》",
+      "entryDept": "福鹿事业部",
+      "track": "creative",
+      "trackLabel": "创意应用",
+      "revoked": false,
+      "createdAt": "2026-08-18T06:16:58.529Z"
     }
   ],
   "drawRecords": [
