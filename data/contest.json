@@ -14417,6 +14417,15 @@
       "voterAvatar": "",
       "stage": "semi_final",
       "createdAt": "2026-08-18T02:35:32.781Z"
+    },
+    {
+      "entryId": "entry_1785834273411_1fek2r",
+      "voterId": "gnxNWbHhMYWFUrWP6VnNPwiEiE",
+      "voterName": "小红豆",
+      "voterMobile": "15298392042",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPDhuywtUNW0bNA5vNA5uwYsS1W-E1I1cC9Y4pR0D-AA_923_923.jpg",
+      "stage": "semi_final",
+      "createdAt": "2026-08-18T02:35:51.981Z"
     }
   ],
   "judgeScores": [
