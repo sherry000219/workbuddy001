@@ -19032,6 +19032,20 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-18T07:28:40.953Z"
+    },
+    {
+      "id": "bet_msyde8zq_rbvaw5",
+      "voterId": "CV0VNQctjkpBQ32FiilaP3AiEiE",
+      "voterName": "汪玢儿（bin）",
+      "voterMobile": "15256989830",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPM5HioJpNyLHNArLNArI_690_690.jpg",
+      "entryId": "entry_1785124018451_kk1g17",
+      "entryTitle": "服务质检CT",
+      "entryDept": "中小微事业群",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-18T07:57:45.350Z"
     }
   ],
   "drawRecords": [
