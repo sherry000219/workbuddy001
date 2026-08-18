@@ -17093,6 +17093,20 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-17T10:55:50.819Z"
+    },
+    {
+      "id": "bet_msxzjwwp_y3zteu",
+      "voterId": "cVHCpDYoKoOxf9RD0xJyawiEiE",
+      "voterName": "张训豪",
+      "voterMobile": "13353431870",
+      "voterAvatar": "",
+      "entryId": "entry_1784284342845_dzvql7",
+      "entryTitle": "ClipQueue批量粘贴工具",
+      "entryDept": "中小微事业群",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-18T01:30:15.001Z"
     }
   ],
   "drawRecords": [
