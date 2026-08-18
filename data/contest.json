@@ -17256,6 +17256,20 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-18T01:51:20.347Z"
+    },
+    {
+      "id": "bet_msy0b2vg_7gsd1t",
+      "voterId": "Qmzdd3iSrv0gq7C1qbyiif7wiEiE",
+      "voterName": "李清新",
+      "voterMobile": "17621626165",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDgtY1jDzpc7NAbnNAcU_453_441.jpg",
+      "entryId": "entry_1785909222508_t01wgt",
+      "entryTitle": "四川分公司 WorkBuddy 实战应用",
+      "entryDept": "中小微事业群",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-18T01:51:22.444Z"
     }
   ],
   "drawRecords": [
