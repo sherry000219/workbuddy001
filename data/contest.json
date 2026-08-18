@@ -22931,6 +22931,16 @@
       "prizeName": "云社区10积分",
       "isWin": true,
       "drawnAt": "2026-08-18T01:59:31.091Z"
+    },
+    {
+      "id": "dr_msy0mrrc_t0btz3",
+      "userId": "dqlP6iiqKPMSsWBQhciPQMfAiEiE",
+      "userName": "邓家伟",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-18T02:00:27.912Z"
     }
   ],
   "settings": {
