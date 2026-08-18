@@ -17770,6 +17770,20 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-18T02:01:30.509Z"
+    },
+    {
+      "id": "bet_msy0onkw_fiumna",
+      "voterId": "Zq00ufoJ3bWxf9RD0xJyawiEiE",
+      "voterName": "狄青",
+      "voterMobile": "13951949850",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3xEYxh6OFnNBIjNBIiwsvR9WlwhjPYIcPuEgZ2KAA_1160_1160.jpg",
+      "entryId": "entry_1785834273411_1fek2r",
+      "entryTitle": "数科中心业务工作台",
+      "entryDept": "数科中心",
+      "track": "business",
+      "trackLabel": "业务赋能",
+      "revoked": false,
+      "createdAt": "2026-08-18T02:01:55.808Z"
     }
   ],
   "drawRecords": [
