@@ -15383,6 +15383,15 @@
       "voterAvatar": "",
       "stage": "semi_final",
       "createdAt": "2026-08-19T01:49:48.933Z"
+    },
+    {
+      "entryId": "entry_1785325566960_99axb6",
+      "voterId": "W6eiiggJk1uAq7C1qbyiif7wiEiE",
+      "voterName": "Robin",
+      "voterMobile": "13720029802",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPD4d8tLsqhbjNAvDNAu4_750_752.jpg",
+      "stage": "semi_final",
+      "createdAt": "2026-08-19T02:03:49.856Z"
     }
   ],
   "judgeScores": [
