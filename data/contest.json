@@ -20859,6 +20859,20 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-19T07:41:52.705Z"
+    },
+    {
+      "id": "bet_mt0vbjf4_a0sg53",
+      "voterId": "p2Vs0OTOF4FBQ32FiilaP3AiEiE",
+      "voterName": "时海龙",
+      "voterMobile": "15035122496",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDhYBVUMOGYLNAbDNAbA_432_432.jpg",
+      "entryId": "entry_1784284342845_dzvql7",
+      "entryTitle": "ClipQueue批量粘贴工具",
+      "entryDept": "中小微事业群",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-20T01:55:04.336Z"
     }
   ],
   "drawRecords": [
