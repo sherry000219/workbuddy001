@@ -26968,6 +26968,16 @@
       "prizeName": "云社区10积分",
       "isWin": true,
       "drawnAt": "2026-08-21T05:45:11.255Z"
+    },
+    {
+      "id": "dr_mt2j3xmk_ncw7ms",
+      "userId": "YxHf7OoFAiPj6fsPZ9RvXvwiEiE",
+      "userName": "郑超",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-21T05:48:46.460Z"
     }
   ],
   "settings": {
