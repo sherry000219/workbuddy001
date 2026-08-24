@@ -22319,6 +22319,20 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-24T10:06:22.076Z"
+    },
+    {
+      "id": "bet_mt73xf2j_yvpn5c",
+      "voterId": "ZyEdWaiPaCLIqj75CLE5iPiPQiEiE",
+      "voterName": "浙沪任静",
+      "voterMobile": "13120723826",
+      "voterAvatar": "",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-24T10:42:39.115Z"
     }
   ],
   "drawRecords": [
