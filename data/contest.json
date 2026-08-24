@@ -21648,6 +21648,20 @@
       "trackLabel": "创意应用",
       "revoked": false,
       "createdAt": "2026-08-24T02:45:51.454Z"
+    },
+    {
+      "id": "bet_mt6n4dv2_8jhdnb",
+      "voterId": "3giShu1z7sVe0wvfVzkiSvIgiEiE",
+      "voterName": "杨慧敏",
+      "voterMobile": "15847143039",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPD1W_yk6rA8LNAufNAuc_743_743.png",
+      "entryId": "entry_1786418743612_h5sx2m",
+      "entryTitle": "合同风险智能预警平台：风险先知，提前预警合同到期与风险，实现用工管理提效。",
+      "entryDept": "职能中台",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-24T02:52:10.670Z"
     }
   ],
   "drawRecords": [
