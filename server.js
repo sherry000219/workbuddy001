@@ -204,7 +204,7 @@ function loadDB() {
       if (!s.stage) s.stage = 'preliminary';
     });
     // 押宝记录保留完整历史（含撤销），用于统计撤销次数；由 getActiveBet 取当前有效押宝
-    merged.bets = (merged.bets || []).map(b => ({ ...b, revoked: !!b.revoked })).filter(b => b.voterId && b.id);
+    merged.bets = (merged.bets || []).map(b => ({ ...b, stage: b.stage || 'semi_final', revoked: !!b.revoked })).filter(b => b.voterId && b.id);
     // 迁移：旧版 judges 是全局数组，新版改为按赛段 judgesByStage
     if (!merged.settings.judgesByStage) {
       const oldJudges = merged.settings.judges || [];
@@ -410,22 +410,22 @@ function getCompositeScore(entryId, stage) {
   if (stage === 'final' || stage === 'awarded') {
     currentComposite = avgScore; // 100% judge score, no voting
   } else {
-    // For preliminary and semi_final: 80% judge + 20% votes
+    // For preliminary and semi_final: 80% judge + 20% votes（保留 2 位小数）
     const votable = getVotableEntries(stage);
     const allVoteCounts = votable.map(e => getEntryStageScores(e.id, stage).voteCount);
     const maxVotes = Math.max(1, ...allVoteCounts, voteCount);
-    const voteScore = Math.round((voteCount / maxVotes) * 100);
-    currentComposite = Math.round(avgScore * 0.8 + voteScore * 0.2);
+    const voteScore = (voteCount / maxVotes) * 100;
+    currentComposite = Math.round((avgScore * 0.8 + voteScore * 0.2) * 100) / 100;
   }
 
-  // 赛段晋级时，上一赛段综合分按 40% 权重继承到本赛段（当前赛段 60%）
+  // 赛段晋级时，上一赛段综合分按 40% 权重继承到本赛段（当前赛段 60%），保留 2 位小数
   if (stage === 'semi_final') {
     const prevComposite = getCompositeScore(entryId, 'preliminary');
-    return Math.round(prevComposite * 0.4 + currentComposite * 0.6);
+    return Math.round((prevComposite * 0.4 + currentComposite * 0.6) * 100) / 100;
   }
   if (stage === 'final' || stage === 'awarded') {
     const prevComposite = getCompositeScore(entryId, 'semi_final');
-    return Math.round(prevComposite * 0.4 + currentComposite * 0.6);
+    return Math.round((prevComposite * 0.4 + currentComposite * 0.6) * 100) / 100;
   }
   return currentComposite;
 }
@@ -1181,28 +1181,43 @@ function getEntryBetTrack(entry) {
   return entry.track || 'efficiency';
 }
 
+// 押宝开放赛段：复赛押宝、决赛押宝都可开（投票仅在初赛/复赛，押宝可延伸到决赛）
+const BETTING_STAGES = ['semi_final', 'final'];
 function isBettingOpen() {
-  // 押宝仅在复赛阶段开放，决赛不再开放投票/押宝
-  return getCurrentStage() === 'semi_final';
+  return BETTING_STAGES.includes(getCurrentStage());
+}
+function getBettingStage() {
+  return isBettingOpen() ? getCurrentStage() : null;
 }
 
-// 当前有效押宝（未撤销）
-function getActiveBet(userId) {
-  return db.bets.find(b => b.voterId === userId && !b.revoked) || null;
+// 当前有效押宝（未撤销，限定赛段）
+function getActiveBet(userId, stage) {
+  const s = stage || getBettingStage();
+  return db.bets.find(b => b.voterId === userId && !b.revoked && (b.stage || 'semi_final') === s) || null;
 }
 
-// 用户历史撤销次数
-function getRevokeCount(userId) {
-  return db.bets.filter(b => b.voterId === userId && b.revoked).length;
+// 用户历史撤销次数（限定赛段）
+function getRevokeCount(userId, stage) {
+  const s = stage || getBettingStage();
+  return db.bets.filter(b => b.voterId === userId && b.revoked && (b.stage || 'semi_final') === s).length;
 }
 
 // 是否还能撤销（仅允许撤销 1 次）
-function canRevokeBet(userId) {
-  return isBettingOpen() && !!getActiveBet(userId) && getRevokeCount(userId) < 1;
+function canRevokeBet(userId, stage) {
+  return isBettingOpen() && !!getActiveBet(userId, stage) && getRevokeCount(userId, stage) < 1;
+}
+
+// 用户在某赛段的历史押宝（不论是否撤销）
+function getStageBets(userId, stage) {
+  return db.bets.filter(b => b.voterId === userId && (b.stage || 'semi_final') === stage);
 }
 
 function getBettableEntries() {
-  // 复赛阶段可押宝：所有晋级复赛的作品
+  // 决赛阶段押宝：仅决赛作品（finalist/awarded）；复赛阶段：所有复赛作品
+  const cur = getCurrentStage();
+  if (cur === 'final' || cur === 'awarded') {
+    return db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
+  }
   return db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
 }
 
@@ -1211,10 +1226,11 @@ app.post('/api/bet/:entryId', requireAuth, (req, res) => {
   if (!isBettingOpen()) {
     return res.status(400).json({ error: '当前赛段未开放押宝' });
   }
+  const stage = getBettingStage();
   const userId = req.ddUser.openId;
-  const existing = getActiveBet(userId);
+  const existing = getActiveBet(userId, stage);
   if (existing) {
-    return res.status(400).json({ error: '每人仅限押宝 1 个作品，您已押宝「' + existing.entryTitle + '」' });
+    return res.status(400).json({ error: '每人每赛段仅限押宝 1 个作品，您已押宝「' + existing.entryTitle + '」' });
   }
   const entry = getBettableEntries().find(e => e.id === req.params.entryId);
   if (!entry) return res.status(404).json({ error: '该作品不可押宝' });
@@ -1225,6 +1241,7 @@ app.post('/api/bet/:entryId', requireAuth, (req, res) => {
     voterName: req.ddUser.nick,
     voterMobile: req.ddUser.mobile || '',
     voterAvatar: req.ddUser.avatarUrl || '',
+    stage,
     entryId: entry.id,
     entryTitle: entry.title,
     entryDept: entry.dept1 || entry.dept || '',
@@ -1239,18 +1256,19 @@ app.post('/api/bet/:entryId', requireAuth, (req, res) => {
   res.json({ success: true, bet });
 });
 
-// POST /api/bet/revoke — 撤销当前押宝（每人限 1 次）
+// POST /api/bet/revoke — 撤销当前押宝（每人每赛段限 1 次）
 app.post('/api/bet/revoke', requireAuth, (req, res) => {
   if (!isBettingOpen()) {
     return res.status(400).json({ error: '当前赛段未开放押宝，无法撤销' });
   }
+  const stage = getBettingStage();
   const userId = req.ddUser.openId;
-  const activeBet = getActiveBet(userId);
+  const activeBet = getActiveBet(userId, stage);
   if (!activeBet) {
     return res.status(400).json({ error: '您当前没有押宝记录' });
   }
-  if (getRevokeCount(userId) >= 1) {
-    return res.status(400).json({ error: '每人仅限撤销 1 次押宝' });
+  if (getRevokeCount(userId, stage) >= 1) {
+    return res.status(400).json({ error: '每人每赛段仅限撤销 1 次押宝' });
   }
   activeBet.revoked = true;
   activeBet.revokedAt = new Date().toISOString();
@@ -1259,23 +1277,31 @@ app.post('/api/bet/revoke', requireAuth, (req, res) => {
   res.json({ success: true, message: '已撤销押宝，可重新选择 1 个作品' });
 });
 
-// GET /api/my-bet — 当前用户押宝记录
+// GET /api/my-bet — 当前用户押宝记录（含跨赛段历史）
 app.get('/api/my-bet', requireAuth, (req, res) => {
   const userId = req.ddUser.openId;
-  const bet = getActiveBet(userId);
+  const currentStage = getBettingStage();
+  const bet = currentStage ? getActiveBet(userId, currentStage) : null;
+  // 跨赛段历史：用户的所有押宝（含撤销、含复赛和决赛）
+  const allBets = getStageBets(userId, 'semi_final')
+    .concat(getStageBets(userId, 'final'))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   res.json({
     bet,
     isBettingOpen: isBettingOpen(),
     currentStage: getCurrentStage(),
-    canRevoke: canRevokeBet(userId),
-    hasRevoked: getRevokeCount(userId) >= 1
+    bettingStage: currentStage,
+    canRevoke: canRevokeBet(userId, currentStage),
+    hasRevoked: currentStage ? getRevokeCount(userId, currentStage) >= 1 : false,
+    history: allBets
   });
 });
 
 // GET /api/bets/summary — 押宝统计（公开）
 app.get('/api/bets/summary', (req, res) => {
+  const stage = getBettingStage();
   const bettable = getBettableEntries();
-  const activeBets = db.bets.filter(b => !b.revoked);
+  const activeBets = db.bets.filter(b => !b.revoked && (b.stage || 'semi_final') === stage);
   const summary = bettable.map(e => {
     const track = getEntryBetTrack(e);
     const count = activeBets.filter(b => b.entryId === e.id).length;
@@ -1289,7 +1315,7 @@ app.get('/api/bets/summary', (req, res) => {
     };
   }).filter(s => s.betCount > 0).sort((a, b) => b.betCount - a.betCount);
   const totalBettors = new Set(activeBets.map(b => b.voterId)).size;
-  res.json({ summary, totalBettors, isBettingOpen: isBettingOpen(), currentStage: getCurrentStage() });
+  res.json({ summary, totalBettors, isBettingOpen: isBettingOpen(), currentStage: getCurrentStage(), bettingStage: stage });
 });
 
 // ========== API: JUDGE ==========
@@ -1397,19 +1423,21 @@ app.get('/api/ranking', requireAuth, (req, res) => {
       const composite = getCompositeScore(e.id, targetStage);
       return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, judgeAvg: sd.avgScore, composite };
     });
-    const typeMap = computePromotePlan(annotated);
     // 晋级标注只对实际已晋级的作品生效（管理后台勾选了才显示）：
     // 已晋级 ∧ 算法直晋级 → direct；已晋级 ∧ 其余 → dept；未晋级 → none
     const advancedStatus = targetStage === 'semi_final'
       ? ['semi_finalist', 'finalist', 'awarded']
       : (targetStage === 'final' || targetStage === 'awarded') ? ['finalist', 'awarded'] : [];
+    // 晋级算法只基于已晋级作品计算（避免 eliminated_final 抢占前 10 名位置）
+    const eligible = annotated.filter(e => advancedStatus.includes(e.roundStatus || 'approved'));
+    const typeMap = computePromotePlan(eligible);
     return annotated.map(e => {
       const t = typeMap.get(e.id) || {};
       let pt = 'none';
       if (advancedStatus.includes(e.roundStatus || 'approved')) {
         pt = t.promoteType === 'direct' ? 'direct' : 'dept';
       }
-      return { ...e, promoteType: pt, promoteDept: t.promoteDept };
+      return { ...e, promoteType: pt, promoteDept: deptKeyOf(e) };
     }).sort((a, b) => (b.composite || 0) - (a.composite || 0)).slice(0, 30);
   };
   const individual = enrich(entries.filter(e => e.entryType !== 'team'));
@@ -1425,7 +1453,8 @@ app.get('/api/stats', requireAuth, (req, res) => {
   const stageVotes = db.votes.filter(v => (v.stage || 'preliminary') === stage).length;
   const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
   const judgeCount = new Set(stageScores.map(s => s.judgeName)).size;
-  const semiFinalists = db.entries.filter(e => e.roundStatus === 'semi_finalist').length;
+  // 复赛晋级总数：包含已进入决赛/已获奖的（这些之前都曾晋级过复赛）
+  const semiFinalists = db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded').length;
   const finalists = db.entries.filter(e => e.roundStatus === 'finalist').length;
   const awarded = db.entries.filter(e => e.award).length;
   const deptCounts = {};
@@ -1450,7 +1479,7 @@ app.get('/api/export/csv', verifyAdminToken, (req, res) => {
     db.entries.forEach(e => {
       const sd = getEntryStageScores(e.id, stage);
       const voteScore = Math.round((sd.voteCount / maxVotes) * 100);
-      const composite = (stage === 'final' || stage === 'awarded') ? sd.avgScore : Math.round(sd.avgScore * 0.8 + voteScore * 0.2);
+      const composite = (stage === 'final' || stage === 'awarded') ? sd.avgScore : Math.round((sd.avgScore * 0.8 + voteScore * 0.2) * 100) / 100;
       const roundLabel = { approved: '初赛', semi_finalist: '复赛晋级', eliminated_semi: '复赛淘汰', finalist: '决赛晋级', eliminated_final: '决赛淘汰', awarded: '已获奖' }[e.roundStatus] || '初赛';
       const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
       csv += `${esc(e.id)},${esc(e.status === 'approved' ? '已收录' : '待审核')},${esc(roundLabel)},${esc(e.name)},${esc(e.dept)},${esc(e.subdep)},${esc(trackLabel[e.track] || e.track)},${esc(e.title)},${esc(e.scene)},${esc(e.process_text)},${esc(e.process_link || '')},${esc(e.result_text)},${esc(e.result_link || '')},${esc(e.extra)},${esc(e.posterUrl || '')},${esc(e.docUrl || '')},${esc(e.createdAt)},${sd.voteCount},${sd.avgScore},${composite}\n`;
@@ -2019,8 +2048,8 @@ app.post('/api/auth/dd-code', async (req, res) => {
     const stage = getCurrentStage();
     const voteCount = getUserStageVoteCount(userInfo.openId, stage);
     const ddCodeLimit = getVoteLimit(stage);
-    const myBet = getActiveBet(userInfo.openId);
-    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, mobile: userInfo.mobile, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, ddCodeLimit - voteCount), totalVotes: ddCodeLimit, currentStage: stage, myBet, isBettingOpen: isBettingOpen() });
+    const myBet = getActiveBet(userInfo.openId, getBettingStage());
+    res.json({ success: true, user: { nick: userInfo.nick, openId: userInfo.openId, mobile: userInfo.mobile, avatarUrl: userInfo.avatarUrl }, remainingVotes: Math.max(0, ddCodeLimit - voteCount), totalVotes: ddCodeLimit, currentStage: stage, bettingStage: getBettingStage(), myBet, isBettingOpen: isBettingOpen() });
   } catch (e) {
     console.error('DingTalk auth error:', e.message);
     res.status(400).json({ error: e.message || '钉钉授权失败' });
@@ -2398,7 +2427,7 @@ app.post('/api/admin/restore-stage', verifyAdminToken, (req, res) => {
   db.settings.currentStage = 'semi_final';
   saveDB();
   ghPush().catch(e => console.error('[restore-stage] GitHub push failed:', e.message));
-  res.json({ success: true, currentStage: db.settings.currentStage, restored, semiFinalists: db.entries.filter(e => e.roundStatus === 'semi_finalist').length });
+  res.json({ success: true, currentStage: db.settings.currentStage, restored, semiFinalists: db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded').length });
 });
 
 // ========== API: ADMIN SETTLE (结算获奖) ==========

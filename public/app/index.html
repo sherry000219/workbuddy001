@@ -194,9 +194,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     </div>
     <h1 class="hero-title">云帐房头号玩家第三季</h1>
     <p class="hero-sub">解决一个真实工作难题，秀出你的 AI 实战力，做云厂头号玩家。</p>
-    <div class="hero-actions">
-      <a href="/app/lucky.html" class="hero-cta" style="background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 8px 28px rgba(245,158,11,0.35);">🎁 投票抽奖</a>
-      <a href="/app/browse.html" class="hero-cta hero-vote">🗳️ 复赛投票</a>
+    <div class="hero-actions" id="heroActions">
+      <a href="/app/lucky.html" class="hero-cta" id="heroCtaLucky" style="background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 8px 28px rgba(245,158,11,0.35);">🎁 投票抽奖</a>
+      <a href="/app/browse.html" class="hero-cta hero-vote" id="heroCtaVote">🗳️ 复赛投票</a>
+      <a href="/app/browse.html#betting" class="hero-cta" id="heroCtaBet" style="display:none;background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 8px 28px rgba(245,158,11,0.35);">🎯 决赛押宝</a>
     </div>
   </div>
   <div class="kb-container">
@@ -493,6 +494,22 @@ function updateStageUI(targetStage) {
   if (hint) {
     hint.textContent = targetStage === currentStage ? '（当前赛段）' : '（历史赛段回顾）';
   }
+  // HERO 区按赛段切换：决赛阶段只显示「🎯 决赛押宝」；其他阶段保留「投票抽奖」+「复赛投票」
+  const heroLucky = document.getElementById('heroCtaLucky');
+  const heroVote = document.getElementById('heroCtaVote');
+  const heroBet = document.getElementById('heroCtaBet');
+  if (heroLucky && heroVote && heroBet) {
+    if (currentStage === 'final' || currentStage === 'awarded') {
+      heroLucky.style.display = 'none';
+      heroVote.style.display = 'none';
+      heroBet.style.display = '';
+      heroBet.textContent = '🎯 决赛押宝';
+    } else {
+      heroLucky.style.display = '';
+      heroVote.style.display = '';
+      heroBet.style.display = 'none';
+    }
+  }
 }
 
 async function checkVotingStatus() {
@@ -664,17 +681,23 @@ function renderRankList(list, containerId) {
     container.innerHTML = '<div class="empty-state" style="padding:40px 20px;"><div class="icon">🏆</div><p>暂无排名数据</p></div>';
     return;
   }
-  function medalOf(i) { return i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : ''; }
-  function rankClassOf(i) { return i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : 'normal'; }
-  function rowHtml(e, idx, typeLabel, typeIcon, hideRank) {
-    const medal = hideRank ? '' : medalOf(idx);
-    const rankClass = hideRank ? '' : rankClassOf(idx);
-    const rankDisplay = hideRank ? '' : (medal || (idx+1));
+  // dense rank 编号：分数相同并列（综合分优先、综合分相同时评委打分次之）
+  function denseRank(entries) {
+    let prevKey = null, rank = 0;
+    entries.forEach(function(e, i) {
+      const c = Number(e.composite || 0), j = Number(e.judgeAvg || 0);
+      const key = c + '|' + j;
+      if (key !== prevKey) { rank = i + 1; prevKey = key; }
+      e._rank = rank;
+    });
+  }
+  function fmtScore(v) { const n = Number(v || 0); return (Math.round(n * 100) / 100).toFixed(2); }
+  function rowHtml(e, typeLabel, typeIcon) {
     const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
     const tBadge = teamBadgeHtml(e);
     const deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
     const typeTag = typeLabel ? '<span style="display:inline-block;background:' + (typeIcon === '🚀' ? 'rgba(255,107,53,0.12)' : 'rgba(124,58,237,0.12)') + ';color:' + (typeIcon === '🚀' ? '#ff6b35' : '#7c3aed') + ';font-size:11px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:4px;">' + typeIcon + ' ' + typeLabel + '</span>' : '';
-    return '<div class="rank-item" onclick="openDetail(\'' + e.id + '\')"><div class="rank-num ' + rankClass + '">' + rankDisplay + '</div><div class="rank-info"><div class="rname">' + typeTag + e.title + ' ' + badge + tBadge + '</div><div class="rdept">' + e.name + ' · ' + deptChain + ' · ' + trackLabel(e.track) + '</div></div><div class="rank-score">' + (e.composite||0) + '</div></div>';
+    return '<div class="rank-item" onclick="openDetail(\'' + e.id + '\')"><div class="rank-num">' + (e._rank || '') + '</div><div class="rank-info"><div class="rname">' + typeTag + e.title + ' ' + badge + tBadge + '</div><div class="rdept">' + e.name + ' · ' + deptChain + ' · ' + trackLabel(e.track) + '</div></div><div class="rank-score">' + fmtScore(e.composite) + '</div></div>';
   }
   function groupHeader(label, count) {
     return '<div style="padding:8px 12px;background:#f3f4f6;border-bottom:1px solid #e5e7eb;font-size:13px;font-weight:700;color:#374151;border-top:1px solid #e5e7eb;">' + label + ' <span style="color:#9ca3af;font-weight:400;">（' + count + ' 个）</span></div>';
@@ -685,22 +708,25 @@ function renderRankList(list, containerId) {
   const rest = list.filter(e => e.promoteType === 'none');
   let html = '';
   if (direct.length > 0) {
+    denseRank(direct);
     html += groupHeader('🚀 直晋级（个人 TOP10 / 团队 TOP3）', direct.length);
-    direct.forEach((e, i) => { html += rowHtml(e, i, '直晋级', '🚀'); });
+    direct.forEach((e) => { html += rowHtml(e, '直晋级', '🚀'); });
   }
   if (dept.length > 0) {
-    // 部门奖内按 promoteDept 子分组
+    // 部门奖内按 promoteDept 子分组，每组内 dense rank
     const byDept = {};
     dept.forEach(e => { (byDept[e.promoteDept] = byDept[e.promoteDept] || []).push(e); });
     html += groupHeader('🏢 部门维度晋级（各部门前 1）', dept.length);
     Object.keys(byDept).sort().forEach(d => {
+      denseRank(byDept[d]);
       html += '<div style="padding:6px 12px;background:#fafafa;border-bottom:1px solid #f3f4f6;font-size:12px;font-weight:600;color:#6b7280;">🏢 ' + (d === '__none__' ? '未填写部门' : d) + '</div>';
-      byDept[d].forEach(e => { html += rowHtml(e, 0, '部门维度晋级', '🏢'); });
+      byDept[d].forEach(e => { html += rowHtml(e, '部门维度晋级', '🏢'); });
     });
   }
   if (rest.length > 0) {
+    denseRank(rest);
     html += groupHeader('📊 其余作品（按综合分排名）', rest.length);
-    rest.forEach((e, i) => { html += rowHtml(e, i, '', '', true); });
+    rest.forEach((e) => { html += rowHtml(e, '', ''); });
   }
   container.innerHTML = html;
 }

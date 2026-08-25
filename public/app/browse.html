@@ -213,6 +213,8 @@ let myBet = null;
 let canRevokeBet = false;
 let hasRevokedBet = false;
 let isBettingOpen = false;
+let bettingStage = null; // 当前可押宝赛段：'semi_final' | 'final' | null
+let betHistory = [];     // 跨赛段历史（含复赛+决赛）
 let votingEnabled = false;
 let currentStage = 'preliminary';
 let isVotingStage = true;
@@ -286,6 +288,8 @@ async function loadMyBet() {
     myBet = data.bet || null;
     canRevokeBet = data.canRevoke || false;
     hasRevokedBet = data.hasRevoked || false;
+    bettingStage = data.bettingStage || null;
+    betHistory = data.history || [];
   } catch(e) { console.error('loadMyBet error:', e); }
 }
 
@@ -325,29 +329,58 @@ function updateVotingUI() {
   if (votingEnabled && isVotingStage) { banner.style.display = 'none'; }
   else if (!isVotingStage) { banner.style.display = 'block'; banner.innerHTML = '📋 当前为<strong>' + STAGE_LABELS[currentStage] + '</strong>阶段，不支持投票'; banner.style.background = 'rgba(37,99,235,0.06)'; banner.style.borderColor = 'rgba(37,99,235,0.15)'; banner.style.color = '#2563eb'; }
   else { banner.style.display = 'block'; banner.innerHTML = '⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道'; banner.style.background = 'rgba(255,215,64,0.08)'; banner.style.borderColor = 'rgba(255,215,64,0.2)'; banner.style.color = '#ffd740'; }
-  if (betBanner) betBanner.style.display = (isBettingOpen && ddAuthed) ? 'block' : 'none';
+  if (betBanner) {
+    betBanner.style.display = (isBettingOpen && ddAuthed) ? 'block' : 'none';
+    if (isBettingOpen && ddAuthed) {
+      const stageName = bettingStage === 'final' ? '决赛' : '复赛';
+      betBanner.innerHTML = '🎯 <strong>' + stageName + '押宝进行中</strong> — 每人每赛段仅限押宝 1 个作品，预测它为某赛道冠军；押宝后可撤销 1 次并重新选择。押中人数越少，获奖概率越大！';
+    }
+  }
   updateMyBetBanner();
 }
+
+function betStageLabel(s) { return s === 'final' ? '决赛' : (s === 'semi_final' ? '复赛' : '押宝'); }
 
 function updateMyBetBanner() {
   const banner = document.getElementById('my-bet-banner');
   if (!banner) return;
-  if (!ddAuthed || !isBettingOpen) { banner.style.display = 'none'; return; }
-  if (myBet) {
-    let html = '🎯 <strong>您已押宝《' + escapeHtml(myBet.entryTitle) + '》</strong>（' + (myBet.trackLabel || '') + '）';
-    if (canRevokeBet) {
-      html += ' <button class="btn btn-sm" style="background:#ef4444;color:#fff;border:none;margin-left:8px;" onclick="revokeBet()">撤销押宝</button>';
+  if (!ddAuthed) { banner.style.display = 'none'; return; }
+  // 复赛押宝历史（决赛阶段始终展示，作为记录）
+  const semiHist = betHistory.filter(b => (b.stage || 'semi_final') === 'semi_final');
+  const finalHist = betHistory.filter(b => b.stage === 'final');
+  let html = '';
+  if (isBettingOpen) {
+    // 当前赛段押宝状态
+    if (myBet) {
+      html += '🎯 <strong>您已' + betStageLabel(bettingStage) + '押宝《' + escapeHtml(myBet.entryTitle) + '》</strong>（' + (myBet.trackLabel || '') + '）';
+      if (canRevokeBet) {
+        html += ' <button class="btn btn-sm" style="background:#ef4444;color:#fff;border:none;margin-left:8px;" onclick="revokeBet()">撤销押宝</button>';
+      } else if (hasRevokedBet) {
+        html += ' <span style="color:#6b7280;margin-left:8px;">（已用掉撤销次数）</span>';
+      }
     } else if (hasRevokedBet) {
-      html += ' <span style="color:#6b7280;margin-left:8px;">（已用掉撤销次数）</span>';
+      html += '💨 <strong>您已撤销' + betStageLabel(bettingStage) + '押宝</strong>，撤销次数已用完';
+    } else {
+      html += '🎯 <strong>您还未' + betStageLabel(bettingStage) + '押宝</strong>，可在下方选择 1 个作品进行押宝';
     }
+  }
+  // 跨赛段历史（重点：复赛押宝在决赛阶段展示）
+  const otherHist = (bettingStage === 'final') ? semiHist : (bettingStage === 'semi_final' ? finalHist : []);
+  if (otherHist.length > 0) {
+    const otherStageName = betStageLabel(bettingStage === 'final' ? 'semi_final' : 'final');
+    html += '<div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(16,185,129,0.3);">';
+    html += '📋 <strong>' + otherStageName + '押宝记录：</strong>';
+    otherHist.forEach(b => {
+      const status = b.revoked ? '<span style="color:#9ca3af;">（已撤销）</span>' : '<span style="color:#059669;">（有效）</span>';
+      html += '<div style="font-size:12px;margin-top:2px;">· 《' + escapeHtml(b.entryTitle) + '》' + status + '</div>';
+    });
+    html += '</div>';
+  }
+  if (html) {
     banner.innerHTML = html;
     banner.style.display = 'block';
-  } else if (hasRevokedBet) {
-    banner.innerHTML = '💨 <strong>您已撤销押宝</strong>，可重新选择 1 个作品押宝（撤销次数已用完）';
-    banner.style.display = 'block';
   } else {
-    banner.innerHTML = '🎯 <strong>您还未押宝</strong>，可在下方选择 1 个晋级复赛的作品进行押宝';
-    banner.style.display = 'block';
+    banner.style.display = 'none';
   }
 }
 
@@ -465,7 +498,7 @@ async function renderGallery() {
       const badge = awardBadge(e.award) || roundBadge(rs);
       const isEliminated = rs === 'eliminated_semi' || rs === 'eliminated_final';
       const canVote = isVotingStage && !isEliminated && rs !== 'awarded' && rs !== 'finalist';
-      const canBet = isBettingOpen && (rs === 'semi_finalist' || rs === 'finalist' || rs === 'awarded');
+      const canBet = isBettingOpen && ((bettingStage === 'final' && (rs === 'finalist' || rs === 'awarded')) || (bettingStage === 'semi_final' && (rs === 'semi_finalist' || rs === 'finalist' || rs === 'awarded')));
       const isMyBet = myBet && myBet.entryId === e.id;
       let voteBtn = '';
       if (isVotingStage && canVote) {
@@ -481,7 +514,7 @@ async function renderGallery() {
             betBtn += ' <button class="btn btn-sm" style="background:#ef4444;color:#fff;border:none;margin-left:4px;" onclick="event.stopPropagation();revokeBet()">撤销</button>';
           }
         } else if (!myBet) {
-          betBtn = '<button class="btn btn-sm" style="background:#f59e0b;color:#fff;border:none;" onclick="event.stopPropagation();placeBet(\'' + e.id + '\')">🎯 押宝</button>';
+          betBtn = '<button class="btn btn-sm" style="background:#f59e0b;color:#fff;border:none;" onclick="event.stopPropagation();placeBet(\'' + e.id + '\')">🎯 ' + (bettingStage === 'final' ? '决赛押宝' : '复赛押宝') + '</button>';
         } else {
           betBtn = '<span style="font-size:12px;color:var(--text-dim);">已押其他作品</span>';
         }
@@ -522,14 +555,14 @@ async function voteEntry(entryId) {
 async function placeBet(entryId) {
   if (!ddAuthed) return showToast('请先通过钉钉登录后再押宝', 'error');
   if (!isBettingOpen) return showToast('当前赛段未开放押宝', 'error');
-  if (myBet) return showToast('您已押宝「' + myBet.entryTitle + '」，每人仅限押宝 1 个作品', 'error');
+  if (myBet) return showToast('您已' + (bettingStage === 'final' ? '决赛' : '复赛') + '押宝「' + myBet.entryTitle + '」，每人每赛段仅限 1 个作品', 'error');
   try {
     const resp = await fetch('/api/bet/' + entryId, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), credentials: 'include' });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || '押宝失败');
     myBet = data.bet;
     canRevokeBet = true;
-    showToast('🎯 押宝成功！您预测「' + myBet.entryTitle + '」为 ' + myBet.trackLabel + ' 冠军', 'success');
+    showToast('🎯 ' + (bettingStage === 'final' ? '决赛' : '复赛') + '押宝成功！您预测「' + myBet.entryTitle + '」为 ' + myBet.trackLabel + ' 冠军', 'success');
     renderGallery();
   } catch(e) { showToast(e.message, 'error'); }
 }
@@ -607,7 +640,7 @@ async function openDetail(entryId) {
           betBtnHtml += ' <button class="btn btn-outline" style="padding:8px 20px;font-size:14px;border-radius:10px;font-weight:700;margin-left:8px;color:#ef4444;border-color:#ef4444;" onclick="revokeBet()">撤销押宝</button>';
         }
       } else if (!myBet) {
-        betBtnHtml = '<button class="btn btn-primary" style="padding:8px 20px;font-size:14px;border-radius:10px;font-weight:700;margin-left:8px;background:#f59e0b;border-color:#f59e0b;" onclick="placeBet(\'' + e.id + '\')">🎯 押宝</button>';
+        betBtnHtml = '<button class="btn btn-primary" style="padding:8px 20px;font-size:14px;border-radius:10px;font-weight:700;margin-left:8px;background:#f59e0b;border-color:#f59e0b;" onclick="placeBet(\'' + e.id + '\')">🎯 ' + (bettingStage === 'final' ? '决赛押宝' : '复赛押宝') + '</button>';
       }
     }
     var extraHtml = '';
@@ -634,7 +667,7 @@ async function openDetail(entryId) {
       }
     }
     var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-    document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + posterHtml + processHtml + resultHtml + extraHtml + docHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span>' + voteBtnHtml + '</div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div>' + (canBetDetail ? '<div style="margin-top:14px;padding:12px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;font-size:13px;color:#92400e;line-height:1.6;">🎯 <strong>决赛押宝</strong>：每人仅限押宝 1 个作品，预测它为某赛道冠军。押中人数越少，获奖概率越大！' + betBtnHtml + '</div>' : '') + '<div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
+    document.getElementById('detailContent').innerHTML = editNoticeHtml + '<h2>' + e.title + ' ' + badge + '</h2><div style="margin-bottom:12px;"><span style="font-size:13px;color:var(--text-dim);">' + e.name + ' · ' + deptChain + ' · ' + new Date(e.createdAt).toLocaleString('zh-CN') + '</span></div>' + sceneHtml + posterHtml + processHtml + resultHtml + extraHtml + docHtml + '<div style="display:flex;align-items:center;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:700;color:#ff6b35;">' + (e.avgScore || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '评委均分</span></div><div><span style="font-size:16px;font-weight:600;">👍 ' + (e.voteCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> ' + stageText + '票</span>' + voteBtnHtml + '</div><div><span style="font-size:16px;font-weight:600;color:#ffd740;">' + (e.judgeCount||0) + '</span><span style="font-size:12px;color:var(--text-dim);"> 位评委打分</span></div><div><span style="font-size:16px;font-weight:700;color:#ff6b35;">' + (e.composite || '-') + '</span><span style="font-size:12px;color:var(--text-dim);"> 综合分</span></div></div>' + (canBetDetail ? '<div style="margin-top:14px;padding:12px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;font-size:13px;color:#92400e;line-height:1.6;">🎯 <strong>' + (bettingStage === 'final' ? '决赛' : '复赛') + '押宝</strong>：每人每赛段仅限 1 个作品，预测它为某赛道冠军。押中人数越少，获奖概率越大！' + betBtnHtml + '</div>' : '') + '<div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeDetail()">关闭</button></div>';
   } catch(e) {
     clearTimeout(detailLoadingTimer);
     const isAuthError = e.message && (e.message.indexOf('登录') !== -1 || e.message.indexOf('请先') !== -1 || e.message.indexOf('unauthorized') !== -1 || e.message.indexOf('Unauthorized') !== -1);
