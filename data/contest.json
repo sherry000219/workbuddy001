@@ -23005,6 +23005,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-25T07:38:11.824Z"
+    },
+    {
+      "id": "bet_mt8cs8xm_777z0k",
+      "voterId": "I884kWX7VmrhuoCrGUaaiPAiEiE",
+      "voterName": "李艋",
+      "voterMobile": "13851721635",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-25T07:38:20.602Z"
     }
   ],
   "drawRecords": [
