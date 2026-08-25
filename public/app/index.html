@@ -691,10 +691,10 @@ function renderRankList(list, containerId) {
     // 部门奖内按 promoteDept 子分组
     const byDept = {};
     dept.forEach(e => { (byDept[e.promoteDept] = byDept[e.promoteDept] || []).push(e); });
-    html += groupHeader('🏢 部门入围（各部门前 1）', dept.length);
+    html += groupHeader('🏢 部门维度晋级（各部门前 1）', dept.length);
     Object.keys(byDept).sort().forEach(d => {
       html += '<div style="padding:6px 12px;background:#fafafa;border-bottom:1px solid #f3f4f6;font-size:12px;font-weight:600;color:#6b7280;">🏢 ' + (d === '__none__' ? '未填写部门' : d) + '</div>';
-      byDept[d].forEach(e => { html += rowHtml(e, 0, '部门奖', '🏢'); });
+      byDept[d].forEach(e => { html += rowHtml(e, 0, '部门维度晋级', '🏢'); });
     });
   }
   if (rest.length > 0) {
