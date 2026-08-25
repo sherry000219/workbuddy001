@@ -22810,6 +22810,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-25T07:27:03.650Z"
+    },
+    {
+      "id": "bet_mt8cdvv9_cpbdcy",
+      "voterId": "N2YIdd8qLf72bEiSyLtOAeQiEiE",
+      "voterName": "少峰",
+      "voterMobile": "13359013429",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDgfLVlL_MYwzMg_50_51.jpg",
+      "stage": "final",
+      "entryId": "entry_1785316018922_s1rkqh",
+      "entryTitle": "最适配销售的CRM：用Workbuddy定制化系统",
+      "entryDept": "中小微事业群",
+      "track": "business",
+      "trackLabel": "业务赋能",
+      "revoked": false,
+      "createdAt": "2026-08-25T07:27:10.485Z"
     }
   ],
   "drawRecords": [
