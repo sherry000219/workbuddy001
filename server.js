@@ -530,13 +530,13 @@ async function ghPull() {
     return;
   }
   if (status >= 400) throw new Error(data.message || `GitHub API error ${status}`);
-  _ghSha = data.sha;
-  // 处理空文件（GitHub 对 size=0 文件返回 encoding: 'none'）：把空对象视作空数据，跳过合并
-  if (data.encoding === 'none' || !data.content) {
-    console.log('[gh] Remote file is empty (encoding: none), treating as empty data');
-    _syncStatus.githubEntries = 0;
-    return;
+  // 空文件（GitHub 对 size=0 文件返回 encoding: 'none'）一律当作拉取失败处理：
+  // 防止「空数据进入内存 + _ghSha 被设置导致推送守卫失效」的连锁覆盖事故。
+  // 启动序列会把这种情况纳入「从未成功拉取」→ 只读模式持续重试，直到拉到真实数据。
+  if (data.encoding === 'none' || !data.content || data.size === 0) {
+    throw new Error('[gh] remote contest.json is EMPTY — treated as pull failure (anti-wipe guard)');
   }
+  _ghSha = data.sha;
   const buf = Buffer.from(data.content, data.encoding || 'base64');
   const remoteData = JSON.parse(buf.toString('utf8'));
   const remoteCount = (remoteData.entries || []).length;
