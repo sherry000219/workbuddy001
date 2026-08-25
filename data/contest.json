@@ -22660,6 +22660,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-25T07:24:28.494Z"
+    },
+    {
+      "id": "bet_mt8cbmtq_4vn8o6",
+      "voterId": "mkiibgHXiip3zhuoCrGUaaiPAiEiE",
+      "voterName": "童伟正",
+      "voterMobile": "19951656133",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDgtYw-Rh7ADNAjDNAjA_560_560.jpg",
+      "stage": "final",
+      "entryId": "entry_1786014745788_j70nld",
+      "entryTitle": "恋爱式哄客销售技巧",
+      "entryDept": "福鹿事业部",
+      "track": "business",
+      "trackLabel": "业务赋能",
+      "revoked": false,
+      "createdAt": "2026-08-25T07:25:25.454Z"
     }
   ],
   "drawRecords": [
