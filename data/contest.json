@@ -28103,7 +28103,7 @@
     "judgePassword": "wb2026",
     "adminPassword": "yzfwb2026",
     "votingEnabled": false,
-    "currentStage": "final",
+    "currentStage": "semi_final",
     "luckyListEnabled": true,
     "drawConfig": {
       "enabled": false,
