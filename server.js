@@ -347,6 +347,62 @@ function getEntryStageScores(entryId, stage) {
   return { scores, voteCount, avgScore, judgeCount: scores.length };
 }
 
+// ========== 统一晋级规则（管理后台勾选面板与排名页共用） ==========
+// 部门归属键：中小微事业群下钻二级部门，其余用一级部门
+function deptKeyOf(e) {
+  const d1 = (e.dept1 || e.dept || '').trim();
+  if (!d1) return '__none__';
+  if (d1.indexOf('中小微') !== -1) {
+    const d2 = (e.dept2 || e.subdept || '').trim();
+    if (d2) return d1 + '/' + d2;
+  }
+  return d1;
+}
+
+// 晋级规则：个人 TOP10 / 团队 TOP3 直晋级；其余各部门（按 deptKeyOf）前 1 部门维度晋级。
+// 去重：个人部门维度——TOP10 中该部门已超过 2 个不录、该部门已有团队作品入围不录；
+//       团队部门维度——TOP3 中已有该部门不录。
+function computePromotePlan(annotated) {
+  const sorted = annotated.slice().sort((a, b) => (b.composite || 0) - (a.composite || 0));
+  const personal = sorted.filter(e => e.entryType !== 'team');
+  const team = sorted.filter(e => e.entryType === 'team');
+  const directP = personal.slice(0, 10);
+  const directT = team.slice(0, 3);
+  const directIds = new Set([...directP, ...directT].map(e => e.id));
+  const pdc = {}; directP.forEach(e => { const d = deptKeyOf(e); pdc[d] = (pdc[d] || 0) + 1; });
+  const tdc = {}; directT.forEach(e => { const d = deptKeyOf(e); tdc[d] = (tdc[d] || 0) + 1; });
+  // 团队部门维度：TOP3 已有该部门则不录
+  const deptT = []; const seenT = new Set();
+  for (const e of team) {
+    if (directIds.has(e.id)) continue;
+    const d = deptKeyOf(e);
+    if (seenT.has(d) || tdc[d]) continue;
+    deptT.push(e); seenT.add(d);
+  }
+  // 已有团队作品入围的部门集合（团队直晋级 ∪ 团队部门维度）
+  const teamAdvancedDepts = new Set([...directT, ...deptT].map(e => deptKeyOf(e)));
+  // 个人部门维度：TOP10 中该部门 >2 个不录；团队已入围该部门不录
+  const deptP = []; const seenP = new Set();
+  for (const e of personal) {
+    if (directIds.has(e.id)) continue;
+    const d = deptKeyOf(e);
+    if (seenP.has(d)) continue;
+    if ((pdc[d] || 0) > 2) continue;
+    if (teamAdvancedDepts.has(d)) continue;
+    deptP.push(e); seenP.add(d);
+  }
+  const deptIds = new Set([...deptP, ...deptT].map(e => e.id));
+  // 标注每个作品
+  const result = new Map();
+  annotated.forEach(e => {
+    let t = 'none';
+    if (directIds.has(e.id)) t = 'direct';
+    else if (deptIds.has(e.id)) t = 'dept';
+    result.set(e.id, { promoteType: t, promoteDept: deptKeyOf(e) });
+  });
+  return result;
+}
+
 // Calculate composite score for an entry in a specific stage
 function getCompositeScore(entryId, stage) {
   const { avgScore, voteCount } = getEntryStageScores(entryId, stage);
@@ -1335,59 +1391,13 @@ app.get('/api/ranking', requireAuth, (req, res) => {
     entries = db.entries.filter(e => e.status === 'approved');
   }
   if (track) entries = entries.filter(e => e.track === track);
-  // 计算晋级类型（个人 TOP10 / 团队 TOP3 直晋级 + 部门奖前 1；中小微下钻二级）
-  function deptKey(e) {
-    const d1 = (e.dept1 || e.dept || '').trim();
-    if (!d1) return '__none__';
-    if (d1.indexOf('中小微') !== -1) {
-      const d2 = (e.dept2 || e.subdept || '').trim();
-      if (d2) return d1 + '/' + d2;
-    }
-    return d1;
-  }
-  function computePromoteTypes(list) {
-    const sorted = list.slice().sort((a, b) => (b.composite || 0) - (a.composite || 0));
-    const personal = sorted.filter(e => e.entryType !== 'team');
-    const team = sorted.filter(e => e.entryType === 'team');
-    const directP = personal.slice(0, 10);
-    const directT = team.slice(0, 3);
-    const directIds = new Set([...directP, ...directT].map(e => e.id));
-    const pdc = {}, tdc = {};
-    directP.forEach(e => { const d = deptKey(e); pdc[d] = (pdc[d] || 0) + 1; });
-    directT.forEach(e => { const d = deptKey(e); tdc[d] = (tdc[d] || 0) + 1; });
-    const deptP = []; const seenP = new Set();
-    for (const e of personal) {
-      if (directIds.has(e.id)) continue;
-      const d = deptKey(e);
-      if (seenP.has(d)) continue;
-      if ((pdc[d] || 0) > 2) continue; // TOP10 中该部门已超过 2 个 → 不再录
-      deptP.push(e); seenP.add(d);
-    }
-    const deptT = []; const seenT = new Set();
-    for (const e of team) {
-      if (directIds.has(e.id)) continue;
-      const d = deptKey(e);
-      if (seenT.has(d)) continue;
-      if (tdc[d]) continue; // TOP3 已有该部门 → 不录
-      deptT.push(e); seenT.add(d);
-    }
-    const deptIds = new Set([...deptP, ...deptT].map(e => e.id));
-    const result = new Map();
-    list.forEach(e => {
-      let t = 'none';
-      if (directIds.has(e.id)) t = 'direct';
-      else if (deptIds.has(e.id)) t = 'dept';
-      result.set(e.id, { promoteType: t, promoteDept: deptKey(e) });
-    });
-    return result;
-  }
   const enrich = (list) => {
     const annotated = list.map(e => {
       const sd = getEntryStageScores(e.id, targetStage);
       const composite = getCompositeScore(e.id, targetStage);
       return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, judgeAvg: sd.avgScore, composite };
     });
-    const typeMap = computePromoteTypes(annotated);
+    const typeMap = computePromotePlan(annotated);
     return annotated.map(e => ({ ...e, ...typeMap.get(e.id) })).sort((a, b) => (b.composite || 0) - (a.composite || 0)).slice(0, 30);
   };
   const individual = enrich(entries.filter(e => e.entryType !== 'team'));
@@ -2175,7 +2185,7 @@ app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
   const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
   const allJudges = [...new Set(stageScores.map(s => s.judgeName))].sort();
 
-  const entryScores = entries.map(e => {
+  const entryScoresRaw = entries.map(e => {
     const scores = stageScores
       .filter(s => s.entryId === e.id)
       .map(s => ({
@@ -2215,6 +2225,9 @@ app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
       composite
     };
   });
+  // 统一晋级规则标注（与排名页 /api/ranking 同一函数，保证展示与勾选建议一致）
+  const promoteMap = computePromotePlan(entryScoresRaw);
+  const entryScores = entryScoresRaw.map(e => ({ ...e, ...promoteMap.get(e.id) }));
 
   const summary = {
     totalEntries: entries.length,
