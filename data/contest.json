@@ -23095,6 +23095,21 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-25T07:40:43.965Z"
+    },
+    {
+      "id": "bet_mt8cxgod_plykpd",
+      "voterId": "1hdS3HJ338QKbmNUHwDDfAiEiE",
+      "voterName": "王锐",
+      "voterMobile": "18654142303",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3UWTG_5WAnNAvDNAvCwpC8yBGpDwUUHNc-q200IAA_752_752.jpg",
+      "stage": "final",
+      "entryId": "entry_1785348752114_picbqa",
+      "entryTitle": "智数驱动 · 赋能一线」\u000b——基于 AI 全链路开发的工单智能看板与业务洞察平台",
+      "entryDept": "中小微事业群",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-25T07:42:23.917Z"
     }
   ],
   "drawRecords": [
