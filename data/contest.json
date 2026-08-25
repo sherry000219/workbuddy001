@@ -22990,6 +22990,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-25T07:38:01.574Z"
+    },
+    {
+      "id": "bet_mt8cs25s_26h896",
+      "voterId": "DiPqtiPkN7ePLhuoCrGUaaiPAiEiE",
+      "voterName": "吕翔宇",
+      "voterMobile": "15298362841",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-25T07:38:11.824Z"
     }
   ],
   "drawRecords": [
