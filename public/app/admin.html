@@ -186,6 +186,12 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
             <button class="btn btn-outline btn-sm" onclick="adminReset('full')">⚠️ 完全重置</button>
           </div>
         </div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #e5e7eb;">
+          <p style="color:var(--text-dim);font-size:13px;margin-bottom:4px;">↩️ 撤销晋级（把决赛晋级标记还原为复赛，回到勾选晋级决赛之前；打分/投票/抽奖/押宝全部保留）</p>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="btn btn-outline btn-sm" style="border-color:#f59e0b;color:#b45309;" onclick="restoreStage()">↩️ 撤销晋级决赛，退回复赛勾选前</button>
+          </div>
+        </div>
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,82,82,0.2);">
           <p style="color:var(--red);font-size:13px;margin-bottom:4px;">⚠️ 清空数据（不可恢复）</p>
           <div style="display:flex;gap:10px;margin-top:8px;">
@@ -1058,6 +1064,18 @@ async function adminReset(mode) {
     document.getElementById('adminVotingToggle').checked = false; document.getElementById('adminStageSelect').value = 'preliminary';
     updateAdminStageLabel(); loadStats(); renderAdminDashboard();
     showToast('「' + label + '」完成，已回到初赛', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function restoreStage() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  if (!confirm('确认「撤销晋级决赛，退回复赛勾选前」？\n\n将把所有决赛晋级/淘汰标记还原为复赛状态（回到勾选晋级决赛之前）。\n评委打分、投票、抽奖、押宝数据全部保留不受影响。\n\n确定继续？')) return;
+  try {
+    var data = await api('/api/admin/restore-stage', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ to: 'semi_final' }) });
+    currentStage = 'semi_final'; isVotingStage = true;
+    document.getElementById('adminStageSelect').value = 'semi_final';
+    updateAdminStageLabel(); loadStats(); renderAdminDashboard();
+    showToast('✅ 已撤销晋级决赛，还原 ' + data.restored + ' 个作品为复赛状态（当前复赛作品共 ' + data.semiFinalists + ' 个）', 'success');
   } catch(e) { showToast(e.message, 'error'); }
 }
 

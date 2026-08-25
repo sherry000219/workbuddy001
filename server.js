@@ -2365,6 +2365,30 @@ app.post('/api/admin/promote', verifyAdminToken, (req, res) => {
   res.json({ success: true, currentStage: db.settings.currentStage, promoted });
 });
 
+// ========== API: ADMIN RESTORE-STAGE（撤销晋级，退回上一赛段勾选之前的状态） ==========
+// POST /api/admin/restore-stage
+// body: { to: 'semi_final' }
+// 把 finalist/eliminated_final/awarded 全部还原为 semi_finalist（回到勾选晋级决赛之前），
+// 打分、投票、抽奖、押宝数据全部保留不动。
+app.post('/api/admin/restore-stage', verifyAdminToken, (req, res) => {
+  const { to } = req.body;
+  if (to !== 'semi_final') {
+    return res.status(400).json({ error: '目前仅支持 to: semi_final（撤销晋级决赛）' });
+  }
+  let restored = 0;
+  db.entries.forEach(e => {
+    if (e.roundStatus === 'finalist' || e.roundStatus === 'eliminated_final' || e.roundStatus === 'awarded') {
+      e.roundStatus = 'semi_finalist';
+      e.award = null;
+      restored++;
+    }
+  });
+  db.settings.currentStage = 'semi_final';
+  saveDB();
+  ghPush().catch(e => console.error('[restore-stage] GitHub push failed:', e.message));
+  res.json({ success: true, currentStage: db.settings.currentStage, restored, semiFinalists: db.entries.filter(e => e.roundStatus === 'semi_finalist').length });
+});
+
 // ========== API: ADMIN SETTLE (结算获奖) ==========
 // POST /api/admin/settle
 // body: { awards: { 'entry_id': 'first'|'second'|'third'|'excellence', ... } }
