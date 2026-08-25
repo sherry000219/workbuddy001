@@ -578,14 +578,20 @@ function renderStageManagePanel(entryScores) {
     if (!tr) return '';
     return ' | 赛道第' + tr.rank + '名/' + tr.total;
   }
-  // 直晋级区标注归属：个人显示部门，团队显示团队名
-  function directInfoHtml(e, isTeam) {
+  // 归属标注：所有作品行尾显示；团队显示团队名，个人显示部门（中小微事业群再下钻二级部门）
+  function orgInfoHtml(e, isTeam) {
     if (isTeam) {
       var tn = (e.teamName || '').trim();
       return tn ? ' | 🏠 ' + escapeHtml(tn) : '';
     }
-    var d = (e.dept1 || e.dept || '').trim();
-    return d ? ' | 🏢 ' + escapeHtml(d) : '';
+    var d1 = (e.dept1 || e.dept || '').trim();
+    if (!d1) return '';
+    var label = d1;
+    if (d1.indexOf('中小微') !== -1) {
+      var d2 = (e.dept2 || '').trim();
+      if (d2) label = d1 + '/' + d2;
+    }
+    return ' | 🏢 ' + escapeHtml(label);
   }
   // 按个人/团队拆分，组内保持传入排序
   function splitByType(list) {
@@ -645,7 +651,7 @@ function renderStageManagePanel(entryScores) {
     var sorted = entryScores.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
     var trackRanks = buildTrackRanks(sorted);
     var rowsHtml = renderGroupedRows(sorted, function(e, idx, isTeam, isDirect) {
-      return '<div class="promote-entry"><span style="display:inline-block;min-width:40px;color:var(--text-dim);font-size:12px;">第' + (idx + 1) + '名</span><input type="checkbox" id="promote_' + e.id + '" ' + (e.roundStatus === 'semi_finalist' ? 'checked' : '') + '><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + trackBadgeHtml(e.track) + (isTeam ? teamBadgeHtml() : '') + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + trackRankHtml(e, trackRanks) + (isDirect ? directInfoHtml(e, isTeam) : '') + ' | ' + e.name + '</span></div>';
+      return '<div class="promote-entry"><span style="display:inline-block;min-width:40px;color:var(--text-dim);font-size:12px;">第' + (idx + 1) + '名</span><input type="checkbox" id="promote_' + e.id + '" ' + (e.roundStatus === 'semi_finalist' ? 'checked' : '') + '><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + trackBadgeHtml(e.track) + (isTeam ? teamBadgeHtml() : '') + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + trackRankHtml(e, trackRanks) + orgInfoHtml(e, isTeam) + ' | ' + e.name + '</span></div>';
     }, { individual: 10, team: 3 });
     panel.innerHTML = '<div class="promote-panel"><h3>🔄 晋级复赛管理</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">个人 TOP10 与团队 TOP3 直接晋级（不占部门名额）；其余作品按部门分组排名。勾选需要晋级复赛的作品，未勾选的将标记为淘汰。点击"确认晋级复赛"后阶段将切换到复赛。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + rowsHtml + '</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center;"><button class="btn btn-success btn-sm" onclick="adminPromote(\'semi_final\')">✅ 确认晋级复赛</button><span style="font-size:12px;color:var(--text-dim);">已勾选 <strong id="promoteCount">0</strong> 个作品</span></div></div>';
     document.querySelectorAll('input[id^="promote_"]').forEach(function(cb) { cb.addEventListener('change', updatePromoteCount); });
@@ -655,7 +661,7 @@ function renderStageManagePanel(entryScores) {
     var sorted2 = semiEntries.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
     var trackRanks2 = buildTrackRanks(sorted2);
     var rowsHtml2 = renderGroupedRows(sorted2, function(e, idx, isTeam, isDirect) {
-      return '<div class="promote-entry"><span style="display:inline-block;min-width:40px;color:var(--text-dim);font-size:12px;">第' + (idx + 1) + '名</span><input type="checkbox" id="promote_' + e.id + '" checked><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + trackBadgeHtml(e.track) + (isTeam ? teamBadgeHtml() : '') + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + trackRankHtml(e, trackRanks2) + (isDirect ? directInfoHtml(e, isTeam) : '') + ' | ' + e.name + '</span></div>';
+      return '<div class="promote-entry"><span style="display:inline-block;min-width:40px;color:var(--text-dim);font-size:12px;">第' + (idx + 1) + '名</span><input type="checkbox" id="promote_' + e.id + '" checked><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + trackBadgeHtml(e.track) + (isTeam ? teamBadgeHtml() : '') + '</span><span class="pe-score">综合分: ' + (e.composite || '—') + ' | 均分: ' + (e.avgScore || '—') + trackRankHtml(e, trackRanks2) + orgInfoHtml(e, isTeam) + ' | ' + e.name + '</span></div>';
     }, { individual: 10, team: 3 });
     panel.innerHTML = '<div class="promote-panel"><h3>🏆 晋级决赛管理</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">个人 TOP10 与团队 TOP3 直接晋级（不占部门名额）；其余作品按部门分组排名，当前所有复赛作品默认已勾选。取消勾选不需要晋级决赛的作品，未勾选的将标记为淘汰。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + rowsHtml2 + '</div><div style="margin-top:12px;display:flex;gap:8px;align-items:center;"><button class="btn btn-primary btn-sm" onclick="adminPromote(\'final\')">✅ 确认晋级决赛</button><span style="font-size:12px;color:var(--text-dim);">已勾选 <strong id="promoteCount">0</strong> 个作品</span></div></div>';
     document.querySelectorAll('input[id^="promote_"]').forEach(function(cb) { cb.addEventListener('change', updatePromoteCount); });
@@ -665,7 +671,7 @@ function renderStageManagePanel(entryScores) {
     var sorted3 = finalEntries.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
     var trackRanks3 = buildTrackRanks(sorted3);
     var rowsHtml3 = renderGroupedRows(sorted3, function(e, idx, isTeam) {
-      return '<div class="promote-entry"><select class="award-select" id="award_' + e.id + '"><option value="">未获奖</option><option value="first" ' + (e.award === 'first' ? 'selected' : '') + '>🥇 一等奖</option><option value="second" ' + (e.award === 'second' ? 'selected' : '') + '>🥈 二等奖</option><option value="third" ' + (e.award === 'third' ? 'selected' : '') + '>🥉 三等奖</option><option value="excellence" ' + (e.award === 'excellence' ? 'selected' : '') + '>🎖️ 优秀奖</option></select><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + trackBadgeHtml(e.track) + (isTeam ? teamBadgeHtml() : '') + '</span><span class="pe-score">评委均分: ' + (e.avgScore || '—') + trackRankHtml(e, trackRanks3) + ' | ' + e.name + '</span></div>';
+      return '<div class="promote-entry"><select class="award-select" id="award_' + e.id + '"><option value="">未获奖</option><option value="first" ' + (e.award === 'first' ? 'selected' : '') + '>🥇 一等奖</option><option value="second" ' + (e.award === 'second' ? 'selected' : '') + '>🥈 二等奖</option><option value="third" ' + (e.award === 'third' ? 'selected' : '') + '>🥉 三等奖</option><option value="excellence" ' + (e.award === 'excellence' ? 'selected' : '') + '>🎖️ 优秀奖</option></select><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + trackBadgeHtml(e.track) + (isTeam ? teamBadgeHtml() : '') + '</span><span class="pe-score">评委均分: ' + (e.avgScore || '—') + trackRankHtml(e, trackRanks3) + orgInfoHtml(e, isTeam) + ' | ' + e.name + '</span></div>';
     });
     panel.innerHTML = '<div class="promote-panel"><h3>🏆 结算获奖</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">已按个人（细分部门）/ 团队分组，组内按综合分排名排序。为决赛作品设置获奖等级。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + rowsHtml3 + '</div><div style="margin-top:12px;"><button class="btn btn-gold btn-sm" onclick="adminSettle()">🏆 确认结算</button></div></div>';
   } else if (currentStage === 'awarded') {
