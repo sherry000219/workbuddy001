@@ -23185,6 +23185,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-25T07:44:41.859Z"
+    },
+    {
+      "id": "bet_mt8d2fdh_bscgsk",
+      "voterId": "iPZ3EuJRRBCiShuoCrGUaaiPAiEiE",
+      "voterName": "殷小强",
+      "voterMobile": "15195960506",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPM3DO6pf11oHNBQDNBQA_1280_1280.png",
+      "stage": "final",
+      "entryId": "entry_1786351346788_dvmzme",
+      "entryTitle": "数据哨兵——基于 Skill 的实时动态看板",
+      "entryDept": "中小微事业群",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-25T07:46:15.509Z"
     }
   ],
   "drawRecords": [
