@@ -528,25 +528,42 @@ async function renderAdminDashboard() {
       return;
     }
 
-    tbody.innerHTML = entryScores.map(function(e) {
+    // 排序：先个人后团队，各按赛道（效率提升→创意应用→业务赋能），赛道内按综合分降序
+    var TRACK_ORDER = { efficiency: 0, creative: 1, business: 2 };
+    var sortedScores = entryScores.slice().sort(function(a, b) {
+      var ta = a.entryType === 'team' ? 1 : 0, tb = b.entryType === 'team' ? 1 : 0;
+      if (ta !== tb) return ta - tb;
+      var ka = (TRACK_ORDER[a.track] !== undefined) ? TRACK_ORDER[a.track] : 9;
+      var kb = (TRACK_ORDER[b.track] !== undefined) ? TRACK_ORDER[b.track] : 9;
+      if (ka !== kb) return ka - kb;
+      return (b.composite || 0) - (a.composite || 0);
+    });
+    var totalCols2 = 9 + Math.max(1, allJudges.length);
+
+    var rowsHtml = '';
+    var prevGroupKey = null;
+    sortedScores.forEach(function(e) {
+      // 分组小标题行：个人/团队 × 赛道
+      var groupKey = (e.entryType === 'team' ? 'team' : 'individual') + '|' + (e.track || '');
+      if (groupKey !== prevGroupKey) {
+        var typeLabel = e.entryType === 'team' ? '👥 团队' : '👤 个人';
+        var trackName = trackLabel(e.track) || '未分类';
+        var groupCount = sortedScores.filter(function(x) { return ((x.entryType === 'team' ? 'team' : 'individual') + '|' + (x.track || '')) === groupKey; }).length;
+        rowsHtml += '<tr><td colspan="' + totalCols2 + '" style="background:#f3f4f6;font-weight:700;color:#374151;padding:8px 14px;font-size:13px;">' + typeLabel + ' · ' + trackName + ' <span style="color:#9ca3af;font-weight:400;font-size:12px;">（' + groupCount + ' 个作品）</span></td></tr>';
+        prevGroupKey = groupKey;
+      }
       var judgeCells = allJudges.map(function(judge) {
-        var s = e.scores.find(function(sc) { return sc.judgeName === judge; });
-        if (s) return '<td style="background:rgba(0,230,118,0.08);font-weight:500;">' + s.total + '<br><small style="color:var(--text-dim);font-weight:400;">实' + s.practicality + ' 创' + s.innovation + ' 推' + s.scalability + ' 效' + s.presentation + '</small></td>';
-        return '<td style="background:rgba(255,82,82,0.08);color:#ff5252;font-weight:500;text-align:center;" title="' + judge + ' 未评分">未评</td>';
+      var s = e.scores.find(function(sc) { return sc.judgeName === judge; });
+      if (s) return '<td style="background:rgba(0,230,118,0.08);font-weight:500;">' + s.total + '<br><small style="color:var(--text-dim);font-weight:400;">实' + s.practicality + ' 创' + s.innovation + ' 推' + s.scalability + ' 效' + s.presentation + '</small></td>';
+      return '<td style="background:rgba(255,82,82,0.08);color:#ff5252;font-weight:500;text-align:center;" title="' + judge + ' 未评分">未评</td>';
       }).join('');
       var hasScores = e.scores.length > 0;
       var badge = awardBadge(e.award) || roundBadge(e.roundStatus);
-          var editNoticeHtml = '';
-    if (e.editNotice) {
-      editNoticeHtml = '<div style="background:rgba(255,215,64,0.12);border:1px solid rgba(255,215,64,0.35);color:#b45309;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;">📝 作者于 ' + new Date(e.lastEditedAt || e.updatedAt || e.createdAt).toLocaleString('zh-CN') + ' 编辑过本作品，内容可能有更新，请留意。</div>';
-    }
-    var ackHtml = '';
-    if (e.editNotice) {
-      ackHtml = "<button class=\"btn btn-outline btn-sm\" onclick=\"ackEdit('" + e.id + "')\">已知悉更新</button>";
-    }
+      var teamTag = e.entryType === 'team' ? '<span style="display:inline-block;background:#ede9fe;color:#7c3aed;font-size:11px;font-weight:600;padding:1px 6px;border-radius:4px;">👥 团队</span>' : '';
 var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join('/') || '-';
-      return '<tr><td style="position:sticky;left:0;background:#f9fafb;z-index:1;"><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#ff6b35;font-weight:500;">' + e.title.substring(0,16) + (e.title.length>16?'...':'') + '</a> ' + badge + '</td><td>' + e.name + '</td><td>' + deptChain + '</td><td>' + trackLabel(e.track) + '</td><td style="font-size:12px;">' + (ROUND_LABELS[e.roundStatus] || '初赛') + '</td>' + judgeCells + '<td style="font-weight:700;color:' + (hasScores ? '#ff6b35' : 'var(--text-dim)') + ';">' + (hasScores ? e.avgScore : '—') + '</td><td style="font-weight:700;color:#ff6b35;">' + fmtScore(e.composite) + '</td><td>' + (e.judgeCount||0) + '</td><td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry(\'' + e.id + '\')">删除</button></td></tr>';
-    }).join('');
+      rowsHtml += '<tr><td style="position:sticky;left:0;background:#f9fafb;z-index:1;"><a href="javascript:void(0)" onclick="openDetail(\'' + e.id + '\')" style="color:#ff6b35;font-weight:500;">' + e.title.substring(0,16) + (e.title.length>16?'...':'') + '</a> ' + badge + teamTag + '</td><td>' + e.name + '</td><td>' + deptChain + '</td><td>' + trackLabel(e.track) + '</td><td style="font-size:12px;">' + (ROUND_LABELS[e.roundStatus] || '初赛') + '</td>' + judgeCells + '<td style="font-weight:700;color:' + (hasScores ? '#ff6b35' : 'var(--text-dim)') + ';">' + (hasScores ? e.avgScore : '—') + '</td><td style="font-weight:700;color:#ff6b35;">' + fmtScore(e.composite) + '</td><td>' + (e.judgeCount||0) + '</td><td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEntry(\'' + e.id + '\')">删除</button></td></tr>';
+    });
+    tbody.innerHTML = rowsHtml;
   } catch(e) { console.error('Admin dashboard error:', e); showToast('加载失败', 'error'); }
 }
 
