@@ -273,7 +273,32 @@ function migrateLegacyAttachments() {
   return changed;
 }
 
-const db = loadDB();
+// 启动数据载入：本地 contest.json 为空时，优先从 main 分支固化的恢复文件载入
+// （彻底解决 GitHub API 缓存导致远程好数据拉不到的问题）
+const RECOVERY_FILE = path.join(__dirname, 'data', 'recovery', 'contest.json');
+function loadDBWithRecovery() {
+  const local = loadDB();
+  const localEmpty = (local.entries || []).length === 0 && (local.votes || []).length === 0 && (local.judgeScores || []).length === 0;
+  if (localEmpty && fs.existsSync(RECOVERY_FILE)) {
+    try {
+      const recovery = JSON.parse(fs.readFileSync(RECOVERY_FILE, 'utf8'));
+      const recoveryHasData = (recovery.entries || []).length > 0;
+      if (recoveryHasData) {
+        console.log('[recovery] 本地数据为空，从恢复文件载入 — entries:', recovery.entries.length, '| votes:', recovery.votes.length, '| scores:', recovery.judgeScores.length, '| stage:', recovery.settings && recovery.settings.currentStage);
+        // 合并：恢复文件为基准，并保留本地 settings（避免覆盖管理员配置）
+        const merged = { ...recovery, settings: { ...recovery.settings, ...local.settings } };
+        // 立即写盘——让 doGhPush 的空数据守卫放行，使恢复数据能推上 GitHub
+        fs.writeFileSync(DB_FILE, JSON.stringify(merged, null, 2), 'utf8');
+        return merged;
+      }
+    } catch (e) {
+      console.error('[recovery] 恢复文件读取失败:', e.message);
+    }
+  }
+  return local;
+}
+
+const db = loadDBWithRecovery();
 
 // 启动闸门：GitHub 同步 + 本地数据载入完成前为 false，期间拒绝一切写入请求，
 // 避免启动窗口内提交的报名被 ghPull 用旧快照整体覆盖而静默丢失
