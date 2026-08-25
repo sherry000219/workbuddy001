@@ -22900,6 +22900,21 @@
       "trackLabel": "业务赋能",
       "revoked": false,
       "createdAt": "2026-08-25T07:37:18.555Z"
+    },
+    {
+      "id": "bet_mt8cqx4g_eit2ni",
+      "voterId": "eHiPj3SysafiSqkIPCNV0nRwiEiE",
+      "voterName": "曹俊",
+      "voterMobile": "18550038060",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-25T07:37:18.640Z"
     }
   ],
   "drawRecords": [
