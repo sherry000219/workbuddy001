@@ -22600,6 +22600,21 @@
       "revoked": false,
       "createdAt": "2026-08-24T13:00:53.530Z",
       "stage": "semi_final"
+    },
+    {
+      "id": "bet_mt8ankfw_qzzvqm",
+      "voterId": "BB11VFswiSzRQHntbiinVhRQiEiE",
+      "voterName": "赵冰艳",
+      "voterMobile": "13057597597",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-25T06:38:43.004Z"
     }
   ],
   "drawRecords": [
