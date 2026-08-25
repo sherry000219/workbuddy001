@@ -1398,7 +1398,19 @@ app.get('/api/ranking', requireAuth, (req, res) => {
       return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, judgeAvg: sd.avgScore, composite };
     });
     const typeMap = computePromotePlan(annotated);
-    return annotated.map(e => ({ ...e, ...typeMap.get(e.id) })).sort((a, b) => (b.composite || 0) - (a.composite || 0)).slice(0, 30);
+    // 晋级标注只对实际已晋级的作品生效（管理后台勾选了才显示）：
+    // 已晋级 ∧ 算法直晋级 → direct；已晋级 ∧ 其余 → dept；未晋级 → none
+    const advancedStatus = targetStage === 'semi_final'
+      ? ['semi_finalist', 'finalist', 'awarded']
+      : (targetStage === 'final' || targetStage === 'awarded') ? ['finalist', 'awarded'] : [];
+    return annotated.map(e => {
+      const t = typeMap.get(e.id) || {};
+      let pt = 'none';
+      if (advancedStatus.includes(e.roundStatus || 'approved')) {
+        pt = t.promoteType === 'direct' ? 'direct' : 'dept';
+      }
+      return { ...e, promoteType: pt, promoteDept: t.promoteDept };
+    }).sort((a, b) => (b.composite || 0) - (a.composite || 0)).slice(0, 30);
   };
   const individual = enrich(entries.filter(e => e.entryType !== 'team'));
   const team = enrich(entries.filter(e => e.entryType === 'team'));
