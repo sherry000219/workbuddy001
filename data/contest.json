@@ -20138,7 +20138,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T06:39:17.017Z"
+      "createdAt": "2026-08-17T06:39:17.017Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswv7qb9_gre7c4",
@@ -20152,7 +20153,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T06:41:01.941Z"
+      "createdAt": "2026-08-17T06:41:01.941Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswv9i30_xcam5b",
@@ -20166,7 +20168,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T06:42:24.588Z"
+      "createdAt": "2026-08-17T06:42:24.588Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswvao2s_mhbwcf",
@@ -20180,7 +20183,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T06:43:19.012Z"
+      "createdAt": "2026-08-17T06:43:19.012Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswvcyzt_ujhjjp",
@@ -20194,7 +20198,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T06:45:06.473Z"
+      "createdAt": "2026-08-17T06:45:06.473Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswvd3h3_ntwfr1",
@@ -20208,7 +20213,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T06:45:12.279Z"
+      "createdAt": "2026-08-17T06:45:12.279Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswve3tn_qauqr2",
@@ -20222,7 +20228,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T06:45:59.387Z"
+      "createdAt": "2026-08-17T06:45:59.387Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswvettd_7mhvup",
@@ -20236,7 +20243,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T06:46:33.073Z"
+      "createdAt": "2026-08-17T06:46:33.073Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswvf0g1_nfuz47",
@@ -20250,7 +20258,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T06:46:41.665Z"
+      "createdAt": "2026-08-17T06:46:41.665Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswvhs3k_j1l5g6",
@@ -20264,7 +20273,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T06:48:50.816Z"
+      "createdAt": "2026-08-17T06:48:50.816Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswvhyvk_6pyf2p",
@@ -20278,7 +20288,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T06:48:59.600Z"
+      "createdAt": "2026-08-17T06:48:59.600Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswvmcvc_lws6h6",
@@ -20292,7 +20303,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T06:52:24.360Z"
+      "createdAt": "2026-08-17T06:52:24.360Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswvp4n9_1onqt1",
@@ -20306,7 +20318,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T06:54:33.669Z"
+      "createdAt": "2026-08-17T06:54:33.669Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswvqjbf_ih0dl2",
@@ -20320,7 +20333,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T06:55:39.339Z"
+      "createdAt": "2026-08-17T06:55:39.339Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msww25pu_4ri3kk",
@@ -20334,7 +20348,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T07:04:41.587Z"
+      "createdAt": "2026-08-17T07:04:41.587Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msww3edi_3uc7q3",
@@ -20348,7 +20363,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:05:39.462Z"
+      "createdAt": "2026-08-17T07:05:39.462Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msww8q1z_o1j4m4",
@@ -20362,7 +20378,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T07:09:47.879Z"
+      "createdAt": "2026-08-17T07:09:47.879Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msww9nmk_c481p5",
@@ -20376,7 +20393,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:10:31.388Z"
+      "createdAt": "2026-08-17T07:10:31.388Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msww9z0z_2iazkv",
@@ -20390,7 +20408,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:10:46.163Z"
+      "createdAt": "2026-08-17T07:10:46.163Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwbt76_xqu7yv",
@@ -20404,7 +20423,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:12:11.922Z"
+      "createdAt": "2026-08-17T07:12:11.922Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwc3e5_euhm12",
@@ -20418,7 +20438,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:12:25.133Z"
+      "createdAt": "2026-08-17T07:12:25.133Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwchxn_2vmxbq",
@@ -20432,7 +20453,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:12:43.979Z"
+      "createdAt": "2026-08-17T07:12:43.979Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwcirv_4au79u",
@@ -20446,7 +20468,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:12:45.067Z"
+      "createdAt": "2026-08-17T07:12:45.067Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwd54p_kbc1uw",
@@ -20460,7 +20483,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T07:13:14.041Z"
+      "createdAt": "2026-08-17T07:13:14.041Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwd59h_k29upe",
@@ -20474,7 +20498,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:13:14.213Z"
+      "createdAt": "2026-08-17T07:13:14.213Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwdqqz_ek6wgw",
@@ -20488,7 +20513,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-17T07:13:42.059Z"
+      "createdAt": "2026-08-17T07:13:42.059Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwendm_gdivp3",
@@ -20502,7 +20528,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:14:24.346Z"
+      "createdAt": "2026-08-17T07:14:24.346Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwfz4i_mokzdg",
@@ -20516,7 +20543,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:15:26.226Z"
+      "createdAt": "2026-08-17T07:15:26.226Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwgvk3_inixs7",
@@ -20530,7 +20558,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:16:08.259Z"
+      "createdAt": "2026-08-17T07:16:08.259Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwh5n0_cnhq8z",
@@ -20544,7 +20573,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T07:16:21.324Z"
+      "createdAt": "2026-08-17T07:16:21.324Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwh620_4v58tc",
@@ -20558,7 +20588,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:16:21.864Z"
+      "createdAt": "2026-08-17T07:16:21.864Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwi3um_q6hwa3",
@@ -20572,7 +20603,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:17:05.662Z"
+      "createdAt": "2026-08-17T07:17:05.662Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwi4mx_rx5srn",
@@ -20586,7 +20618,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:17:06.681Z"
+      "createdAt": "2026-08-17T07:17:06.681Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwi4va_tb5fog",
@@ -20600,7 +20633,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:17:06.982Z"
+      "createdAt": "2026-08-17T07:17:06.982Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwk6b2_9utc40",
@@ -20614,7 +20648,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:18:42.158Z"
+      "createdAt": "2026-08-17T07:18:42.158Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwkacm_hr1j5p",
@@ -20628,7 +20663,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:18:47.398Z"
+      "createdAt": "2026-08-17T07:18:47.398Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwkyom_zfqbo2",
@@ -20642,7 +20678,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T07:19:18.934Z"
+      "createdAt": "2026-08-17T07:19:18.934Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwllo6_u1w1zq",
@@ -20656,7 +20693,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:19:48.726Z"
+      "createdAt": "2026-08-17T07:19:48.726Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwmrva_vkxh52",
@@ -20670,7 +20708,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:20:43.414Z"
+      "createdAt": "2026-08-17T07:20:43.414Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwqp0d_lb95yh",
@@ -20684,7 +20723,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:23:46.333Z"
+      "createdAt": "2026-08-17T07:23:46.333Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwsbbv_6mkckh",
@@ -20698,7 +20738,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:25:01.915Z"
+      "createdAt": "2026-08-17T07:25:01.915Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwtb30_9e5k0v",
@@ -20712,7 +20753,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:25:48.252Z"
+      "createdAt": "2026-08-17T07:25:48.252Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwu9oq_gxerl6",
@@ -20726,7 +20768,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:26:33.098Z"
+      "createdAt": "2026-08-17T07:26:33.098Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwvl03_cqcjtm",
@@ -20740,7 +20783,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:27:34.419Z"
+      "createdAt": "2026-08-17T07:27:34.419Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwvy3u_ha4z8b",
@@ -20754,7 +20798,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:27:51.402Z"
+      "createdAt": "2026-08-17T07:27:51.402Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwy0o3_y4nvdn",
@@ -20768,7 +20813,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:29:28.035Z"
+      "createdAt": "2026-08-17T07:29:28.035Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwzas3_wyspab",
@@ -20782,7 +20828,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-17T07:30:27.795Z"
+      "createdAt": "2026-08-17T07:30:27.795Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwzbfh_s30dxp",
@@ -20796,7 +20843,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-17T07:30:28.637Z"
+      "createdAt": "2026-08-17T07:30:28.637Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswwzwmk_isipdq",
@@ -20810,7 +20858,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:30:56.108Z"
+      "createdAt": "2026-08-17T07:30:56.108Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswx4jkb_ja310r",
@@ -20824,7 +20873,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T07:34:32.459Z"
+      "createdAt": "2026-08-17T07:34:32.459Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswx4rao_u52z46",
@@ -20838,7 +20888,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:34:42.480Z"
+      "createdAt": "2026-08-17T07:34:42.480Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswx6gfx_w2222x",
@@ -20852,7 +20903,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:36:01.725Z"
+      "createdAt": "2026-08-17T07:36:01.725Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswx6sha_1mklvc",
@@ -20866,7 +20918,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:36:17.326Z"
+      "createdAt": "2026-08-17T07:36:17.326Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswx8tun_uwjdfq",
@@ -20880,7 +20933,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:37:52.415Z"
+      "createdAt": "2026-08-17T07:37:52.415Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswx9j3r_gdlhip",
@@ -20894,7 +20948,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:38:25.143Z"
+      "createdAt": "2026-08-17T07:38:25.143Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxatiy_jrdz4x",
@@ -20908,7 +20963,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:39:25.306Z"
+      "createdAt": "2026-08-17T07:39:25.306Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxazat_ajfuwr",
@@ -20922,7 +20978,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:39:32.789Z"
+      "createdAt": "2026-08-17T07:39:32.789Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxbucm_wgi8gq",
@@ -20936,7 +20993,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-17T07:40:13.030Z"
+      "createdAt": "2026-08-17T07:40:13.030Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxc2ov_ii5lkq",
@@ -20950,7 +21008,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:40:23.839Z"
+      "createdAt": "2026-08-17T07:40:23.839Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxd63m_v27ale",
@@ -20964,7 +21023,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:41:14.914Z"
+      "createdAt": "2026-08-17T07:41:14.914Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxdoth_iwi95u",
@@ -20978,7 +21038,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:41:39.173Z"
+      "createdAt": "2026-08-17T07:41:39.173Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxe4zq_pf5n6b",
@@ -20992,7 +21053,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:42:00.134Z"
+      "createdAt": "2026-08-17T07:42:00.134Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxekst_rvvbdj",
@@ -21006,7 +21068,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:42:20.621Z"
+      "createdAt": "2026-08-17T07:42:20.621Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxmqhy_hpfvzg",
@@ -21020,7 +21083,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:48:41.254Z"
+      "createdAt": "2026-08-17T07:48:41.254Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxpa41_pfm3nw",
@@ -21034,7 +21098,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T07:50:39.985Z"
+      "createdAt": "2026-08-17T07:50:39.985Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxqr7x_yy9cmg",
@@ -21048,7 +21113,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T07:51:48.813Z"
+      "createdAt": "2026-08-17T07:51:48.813Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxvdma_h8zgba",
@@ -21062,7 +21128,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T07:55:24.467Z"
+      "createdAt": "2026-08-17T07:55:24.467Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxvudu_mxlp5z",
@@ -21076,7 +21143,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:55:46.194Z"
+      "createdAt": "2026-08-17T07:55:46.194Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxy3fl_8g0ut0",
@@ -21090,7 +21158,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:57:31.233Z"
+      "createdAt": "2026-08-17T07:57:31.233Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswxyhov_s3r5sw",
@@ -21104,7 +21173,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T07:57:49.711Z"
+      "createdAt": "2026-08-17T07:57:49.711Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswy68zj_g9wshu",
@@ -21118,7 +21188,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T08:03:51.679Z"
+      "createdAt": "2026-08-17T08:03:51.679Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswyhd4t_zb1str",
@@ -21132,7 +21203,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T08:12:30.269Z"
+      "createdAt": "2026-08-17T08:12:30.269Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswykbt9_8u4t84",
@@ -21146,7 +21218,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T08:14:48.525Z"
+      "createdAt": "2026-08-17T08:14:48.525Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswykyuo_9g0hku",
@@ -21160,7 +21233,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T08:15:18.384Z"
+      "createdAt": "2026-08-17T08:15:18.384Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswypqan_9gt5o6",
@@ -21174,7 +21248,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-17T08:19:00.575Z"
+      "createdAt": "2026-08-17T08:19:00.575Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswzki4i_ae1n8y",
@@ -21188,7 +21263,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T08:42:56.322Z"
+      "createdAt": "2026-08-17T08:42:56.322Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mswznxa4_q7aqvh",
@@ -21202,7 +21278,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-17T08:45:35.932Z"
+      "createdAt": "2026-08-17T08:45:35.932Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msx18trg_dspznp",
@@ -21216,7 +21293,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T09:29:50.764Z"
+      "createdAt": "2026-08-17T09:29:50.764Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msx1abie_he2bwe",
@@ -21230,7 +21308,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T09:31:00.422Z"
+      "createdAt": "2026-08-17T09:31:00.422Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msx1dl4l_qrb6qs",
@@ -21244,7 +21323,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T09:33:32.853Z"
+      "createdAt": "2026-08-17T09:33:32.853Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msx1qsvh_p3v7i5",
@@ -21258,7 +21338,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-17T09:43:49.421Z"
+      "createdAt": "2026-08-17T09:43:49.421Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msx2f04i_sz19nv",
@@ -21272,7 +21353,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T10:02:38.562Z"
+      "createdAt": "2026-08-17T10:02:38.562Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msx3fjhc_1yk82c",
@@ -21286,7 +21368,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T10:31:03.264Z"
+      "createdAt": "2026-08-17T10:31:03.264Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msx3pvn7_1qcxlq",
@@ -21300,7 +21383,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T10:39:05.587Z"
+      "createdAt": "2026-08-17T10:39:05.587Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msx46nko_ewx37b",
@@ -21314,7 +21398,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T10:52:08.280Z"
+      "createdAt": "2026-08-17T10:52:08.280Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msx4bfab_e7cvm8",
@@ -21328,7 +21413,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-17T10:55:50.819Z"
+      "createdAt": "2026-08-17T10:55:50.819Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msxzjwwp_y3zteu",
@@ -21342,7 +21428,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T01:30:15.001Z"
+      "createdAt": "2026-08-18T01:30:15.001Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0b197_q97vjg",
@@ -21356,7 +21443,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T01:51:20.347Z"
+      "createdAt": "2026-08-18T01:51:20.347Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0b2vg_7gsd1t",
@@ -21370,7 +21458,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T01:51:22.444Z"
+      "createdAt": "2026-08-18T01:51:22.444Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0b59f_i8xpvg",
@@ -21384,7 +21473,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T01:51:25.539Z"
+      "createdAt": "2026-08-18T01:51:25.539Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0clgp_w7n2yx",
@@ -21398,7 +21488,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T01:52:33.193Z"
+      "createdAt": "2026-08-18T01:52:33.193Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0cvap_7l5k4o",
@@ -21412,7 +21503,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T01:52:45.937Z"
+      "createdAt": "2026-08-18T01:52:45.937Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0f5pe_iui1w6",
@@ -21426,7 +21518,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T01:54:32.738Z"
+      "createdAt": "2026-08-18T01:54:32.738Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0frlb_rgdhhj",
@@ -21440,7 +21533,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T01:55:01.103Z"
+      "createdAt": "2026-08-18T01:55:01.103Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0hac4_1ezvc6",
@@ -21454,7 +21548,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-18T01:56:12.052Z"
+      "createdAt": "2026-08-18T01:56:12.052Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0hf0w_bwhpsj",
@@ -21468,7 +21563,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T01:56:18.128Z"
+      "createdAt": "2026-08-18T01:56:18.128Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0jqt9_1bbypu",
@@ -21482,7 +21578,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-18T01:58:06.717Z"
+      "createdAt": "2026-08-18T01:58:06.717Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0m378_ue2i48",
@@ -21496,7 +21593,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T01:59:56.084Z"
+      "createdAt": "2026-08-18T01:59:56.084Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0o425_tfoplj",
@@ -21510,7 +21608,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T02:01:30.509Z"
+      "createdAt": "2026-08-18T02:01:30.509Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0onkw_fiumna",
@@ -21524,7 +21623,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-18T02:01:55.808Z"
+      "createdAt": "2026-08-18T02:01:55.808Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0rgia_mzasho",
@@ -21538,7 +21638,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-18T02:04:06.610Z"
+      "createdAt": "2026-08-18T02:04:06.610Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0tqvw_y1fg59",
@@ -21552,7 +21653,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T02:05:53.372Z"
+      "createdAt": "2026-08-18T02:05:53.372Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0wlsd_87q739",
@@ -21566,7 +21668,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-18T02:08:06.733Z"
+      "createdAt": "2026-08-18T02:08:06.733Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy0xgcg_hmhds6",
@@ -21580,7 +21683,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T02:08:46.336Z"
+      "createdAt": "2026-08-18T02:08:46.336Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy11otw_4uaup8",
@@ -21594,7 +21698,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T02:12:03.956Z"
+      "createdAt": "2026-08-18T02:12:03.956Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy1904h_vj2tn4",
@@ -21608,7 +21713,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-18T02:17:45.185Z"
+      "createdAt": "2026-08-18T02:17:45.185Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy19lu5_k65bnv",
@@ -21622,7 +21728,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T02:18:13.325Z"
+      "createdAt": "2026-08-18T02:18:13.325Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy19y42_ncz7jy",
@@ -21636,7 +21743,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-18T02:18:29.234Z"
+      "createdAt": "2026-08-18T02:18:29.234Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy1x443_cuh2wu",
@@ -21650,7 +21758,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T02:36:30.099Z"
+      "createdAt": "2026-08-18T02:36:30.099Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy3bgz9_vi2a20",
@@ -21664,7 +21773,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T03:15:39.573Z"
+      "createdAt": "2026-08-18T03:15:39.573Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy3f6qg_ujnfvm",
@@ -21678,7 +21788,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T03:18:32.920Z"
+      "createdAt": "2026-08-18T03:18:32.920Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy5m6ui_nis5gp",
@@ -21692,7 +21803,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T04:19:58.890Z"
+      "createdAt": "2026-08-18T04:19:58.890Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy9rwks_0km30w",
@@ -21706,7 +21818,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T06:16:23.980Z"
+      "createdAt": "2026-08-18T06:16:23.980Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msy9sn8h_97pfke",
@@ -21720,7 +21833,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-18T06:16:58.529Z"
+      "createdAt": "2026-08-18T06:16:58.529Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyab12d_bs6sh3",
@@ -21734,7 +21848,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T06:31:16.261Z"
+      "createdAt": "2026-08-18T06:31:16.261Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyak05x_ovvawx",
@@ -21748,7 +21863,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T06:38:14.997Z"
+      "createdAt": "2026-08-18T06:38:14.997Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyaqy85_u0xvre",
@@ -21762,7 +21878,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T06:43:39.077Z"
+      "createdAt": "2026-08-18T06:43:39.077Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyat3hb_4jhn30",
@@ -21776,7 +21893,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T06:45:19.199Z"
+      "createdAt": "2026-08-18T06:45:19.199Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyb6xrk_f52szr",
@@ -21790,7 +21908,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T06:56:04.976Z"
+      "createdAt": "2026-08-18T06:56:04.976Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyb7cql_8hxdbv",
@@ -21804,7 +21923,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T06:56:24.381Z"
+      "createdAt": "2026-08-18T06:56:24.381Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyb93ur_5xzxwl",
@@ -21818,7 +21938,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T06:57:46.179Z"
+      "createdAt": "2026-08-18T06:57:46.179Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msybn2s7_ok8e3b",
@@ -21832,7 +21953,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T07:08:37.975Z"
+      "createdAt": "2026-08-18T07:08:37.975Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msybn2sj_n61w9n",
@@ -21846,7 +21968,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T07:08:37.987Z"
+      "createdAt": "2026-08-18T07:08:37.987Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyccv09_t950wb",
@@ -21860,7 +21983,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T07:28:40.953Z"
+      "createdAt": "2026-08-18T07:28:40.953Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyde8zq_rbvaw5",
@@ -21874,7 +21998,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T07:57:45.350Z"
+      "createdAt": "2026-08-18T07:57:45.350Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msydee0q_1z87fl",
@@ -21888,7 +22013,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T07:57:51.866Z"
+      "createdAt": "2026-08-18T07:57:51.866Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msydgq6e_dda3xv",
@@ -21902,7 +22028,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-18T07:59:40.934Z"
+      "createdAt": "2026-08-18T07:59:40.934Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msydixe0_p5e7vd",
@@ -21916,7 +22043,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-18T08:01:23.592Z"
+      "createdAt": "2026-08-18T08:01:23.592Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyednfl_6fg4hs",
@@ -21930,7 +22058,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T08:25:17.025Z"
+      "createdAt": "2026-08-18T08:25:17.025Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyfktbu_ixbii8",
@@ -21944,7 +22073,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-18T08:58:50.874Z"
+      "createdAt": "2026-08-18T08:58:50.874Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msyhd1gw_5d30t3",
@@ -21958,7 +22088,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-18T09:48:47.408Z"
+      "createdAt": "2026-08-18T09:48:47.408Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszfn6b6_qybslv",
@@ -21972,7 +22103,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-19T01:48:27.186Z"
+      "createdAt": "2026-08-19T01:48:27.186Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszg6wad_mnocw0",
@@ -21986,7 +22118,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-19T02:03:47.317Z"
+      "createdAt": "2026-08-19T02:03:47.317Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszg85lp_73h0dx",
@@ -22000,7 +22133,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-19T02:04:46.045Z"
+      "createdAt": "2026-08-19T02:04:46.045Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszg8kn1_fwqqom",
@@ -22014,7 +22148,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-19T02:05:05.533Z"
+      "createdAt": "2026-08-19T02:05:05.533Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszga3z1_ehai6r",
@@ -22028,7 +22163,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-19T02:06:17.245Z"
+      "createdAt": "2026-08-19T02:06:17.245Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszga53v_rjnlvd",
@@ -22042,7 +22178,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-19T02:06:18.715Z"
+      "createdAt": "2026-08-19T02:06:18.715Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszga944_xhj30l",
@@ -22056,7 +22193,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-19T02:06:23.908Z"
+      "createdAt": "2026-08-19T02:06:23.908Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszgqqes_pd7w2p",
@@ -22070,7 +22208,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-19T02:19:12.820Z"
+      "createdAt": "2026-08-19T02:19:12.820Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszisnlg_q0aga4",
@@ -22084,7 +22223,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-19T03:16:41.716Z"
+      "createdAt": "2026-08-19T03:16:41.716Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszkfypn_mzxq5m",
@@ -22098,7 +22238,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-19T04:02:48.827Z"
+      "createdAt": "2026-08-19T04:02:48.827Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_msznv8la_rymcpi",
@@ -22112,7 +22253,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-19T05:38:40.318Z"
+      "createdAt": "2026-08-19T05:38:40.318Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszoc726_gys0i4",
@@ -22126,7 +22268,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-19T05:51:51.486Z"
+      "createdAt": "2026-08-19T05:51:51.486Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszodbz3_dg9zqe",
@@ -22140,7 +22283,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-19T05:52:44.511Z"
+      "createdAt": "2026-08-19T05:52:44.511Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mszs9old_mbrlqs",
@@ -22154,7 +22298,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-19T07:41:52.705Z"
+      "createdAt": "2026-08-19T07:41:52.705Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt0vbjf4_a0sg53",
@@ -22168,7 +22313,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-20T01:55:04.336Z"
+      "createdAt": "2026-08-20T01:55:04.336Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt2e7cph_gle5uy",
@@ -22182,7 +22328,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-21T03:31:27.893Z"
+      "createdAt": "2026-08-21T03:31:27.893Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt2ee5vw_pft24z",
@@ -22196,7 +22343,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-21T03:36:45.644Z"
+      "createdAt": "2026-08-21T03:36:45.644Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt2n8i68_sie4u3",
@@ -22210,7 +22358,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-21T07:44:18.176Z"
+      "createdAt": "2026-08-21T07:44:18.176Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt2rz2is_y7hc7o",
@@ -22224,7 +22373,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-21T09:56:56.068Z"
+      "createdAt": "2026-08-21T09:56:56.068Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6moakc_vz228u",
@@ -22238,7 +22388,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-24T02:39:39.900Z"
+      "createdAt": "2026-08-24T02:39:39.900Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6muwf0_s5wph8",
@@ -22252,7 +22403,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-24T02:44:48.156Z"
+      "createdAt": "2026-08-24T02:44:48.156Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6mvgyg_wdt2vz",
@@ -22266,7 +22418,8 @@
       "track": "business",
       "trackLabel": "业务赋能",
       "revoked": false,
-      "createdAt": "2026-08-24T02:45:14.776Z"
+      "createdAt": "2026-08-24T02:45:14.776Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6mvo0p_12scaa",
@@ -22280,7 +22433,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-24T02:45:23.929Z"
+      "createdAt": "2026-08-24T02:45:23.929Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6mw99a_1lz3kg",
@@ -22294,7 +22448,8 @@
       "track": "creative",
       "trackLabel": "创意应用",
       "revoked": false,
-      "createdAt": "2026-08-24T02:45:51.454Z"
+      "createdAt": "2026-08-24T02:45:51.454Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6n4dv2_8jhdnb",
@@ -22308,7 +22463,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-24T02:52:10.670Z"
+      "createdAt": "2026-08-24T02:52:10.670Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6sz890_kgao25",
@@ -22322,7 +22478,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-24T05:36:07.812Z"
+      "createdAt": "2026-08-24T05:36:07.812Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6t0yfw_7tpxi8",
@@ -22336,7 +22493,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-24T05:37:28.412Z"
+      "createdAt": "2026-08-24T05:37:28.412Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6uemst_m1br5q",
@@ -22350,7 +22508,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-24T06:16:06.125Z"
+      "createdAt": "2026-08-24T06:16:06.125Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6ufzfh_br9ug9",
@@ -22364,7 +22523,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-24T06:17:09.149Z"
+      "createdAt": "2026-08-24T06:17:09.149Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt6uptpv_qkv4eu",
@@ -22378,7 +22538,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-24T06:24:48.307Z"
+      "createdAt": "2026-08-24T06:24:48.307Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt71y3he_qcogqd",
@@ -22392,7 +22553,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-24T09:47:11.522Z"
+      "createdAt": "2026-08-24T09:47:11.522Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt72mr98_jq8r0i",
@@ -22406,7 +22568,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-24T10:06:22.076Z"
+      "createdAt": "2026-08-24T10:06:22.076Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt73xf2j_yvpn5c",
@@ -22420,7 +22583,8 @@
       "track": "efficiency",
       "trackLabel": "效率提升",
       "revoked": false,
-      "createdAt": "2026-08-24T10:42:39.115Z"
+      "createdAt": "2026-08-24T10:42:39.115Z",
+      "stage": "semi_final"
     },
     {
       "id": "bet_mt78v72y_3ncrst",
@@ -22434,7 +22598,8 @@
       "track": "team",
       "trackLabel": "团队赛道",
       "revoked": false,
-      "createdAt": "2026-08-24T13:00:53.530Z"
+      "createdAt": "2026-08-24T13:00:53.530Z",
+      "stage": "semi_final"
     }
   ],
   "drawRecords": [
@@ -28337,7 +28502,6 @@
         "王倩",
         "薛兴华",
         "张旭睿",
-        "徐铭瑞",
         "黄河",
         "程航",
         "杨晓东"
