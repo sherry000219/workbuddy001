@@ -512,6 +512,11 @@ async function ghPull() {
   _syncStatus.lastStatus = status;
   _syncStatus.lastResponse = data && data.message ? data.message : null;
   if (status === 404) {
+    // 防空覆盖守卫：远程文件不存在且本地内存为空时，禁止用空数据初始化远程
+    const isEmptyMemory = (db.entries || []).length === 0 && (db.votes || []).length === 0 && (db.judgeScores || []).length === 0;
+    if (isEmptyMemory) {
+      throw new Error('[gh] remote contest.json missing AND local memory is empty — refuse to initialize with empty data (anti-wipe guard)');
+    }
     // File doesn't exist yet — use current in-memory data (not empty DEFAULT_DB)
     // 这样即使 Render 重启，内存中的 db（已 loadDB）也不会被空数据覆盖
     console.log('[gh] data/contest.json not found, creating with current data...');
@@ -526,6 +531,12 @@ async function ghPull() {
   }
   if (status >= 400) throw new Error(data.message || `GitHub API error ${status}`);
   _ghSha = data.sha;
+  // 处理空文件（GitHub 对 size=0 文件返回 encoding: 'none'）：把空对象视作空数据，跳过合并
+  if (data.encoding === 'none' || !data.content) {
+    console.log('[gh] Remote file is empty (encoding: none), treating as empty data');
+    _syncStatus.githubEntries = 0;
+    return;
+  }
   const buf = Buffer.from(data.content, data.encoding || 'base64');
   const remoteData = JSON.parse(buf.toString('utf8'));
   const remoteCount = (remoteData.entries || []).length;
@@ -759,6 +770,18 @@ function ghPush() {
 
 async function doGhPush() {
   if (!GITHUB_TOKEN) return;
+  // 防空覆盖守卫：本进程从未成功拉取过远程数据（_ghSha 为空）且磁盘数据为空时，禁止推送
+  // 这是防止「部署切换期新容器没拉到数据 → 内存空 → 把空库推上 GitHub 清空所有数据」的根本修复
+  if (!_ghSha) {
+    try {
+      const diskData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      const diskEmpty = (diskData.entries || []).length === 0 && (diskData.votes || []).length === 0 && (diskData.judgeScores || []).length === 0;
+      if (diskEmpty) {
+        console.error('[gh] BLOCKED push of EMPTY data (no successful pull yet) — anti-wipe guard');
+        return;
+      }
+    } catch (e) { /* 读取失败时不让推 */ console.error('[gh] BLOCKED push (cannot read DB safely) — anti-wipe guard'); return; }
+  }
   const maxAttempts = 3;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
@@ -2596,11 +2619,13 @@ app.post('/api/force-sync', async (req, res) => {
 
     let stableCount = 0;
     let lastSnapshot = '';
+    let pullEverSucceeded = _syncStatus.pulled; // tryPullWithRetry 是否已成功过
 
     for (let round = 1; round <= MAX_WAIT_ROUNDS; round++) {
       await new Promise(r => setTimeout(r, POLL_INTERVAL));
       try {
         await ghPull();
+        pullEverSucceeded = true;
         const refreshed = loadDB();
         const snapshot = `e:${refreshed.entries.length}|v:${refreshed.votes.length}|s:${refreshed.judgeScores.length}|d:${(refreshed.drawRecords || []).length}|b:${(refreshed.bets || []).length}`;
 
@@ -2626,13 +2651,40 @@ app.post('/api/force-sync', async (req, res) => {
     }
 
     // 用最终稳定的数据更新内存
-    const refreshed = loadDB();
+    let refreshed = loadDB();
     db.entries = refreshed.entries;
     db.votes = refreshed.votes;
     db.judgeScores = refreshed.judgeScores;
     db.settings = refreshed.settings;
     db.drawRecords = refreshed.drawRecords || [];
     db.bets = refreshed.bets || [];
+
+    // 核心保护：如果整个启动过程中从未成功拉取过远程数据（GitHub API 失败/瞬时故障），
+    // 绝不能开放写入——否则内存可能仍是空，会触发空数据推送清空远程
+    // 改为持续重试拉取，直到成功为止（每 30 秒），期间服务仅处理读请求
+    if (!pullEverSucceeded) {
+      console.error('[gh-fatal] 从未成功拉取远程数据 — 保持只读模式，持续重试中（每 30 秒）...');
+      let waitRound = 0;
+      while (true) {
+        waitRound++;
+        await new Promise(r => setTimeout(r, 30000));
+        try {
+          await ghPull();
+          pullEverSucceeded = true;
+          console.log(`[gh-fatal] 第 ${waitRound} 次重试拉取成功，恢复正常写入`);
+          refreshed = loadDB();
+          db.entries = refreshed.entries;
+          db.votes = refreshed.votes;
+          db.judgeScores = refreshed.judgeScores;
+          db.settings = refreshed.settings;
+          db.drawRecords = refreshed.drawRecords || [];
+          db.bets = refreshed.bets || [];
+          break;
+        } catch (e) {
+          if (waitRound % 5 === 0) console.error(`[gh-fatal] 仍在重试拉取... (第 ${waitRound} 次)`);
+        }
+      }
+    }
   } else {
     // 无 GitHub 同步，直接用本地数据
     const refreshed = loadDB();
