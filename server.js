@@ -285,8 +285,9 @@ function loadDBWithRecovery() {
       const recoveryHasData = (recovery.entries || []).length > 0;
       if (recoveryHasData) {
         console.log('[recovery] 本地数据为空，从恢复文件载入 — entries:', recovery.entries.length, '| votes:', recovery.votes.length, '| scores:', recovery.judgeScores.length, '| stage:', recovery.settings && recovery.settings.currentStage);
-        // 合并：恢复文件为基准，并保留本地 settings（避免覆盖管理员配置）
-        const merged = { ...recovery, settings: { ...recovery.settings, ...local.settings } };
+        // 合并：恢复文件完整生效（settings 也以恢复文件为准——里面才有真实的
+        // currentStage、评委/管理员密码、评委名单、奖品配置；本地空库的 settings 只是默认值）
+        const merged = { ...recovery, settings: { ...local.settings, ...recovery.settings } };
         // 立即写盘——让 doGhPush 的空数据守卫放行，使恢复数据能推上 GitHub
         fs.writeFileSync(DB_FILE, JSON.stringify(merged, null, 2), 'utf8');
         return merged;
