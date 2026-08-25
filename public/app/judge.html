@@ -133,19 +133,80 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
       <b>📋 当前评审阶段：</b><span id="judgeStageLabel">初赛</span>
       <span id="judgeStageHint" style="margin-left:8px;color:var(--text-dim);">（本阶段打分独立计算，不影响其他阶段）</span>
     </div>
-    <div style="background:rgba(255,215,64,0.06);padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;color:rgba(255,215,64,0.7);">
-      <b>打分维度参考：</b>
-      实用性(50%)：解决了真实工作问题 |
-      创新性(20%)：场景/用法新颖有启发性 |
-      可推广性(15%)：其他同事可复用 |
-      效果呈现(15%)：有量化数据支撑
+    <div style="background:rgba(255,215,64,0.06);padding:12px 16px;border-radius:8px;margin-bottom:12px;font-size:13px;color:rgba(255,215,64,0.7);">
+      <b>打分维度（总分 100）：</b>创新性 /20 · 实用性 /30 · 可推广性 /20 · 组织价值 /20 · 效果展示 /10 —— 详细标准见下方说明
     </div>
+    <details style="margin-bottom:16px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;" open>
+      <summary style="padding:10px 16px;font-weight:700;font-size:14px;color:var(--text);cursor:pointer;">📖 打分维度详细标准（等级与分数区间）</summary>
+      <div style="padding:0 16px 14px;">
+        <style>
+          .dim-card { border:1px solid #e5e7eb; border-radius:8px; margin-top:10px; overflow:hidden; }
+          .dim-head { padding:8px 12px; background:#fff7ed; color:#b45309; font-weight:700; font-size:13px; }
+          .dim-def { padding:6px 12px; font-size:12px; color:#6b7280; background:#fff; border-bottom:1px solid #f3f4f6; }
+          .dim-table { width:100%; border-collapse:collapse; font-size:12px; }
+          .dim-table th { background:#f9fafb; padding:5px 10px; text-align:left; color:#374151; font-weight:600; border-bottom:1px solid #e5e7eb; }
+          .dim-table td { padding:5px 10px; border-bottom:1px solid #f3f4f6; color:#4b5563; vertical-align:top; }
+          .dim-table td.lv { font-weight:600; white-space:nowrap; color:#1f2937; }
+          .dim-table td.range { white-space:nowrap; color:#ff6b35; font-weight:600; }
+        </style>
+        <div class="dim-card">
+          <div class="dim-head">1. 创新性（满分 20 分）</div>
+          <div class="dim-def">作品在理念、方法、技术或应用场景上是否具有新颖性，是否提出独特解决方案或改进思路，区别于已有做法。</div>
+          <table class="dim-table"><tr><th>等级</th><th>分数区间</th><th>描述</th></tr>
+            <tr><td class="lv">突破性创新</td><td class="range">16 ~ 20</td><td>提出全新的理念、方法或技术，在该领域内尚无先例，具有开创性意义</td></tr>
+            <tr><td class="lv">显著创新</td><td class="range">11 ~ 15</td><td>在现有做法基础上，有较大幅度的改进或跨界融合，具有明显的新颖点</td></tr>
+            <tr><td class="lv">局部创新</td><td class="range">6 ~ 10</td><td>在细节或局部环节有优化和改进，但整体框架仍属常规</td></tr>
+            <tr><td class="lv">创新性不足</td><td class="range">0 ~ 5</td><td>基本沿用已有方法或套路，无明显新颖之处</td></tr>
+          </table>
+        </div>
+        <div class="dim-card">
+          <div class="dim-head">2. 实用性（满分 30 分）</div>
+          <div class="dim-def">作品是否完整成型，具备实际落地的使用场景，能够在真实工作中被有效应用并解决问题。</div>
+          <table class="dim-table"><tr><th>等级</th><th>分数区间</th><th>描述</th></tr>
+            <tr><td class="lv">完整且已在使用</td><td class="range">24 ~ 30</td><td>作品功能完整、运行稳定，已在实际工作场景中投入使用并产生效果</td></tr>
+            <tr><td class="lv">完整但尚未使用</td><td class="range">18 ~ 23</td><td>作品已完成开发或构建，功能完备，但目前尚未投入实际使用</td></tr>
+            <tr><td class="lv">未来可能使用</td><td class="range">12 ~ 17</td><td>作品尚处原型或阶段性成果阶段，具备潜在应用前景，有待进一步完善</td></tr>
+            <tr><td class="lv">不具备实际使用场景</td><td class="range">0 ~ 11</td><td>作品脱离实际需求，难以落地或无法匹配真实工作场景</td></tr>
+          </table>
+        </div>
+        <div class="dim-card">
+          <div class="dim-head">3. 可推广性（满分 20 分）</div>
+          <div class="dim-def">作品是否具备标准化、模块化的能力，能否在本团队、不同团队、地区或规模场景中被复制推广，同时考量实际可参与使用的人次（用户覆盖面）。</div>
+          <table class="dim-table"><tr><th>等级</th><th>分数区间</th><th>描述</th></tr>
+            <tr><td class="lv">可跨领域/跨地区推广</td><td class="range">16 ~ 20</td><td>作品高度标准化和适配，适用范围广泛，可向外部单位或全行业推广；参与使用的人次规模大（如覆盖多地或多层级用户群体）</td></tr>
+            <tr><td class="lv">可在本单位全面推广</td><td class="range">11 ~ 15</td><td>作品适用于本单位内多个部门或团队，具备在本组织内全面铺开的条件；参与使用的人次在本单位内具有较广覆盖面</td></tr>
+            <tr><td class="lv">仅适用于特定场景/团队</td><td class="range">6 ~ 10</td><td>作品具有较强的定制化属性，仅适用于特定业务场景或个别团队；参与使用的人次有限，局限于少数特定人员</td></tr>
+            <tr><td class="lv">不具备推广条件</td><td class="range">0 ~ 5</td><td>作品高度定制、依赖特定环境或资源，无法复制推广；参与使用的人次极少或无实际用户</td></tr>
+          </table>
+        </div>
+        <div class="dim-card">
+          <div class="dim-head">4. 组织价值（满分 20 分）</div>
+          <div class="dim-def">作品对组织带来的综合效益，包括效率提升、成本降低、管理优化、客户满意度或品牌形象增强等。</div>
+          <table class="dim-table"><tr><th>等级</th><th>分数区间</th><th>描述</th></tr>
+            <tr><td class="lv">价值显著</td><td class="range">16 ~ 20</td><td>在效率、成本、管理等核心指标上有显著提升，对组织战略目标贡献明显</td></tr>
+            <tr><td class="lv">价值较明显</td><td class="range">11 ~ 15</td><td>在部分核心指标上有可量化的改善，有助于优化现有工作流程</td></tr>
+            <tr><td class="lv">价值一般</td><td class="range">6 ~ 10</td><td>带来一定程度的改善，但效果有限或仅体现于非核心环节</td></tr>
+            <tr><td class="lv">价值微弱或无法衡量</td><td class="range">0 ~ 5</td><td>难以量化实际效益，或对组织运营无明显正向影响</td></tr>
+          </table>
+        </div>
+        <div class="dim-card">
+          <div class="dim-head">5. 效果展示（满分 10 分）</div>
+          <div class="dim-def">作品在演示汇报或成果展示中，是否清晰、直观、有说服力地呈现了其功能、优势及实际效果。</div>
+          <table class="dim-table"><tr><th>等级</th><th>分数区间</th><th>描述</th></tr>
+            <tr><td class="lv">展示专业且极具说服力</td><td class="range">8 ~ 10</td><td>展示材料逻辑清晰、数据翔实、可视化程度高，能充分证明作品价值，引人信服</td></tr>
+            <tr><td class="lv">展示清晰完整</td><td class="range">5 ~ 7</td><td>展示内容完整，能够清楚说明作品功能和应用效果，无明显缺漏</td></tr>
+            <tr><td class="lv">展示基本合格</td><td class="range">2 ~ 4</td><td>展示能交代作品基本情况，但逻辑或表现力一般，部分内容不够清晰</td></tr>
+            <tr><td class="lv">展示混乱或不完整</td><td class="range">0 ~ 1</td><td>展示内容条理不清，未能有效传达作品的核心功能和实际效果</td></tr>
+          </table>
+        </div>
+      </div>
+    </details>
     <div class="score-table">
       <table>
         <thead>
           <tr>
             <th>作品</th><th>姓名</th><th>部门</th><th>赛道</th>
-            <th>实用性<br><small>/50</small></th><th>创新性<br><small>/20</small></th><th>可推广性<br><small>/15</small></th><th>效果呈现<br><small>/15</small></th>
+            <th>创新性<br><small>/20</small></th><th>实用性<br><small>/30</small></th><th>可推广性<br><small>/20</small></th><th>组织价值<br><small>/20</small></th><th>效果展示<br><small>/10</small></th>
             <th>总分</th><th>操作</th>
           </tr>
         </thead>
@@ -332,7 +393,7 @@ async function renderJudgePanel() {
 
     const tbody = document.getElementById('judgeTableBody');
     if (judgableEntries.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-dim);">当前阶段（' + (STAGE_LABELS[currentStage] || '初赛') + '）没有可评审的作品</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text-dim);">当前阶段（' + (STAGE_LABELS[currentStage] || '初赛') + '）没有可评审的作品</td></tr>';
       return;
     }
 
@@ -340,7 +401,7 @@ async function renderJudgePanel() {
       const hasCurrentScore = !!myScores[e.id];
       const s = myScores[e.id] || inheritedScores[e.id] || {};
       const isInherited = !hasCurrentScore && !!inheritedScores[e.id];
-      const total = (s.practicality||0) + (s.innovation||0) + (s.scalability||0) + (s.presentation||0);
+      const total = (s.innovation||0) + (s.practicality||0) + (s.scalability||0) + (s.value||0) + (s.presentation||0);
       const hasScored = hasCurrentScore ? 'scored' : '';
       const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
       const teamBadge = e.entryType === 'team' ? '<span class="team-badge">👥 团队</span>' : '';
@@ -348,41 +409,42 @@ async function renderJudgePanel() {
       // 回避：评委自己的作品显示灰色，不可打分
       const isOwn = e.name === judgeName || (e.teamMembers && e.teamMembers.includes(judgeName));
       if (isOwn) {
-        return '<tr style="opacity:0.45;background:#f9fafb;"><td><span onclick="openDetail(\'' + e.id + '\')" style="color:var(--text-dim);cursor:pointer;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</span> ' + badge + teamBadge + '</td><td>' + e.name + '</td><td>' + deptChain + '</td><td>' + trackLabel(e.track) + '</td><td colspan="4" style="text-align:center;color:var(--text-dim);font-size:13px;">⊘ 回避</td><td>-</td><td><span style="color:var(--text-dim);font-size:12px;">您的作品</span></td></tr>';
+        return '<tr style="opacity:0.45;background:#f9fafb;"><td><span onclick="openDetail(\'' + e.id + '\')" style="color:var(--text-dim);cursor:pointer;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</span> ' + badge + teamBadge + '</td><td>' + e.name + '</td><td>' + deptChain + '</td><td>' + trackLabel(e.track) + '</td><td colspan="5" style="text-align:center;color:var(--text-dim);font-size:13px;">⊘ 回避</td><td>-</td><td><span style="color:var(--text-dim);font-size:12px;">您的作品</span></td></tr>';
       }
       const inputStyle = isInherited ? 'background:#fffbeb;border-color:#f59e0b;' : '';
       const inheritHint = isInherited ? '<span style="display:inline-block;background:#fffbeb;color:#b45309;border:1px solid #fcd34d;padding:1px 6px;border-radius:6px;font-size:11px;margin-left:6px;vertical-align:middle;">继承自' + (s.inheritedFrom === 'preliminary' ? '初赛' : '复赛') + '</span>' : '';
-      return '<tr class="' + hasScored + '"><td><span onclick="openDetail(\'' + e.id + '\')" style="color:#ff6b35;cursor:pointer;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</span> ' + badge + teamBadge + '</td><td>' + e.name + '</td><td>' + deptChain + '</td><td>' + trackLabel(e.track) + '</td><td><input type="number" min="0" max="50" value="' + (s.practicality||'') + '" id="j_p_' + e.id + '" placeholder="0-50" style="' + inputStyle + '"></td><td><input type="number" min="0" max="20" value="' + (s.innovation||'') + '" id="j_c_' + e.id + '" placeholder="0-20" style="' + inputStyle + '"></td><td><input type="number" min="0" max="15" value="' + (s.scalability||'') + '" id="j_s_' + e.id + '" placeholder="0-15" style="' + inputStyle + '"></td><td><input type="number" min="0" max="15" value="' + (s.presentation||'') + '" id="j_r_' + e.id + '" placeholder="0-15" style="' + inputStyle + '"></td><td><strong>' + total + '</strong></td><td><button class="btn btn-sm ' + (hasCurrentScore ? 'btn-success' : 'btn-primary') + '" onclick="saveScore(\'' + e.id + '\')">' + (hasCurrentScore ? '更新' : '打分') + '</button>' + inheritHint + '</td></tr>';
+      return '<tr class="' + hasScored + '"><td><span onclick="openDetail(\'' + e.id + '\')" style="color:#ff6b35;cursor:pointer;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</span> ' + badge + teamBadge + '</td><td>' + e.name + '</td><td>' + deptChain + '</td><td>' + trackLabel(e.track) + '</td><td><input type="number" min="0" max="20" value="' + (s.innovation||'') + '" id="j_c_' + e.id + '" placeholder="0-20" style="' + inputStyle + '"></td><td><input type="number" min="0" max="30" value="' + (s.practicality||'') + '" id="j_p_' + e.id + '" placeholder="0-30" style="' + inputStyle + '"></td><td><input type="number" min="0" max="20" value="' + (s.scalability||'') + '" id="j_s_' + e.id + '" placeholder="0-20" style="' + inputStyle + '"></td><td><input type="number" min="0" max="20" value="' + (s.value||'') + '" id="j_v_' + e.id + '" placeholder="0-20" style="' + inputStyle + '"></td><td><input type="number" min="0" max="10" value="' + (s.presentation||'') + '" id="j_r_' + e.id + '" placeholder="0-10" style="' + inputStyle + '"></td><td><strong>' + total + '</strong></td><td><button class="btn btn-sm ' + (hasCurrentScore ? 'btn-success' : 'btn-primary') + '" onclick="saveScore(\'' + e.id + '\')">' + (hasCurrentScore ? '更新' : '打分') + '</button>' + inheritHint + '</td></tr>';
     }
     const individual = judgableEntries.filter(function(e) { return e.entryType !== 'team'; });
     const team = judgableEntries.filter(function(e) { return e.entryType === 'team'; });
     let rows = '';
     if (individual.length > 0) {
-      rows += '<tr class="group-header"><td colspan="10">👤 个人参赛（' + individual.length + '）</td></tr>';
+      rows += '<tr class="group-header"><td colspan="11">👤 个人参赛（' + individual.length + '）</td></tr>';
       rows += individual.map(renderEntryRow).join('');
     }
     if (team.length > 0) {
-      rows += '<tr class="group-header"><td colspan="10">👥 团队参赛（' + team.length + '）</td></tr>';
+      rows += '<tr class="group-header"><td colspan="11">👥 团队参赛（' + team.length + '）</td></tr>';
       rows += team.map(renderEntryRow).join('');
     }
     if (!rows) {
-      rows = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-dim);">当前阶段（' + (STAGE_LABELS[currentStage] || '初赛') + '）没有可评审的作品</td></tr>';
+      rows = '<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text-dim);">当前阶段（' + (STAGE_LABELS[currentStage] || '初赛') + '）没有可评审的作品</td></tr>';
     }
     tbody.innerHTML = rows;
   } catch(e) { console.error('Judge panel error:', e); }
 }
 
 async function saveScore(entryId) {
-  const p = parseInt(document.getElementById('j_p_' + entryId).value) || 0;
   const c = parseInt(document.getElementById('j_c_' + entryId).value) || 0;
+  const p = parseInt(document.getElementById('j_p_' + entryId).value) || 0;
   const s = parseInt(document.getElementById('j_s_' + entryId).value) || 0;
+  const v = parseInt(document.getElementById('j_v_' + entryId).value) || 0;
   const r = parseInt(document.getElementById('j_r_' + entryId).value) || 0;
-  if (p > 50 || c > 20 || s > 15 || r > 15) return showToast('分数超出上限，请检查！', 'error');
+  if (c > 20 || p > 30 || s > 20 || v > 20 || r > 10) return showToast('分数超出上限（创新性20/实用性30/可推广性20/组织价值20/效果展示10）', 'error');
   try {
     const data = await api('/api/judge/scores/' + entryId, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ judgeName: judgeName, practicality: p, innovation: c, scalability: s, presentation: r, judgePassword: judgePassword })
+      body: JSON.stringify({ judgeName: judgeName, innovation: c, practicality: p, scalability: s, value: v, presentation: r, judgePassword: judgePassword })
     });
     showToast('打分已保存！总分：' + data.total + '（' + (STAGE_LABELS[data.stage] || '') + '）', 'success');
     renderJudgePanel();
