@@ -22705,6 +22705,21 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-25T07:25:32.928Z"
+    },
+    {
+      "id": "bet_mt8cc8ah_i72y29",
+      "voterId": "pZK4vYX2ZLDqkIPCNV0nRwiEiE",
+      "voterName": "陈好好",
+      "voterMobile": "18963602126",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5xCCYYVe3_NBDjNBDiwF9Q3Ebb4Re0JLUkUBTB4AA_1080_1080.jpg",
+      "stage": "final",
+      "entryId": "entry_1786351346788_dvmzme",
+      "entryTitle": "数据哨兵——基于 Skill 的实时动态看板",
+      "entryDept": "中小微事业群",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-25T07:25:53.273Z"
     }
   ],
   "drawRecords": [
