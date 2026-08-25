@@ -666,14 +666,15 @@ function renderRankList(list, containerId) {
   }
   function medalOf(i) { return i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : ''; }
   function rankClassOf(i) { return i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : 'normal'; }
-  function rowHtml(e, idx, typeLabel, typeIcon) {
-    const medal = medalOf(idx);
-    const rankClass = rankClassOf(idx);
+  function rowHtml(e, idx, typeLabel, typeIcon, hideRank) {
+    const medal = hideRank ? '' : medalOf(idx);
+    const rankClass = hideRank ? '' : rankClassOf(idx);
+    const rankDisplay = hideRank ? '' : (medal || (idx+1));
     const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
     const tBadge = teamBadgeHtml(e);
     const deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
     const typeTag = typeLabel ? '<span style="display:inline-block;background:' + (typeIcon === '🚀' ? 'rgba(255,107,53,0.12)' : 'rgba(124,58,237,0.12)') + ';color:' + (typeIcon === '🚀' ? '#ff6b35' : '#7c3aed') + ';font-size:11px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:4px;">' + typeIcon + ' ' + typeLabel + '</span>' : '';
-    return '<div class="rank-item" onclick="openDetail(\'' + e.id + '\')"><div class="rank-num ' + rankClass + '">' + (medal || (idx+1)) + '</div><div class="rank-info"><div class="rname">' + typeTag + e.title + ' ' + badge + tBadge + '</div><div class="rdept">' + e.name + ' · ' + deptChain + ' · ' + trackLabel(e.track) + '</div></div><div class="rank-score">' + (e.composite||0) + '</div></div>';
+    return '<div class="rank-item" onclick="openDetail(\'' + e.id + '\')"><div class="rank-num ' + rankClass + '">' + rankDisplay + '</div><div class="rank-info"><div class="rname">' + typeTag + e.title + ' ' + badge + tBadge + '</div><div class="rdept">' + e.name + ' · ' + deptChain + ' · ' + trackLabel(e.track) + '</div></div><div class="rank-score">' + (e.composite||0) + '</div></div>';
   }
   function groupHeader(label, count) {
     return '<div style="padding:8px 12px;background:#f3f4f6;border-bottom:1px solid #e5e7eb;font-size:13px;font-weight:700;color:#374151;border-top:1px solid #e5e7eb;">' + label + ' <span style="color:#9ca3af;font-weight:400;">（' + count + ' 个）</span></div>';
@@ -699,7 +700,7 @@ function renderRankList(list, containerId) {
   }
   if (rest.length > 0) {
     html += groupHeader('📊 其余作品（按综合分排名）', rest.length);
-    rest.forEach((e, i) => { html += rowHtml(e, i, '', ''); });
+    rest.forEach((e, i) => { html += rowHtml(e, i, '', '', true); });
   }
   container.innerHTML = html;
 }
