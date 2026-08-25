@@ -267,10 +267,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     </select>
     <span id="rankStageHint" style="font-size:12px;color:var(--text-dim);"></span>
   </div>
-  <div class="rank-section-title">👤 个人参赛</div>
-  <div class="ranking-list" id="rankingListIndividual"></div>
-  <div class="rank-section-title">👥 团队参赛</div>
-  <div class="ranking-list" id="rankingListTeam"></div>
+  <div class="rank-section-title">🏆 排名总览</div>
+  <div class="ranking-list" id="rankingListAll"></div>
 </div>
 
 </div><!-- .main-container -->
@@ -674,59 +672,63 @@ function renderStatsBar(containerId, stats) {
 function teamBadgeHtml(entry) {
   return entry.entryType === 'team' ? '<span class="team-badge">👥 团队</span>' : '';
 }
-function renderRankList(list, containerId) {
+// 四段结构：个人晋级 / 团队晋级 / 个人淘汰 / 团队淘汰
+// 晋级组显示名次（dense rank，分数相同并列）；淘汰组按排名排序但不显示名次
+function renderRankList(individual, team, containerId, viewStage) {
   const container = document.getElementById(containerId);
   if (!container) return;
-  if (!list || list.length === 0) {
+  if ((!individual || individual.length === 0) && (!team || team.length === 0)) {
     container.innerHTML = '<div class="empty-state" style="padding:40px 20px;"><div class="icon">🏆</div><p>暂无排名数据</p></div>';
     return;
   }
-  // dense rank 编号：分数相同并列（综合分优先、综合分相同时评委打分次之）
+  // 该视图下的晋级状态集合：查看复赛历史时晋级=进入过复赛；决赛/结算时晋级=进入过决赛
+  const advancedStatus = viewStage === 'semi_final'
+    ? ['semi_finalist', 'finalist', 'awarded']
+    : (viewStage === 'final' || viewStage === 'awarded') ? ['finalist', 'awarded'] : [];
+  function isAdvanced(e) { return advancedStatus.includes(e.roundStatus || 'approved'); }
+  // dense rank：综合分优先，综合分相同时评委打分次之
   function denseRank(entries) {
     let prevKey = null, rank = 0;
     entries.forEach(function(e, i) {
-      const c = Number(e.composite || 0), j = Number(e.judgeAvg || 0);
-      const key = c + '|' + j;
+      const key = Number(e.composite || 0) + '|' + Number(e.judgeAvg || 0);
       if (key !== prevKey) { rank = i + 1; prevKey = key; }
       e._rank = rank;
     });
   }
   function fmtScore(v) { const n = Number(v || 0); return (Math.round(n * 100) / 100).toFixed(2); }
-  function rowHtml(e, typeLabel, typeIcon) {
+  function rowHtml(e, showRank, tagLabel, tagBg, tagColor) {
     const badge = awardBadge(e.award) || roundBadge(e.roundStatus);
     const tBadge = teamBadgeHtml(e);
     const deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(function(d) { return d; }).join(' / ') || '-';
-    const typeTag = typeLabel ? '<span style="display:inline-block;background:' + (typeIcon === '🚀' ? 'rgba(255,107,53,0.12)' : 'rgba(124,58,237,0.12)') + ';color:' + (typeIcon === '🚀' ? '#ff6b35' : '#7c3aed') + ';font-size:11px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:4px;">' + typeIcon + ' ' + typeLabel + '</span>' : '';
-    return '<div class="rank-item" onclick="openDetail(\'' + e.id + '\')"><div class="rank-num">' + (e._rank || '') + '</div><div class="rank-info"><div class="rname">' + typeTag + e.title + ' ' + badge + tBadge + '</div><div class="rdept">' + e.name + ' · ' + deptChain + ' · ' + trackLabel(e.track) + '</div></div><div class="rank-score">' + fmtScore(e.composite) + '</div></div>';
+    const tag = tagLabel ? '<span style="display:inline-block;background:' + tagBg + ';color:' + tagColor + ';font-size:11px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:4px;">' + tagLabel + '</span>' : '';
+    return '<div class="rank-item" onclick="openDetail(\'' + e.id + '\')"><div class="rank-num">' + (showRank ? (e._rank || '') : '') + '</div><div class="rank-info"><div class="rname">' + tag + e.title + ' ' + badge + tBadge + '</div><div class="rdept">' + e.name + ' · ' + deptChain + ' · ' + trackLabel(e.track) + '</div></div><div class="rank-score">' + fmtScore(e.composite) + '</div></div>';
   }
-  function groupHeader(label, count) {
-    return '<div style="padding:8px 12px;background:#f3f4f6;border-bottom:1px solid #e5e7eb;font-size:13px;font-weight:700;color:#374151;border-top:1px solid #e5e7eb;">' + label + ' <span style="color:#9ca3af;font-weight:400;">（' + count + ' 个）</span></div>';
+  function groupHeader(label, count, bg, color) {
+    return '<div style="padding:10px 14px;background:' + bg + ';border-bottom:1px solid #e5e7eb;font-size:14px;font-weight:700;color:' + color + ';border-top:1px solid #e5e7eb;">' + label + ' <span style="font-weight:400;opacity:.7;">（' + count + ' 个）</span></div>';
   }
-  // 拆分：直晋级 / 部门奖 / 其余
-  const direct = list.filter(e => e.promoteType === 'direct');
-  const dept = list.filter(e => e.promoteType === 'dept');
-  const rest = list.filter(e => e.promoteType === 'none');
+  // 拆分四组
+  const advIndividual = (individual || []).filter(isAdvanced);
+  const elimIndividual = (individual || []).filter(e => !isAdvanced(e));
+  const advTeam = (team || []).filter(isAdvanced);
+  const elimTeam = (team || []).filter(e => !isAdvanced(e));
+  denseRank(advIndividual);
+  denseRank(advTeam);
   let html = '';
-  if (direct.length > 0) {
-    denseRank(direct);
-    html += groupHeader('🚀 直晋级（个人 TOP10 / 团队 TOP3）', direct.length);
-    direct.forEach((e) => { html += rowHtml(e, '直晋级', '🚀'); });
+  if (advIndividual.length > 0) {
+    html += groupHeader('✅ 个人晋级', advIndividual.length, 'rgba(16,185,129,0.08)', '#059669');
+    advIndividual.forEach(e => { html += rowHtml(e, true); });
   }
-  if (dept.length > 0) {
-    // 部门奖内按 promoteDept 子分组，每组内 dense rank
-    const byDept = {};
-    dept.forEach(e => { (byDept[e.promoteDept] = byDept[e.promoteDept] || []).push(e); });
-    html += groupHeader('🏢 部门维度晋级（各部门前 1）', dept.length);
-    Object.keys(byDept).sort().forEach(d => {
-      denseRank(byDept[d]);
-      html += '<div style="padding:6px 12px;background:#fafafa;border-bottom:1px solid #f3f4f6;font-size:12px;font-weight:600;color:#6b7280;">🏢 ' + (d === '__none__' ? '未填写部门' : d) + '</div>';
-      byDept[d].forEach(e => { html += rowHtml(e, '部门维度晋级', '🏢'); });
-    });
+  if (advTeam.length > 0) {
+    html += groupHeader('✅ 团队晋级', advTeam.length, 'rgba(16,185,129,0.08)', '#059669');
+    advTeam.forEach(e => { html += rowHtml(e, true); });
   }
-  if (rest.length > 0) {
-    denseRank(rest);
-    html += groupHeader('📊 其余作品（按综合分排名）', rest.length);
-    rest.forEach((e) => { html += rowHtml(e, '', ''); });
+  if (elimIndividual.length > 0) {
+    html += groupHeader('👤 个人未晋级', elimIndividual.length, '#f3f4f6', '#6b7280');
+    elimIndividual.forEach(e => { html += rowHtml(e, false, '', '', ''); });
+  }
+  if (elimTeam.length > 0) {
+    html += groupHeader('👥 团队未晋级', elimTeam.length, '#f3f4f6', '#6b7280');
+    elimTeam.forEach(e => { html += rowHtml(e, false, '', '', ''); });
   }
   container.innerHTML = html;
 }
@@ -743,8 +745,7 @@ async function renderRanking() {
     if (data.currentStage) {
       updateStageUI(data.currentStage);
     }
-    renderRankList(data.individual || [], 'rankingListIndividual');
-    renderRankList(data.team || [], 'rankingListTeam');
+    renderRankList(data.individual || [], data.team || [], 'rankingListAll', data.currentStage || stage);
   } catch(e) { console.error('Ranking error:', e); }
 }
 
