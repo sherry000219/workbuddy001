@@ -1335,11 +1335,61 @@ app.get('/api/ranking', requireAuth, (req, res) => {
     entries = db.entries.filter(e => e.status === 'approved');
   }
   if (track) entries = entries.filter(e => e.track === track);
-  const enrich = (list) => list.map(e => {
-    const sd = getEntryStageScores(e.id, targetStage);
-    const composite = getCompositeScore(e.id, targetStage);
-    return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, judgeAvg: sd.avgScore, composite };
-  }).sort((a, b) => b.composite - a.composite).slice(0, 30);
+  // 计算晋级类型（个人 TOP10 / 团队 TOP3 直晋级 + 部门奖前 1；中小微下钻二级）
+  function deptKey(e) {
+    const d1 = (e.dept1 || e.dept || '').trim();
+    if (!d1) return '__none__';
+    if (d1.indexOf('中小微') !== -1) {
+      const d2 = (e.dept2 || e.subdept || '').trim();
+      if (d2) return d1 + '/' + d2;
+    }
+    return d1;
+  }
+  function computePromoteTypes(list) {
+    const sorted = list.slice().sort((a, b) => (b.composite || 0) - (a.composite || 0));
+    const personal = sorted.filter(e => e.entryType !== 'team');
+    const team = sorted.filter(e => e.entryType === 'team');
+    const directP = personal.slice(0, 10);
+    const directT = team.slice(0, 3);
+    const directIds = new Set([...directP, ...directT].map(e => e.id));
+    const pdc = {}, tdc = {};
+    directP.forEach(e => { const d = deptKey(e); pdc[d] = (pdc[d] || 0) + 1; });
+    directT.forEach(e => { const d = deptKey(e); tdc[d] = (tdc[d] || 0) + 1; });
+    const deptP = []; const seenP = new Set();
+    for (const e of personal) {
+      if (directIds.has(e.id)) continue;
+      const d = deptKey(e);
+      if (seenP.has(d)) continue;
+      if ((pdc[d] || 0) > 2) continue; // TOP10 中该部门已超过 2 个 → 不再录
+      deptP.push(e); seenP.add(d);
+    }
+    const deptT = []; const seenT = new Set();
+    for (const e of team) {
+      if (directIds.has(e.id)) continue;
+      const d = deptKey(e);
+      if (seenT.has(d)) continue;
+      if (tdc[d]) continue; // TOP3 已有该部门 → 不录
+      deptT.push(e); seenT.add(d);
+    }
+    const deptIds = new Set([...deptP, ...deptT].map(e => e.id));
+    const result = new Map();
+    list.forEach(e => {
+      let t = 'none';
+      if (directIds.has(e.id)) t = 'direct';
+      else if (deptIds.has(e.id)) t = 'dept';
+      result.set(e.id, { promoteType: t, promoteDept: deptKey(e) });
+    });
+    return result;
+  }
+  const enrich = (list) => {
+    const annotated = list.map(e => {
+      const sd = getEntryStageScores(e.id, targetStage);
+      const composite = getCompositeScore(e.id, targetStage);
+      return { ...e, roundStatus: e.roundStatus || 'approved', award: e.award || null, voteCount: sd.voteCount, judgeAvg: sd.avgScore, composite };
+    });
+    const typeMap = computePromoteTypes(annotated);
+    return annotated.map(e => ({ ...e, ...typeMap.get(e.id) })).sort((a, b) => (b.composite || 0) - (a.composite || 0)).slice(0, 30);
+  };
   const individual = enrich(entries.filter(e => e.entryType !== 'team'));
   const team = enrich(entries.filter(e => e.entryType === 'team'));
   res.json({ individual, team, currentStage: targetStage });
