@@ -317,7 +317,9 @@ function getVotableEntries(stage) {
     return db.entries.filter(e => e.status === 'approved');
   }
   if (stage === 'semi_final') {
-    return db.entries.filter(e => e.roundStatus === 'semi_finalist');
+    // 复赛投票分分母：所有复赛参与者（含已晋级决赛的 finalist/awarded/eliminated_final），
+    // 避免晋级决赛后 semi_finalist 集合变空导致投票分全部虚高为满分
+    return db.entries.filter(e => ['semi_finalist', 'finalist', 'awarded', 'eliminated_final'].includes(e.roundStatus));
   }
   return [];
 }
