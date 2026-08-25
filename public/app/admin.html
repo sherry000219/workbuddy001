@@ -554,8 +554,7 @@ async function renderAdminDashboard() {
       }
       var judgeCells = allJudges.map(function(judge) {
       var s = e.scores.find(function(sc) { return sc.judgeName === judge; });
-      var isNewDimsView = currentStage === 'final' || currentStage === 'awarded';
-      if (s) return '<td style="background:rgba(0,230,118,0.08);font-weight:500;">' + s.total + '<br><small style="color:var(--text-dim);font-weight:400;">' + (isNewDimsView ? ('创' + s.innovation + ' 实' + s.practicality + ' 推' + s.scalability + ' 值' + (s.value || 0) + ' 展' + s.presentation) : ('实' + s.practicality + ' 创' + s.innovation + ' 推' + s.scalability + ' 效' + s.presentation)) + '</small></td>';
+      if (s) return '<td style="background:rgba(0,230,118,0.08);font-weight:500;">' + s.total + '<br><small style="color:var(--text-dim);font-weight:400;">实' + s.practicality + ' 创' + s.innovation + ' 推' + s.scalability + ' 效' + s.presentation + '</small></td>';
       return '<td style="background:rgba(255,82,82,0.08);color:#ff5252;font-weight:500;text-align:center;" title="' + judge + ' 未评分">未评</td>';
       }).join('');
       var hasScores = e.scores.length > 0;

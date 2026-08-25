@@ -343,10 +343,8 @@ function getJudgableEntries(stage) {
 function getEntryStageScores(entryId, stage) {
   const scores = db.judgeScores.filter(s => s.entryId === entryId && (s.stage || 'preliminary') === stage);
   const voteCount = db.votes.filter(v => v.entryId === entryId && (v.stage || 'preliminary') === stage).length;
-  // 维度体系按赛段：决赛/结算五维（含组织价值）；初赛/复赛旧四维
-  const isNewDims = stage === 'final' || stage === 'awarded';
   const avgScore = scores.length > 0
-    ? Math.round(scores.reduce((sum, s) => sum + (s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (isNewDims ? (s.value || 0) : 0) + (s.presentation || 0), 0) / scores.length)
+    ? Math.round(scores.reduce((sum, s) => sum + s.practicality + s.innovation + s.scalability + s.presentation, 0) / scores.length)
     : 0;
   return { scores, voteCount, avgScore, judgeCount: scores.length };
 }
@@ -514,12 +512,6 @@ async function ghPull() {
   _syncStatus.lastStatus = status;
   _syncStatus.lastResponse = data && data.message ? data.message : null;
   if (status === 404) {
-    // 防空覆盖守卫：远程文件不存在且本地内存为空时，禁止用空数据初始化远程
-    // （防止部署切换期新容器没拉到数据时把空库推上去清空全部线上数据）
-    const isEmptyMemory = (db.entries || []).length === 0 && (db.votes || []).length === 0 && (db.judgeScores || []).length === 0;
-    if (isEmptyMemory) {
-      throw new Error('[gh] remote contest.json missing AND local memory is empty — refuse to initialize with empty data (anti-wipe guard)');
-    }
     // File doesn't exist yet — use current in-memory data (not empty DEFAULT_DB)
     // 这样即使 Render 重启，内存中的 db（已 loadDB）也不会被空数据覆盖
     console.log('[gh] data/contest.json not found, creating with current data...');
@@ -767,24 +759,6 @@ function ghPush() {
 
 async function doGhPush() {
   if (!GITHUB_TOKEN) return;
-  // 防空覆盖守卫：本进程尚未成功拉取过远程数据（_ghSha 为空）且内存为空时，禁止推送
-  // （防止部署切换期新容器没拉到数据时，把空库推上去清空全部线上数据）
-  if (!_ghSha && (db.entries || []).length === 0 && (db.votes || []).length === 0 && (db.judgeScores || []).length === 0) {
-    console.error('[gh] BLOCKED pushing EMPTY data before any successful pull (anti-wipe guard) — forcing pull first');
-    try { await ghPull(); } catch (e) { console.error('[gh] anti-wipe pull failed:', e.message); }
-    const refreshed = loadDB();
-    if ((refreshed.entries || []).length === 0 && (refreshed.votes || []).length === 0) {
-      console.error('[gh] Still empty after pull — skip this push to protect remote data');
-      return;
-    }
-    db.entries = refreshed.entries;
-    db.votes = refreshed.votes;
-    db.judgeScores = refreshed.judgeScores;
-    db.settings = refreshed.settings;
-    db.drawRecords = refreshed.drawRecords || [];
-    db.bets = refreshed.bets || [];
-    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
-  }
   const maxAttempts = 3;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
@@ -1348,7 +1322,7 @@ app.get('/api/bets/summary', (req, res) => {
 
 // ========== API: JUDGE ==========
 app.post('/api/judge/scores/:entryId', (req, res) => {
-  const { judgeName, practicality, innovation, scalability, presentation, value, judgePassword } = req.body;
+  const { judgeName, practicality, innovation, scalability, presentation, judgePassword } = req.body;
   if (!judgeName) return res.status(400).json({ error: '请输入评委姓名' });
   if (judgePassword !== getJudgePassword()) {
     return res.status(403).json({ error: '评委密码错误' });
@@ -1366,24 +1340,14 @@ app.post('/api/judge/scores/:entryId', (req, res) => {
   if (entry.name === judgeName || (entry.teamMembers && entry.teamMembers.includes(judgeName))) {
     return res.status(403).json({ error: '评委不能给自己的作品打分，已自动回避' });
   }
-  // 维度体系按赛段区分：决赛/结算用新五维（创新20/实用30/可推广20/组织价值20/效果展示10），
-  // 初赛/复赛保持旧四维（实用50/创新20/可推广15/效果15）——只有决赛改维度
-  const isNewDims = stage === 'final' || stage === 'awarded';
-  const p = parseInt(practicality) || 0, c = parseInt(innovation) || 0, s = parseInt(scalability) || 0, v = parseInt(value) || 0, r = parseInt(presentation) || 0;
-  if (isNewDims) {
-    if (p > 30 || c > 20 || s > 20 || v > 20 || r > 10) return res.status(400).json({ error: '分数超出上限（创新性20/实用性30/可推广性20/组织价值20/效果展示10）' });
-  } else {
-    if (p > 50 || c > 20 || s > 15 || r > 15) return res.status(400).json({ error: '分数超出上限（实用性50/创新性20/可推广性15/效果呈现15）' });
-  }
+  const p = parseInt(practicality) || 0, c = parseInt(innovation) || 0, s = parseInt(scalability) || 0, r = parseInt(presentation) || 0;
+  if (p > 50 || c > 20 || s > 15 || r > 15) return res.status(400).json({ error: '分数超出上限' });
   const idx = db.judgeScores.findIndex(sc => sc.entryId === req.params.entryId && sc.judgeName === judgeName && (sc.stage || 'preliminary') === stage);
-  const scoreData = isNewDims
-    ? { entryId: req.params.entryId, judgeName, practicality: p, innovation: c, scalability: s, value: v, presentation: r, stage, updatedAt: new Date().toISOString() }
-    : { entryId: req.params.entryId, judgeName, practicality: p, innovation: c, scalability: s, presentation: r, stage, updatedAt: new Date().toISOString() };
+  const scoreData = { entryId: req.params.entryId, judgeName, practicality: p, innovation: c, scalability: s, presentation: r, stage, updatedAt: new Date().toISOString() };
   if (idx >= 0) db.judgeScores[idx] = scoreData;
   else db.judgeScores.push(scoreData);
   saveDB();
-  ghPush().catch(e => console.error('[judge score] GitHub push failed:', e.message));
-  res.json({ success: true, total: isNewDims ? (p + c + s + v + r) : (p + c + s + r), stage });
+  res.json({ success: true, total: p + c + s + r, stage });
 });
 
 // GET /api/judge/my-scores — return this judge's existing scores for current stage
@@ -1398,17 +1362,14 @@ app.get('/api/judge/my-scores', (req, res) => {
   if (!isJudgeInList(judgeName, stage)) {
     return res.status(403).json({ error: '您不在当前赛段评委名单中，请联系管理员添加' });
   }
-  // 维度体系按赛段区分：决赛五维 / 初复赛旧四维（只有决赛改维度）
-  const isNewDims = stage === 'final' || stage === 'awarded';
   const scores = db.judgeScores
     .filter(s => s.judgeName === judgeName && (s.stage || 'preliminary') === stage)
-    .map(s => ({ entryId: s.entryId, practicality: s.practicality, innovation: s.innovation, scalability: s.scalability, value: s.value || 0, presentation: s.presentation, total: isNewDims ? ((s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.value || 0) + (s.presentation || 0)) : ((s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.presentation || 0)) }));
+    .map(s => ({ entryId: s.entryId, practicality: s.practicality, innovation: s.innovation, scalability: s.scalability, presentation: s.presentation, total: s.practicality + s.innovation + s.scalability + s.presentation }));
 
-  // 赛段继承：仅复赛继承初赛（两者同为旧四维体系）；
-  // 决赛为五维新体系，不继承复赛分数（维度不同，继承会导致分数超上限）
+  // 赛段晋级时，若同一位评委在上个赛段已打分且本赛段尚未打分，默认继承上一赛段分数
   const inherited = [];
-  if (stage === 'semi_final') {
-    const prevStage = 'preliminary';
+  if (stage === 'semi_final' || stage === 'final') {
+    const prevStage = stage === 'semi_final' ? 'preliminary' : 'semi_final';
     const judgable = getJudgableEntries(stage);
     const judgableIds = new Set(judgable.map(e => e.id));
     const existingIds = new Set(scores.map(s => s.entryId));
@@ -1421,7 +1382,7 @@ app.get('/api/judge/my-scores', (req, res) => {
           innovation: s.innovation,
           scalability: s.scalability,
           presentation: s.presentation,
-          total: (s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.presentation || 0),
+          total: s.practicality + s.innovation + s.scalability + s.presentation,
           inheritedFrom: prevStage
         });
       }
@@ -2266,8 +2227,6 @@ app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
   const entries = getJudgableEntries(stage);
   const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
   const allJudges = [...new Set(stageScores.map(s => s.judgeName))].sort();
-  // 维度体系按赛段：决赛五维 / 初复赛旧四维（只有决赛改维度）
-  const isNewDims = stage === 'final' || stage === 'awarded';
 
   const entryScoresRaw = entries.map(e => {
     const scores = stageScores
@@ -2277,11 +2236,8 @@ app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
         practicality: s.practicality,
         innovation: s.innovation,
         scalability: s.scalability,
-        value: s.value || 0,
         presentation: s.presentation,
-        total: isNewDims
-          ? ((s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.value || 0) + (s.presentation || 0))
-          : ((s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.presentation || 0)),
+        total: s.practicality + s.innovation + s.scalability + s.presentation,
         updatedAt: s.updatedAt
       }));
     const avg = scores.length > 0
