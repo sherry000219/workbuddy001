@@ -514,6 +514,12 @@ async function ghPull() {
   _syncStatus.lastStatus = status;
   _syncStatus.lastResponse = data && data.message ? data.message : null;
   if (status === 404) {
+    // 防空覆盖守卫：远程文件不存在且本地内存为空时，禁止用空数据初始化远程
+    // （防止部署切换期新容器没拉到数据时把空库推上去清空全部线上数据）
+    const isEmptyMemory = (db.entries || []).length === 0 && (db.votes || []).length === 0 && (db.judgeScores || []).length === 0;
+    if (isEmptyMemory) {
+      throw new Error('[gh] remote contest.json missing AND local memory is empty — refuse to initialize with empty data (anti-wipe guard)');
+    }
     // File doesn't exist yet — use current in-memory data (not empty DEFAULT_DB)
     // 这样即使 Render 重启，内存中的 db（已 loadDB）也不会被空数据覆盖
     console.log('[gh] data/contest.json not found, creating with current data...');
@@ -761,6 +767,24 @@ function ghPush() {
 
 async function doGhPush() {
   if (!GITHUB_TOKEN) return;
+  // 防空覆盖守卫：本进程尚未成功拉取过远程数据（_ghSha 为空）且内存为空时，禁止推送
+  // （防止部署切换期新容器没拉到数据时，把空库推上去清空全部线上数据）
+  if (!_ghSha && (db.entries || []).length === 0 && (db.votes || []).length === 0 && (db.judgeScores || []).length === 0) {
+    console.error('[gh] BLOCKED pushing EMPTY data before any successful pull (anti-wipe guard) — forcing pull first');
+    try { await ghPull(); } catch (e) { console.error('[gh] anti-wipe pull failed:', e.message); }
+    const refreshed = loadDB();
+    if ((refreshed.entries || []).length === 0 && (refreshed.votes || []).length === 0) {
+      console.error('[gh] Still empty after pull — skip this push to protect remote data');
+      return;
+    }
+    db.entries = refreshed.entries;
+    db.votes = refreshed.votes;
+    db.judgeScores = refreshed.judgeScores;
+    db.settings = refreshed.settings;
+    db.drawRecords = refreshed.drawRecords || [];
+    db.bets = refreshed.bets || [];
+    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
+  }
   const maxAttempts = 3;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
