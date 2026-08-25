@@ -1455,8 +1455,8 @@ app.get('/api/stats', requireAuth, (req, res) => {
   const stageVotes = db.votes.filter(v => (v.stage || 'preliminary') === stage).length;
   const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
   const judgeCount = new Set(stageScores.map(s => s.judgeName)).size;
-  // 复赛晋级总数：包含已进入决赛/已获奖的（这些之前都曾晋级过复赛）
-  const semiFinalists = db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded').length;
+  // 复赛晋级总数：曾进入过复赛阶段的作品（含晋级决赛的、决赛淘汰的、复赛进行中的）
+  const semiFinalists = db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded' || e.roundStatus === 'eliminated_final').length;
   const finalists = db.entries.filter(e => e.roundStatus === 'finalist').length;
   const awarded = db.entries.filter(e => e.award).length;
   const deptCounts = {};
@@ -2429,7 +2429,7 @@ app.post('/api/admin/restore-stage', verifyAdminToken, (req, res) => {
   db.settings.currentStage = 'semi_final';
   saveDB();
   ghPush().catch(e => console.error('[restore-stage] GitHub push failed:', e.message));
-  res.json({ success: true, currentStage: db.settings.currentStage, restored, semiFinalists: db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded').length });
+  res.json({ success: true, currentStage: db.settings.currentStage, restored, semiFinalists: db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded' || e.roundStatus === 'eliminated_final').length });
 });
 
 // ========== API: ADMIN SETTLE (结算获奖) ==========
