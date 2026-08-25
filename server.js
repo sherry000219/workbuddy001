@@ -370,7 +370,7 @@ function getEntryStageScores(entryId, stage) {
   const scores = db.judgeScores.filter(s => s.entryId === entryId && (s.stage || 'preliminary') === stage);
   const voteCount = db.votes.filter(v => v.entryId === entryId && (v.stage || 'preliminary') === stage).length;
   const avgScore = scores.length > 0
-    ? Math.round(scores.reduce((sum, s) => sum + s.practicality + s.innovation + s.scalability + s.presentation, 0) / scores.length)
+    ? Math.round(scores.reduce((sum, s) => sum + (s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.value || 0) + (s.presentation || 0), 0) / scores.length)
     : 0;
   return { scores, voteCount, avgScore, judgeCount: scores.length };
 }
@@ -1371,7 +1371,7 @@ app.get('/api/bets/summary', (req, res) => {
 
 // ========== API: JUDGE ==========
 app.post('/api/judge/scores/:entryId', (req, res) => {
-  const { judgeName, practicality, innovation, scalability, presentation, judgePassword } = req.body;
+  const { judgeName, practicality, innovation, scalability, presentation, value, judgePassword } = req.body;
   if (!judgeName) return res.status(400).json({ error: '请输入评委姓名' });
   if (judgePassword !== getJudgePassword()) {
     return res.status(403).json({ error: '评委密码错误' });
@@ -1389,14 +1389,16 @@ app.post('/api/judge/scores/:entryId', (req, res) => {
   if (entry.name === judgeName || (entry.teamMembers && entry.teamMembers.includes(judgeName))) {
     return res.status(403).json({ error: '评委不能给自己的作品打分，已自动回避' });
   }
-  const p = parseInt(practicality) || 0, c = parseInt(innovation) || 0, s = parseInt(scalability) || 0, r = parseInt(presentation) || 0;
-  if (p > 50 || c > 20 || s > 15 || r > 15) return res.status(400).json({ error: '分数超出上限' });
+  // 五维度：创新性/20 实用性/30 可推广性/20 组织价值/20 效果展示/10（满分 100）
+  const p = parseInt(practicality) || 0, c = parseInt(innovation) || 0, s = parseInt(scalability) || 0, v = parseInt(value) || 0, r = parseInt(presentation) || 0;
+  if (p > 30 || c > 20 || s > 20 || v > 20 || r > 10) return res.status(400).json({ error: '分数超出上限（实用性30/创新性20/可推广性20/组织价值20/效果展示10）' });
   const idx = db.judgeScores.findIndex(sc => sc.entryId === req.params.entryId && sc.judgeName === judgeName && (sc.stage || 'preliminary') === stage);
-  const scoreData = { entryId: req.params.entryId, judgeName, practicality: p, innovation: c, scalability: s, presentation: r, stage, updatedAt: new Date().toISOString() };
+  const scoreData = { entryId: req.params.entryId, judgeName, practicality: p, innovation: c, scalability: s, value: v, presentation: r, stage, updatedAt: new Date().toISOString() };
   if (idx >= 0) db.judgeScores[idx] = scoreData;
   else db.judgeScores.push(scoreData);
   saveDB();
-  res.json({ success: true, total: p + c + s + r, stage });
+  ghPush().catch(e => console.error('[judge score] GitHub push failed:', e.message));
+  res.json({ success: true, total: p + c + s + v + r, stage });
 });
 
 // GET /api/judge/my-scores — return this judge's existing scores for current stage
@@ -1413,7 +1415,7 @@ app.get('/api/judge/my-scores', (req, res) => {
   }
   const scores = db.judgeScores
     .filter(s => s.judgeName === judgeName && (s.stage || 'preliminary') === stage)
-    .map(s => ({ entryId: s.entryId, practicality: s.practicality, innovation: s.innovation, scalability: s.scalability, presentation: s.presentation, total: s.practicality + s.innovation + s.scalability + s.presentation }));
+    .map(s => ({ entryId: s.entryId, practicality: s.practicality, innovation: s.innovation, scalability: s.scalability, value: s.value || 0, presentation: s.presentation, total: (s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.value || 0) + (s.presentation || 0) }));
 
   // 赛段晋级时，若同一位评委在上个赛段已打分且本赛段尚未打分，默认继承上一赛段分数
   const inherited = [];
@@ -1430,8 +1432,9 @@ app.get('/api/judge/my-scores', (req, res) => {
           practicality: s.practicality,
           innovation: s.innovation,
           scalability: s.scalability,
+          value: s.value || 0,
           presentation: s.presentation,
-          total: s.practicality + s.innovation + s.scalability + s.presentation,
+          total: (s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.value || 0) + (s.presentation || 0),
           inheritedFrom: prevStage
         });
       }
@@ -2285,8 +2288,9 @@ app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
         practicality: s.practicality,
         innovation: s.innovation,
         scalability: s.scalability,
+        value: s.value || 0,
         presentation: s.presentation,
-        total: s.practicality + s.innovation + s.scalability + s.presentation,
+        total: (s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.value || 0) + (s.presentation || 0),
         updatedAt: s.updatedAt
       }));
     const avg = scores.length > 0
