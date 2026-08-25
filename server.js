@@ -919,8 +919,16 @@ app.use(express.urlencoded({ extended: true, limit: '60mb' }));
 app.use(cookieParser());
 
 // 启动闸门：同步未完成前拒绝写入（GET/HEAD 放行），防止启动窗口内提交被旧快照覆盖
+// 豁免：登录/登出/手动同步接口——它们只建会话或帮助恢复，不改动赛事数据；
+// 只读期间管理员尤其需要能登录后台查看状态
+const READY_EXEMPT_PATHS = new Set([
+  '/api/admin/auth',
+  '/api/auth/dd-code',
+  '/api/auth/logout',
+  '/api/force-sync'
+]);
 app.use((req, res, next) => {
-  if (!_ready && req.method !== 'GET' && req.method !== 'HEAD') {
+  if (!_ready && req.method !== 'GET' && req.method !== 'HEAD' && !READY_EXEMPT_PATHS.has(req.path)) {
     return res.status(503).json({ error: '服务器正在启动同步数据，请 3 秒后重试' });
   }
   next();
