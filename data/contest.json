@@ -22870,6 +22870,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-25T07:37:02.980Z"
+    },
+    {
+      "id": "bet_mt8cqs68_m08ygr",
+      "voterId": "V6Q3l8kezw7huoCrGUaaiPAiEiE",
+      "voterName": "陈跃远",
+      "voterMobile": "19962006810",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQLPDhtI6nx4k9LMwszCsCH3oQzhd354AkgjgsTA-QA_194_194.png",
+      "stage": "final",
+      "entryId": "entry_1785751983953_jddr0p",
+      "entryTitle": "合同税务风险检测",
+      "entryDept": "有度税智",
+      "track": "creative",
+      "trackLabel": "创意应用",
+      "revoked": false,
+      "createdAt": "2026-08-25T07:37:12.224Z"
     }
   ],
   "drawRecords": [
