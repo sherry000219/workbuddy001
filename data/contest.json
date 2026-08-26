@@ -23605,6 +23605,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-26T02:17:24.308Z"
+    },
+    {
+      "id": "bet_mt9grgau_5bcelt",
+      "voterId": "lNB3AIpq0VlBQ32FiilaP3AiEiE",
+      "voterName": "尹建平",
+      "voterMobile": "13381050510",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDiCpxCX229XNAzzNAzw_828_828.jpg",
+      "stage": "final",
+      "entryId": "entry_1784280815114_69d8de",
+      "entryTitle": "往来账龄分析工具",
+      "entryDept": "中小微事业群",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:17:28.134Z"
     }
   ],
   "drawRecords": [
