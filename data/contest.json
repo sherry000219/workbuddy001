@@ -23171,8 +23171,9 @@
       "entryDept": "产研中心",
       "track": "team",
       "trackLabel": "团队赛道",
-      "revoked": false,
-      "createdAt": "2026-08-25T07:42:44.057Z"
+      "revoked": true,
+      "createdAt": "2026-08-25T07:42:44.057Z",
+      "revokedAt": "2026-08-26T10:19:35.747Z"
     },
     {
       "id": "bet_mt8d07ts_jxf4xf",
