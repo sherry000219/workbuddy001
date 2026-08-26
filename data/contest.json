@@ -26,11 +26,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-11T03:25:43.612Z",
-      "updatedAt": "2026-08-11T04:09:43.807Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-11T04:09:43.807Z",
       "editNotice": false,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-11T06:27:17.500Z"
+      "editNoticeAckAt": "2026-08-11T06:27:17.500Z",
+      "judgeOrder": 1
     },
     {
       "id": "entry_1786374088143_40x0ai",
@@ -58,9 +59,10 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-10T15:01:28.143Z",
-      "updatedAt": "2026-08-11T02:56:44.381Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-11T02:56:44.381Z",
-      "editNotice": true
+      "editNotice": true,
+      "judgeOrder": 1
     },
     {
       "id": "entry_1786359942777_etq9ft",
@@ -176,7 +178,9 @@
       "status": "approved",
       "roundStatus": "finalist",
       "award": null,
-      "createdAt": "2026-08-10T08:42:26.788Z"
+      "createdAt": "2026-08-10T08:42:26.788Z",
+      "judgeOrder": 4,
+      "updatedAt": "2026-08-26T06:18:41.661Z"
     },
     {
       "id": "entry_1786340551344_uzahth",
@@ -204,9 +208,10 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-10T05:42:31.344Z",
-      "updatedAt": "2026-08-17T06:40:39.938Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-17T06:40:39.938Z",
-      "editNotice": true
+      "editNotice": true,
+      "judgeOrder": 3
     },
     {
       "id": "entry_1786338333096_ik561c",
@@ -261,11 +266,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-10T03:59:42.444Z",
-      "updatedAt": "2026-08-17T07:57:57.211Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-17T07:57:57.211Z",
       "editNotice": true,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-12T08:18:06.795Z"
+      "editNoticeAckAt": "2026-08-12T08:18:06.795Z",
+      "judgeOrder": 2
     },
     {
       "id": "entry_1786332037086_kh49z0",
@@ -323,9 +329,10 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-09T17:06:09.144Z",
-      "updatedAt": "2026-08-10T02:46:39.272Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-10T02:46:39.272Z",
-      "editNotice": true
+      "editNotice": true,
+      "judgeOrder": 3
     },
     {
       "id": "entry_1786287685562_ypa37h",
@@ -353,11 +360,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-09T15:01:25.562Z",
-      "updatedAt": "2026-08-11T01:50:06.469Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-11T01:50:06.469Z",
       "editNotice": false,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-13T03:10:42.561Z"
+      "editNoticeAckAt": "2026-08-13T03:10:42.561Z",
+      "judgeOrder": 8
     },
     {
       "id": "entry_1786094652380_rfnla8",
@@ -503,11 +511,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-06T11:12:25.788Z",
-      "updatedAt": "2026-08-25T05:24:34.259Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-25T05:24:34.259Z",
       "editNotice": true,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-13T03:11:56.131Z"
+      "editNoticeAckAt": "2026-08-13T03:11:56.131Z",
+      "judgeOrder": 5
     },
     {
       "id": "entry_1785933777405_l85dpc",
@@ -535,11 +544,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-05T12:42:57.405Z",
-      "updatedAt": "2026-08-12T08:56:09.077Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-12T08:56:09.077Z",
       "editNotice": false,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-13T03:12:15.653Z"
+      "editNoticeAckAt": "2026-08-13T03:12:15.653Z",
+      "judgeOrder": 6
     },
     {
       "id": "entry_1785925402853_n2ttu7",
@@ -567,9 +577,10 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-05T10:23:22.853Z",
-      "updatedAt": "2026-08-18T06:31:02.918Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-18T06:31:02.918Z",
-      "editNotice": true
+      "editNotice": true,
+      "judgeOrder": 7
     },
     {
       "id": "entry_1785909222508_t01wgt",
@@ -715,11 +726,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-03T10:13:03.953Z",
-      "updatedAt": "2026-08-19T03:40:29.968Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-19T03:40:29.968Z",
       "editNotice": true,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-13T03:13:32.759Z"
+      "editNoticeAckAt": "2026-08-13T03:13:32.759Z",
+      "judgeOrder": 4
     },
     {
       "id": "entry_1785739902617_utxej4",
@@ -892,11 +904,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-07-29T18:12:32.114Z",
-      "updatedAt": "2026-07-29T18:51:18.437Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-07-29T18:51:18.437Z",
       "editNotice": false,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-13T03:35:12.393Z"
+      "editNoticeAckAt": "2026-08-13T03:35:12.393Z",
+      "judgeOrder": 2
     },
     {
       "id": "entry_1785325566960_99axb6",
@@ -924,11 +937,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-07-29T11:46:06.960Z",
-      "updatedAt": "2026-08-12T04:09:57.709Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-12T04:09:57.709Z",
       "editNotice": false,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-12T08:59:06.336Z"
+      "editNoticeAckAt": "2026-08-12T08:59:06.336Z",
+      "judgeOrder": 9
     },
     {
       "id": "entry_1785316018922_s1rkqh",
@@ -956,11 +970,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-07-29T09:06:58.922Z",
-      "updatedAt": "2026-08-11T04:00:22.493Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-08-11T04:00:22.493Z",
       "editNotice": false,
       "editNoticeAckBy": "赵冰艳",
-      "editNoticeAckAt": "2026-08-12T07:20:33.046Z"
+      "editNoticeAckAt": "2026-08-12T07:20:33.046Z",
+      "judgeOrder": 10
     },
     {
       "id": "entry_1785136604075_9xogv4",
@@ -1017,7 +1032,9 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-07-27T03:46:58.451Z",
-      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/bva6QBXJwZRxvZ6acMLdYqXKVn4qY5Pr?_fid=bva6QBXJwZRxvZ6acMLdYqXKVn4qY5Pr"
+      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/bva6QBXJwZRxvZ6acMLdYqXKVn4qY5Pr?_fid=bva6QBXJwZRxvZ6acMLdYqXKVn4qY5Pr",
+      "judgeOrder": 5,
+      "updatedAt": "2026-08-26T06:18:41.661Z"
     },
     {
       "id": "entry_1784284342845_dzvql7",
@@ -1105,12 +1122,13 @@
       "createdAt": "2026-07-17T09:33:35.114Z",
       "process_link": "",
       "result_link": "",
-      "updatedAt": "2026-07-23T10:14:34.244Z",
+      "updatedAt": "2026-08-26T06:18:41.661Z",
       "lastEditedAt": "2026-07-23T10:14:34.244Z",
       "editNotice": false,
       "posterUrl": "https://alidocs.dingtalk.com/i/nodes/9E05BDRVQeyRpeN2fDPLvPO5V63zgkYA?_fid=9E05BDRVQeyRpeN2fDPLvPO5V63zgkYA",
       "editNoticeAckBy": "美娜",
-      "editNoticeAckAt": "2026-08-13T03:27:13.179Z"
+      "editNoticeAckAt": "2026-08-13T03:27:13.179Z",
+      "judgeOrder": 11
     },
     {
       "id": "entry_1784190723267_8r8xc0",
