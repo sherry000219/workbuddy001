@@ -1315,6 +1315,28 @@ function getBettableEntries() {
   return db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
 }
 
+// POST /api/bet/revoke — 撤销当前押宝（每人每赛段限 1 次）
+// 注意：必须注册在 /api/bet/:entryId 之前，否则 'revoke' 会被当作 entryId 匹配走押宝逻辑
+app.post('/api/bet/revoke', requireAuth, (req, res) => {
+  if (!isBettingOpen()) {
+    return res.status(400).json({ error: '当前赛段未开放押宝，无法撤销' });
+  }
+  const stage = getBettingStage();
+  const userId = req.ddUser.openId;
+  const activeBet = getActiveBet(userId, stage);
+  if (!activeBet) {
+    return res.status(400).json({ error: '您当前没有押宝记录' });
+  }
+  if (getRevokeCount(userId, stage) >= 1) {
+    return res.status(400).json({ error: '每人每赛段仅限撤销 1 次押宝' });
+  }
+  activeBet.revoked = true;
+  activeBet.revokedAt = new Date().toISOString();
+  saveDB();
+  ghPush().catch(e => console.error('[bet revoke] Immediate push failed:', e.message));
+  res.json({ success: true, message: '已撤销押宝，可重新选择 1 个作品' });
+});
+
 // POST /api/bet/:entryId — 押宝某个作品
 app.post('/api/bet/:entryId', requireAuth, (req, res) => {
   if (!isBettingOpen()) {
@@ -1348,27 +1370,6 @@ app.post('/api/bet/:entryId', requireAuth, (req, res) => {
   saveDB();
   ghPush().catch(e => console.error('[bet] Immediate push failed:', e.message));
   res.json({ success: true, bet });
-});
-
-// POST /api/bet/revoke — 撤销当前押宝（每人每赛段限 1 次）
-app.post('/api/bet/revoke', requireAuth, (req, res) => {
-  if (!isBettingOpen()) {
-    return res.status(400).json({ error: '当前赛段未开放押宝，无法撤销' });
-  }
-  const stage = getBettingStage();
-  const userId = req.ddUser.openId;
-  const activeBet = getActiveBet(userId, stage);
-  if (!activeBet) {
-    return res.status(400).json({ error: '您当前没有押宝记录' });
-  }
-  if (getRevokeCount(userId, stage) >= 1) {
-    return res.status(400).json({ error: '每人每赛段仅限撤销 1 次押宝' });
-  }
-  activeBet.revoked = true;
-  activeBet.revokedAt = new Date().toISOString();
-  saveDB();
-  ghPush().catch(e => console.error('[bet revoke] Immediate push failed:', e.message));
-  res.json({ success: true, message: '已撤销押宝，可重新选择 1 个作品' });
 });
 
 // GET /api/my-bet — 当前用户押宝记录（含跨赛段历史）
