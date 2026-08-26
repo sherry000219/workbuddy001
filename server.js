@@ -536,6 +536,29 @@ async function ghPull() {
     console.log('[gh] branch check/create error:', e.message);
   }
 
+// 通过 Git Data API 获取远程 data/contest.json 的真实内容。
+// Contents API 的 GET 有 CDN 缓存（事故中观察到 >15 小时持续返回过期空文件），
+// Git Data API 与 git 协议同源、实时准确——作为拉取的兜底通道。
+async function ghFetchRemoteViaGitData() {
+  try {
+    const ref = await ghReq('GET', `/repos/${GITHUB_REPO}/git/ref/heads/${GITHUB_DATA_BRANCH}`);
+    if (ref.status >= 400) return null;
+    const commitSha = ref.data.object && ref.data.object.sha;
+    if (!commitSha) return null;
+    const tree = await ghReq('GET', `/repos/${GITHUB_REPO}/git/trees/${commitSha}?recursive=1`);
+    if (tree.status >= 400) return null;
+    const node = (tree.data.tree || []).find(n => n.path === 'data/contest.json');
+    if (!node || !node.sha) return null;
+    const blob = await ghReq('GET', `/repos/${GITHUB_REPO}/git/blobs/${node.sha}`);
+    if (blob.status >= 400 || !blob.data.content) return null;
+    const buf = Buffer.from(blob.data.content, blob.data.encoding || 'base64');
+    return { data: JSON.parse(buf.toString('utf8')), blobSha: node.sha };
+  } catch (e) {
+    console.error('[gh] git-data fallback fetch failed:', e.message);
+    return null;
+  }
+}
+
   const { status, data } = await ghReq('GET', `/repos/${GITHUB_REPO}/contents/data/contest.json?ref=${GITHUB_DATA_BRANCH}`);
   _syncStatus.lastStatus = status;
   _syncStatus.lastResponse = data && data.message ? data.message : null;
@@ -558,15 +581,25 @@ async function ghPull() {
     return;
   }
   if (status >= 400) throw new Error(data.message || `GitHub API error ${status}`);
-  // 空文件（GitHub 对 size=0 文件返回 encoding: 'none'）一律当作拉取失败处理：
+  // 空文件处理：Contents API 缓存可能长期返回过期的空文件（事故中 >15 小时），
+  // 先用 Git Data API（实时、与 git 协议同源）兜底拿真实内容；确认真实为空才视为拉取失败。
   // 防止「空数据进入内存 + _ghSha 被设置导致推送守卫失效」的连锁覆盖事故。
-  // 启动序列会把这种情况纳入「从未成功拉取」→ 只读模式持续重试，直到拉到真实数据。
+  let remoteData;
   if (data.encoding === 'none' || !data.content || data.size === 0) {
-    throw new Error('[gh] remote contest.json is EMPTY — treated as pull failure (anti-wipe guard)');
+    console.warn('[gh] Contents API returned EMPTY file (possibly stale cache) — trying git-data API fallback...');
+    const alt = await ghFetchRemoteViaGitData();
+    if (alt && ((alt.data.entries || []).length > 0 || (alt.data.votes || []).length > 0 || (alt.data.judgeScores || []).length > 0)) {
+      console.log('[gh] git-data fallback OK — entries:', (alt.data.entries || []).length, '| votes:', (alt.data.votes || []).length, '(bypassed stale contents cache)');
+      _ghSha = alt.blobSha; // 真实 blob sha，后续推送用它避免 409/422
+      remoteData = alt.data;
+    } else {
+      throw new Error('[gh] remote contest.json is EMPTY — treated as pull failure (anti-wipe guard)');
+    }
+  } else {
+    _ghSha = data.sha;
+    const buf = Buffer.from(data.content, data.encoding || 'base64');
+    remoteData = JSON.parse(buf.toString('utf8'));
   }
-  _ghSha = data.sha;
-  const buf = Buffer.from(data.content, data.encoding || 'base64');
-  const remoteData = JSON.parse(buf.toString('utf8'));
   const remoteCount = (remoteData.entries || []).length;
   const remoteVotes = (remoteData.votes || []).length;
   const remoteScores = (remoteData.judgeScores || []).length;
@@ -2633,6 +2666,8 @@ app.post('/api/force-sync', async (req, res) => {
       db.votes = refreshed.votes;
       db.judgeScores = refreshed.judgeScores;
       db.settings = refreshed.settings;
+      db.drawRecords = refreshed.drawRecords || [];
+      db.bets = refreshed.bets || [];
       _syncStatus.githubEntries = db.entries.length;
     }
     await ghPush();
