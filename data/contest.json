@@ -23710,6 +23710,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-26T02:43:30.701Z"
+    },
+    {
+      "id": "bet_mt9hytfd_vkznrl",
+      "voterId": "1XTE0Hs7ZWfqkIPCNV0nRwiEiE",
+      "voterName": "任歆迪",
+      "voterMobile": "15951992418",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4NIShKAo2nNCADNCACwScEUb29Qci0JwWG_hLWbAA_2048_2048.jpg",
+      "stage": "final",
+      "entryId": "entry_1785325566960_99axb6",
+      "entryTitle": "客户不改接口，260家必须手报：一个 Skill 进去，1分钟一张表",
+      "entryDept": "有度税智",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:51:11.353Z"
     }
   ],
   "drawRecords": [
