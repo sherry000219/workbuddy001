@@ -23665,6 +23665,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-26T02:24:00.581Z"
+    },
+    {
+      "id": "bet_mt9h2exx_ieyvbk",
+      "voterId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
+      "voterName": "刘木目",
+      "voterMobile": "15205203629",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD2lMmFFsfKvNBaDNBaCwFANmWcO0qsUKADgdqEqYAA_1440_1440.jpg",
+      "stage": "final",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:25:59.589Z"
     }
   ],
   "drawRecords": [
