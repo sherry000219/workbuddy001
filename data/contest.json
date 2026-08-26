@@ -23440,6 +23440,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-26T02:07:06.635Z"
+    },
+    {
+      "id": "bet_mt9gfvuh_jj0s3b",
+      "voterId": "7tRTiiiSiP8vo5ViPxQEzbiiGUAiEiE",
+      "voterName": "高喜军",
+      "voterMobile": "18088001761",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPD0eJy2fKP0DNAW3NAW0_365_365.png",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:08:28.409Z"
     }
   ],
   "drawRecords": [
