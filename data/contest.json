@@ -23530,6 +23530,21 @@
       "trackLabel": "创意应用",
       "revoked": false,
       "createdAt": "2026-08-26T02:10:47.161Z"
+    },
+    {
+      "id": "bet_mt9gj2ii_wq664x",
+      "voterId": "t6JEmKZ0zPBxuB6j43FwsQiEiE",
+      "voterName": "金业帅",
+      "voterMobile": "13218099502",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:10:57.018Z"
     }
   ],
   "drawRecords": [
