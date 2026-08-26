@@ -23849,6 +23849,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-26T07:21:07.786Z"
+    },
+    {
+      "id": "bet_mt9u1549_yiqj9h",
+      "voterId": "en8DhRGNo6HqkIPCNV0nRwiEiE",
+      "voterName": "王宁1-任务",
+      "voterMobile": "18105153343",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1785325566960_99axb6",
+      "entryTitle": "客户不改接口，260家必须手报：一个 Skill 进去，1分钟一张表",
+      "entryDept": "有度税智",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T08:28:55.209Z"
     }
   ],
   "drawRecords": [
