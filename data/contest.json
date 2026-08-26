@@ -23545,6 +23545,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-26T02:10:57.018Z"
+    },
+    {
+      "id": "bet_mt9gjgmo_cziwfm",
+      "voterId": "qiiF1KzX7gJ76fsPZ9RvXvwiEiE",
+      "voterName": "高羽欣",
+      "voterMobile": "18406584458",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD2hwf2LtT1XNBJzNBJywesrO3ylNI3IJfI4R07bEAA_1180_1180.jpg",
+      "stage": "final",
+      "entryId": "entry_1786418743612_h5sx2m",
+      "entryTitle": "合同风险智能预警平台：风险先知，提前预警合同到期与风险，实现用工管理提效。",
+      "entryDept": "职能中台",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:11:15.312Z"
     }
   ],
   "drawRecords": [
