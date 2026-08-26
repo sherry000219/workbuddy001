@@ -23395,6 +23395,21 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-26T02:05:13.424Z"
+    },
+    {
+      "id": "bet_mt9gckhl_xsxieo",
+      "voterId": "Pcl8uUx2btO0wvfVzkiSvIgiEiE",
+      "voterName": "金霞",
+      "voterMobile": "18796197359",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5tw2lRUvA_NBJLNBJKwrFnig7x-4psI3maytG_SAA_1170_1170.jpg",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:05:53.721Z"
     }
   ],
   "drawRecords": [
