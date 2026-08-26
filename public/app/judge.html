@@ -436,8 +436,17 @@ async function renderJudgePanel() {
         : '<td><input type="number" min="0" max="50" value="' + (s.practicality||'') + '" id="j_p_' + e.id + '" placeholder="0-50" style="' + inputStyle + '"></td><td><input type="number" min="0" max="20" value="' + (s.innovation||'') + '" id="j_c_' + e.id + '" placeholder="0-20" style="' + inputStyle + '"></td><td><input type="number" min="0" max="15" value="' + (s.scalability||'') + '" id="j_s_' + e.id + '" placeholder="0-15" style="' + inputStyle + '"></td><td><input type="number" min="0" max="15" value="' + (s.presentation||'') + '" id="j_r_' + e.id + '" placeholder="0-15" style="' + inputStyle + '"></td>';
       return '<tr class="' + hasScored + '"><td><span onclick="openDetail(\'' + e.id + '\')" style="color:#ff6b35;cursor:pointer;">' + e.title.substring(0,18) + (e.title.length>18?'...':'') + '</span> ' + badge + teamBadge + '</td><td>' + e.name + '</td><td>' + deptChain + '</td><td>' + trackLabel(e.track) + '</td>' + dimCells + '<td><strong>' + total + '</strong></td><td><button class="btn btn-sm ' + (hasCurrentScore ? 'btn-success' : 'btn-primary') + '" onclick="saveScore(\'' + e.id + '\')">' + (hasCurrentScore ? '更新' : '打分') + '</button>' + inheritHint + '</td></tr>';
     }
-    const individual = judgableEntries.filter(function(e) { return e.entryType !== 'team'; });
-    const team = judgableEntries.filter(function(e) { return e.entryType === 'team'; });
+    // 排序：管理后台设置的 judgeOrder（数字小在前）优先，未设置的保持 newest 顺序排在已设置之后
+    function sortByJudgeOrder(list) {
+      return list.slice().sort(function(a, b) {
+        const oa = (typeof a.judgeOrder === 'number' && a.judgeOrder > 0) ? a.judgeOrder : 9999;
+        const ob = (typeof b.judgeOrder === 'number' && b.judgeOrder > 0) ? b.judgeOrder : 9999;
+        if (oa !== ob) return oa - ob;
+        return 0; // 相同（都未设置）时保持 /api/entries 的 newest 顺序
+      });
+    }
+    const individual = sortByJudgeOrder(judgableEntries.filter(function(e) { return e.entryType !== 'team'; }));
+    const team = sortByJudgeOrder(judgableEntries.filter(function(e) { return e.entryType === 'team'; }));
     const groupColspan = isNewDims ? 11 : 10;
     let rows = '';
     if (individual.length > 0) {

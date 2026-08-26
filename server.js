@@ -2371,6 +2371,7 @@ app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
       createdAt: e.createdAt,
       roundStatus: e.roundStatus || 'approved',
       award: e.award || null,
+      judgeOrder: (typeof e.judgeOrder === 'number' && e.judgeOrder > 0) ? e.judgeOrder : null,
       scores,
       avgScore: avg,
       judgeCount: scores.length,
@@ -2523,6 +2524,25 @@ app.post('/api/admin/promote', verifyAdminToken, (req, res) => {
 // body: { to: 'semi_final' }
 // 把 finalist/eliminated_final/awarded 全部还原为 semi_finalist（回到勾选晋级决赛之前），
 // 打分、投票、抽奖、押宝数据全部保留不动。
+// POST /api/admin/judge-order — 批量设置待打分作品展示顺序（judgeOrder 数字小在前，评委打分面板按此排序）
+app.post('/api/admin/judge-order', verifyAdminToken, (req, res) => {
+  const { orders } = req.body || {};
+  if (!Array.isArray(orders)) return res.status(400).json({ error: 'orders 必须是数组' });
+  let updated = 0;
+  for (const o of orders) {
+    if (!o || !o.entryId) continue;
+    const e = db.entries.find(x => x.id === o.entryId);
+    if (!e) continue;
+    const n = Number(o.order);
+    e.judgeOrder = (Number.isFinite(n) && n > 0) ? n : null;
+    e.updatedAt = new Date().toISOString();
+    updated++;
+  }
+  saveDB();
+  ghPush().catch(err => console.error('[judge-order] GitHub push failed:', err.message));
+  res.json({ success: true, updated });
+});
+
 app.post('/api/admin/restore-stage', verifyAdminToken, (req, res) => {
   const { to } = req.body;
   if (to !== 'semi_final') {
@@ -2798,6 +2818,33 @@ app.post('/api/force-sync', async (req, res) => {
       catch (e) { console.error('[gh] Push after migration failed:', e.message); }
     }
   }
+
+  // 一次性数据迁移（2026-08-26）：决赛待打分作品展示顺序
+  // 个人组 蒋蔚文↔吕玲 互换、团队组 姚靖↔郭彦柳 互换；幂等——仅在与目标不一致时写入
+  const JUDGE_ORDER_SEED = {
+    individual: ['周韦昊', '徐聪明', '周紫怡', '蒋蔚文', '徐航', '王顺泽', '桂万彬', '吕玲', '任歆迪', '刘璐瑶', '时海龙'],
+    team: ['李铭铖', '姚靖', '朱梦瑶', '郭彦柳', '苏万灵']
+  };
+  (function migrateJudgeOrder() {
+    const rank = {};
+    JUDGE_ORDER_SEED.individual.forEach((n, i) => { rank['i:' + n] = i + 1; });
+    JUDGE_ORDER_SEED.team.forEach((n, i) => { rank['t:' + n] = i + 1; });
+    let changed = false;
+    for (const e of db.entries) {
+      if (!['finalist', 'awarded'].includes(e.roundStatus || '')) continue;
+      const key = (e.entryType === 'team' ? 't:' : 'i:') + e.name;
+      if (rank[key] && e.judgeOrder !== rank[key]) {
+        e.judgeOrder = rank[key];
+        e.updatedAt = new Date().toISOString();
+        changed = true;
+      }
+    }
+    if (changed) {
+      console.log('[migrate] judgeOrder seeded for finalist entries');
+      saveDB();
+      if (GITHUB_TOKEN) ghPush().catch(e => console.error('[migrate] judgeOrder push failed:', e.message));
+    }
+  })();
 
   // Pull sessions from GitHub
   if (GITHUB_TOKEN) await ghPullSessions().catch(() => {});

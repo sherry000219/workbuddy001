@@ -318,6 +318,17 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
         </div>
       </div>
     </details>
+    <details class="card" style="margin-bottom:16px;">
+      <summary>🔢 待打分作品排序（评委打分面板展示顺序）</summary>
+      <div style="padding:16px 4px;">
+        <p style="color:var(--text-dim);font-size:13px;margin-bottom:12px;">数字小在前，按组内顺序排列（个人/团队分别排序）。留空则排在已设置序号的后面。评委打分面板实时按此顺序展示。</p>
+        <div id="judgeOrderList" style="max-height:400px;overflow-y:auto;"></div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-primary btn-sm" onclick="saveJudgeOrder()">💾 保存排序</button>
+          <span style="font-size:12px;color:var(--text-dim);" id="judgeOrderHint"></span>
+        </div>
+      </div>
+    </details>
     <div class="score-table" style="overflow-x:auto;">
       <table style="min-width:900px;">
         <thead>
@@ -499,6 +510,7 @@ async function renderAdminDashboard() {
     statsBar.innerHTML = '<div class="stat-card"><div class="num">' + (summary.totalEntries||0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '作品</div></div><div class="stat-card"><div class="num">' + (summary.totalJudges||0) + '</div><div class="label">评委人数</div></div><div class="stat-card"><div class="num">' + (summary.totalScores||0) + '</div><div class="label">打分总数</div></div><div class="stat-card"><div class="num">' + (summary.scoredEntries||0) + '</div><div class="label">已评作品</div></div><div class="stat-card"><div class="num" style="color:#ff5252;">' + (summary.unscoredEntries||0) + '</div><div class="label">未评作品</div></div>';
 
     renderStageManagePanel(entryScores);
+    renderJudgeOrderPanel(entryScores);
 
     var unscoredMap = {};
     if (allJudges.length > 0 && entryScores.length > 0) {
@@ -569,6 +581,59 @@ var deptChain = [e.dept1 || e.dept, e.dept2 || e.subdept, e.dept3].filter(functi
 }
 
 function fmtScore(v) { if (v === undefined || v === null || v === "") return "—"; return (Math.round(Number(v) * 100) / 100).toFixed(2); }
+function renderJudgeOrderPanel(entryScores) {
+  var el = document.getElementById('judgeOrderList');
+  if (!el) return;
+  if (!entryScores || entryScores.length === 0) {
+    el.innerHTML = '<p style="color:var(--text-dim);font-size:13px;">当前赛段暂无可打分作品。</p>';
+    return;
+  }
+  // 展示顺序 = 当前生效顺序（judgeOrder 优先，未设置按 newest）
+  function sortForDisplay(list) {
+    return list.slice().sort(function(a, b) {
+      var oa = a.judgeOrder || 9999, ob = b.judgeOrder || 9999;
+      if (oa !== ob) return oa - ob;
+      return (b.createdAt || '').localeCompare(a.createdAt || '');
+    });
+  }
+  var individual = sortForDisplay(entryScores.filter(function(e) { return e.entryType !== 'team'; }));
+  var team = sortForDisplay(entryScores.filter(function(e) { return e.entryType === 'team'; }));
+  function rowHtml(e) {
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid #f3f4f6;">' +
+      '<input type="number" min="1" placeholder="—" value="' + (e.judgeOrder || '') + '" id="jo_' + e.id + '" style="width:64px;padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;text-align:center;">' +
+      '<span style="flex:1;font-size:13px;font-weight:500;">' + escapeHtml(e.title) + (e.entryType === 'team' ? ' <span style="background:#ede9fe;color:#7c3aed;font-size:11px;padding:1px 6px;border-radius:4px;">👥 团队</span>' : '') + '</span>' +
+      '<span style="font-size:12px;color:var(--text-dim);">' + escapeHtml(e.name) + ' · ' + trackLabel(e.track) + '</span></div>';
+  }
+  var html = '';
+  if (individual.length > 0) {
+    html += '<div style="padding:8px 12px;background:#f3f4f6;font-size:13px;font-weight:700;color:#374151;border-radius:6px 6px 0 0;">👤 个人参赛（' + individual.length + '）</div>';
+    html += individual.map(rowHtml).join('');
+  }
+  if (team.length > 0) {
+    html += '<div style="padding:8px 12px;background:#f3f4f6;font-size:13px;font-weight:700;color:#374151;margin-top:10px;">👥 团队参赛（' + team.length + '）</div>';
+    html += team.map(rowHtml).join('');
+  }
+  el.innerHTML = html;
+}
+
+async function saveJudgeOrder() {
+  if (!adminToken) return showToast('请先登录管理后台', 'error');
+  var inputs = document.querySelectorAll('input[id^="jo_"]');
+  var orders = [];
+  inputs.forEach(function(inp) {
+    var entryId = inp.id.slice(3);
+    var v = inp.value.trim();
+    orders.push({ entryId: entryId, order: v === '' ? null : Number(v) });
+  });
+  try {
+    var data = await api('/api/admin/judge-order', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ orders: orders }) });
+    showToast('✅ 排序已保存（' + data.updated + ' 个作品），评委打分面板已按新顺序展示', 'success');
+    var hint = document.getElementById('judgeOrderHint');
+    if (hint) hint.textContent = '保存于 ' + new Date().toLocaleTimeString('zh-CN');
+    loadAdminDashboard();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
 function renderStageManagePanel(entryScores) {
   var panel = document.getElementById('stageManagePanel');
   if (!panel) return;
