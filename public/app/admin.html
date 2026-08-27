@@ -329,6 +329,12 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
         </div>
       </div>
     </details>
+    <details class="card" style="margin-bottom:16px;" open>
+      <summary>🎯 押宝分布（当前赛段：<span id="betTotalCount">0</span> 人参与，<span id="betTotalNotes">0</span> 注）</summary>
+      <div style="padding:16px 4px;">
+        <div id="betSummaryList" style="max-height:400px;overflow-y:auto;"></div>
+      </div>
+    </details>
     <div class="score-table" style="overflow-x:auto;">
       <table style="min-width:900px;">
         <thead>
@@ -506,9 +512,16 @@ async function renderAdminDashboard() {
     allJudges = data.allJudges;
     const summary = data.summary;
 
-    const statsBar = document.getElementById('adminStatsBar');
-    statsBar.innerHTML = '<div class="stat-card"><div class="num">' + (summary.totalEntries||0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '作品</div></div><div class="stat-card"><div class="num">' + (summary.totalJudges||0) + '</div><div class="label">评委人数</div></div><div class="stat-card"><div class="num">' + (summary.totalScores||0) + '</div><div class="label">打分总数</div></div><div class="stat-card"><div class="num">' + (summary.scoredEntries||0) + '</div><div class="label">已评作品</div></div><div class="stat-card"><div class="num" style="color:#ff5252;">' + (summary.unscoredEntries||0) + '</div><div class="label">未评作品</div></div>';
+    // 押宝统计（公开接口，无赛段限制）
+    var betData = null;
+    try { betData = await api('/api/bets/summary'); } catch(e) { console.error('bets summary error:', e); }
+    var betTotal = betData ? (betData.totalBettors || 0) : 0;
+    var betNotes = betData ? (betData.summary || []).reduce(function(a, s) { return a + (s.betCount || 0); }, 0) : 0;
 
+    const statsBar = document.getElementById('adminStatsBar');
+    statsBar.innerHTML = '<div class="stat-card"><div class="num">' + (summary.totalEntries||0) + '</div><div class="label">' + (STAGE_LABELS[currentStage] || '') + '作品</div></div><div class="stat-card"><div class="num">' + (summary.totalJudges||0) + '</div><div class="label">评委人数</div></div><div class="stat-card"><div class="num">' + (summary.totalScores||0) + '</div><div class="label">打分总数</div></div><div class="stat-card"><div class="num">' + (summary.scoredEntries||0) + '</div><div class="label">已评作品</div></div><div class="stat-card"><div class="num" style="color:#ff5252;">' + (summary.unscoredEntries||0) + '</div><div class="label">未评作品</div></div><div class="stat-card"><div class="num" style="color:#f59e0b;">' + betTotal + '</div><div class="label">押宝人数</div></div><div class="stat-card"><div class="num" style="color:#f59e0b;">' + betNotes + '</div><div class="label">押宝总注数</div></div>';
+
+    renderBetSummary(betData);
     renderStageManagePanel(entryScores);
     renderJudgeOrderPanel(entryScores);
 
@@ -640,6 +653,29 @@ async function saveJudgeOrder() {
     if (hint) hint.textContent = '保存于 ' + new Date().toLocaleTimeString('zh-CN');
     loadAdminDashboard();
   } catch(e) { showToast(e.message, 'error'); }
+}
+
+function renderBetSummary(betData) {
+  var el = document.getElementById('betSummaryList');
+  if (!el) return;
+  var totalEl = document.getElementById('betTotalCount');
+  var notesEl = document.getElementById('betTotalNotes');
+  var list = (betData && betData.summary) || [];
+  var total = betData ? (betData.totalBettors || 0) : 0;
+  var notes = list.reduce(function(a, s) { return a + (s.betCount || 0); }, 0);
+  if (totalEl) totalEl.textContent = total;
+  if (notesEl) notesEl.textContent = notes;
+  if (list.length === 0) {
+    el.innerHTML = '<p style="color:var(--text-dim);font-size:13px;">当前赛段暂无押宝记录。</p>';
+    return;
+  }
+  el.innerHTML = list.map(function(s, i) {
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid #f3f4f6;">' +
+      '<span style="min-width:28px;color:var(--text-dim);font-size:12px;">' + (i + 1) + '</span>' +
+      '<span style="flex:1;font-size:13px;font-weight:500;">' + escapeHtml(s.title) + '</span>' +
+      '<span style="font-size:12px;color:var(--text-dim);">' + escapeHtml(s.name) + ' · ' + escapeHtml(s.trackLabel || '') + '</span>' +
+      '<span style="font-weight:700;color:#f59e0b;font-size:14px;white-space:nowrap;">🎯 ' + s.betCount + ' 人</span></div>';
+  }).join('');
 }
 
 function renderStageManagePanel(entryScores) {

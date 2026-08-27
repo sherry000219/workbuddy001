@@ -443,21 +443,35 @@ async function renderJudgePanel() {
     const team = sortByJudgeOrder(judgableEntries.filter(function(e) { return e.entryType === 'team'; }));
     const groupColspan = isNewDims ? 11 : 10;
     const TRACK_ORDER = ['efficiency', 'creative', 'business'];
-    // 评分标准参考行：每个分组下都显示，打分随时对照
+    // 评分标准参考行：与打分列逐列对齐——每个维度的等级标准就在对应输入框正上方
     function rubricRowHtml() {
-      let content;
+      const cellStyle = 'background:#fffbeb;border-bottom:1px solid #fcd34d;padding:6px 8px;font-size:11px;line-height:1.6;color:#78350f;vertical-align:top;text-align:center;';
+      let dims;
       if (isNewDims) {
-        content = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2px 20px;">' +
-          '<div><b>创新性 /20</b>：突破性创新 16~20 ｜ 显著创新 11~15 ｜ 局部创新 6~10 ｜ 创新性不足 0~5</div>' +
-          '<div><b>实用性 /30</b>：完整且已在使用 24~30 ｜ 完整但尚未使用 18~23 ｜ 未来可能使用 12~17 ｜ 不具备实际使用场景 0~11</div>' +
-          '<div><b>可推广性 /20</b>：可跨领域/跨地区推广 16~20 ｜ 可在本单位全面推广 11~15 ｜ 仅适用特定场景/团队 6~10 ｜ 不具备推广条件 0~5</div>' +
-          '<div><b>组织价值 /20</b>：价值显著 16~20 ｜ 价值较明显 11~15 ｜ 价值一般 6~10 ｜ 价值微弱或无法衡量 0~5</div>' +
-          '<div><b>效果展示 /10</b>：展示专业且极具说服力 8~10 ｜ 展示清晰完整 5~7 ｜ 展示基本合格 2~4 ｜ 展示混乱或不完整 0~1</div>' +
-          '</div>';
+        dims = [
+          ['创新性', 20, '突破性创新 16~20<br>显著创新 11~15<br>局部创新 6~10<br>创新性不足 0~5'],
+          ['实用性', 30, '完整且已在使用 24~30<br>完整但尚未使用 18~23<br>未来可能使用 12~17<br>不具备使用场景 0~11'],
+          ['可推广性', 20, '跨领域/跨地区 16~20<br>本单位全面推广 11~15<br>特定场景/团队 6~10<br>不具备条件 0~5'],
+          ['组织价值', 20, '价值显著 16~20<br>较明显 11~15<br>一般 6~10<br>微弱/无法衡量 0~5'],
+          ['效果展示', 10, '专业极具说服力 8~10<br>清晰完整 5~7<br>基本合格 2~4<br>混乱不完整 0~1']
+        ];
       } else {
-        content = '<b>打分维度（总分 100）：</b>实用性 /50 · 创新性 /20 · 可推广性 /15 · 效果呈现 /15';
+        dims = [
+          ['实用性', 50, '解决真实工作问题'],
+          ['创新性', 20, '场景/用法新颖'],
+          ['可推广性', 15, '其他同事可复用'],
+          ['效果呈现', 15, '有量化数据支撑']
+        ];
       }
-      return '<tr><td colspan="' + groupColspan + '" style="background:#fffbeb;border-bottom:1px solid #fcd34d;padding:8px 14px;font-size:12px;line-height:1.7;color:#78350f;">' + content + '</td></tr>';
+      const dimCells = dims.map(function(d) {
+        return '<td style="' + cellStyle + '"><b style="font-size:12px;">' + d[0] + ' /' + d[1] + '</b><br>' + d[2] + '</td>';
+      }).join('');
+      return '<tr>' +
+        '<td colspan="4" style="' + cellStyle + 'text-align:left;font-weight:600;font-size:12px;">📖 评分标准<br><small style="font-weight:400;color:#a16207;">对照本行标准，在正下方对应列打分</small></td>' +
+        dimCells +
+        '<td style="' + cellStyle + '"></td>' +
+        '<td style="' + cellStyle + '"></td>' +
+        '</tr>';
     }
     let rows = '';
     // 个人参赛：按赛道分组（效率提升 → 创意应用 → 业务赋能）
