@@ -24299,8 +24299,9 @@
       "entryDept": "中小微事业群",
       "track": "business",
       "trackLabel": "业务赋能",
-      "revoked": false,
-      "createdAt": "2026-08-27T06:32:43.777Z"
+      "revoked": true,
+      "createdAt": "2026-08-27T06:32:43.777Z",
+      "revokedAt": "2026-08-27T07:26:41.914Z"
     }
   ],
   "drawRecords": [
