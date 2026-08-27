@@ -23306,9 +23306,8 @@
       "entryDept": "中小微事业群",
       "track": "team",
       "trackLabel": "团队赛道",
-      "revoked": true,
-      "createdAt": "2026-08-26T01:59:22.174Z",
-      "revokedAt": "2026-08-26T06:28:21.938Z"
+      "revoked": false,
+      "createdAt": "2026-08-26T01:59:22.174Z"
     },
     {
       "id": "bet_mt9g90wr_h0ell1",
