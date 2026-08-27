@@ -29694,28 +29694,28 @@
         {
           "id": "prize_msofxdh9_gzt65b",
           "name": "小财神盲盒",
-          "stock": 15,
+          "stock": 3,
           "total": 3,
           "createdAt": "2026-08-11T09:10:55.101Z"
         },
         {
           "id": "prize_msofxib0_fj7kw1",
           "name": "帐sir抱枕毯",
-          "stock": 1,
+          "stock": 2,
           "total": 2,
           "createdAt": "2026-08-11T09:11:01.356Z"
         },
         {
           "id": "prize_msofxnkk_t2rfnf",
           "name": "20元以下饮品任选1杯",
-          "stock": 3,
+          "stock": 5,
           "total": 5,
           "createdAt": "2026-08-11T09:11:08.180Z"
         },
         {
           "id": "prize_msofxzgn_its3td",
           "name": "月度 workbuddy 标准版会员",
-          "stock": 1,
+          "stock": 2,
           "total": 2,
           "createdAt": "2026-08-11T09:11:23.591Z"
         },
@@ -29734,6 +29734,13 @@
           "createdAt": "2026-08-11T09:11:59.130Z"
         },
         {
+          "id": "prize_msofzyli_f893s1",
+          "name": "小米手环9pro",
+          "stock": 1,
+          "total": 1,
+          "createdAt": "2026-08-11T09:12:55.782Z"
+        },
+        {
           "id": "prize_msog0ovt_qfukyq",
           "name": "OPPO耳机Enco air4",
           "stock": 1,
@@ -29743,14 +29750,14 @@
         {
           "id": "prize_msog4cb2_9zweea",
           "name": "云厂价值观定制卫衣",
-          "stock": 1,
+          "stock": 3,
           "total": 2,
           "createdAt": "2026-08-11T09:16:20.174Z"
         },
         {
           "id": "prize_mspr7ff0_8053rf",
           "name": "特步护腰坐垫椅",
-          "stock": 1,
+          "stock": 2,
           "total": 2,
           "createdAt": "2026-08-12T07:14:26.124Z"
         },
