@@ -29797,7 +29797,15 @@
           "createdAt": "2026-08-27T02:17:27.941Z"
         }
       ],
-      "final": [],
+      "final": [
+        {
+          "id": "prize_mtawat3a_d74r5l",
+          "name": "月度workbuddy标准版会员",
+          "stock": 2,
+          "total": 2,
+          "createdAt": "2026-08-27T02:20:11.590Z"
+        }
+      ],
       "awarded": []
     },
     "judges": [
