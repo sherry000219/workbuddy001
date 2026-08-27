@@ -31310,6 +31310,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:14:28.597Z"
+    },
+    {
+      "id": "dr_mtay8n6a_skg1gs",
+      "userId": "18988iSaIyFGxf9RD0xJyawiEiE",
+      "userName": "刘沁",
+      "stage": "semi_final",
+      "prizeId": "prize_msofxdh9_gzt65b",
+      "prizeName": "小财神盲盒",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:14:29.842Z"
     }
   ],
   "settings": {
@@ -31449,7 +31459,7 @@
         {
           "id": "prize_msofxdh9_gzt65b",
           "name": "小财神盲盒",
-          "stock": 2,
+          "stock": 1,
           "total": 3,
           "createdAt": "2026-08-11T09:10:55.101Z"
         },
