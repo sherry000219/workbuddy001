@@ -23968,6 +23968,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-27T03:10:19.541Z"
+    },
+    {
+      "id": "bet_mtay3ngu_2951fk",
+      "voterId": "LFLiiWu8V666yGgvgXVpDDwiEiE",
+      "voterName": "张帅",
+      "voterMobile": "18336217025",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPD2M4c0N_ibXNBQDNBQA_1280_1280.png",
+      "stage": "final",
+      "entryId": "entry_1786418743612_h5sx2m",
+      "entryTitle": "合同风险智能预警平台：风险先知，提前预警合同到期与风险，实现用工管理提效。",
+      "entryDept": "职能中台",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-27T03:10:36.942Z"
     }
   ],
   "drawRecords": [
@@ -30600,6 +30615,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:10:35.857Z"
+    },
+    {
+      "id": "dr_mtay3o7o_woa3lr",
+      "userId": "6ZUcG3iPulQdXtwoPa4TPyAiEiE",
+      "userName": "刘大清",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:10:37.908Z"
     }
   ],
   "settings": {
