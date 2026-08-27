@@ -33179,6 +33179,16 @@
       "prizeName": "20元以下饮品任选1杯",
       "isWin": true,
       "drawnAt": "2026-08-27T07:48:56.480Z"
+    },
+    {
+      "id": "dr_mtb81q4m_r5y4hy",
+      "userId": "s68gMn9jdRLqkIPCNV0nRwiEiE",
+      "userName": "黄河",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaxi5lr_95ct1m",
+      "prizeName": "云社区10积分",
+      "isWin": true,
+      "drawnAt": "2026-08-27T07:49:03.238Z"
     }
   ],
   "settings": {
@@ -33395,7 +33405,7 @@
         {
           "id": "prize_mtaxi5lr_95ct1m",
           "name": "云社区10积分",
-          "stock": 8,
+          "stock": 7,
           "total": 15,
           "createdAt": "2026-08-27T02:53:54.015Z"
         },
