@@ -33159,6 +33159,16 @@
       "prizeName": "云社区50积分",
       "isWin": true,
       "drawnAt": "2026-08-27T07:48:49.517Z"
+    },
+    {
+      "id": "dr_mtb81hhg_hi0le7",
+      "userId": "s68gMn9jdRLqkIPCNV0nRwiEiE",
+      "userName": "黄河",
+      "stage": "semi_final",
+      "prizeId": "prize_msofxdh9_gzt65b",
+      "prizeName": "小财神盲盒",
+      "isWin": true,
+      "drawnAt": "2026-08-27T07:48:52.036Z"
     }
   ],
   "settings": {
@@ -33298,7 +33308,7 @@
         {
           "id": "prize_msofxdh9_gzt65b",
           "name": "小财神盲盒",
-          "stock": 12,
+          "stock": 11,
           "total": 3,
           "createdAt": "2026-08-11T09:10:55.101Z"
         },
