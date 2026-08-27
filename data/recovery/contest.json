@@ -26,11 +26,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-11T03:25:43.612Z",
-      "updatedAt": "2026-08-11T04:09:43.807Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-11T04:09:43.807Z",
       "editNotice": false,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-11T06:27:17.500Z"
+      "editNoticeAckAt": "2026-08-11T06:27:17.500Z",
+      "judgeOrder": 1
     },
     {
       "id": "entry_1786374088143_40x0ai",
@@ -58,9 +59,10 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-10T15:01:28.143Z",
-      "updatedAt": "2026-08-11T02:56:44.381Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-11T02:56:44.381Z",
-      "editNotice": true
+      "editNotice": true,
+      "judgeOrder": 1
     },
     {
       "id": "entry_1786359942777_etq9ft",
@@ -176,7 +178,9 @@
       "status": "approved",
       "roundStatus": "finalist",
       "award": null,
-      "createdAt": "2026-08-10T08:42:26.788Z"
+      "createdAt": "2026-08-10T08:42:26.788Z",
+      "judgeOrder": 4,
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00"
     },
     {
       "id": "entry_1786340551344_uzahth",
@@ -204,9 +208,10 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-10T05:42:31.344Z",
-      "updatedAt": "2026-08-17T06:40:39.938Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-17T06:40:39.938Z",
-      "editNotice": true
+      "editNotice": true,
+      "judgeOrder": 3
     },
     {
       "id": "entry_1786338333096_ik561c",
@@ -261,11 +266,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-10T03:59:42.444Z",
-      "updatedAt": "2026-08-17T07:57:57.211Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-17T07:57:57.211Z",
       "editNotice": true,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-12T08:18:06.795Z"
+      "editNoticeAckAt": "2026-08-12T08:18:06.795Z",
+      "judgeOrder": 2
     },
     {
       "id": "entry_1786332037086_kh49z0",
@@ -323,9 +329,10 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-09T17:06:09.144Z",
-      "updatedAt": "2026-08-10T02:46:39.272Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-10T02:46:39.272Z",
-      "editNotice": true
+      "editNotice": true,
+      "judgeOrder": 3
     },
     {
       "id": "entry_1786287685562_ypa37h",
@@ -353,11 +360,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-09T15:01:25.562Z",
-      "updatedAt": "2026-08-11T01:50:06.469Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-11T01:50:06.469Z",
       "editNotice": false,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-13T03:10:42.561Z"
+      "editNoticeAckAt": "2026-08-13T03:10:42.561Z",
+      "judgeOrder": 8
     },
     {
       "id": "entry_1786094652380_rfnla8",
@@ -503,11 +511,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-06T11:12:25.788Z",
-      "updatedAt": "2026-08-25T05:24:34.259Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-25T05:24:34.259Z",
       "editNotice": true,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-13T03:11:56.131Z"
+      "editNoticeAckAt": "2026-08-13T03:11:56.131Z",
+      "judgeOrder": 5
     },
     {
       "id": "entry_1785933777405_l85dpc",
@@ -535,11 +544,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-05T12:42:57.405Z",
-      "updatedAt": "2026-08-12T08:56:09.077Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-12T08:56:09.077Z",
       "editNotice": false,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-13T03:12:15.653Z"
+      "editNoticeAckAt": "2026-08-13T03:12:15.653Z",
+      "judgeOrder": 6
     },
     {
       "id": "entry_1785925402853_n2ttu7",
@@ -567,9 +577,10 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-05T10:23:22.853Z",
-      "updatedAt": "2026-08-18T06:31:02.918Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-18T06:31:02.918Z",
-      "editNotice": true
+      "editNotice": true,
+      "judgeOrder": 7
     },
     {
       "id": "entry_1785909222508_t01wgt",
@@ -715,11 +726,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-08-03T10:13:03.953Z",
-      "updatedAt": "2026-08-19T03:40:29.968Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-19T03:40:29.968Z",
       "editNotice": true,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-13T03:13:32.759Z"
+      "editNoticeAckAt": "2026-08-13T03:13:32.759Z",
+      "judgeOrder": 4
     },
     {
       "id": "entry_1785739902617_utxej4",
@@ -892,11 +904,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-07-29T18:12:32.114Z",
-      "updatedAt": "2026-07-29T18:51:18.437Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-07-29T18:51:18.437Z",
       "editNotice": false,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-13T03:35:12.393Z"
+      "editNoticeAckAt": "2026-08-13T03:35:12.393Z",
+      "judgeOrder": 2
     },
     {
       "id": "entry_1785325566960_99axb6",
@@ -924,11 +937,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-07-29T11:46:06.960Z",
-      "updatedAt": "2026-08-12T04:09:57.709Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-12T04:09:57.709Z",
       "editNotice": false,
       "editNoticeAckBy": "朱海燕",
-      "editNoticeAckAt": "2026-08-12T08:59:06.336Z"
+      "editNoticeAckAt": "2026-08-12T08:59:06.336Z",
+      "judgeOrder": 9
     },
     {
       "id": "entry_1785316018922_s1rkqh",
@@ -956,11 +970,12 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-07-29T09:06:58.922Z",
-      "updatedAt": "2026-08-11T04:00:22.493Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-08-11T04:00:22.493Z",
       "editNotice": false,
       "editNoticeAckBy": "赵冰艳",
-      "editNoticeAckAt": "2026-08-12T07:20:33.046Z"
+      "editNoticeAckAt": "2026-08-12T07:20:33.046Z",
+      "judgeOrder": 10
     },
     {
       "id": "entry_1785136604075_9xogv4",
@@ -1017,7 +1032,9 @@
       "roundStatus": "finalist",
       "award": null,
       "createdAt": "2026-07-27T03:46:58.451Z",
-      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/bva6QBXJwZRxvZ6acMLdYqXKVn4qY5Pr?_fid=bva6QBXJwZRxvZ6acMLdYqXKVn4qY5Pr"
+      "posterUrl": "https://alidocs.dingtalk.com/i/nodes/bva6QBXJwZRxvZ6acMLdYqXKVn4qY5Pr?_fid=bva6QBXJwZRxvZ6acMLdYqXKVn4qY5Pr",
+      "judgeOrder": 5,
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00"
     },
     {
       "id": "entry_1784284342845_dzvql7",
@@ -1105,12 +1122,13 @@
       "createdAt": "2026-07-17T09:33:35.114Z",
       "process_link": "",
       "result_link": "",
-      "updatedAt": "2026-07-23T10:14:34.244Z",
+      "updatedAt": "2026-08-26T02:14:44.438640+00:00",
       "lastEditedAt": "2026-07-23T10:14:34.244Z",
       "editNotice": false,
       "posterUrl": "https://alidocs.dingtalk.com/i/nodes/9E05BDRVQeyRpeN2fDPLvPO5V63zgkYA?_fid=9E05BDRVQeyRpeN2fDPLvPO5V63zgkYA",
       "editNoticeAckBy": "美娜",
-      "editNoticeAckAt": "2026-08-13T03:27:13.179Z"
+      "editNoticeAckAt": "2026-08-13T03:27:13.179Z",
+      "judgeOrder": 11
     },
     {
       "id": "entry_1784190723267_8r8xc0",
@@ -23230,6 +23248,201 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-25T07:47:53.104Z"
+    },
+    {
+      "id": "bet_mt9fyilf_6dfqr3",
+      "voterId": "Hs1lfHRo5qSXYzje1j6eGgiEiE",
+      "voterName": "吕玲",
+      "voterMobile": "18133445181",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4G4HH-1-43NB-XNB-Cw0MKL12cZSS0JgTyvV3lcAA_2016_2021.jpg",
+      "stage": "final",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T01:54:58.083Z"
+    },
+    {
+      "id": "bet_mt9fz3ei_kaq44y",
+      "voterId": "AjxDiSxACbTkshBqyrnMKiPgiEiE",
+      "voterName": "仲旭",
+      "voterMobile": "13142992707",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T01:55:25.050Z"
+    },
+    {
+      "id": "bet_mt9fzrsd_pd0439",
+      "voterId": "8f8wzii630wxBQ32FiilaP3AiEiE",
+      "voterName": "徐航",
+      "voterMobile": "18344818667",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T01:55:56.653Z"
+    },
+    {
+      "id": "bet_mt9g46da_53xl2m",
+      "voterId": "qHFb13ALXHzhuoCrGUaaiPAiEiE",
+      "voterName": "徐聪明",
+      "voterMobile": "18952230018",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQLPM4WiX_ubU8XNAuPNAuOwUYtMaCXNdUsIggrseb-PAA_739_739.png",
+      "stage": "final",
+      "entryId": "entry_1785348752114_picbqa",
+      "entryTitle": "智数驱动 · 赋能一线」\u000b——基于 AI 全链路开发的工单智能看板与业务洞察平台",
+      "entryDept": "中小微事业群",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-26T01:59:22.174Z"
+    },
+    {
+      "id": "bet_mt9g90wr_h0ell1",
+      "voterId": "3iiENC2XiikML6fsPZ9RvXvwiEiE",
+      "voterName": "彭文杰",
+      "voterMobile": "17739550821",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1786418743612_h5sx2m",
+      "entryTitle": "合同风险智能预警平台：风险先知，提前预警合同到期与风险，实现用工管理提效。",
+      "entryDept": "职能中台",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:03:08.379Z"
+    },
+    {
+      "id": "bet_mt9g92bl_xhmtfj",
+      "voterId": "dSDGUqN7BOXw9Ua01bSbBAiEiE",
+      "voterName": "张恒恒",
+      "voterMobile": "18987866967",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3YU9QBFUUXNAoDNAoCwjayeLQFDxDkJennCiXdhAA_640_640.jpg",
+      "stage": "final",
+      "entryId": "entry_1785316018922_s1rkqh",
+      "entryTitle": "最适配销售的CRM：用Workbuddy定制化系统",
+      "entryDept": "中小微事业群",
+      "track": "business",
+      "trackLabel": "业务赋能",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:03:10.209Z"
+    },
+    {
+      "id": "bet_mt9g9mlj_pghu2m",
+      "voterId": "UoRkQKE9uoWBQ6PoLKu0JgiEiE",
+      "voterName": "殷攀飞",
+      "voterMobile": "15565368526",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lALPD15ht8SaqPXNBQDNBQA_1280_1280.png",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:03:36.487Z"
+    },
+    {
+      "id": "bet_mt9ga4qx_e8760f",
+      "voterId": "7SrAn1DIpDiP0wvfVzkiSvIgiEiE",
+      "voterName": "朱振华",
+      "voterMobile": "15169610529",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDg7mLf8gMdLNAR_NAWI_354_287.jpg",
+      "stage": "final",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:04:00.009Z"
+    },
+    {
+      "id": "bet_mt9gaoyj_qhqgmh",
+      "voterId": "PU0Bo8Yp6SWsWBQhciPQMfAiEiE",
+      "voterName": "钟超群",
+      "voterMobile": "13814006788",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM4t_81g3AiXNBJvNBJuwM5XiOq_OEZUHSnv4xwv6AA_1179_1179.jpg",
+      "stage": "final",
+      "entryId": "entry_1785348752114_picbqa",
+      "entryTitle": "智数驱动 · 赋能一线」\u000b——基于 AI 全链路开发的工单智能看板与业务洞察平台",
+      "entryDept": "中小微事业群",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:04:26.203Z"
+    },
+    {
+      "id": "bet_mt9gb5my_avge87",
+      "voterId": "5Qzmzv8iiCyq31vvaTC7VngiEiE",
+      "voterName": "韩松成",
+      "voterMobile": "18801582409",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD39_HkcPh53NBADNBACwEgEqt8kQw5kJ2_s-bOwIAA_1024_1024.jpg",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:04:47.818Z"
+    },
+    {
+      "id": "bet_mt9gbpe8_u2mxbg",
+      "voterId": "PtPiSGlsVKAwq7C1qbyiif7wiEiE",
+      "voterName": "时键皓",
+      "voterMobile": "19991256082",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD4k7IiDyaonNAaHNAaGwLMSHCHv-ilsIjZBW6DGDAA_417_417.jpg",
+      "stage": "final",
+      "entryId": "entry_1786418743612_h5sx2m",
+      "entryTitle": "合同风险智能预警平台：风险先知，提前预警合同到期与风险，实现用工管理提效。",
+      "entryDept": "职能中台",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:05:13.424Z"
+    },
+    {
+      "id": "bet_mt9gckhl_xsxieo",
+      "voterId": "Pcl8uUx2btO0wvfVzkiSvIgiEiE",
+      "voterName": "金霞",
+      "voterMobile": "18796197359",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5tw2lRUvA_NBJLNBJKwrFnig7x-4psI3maytG_SAA_1170_1170.jpg",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:05:53.721Z"
+    },
+    {
+      "id": "bet_mt9gd5d8_alhbdk",
+      "voterId": "KiioojKWDH7j2bEiSyLtOAeQiEiE",
+      "voterName": "刘美美",
+      "voterMobile": "18895671650",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM43xrquPzM_NBQrNBQqw7hy2baHTTlYJOLQtPLnUAA_1290_1290.jpg",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-26T02:06:20.780Z"
     }
   ],
   "drawRecords": [

@@ -1113,15 +1113,27 @@ app.put('/api/entries/:id', requireAuth, (req, res) => {
 app.post('/api/entries/:id/ack-edit', (req, res) => {
   const entry = db.entries.find(e => e.id === req.params.id);
   if (!entry) return res.status(404).json({ error: '作品不存在' });
-  const { judgeName, judgePassword, adminPassword } = req.body;
-  const judgeOk = judgePassword && judgePassword === getJudgePassword();
-  const adminOk = adminPassword && adminPassword === getAdminPassword();
-  if (!judgeOk && !adminOk) return res.status(403).json({ error: '仅评委或管理员可标记已读' });
-  entry.editNotice = false;
-  entry.editNoticeAckBy = judgeName || '管理员';
-  entry.editNoticeAckAt = new Date().toISOString();
-  saveDB();
-  res.json({ success: true });
+  // 管理员：token 头或密码（向后兼容）
+  const token = req.headers['x-admin-token'] || req.query.adminToken;
+  const adminByToken = token && adminTokens.has(token) && Date.now() <= adminTokens.get(token);
+  const adminByPw = req.body.adminPassword && req.body.adminPassword === getAdminPassword();
+  if (adminByToken || adminByPw) {
+    entry.editNotice = false;
+    entry.editNoticeAckBy = '管理员';
+    entry.editNoticeAckAt = new Date().toISOString();
+    saveDB();
+    return res.json({ success: true });
+  }
+  // 评委：钉钉会话 + 当前赛段评委名单（免密码）
+  const session = getSession(req);
+  if (session && isJudgeInList(session.nick, getCurrentStage())) {
+    entry.editNotice = false;
+    entry.editNoticeAckBy = session.nick;
+    entry.editNoticeAckAt = new Date().toISOString();
+    saveDB();
+    return res.json({ success: true });
+  }
+  return res.status(403).json({ error: '仅评委或管理员可标记已读' });
 });
 
 // ========== API: MY ENTRIES (本人投稿列表) ==========
@@ -1414,12 +1426,11 @@ app.get('/api/bets/summary', (req, res) => {
 });
 
 // ========== API: JUDGE ==========
-app.post('/api/judge/scores/:entryId', (req, res) => {
-  const { judgeName, practicality, innovation, scalability, presentation, value, judgePassword } = req.body;
-  if (!judgeName) return res.status(400).json({ error: '请输入评委姓名' });
-  if (judgePassword !== getJudgePassword()) {
-    return res.status(403).json({ error: '评委密码错误' });
-  }
+// 评委鉴权：钉钉登录 + 当前赛段评委名单（钉钉昵称匹配），不再需要评审密码
+app.post('/api/judge/scores/:entryId', requireAuth, (req, res) => {
+  const { practicality, innovation, scalability, presentation, value } = req.body;
+  const judgeName = req.ddUser.nick;
+  if (!judgeName) return res.status(400).json({ error: '无法获取您的钉钉昵称' });
   const stage = getCurrentStage();
   // 评委名单校验：按当前赛段校验
   if (!isJudgeInList(judgeName, stage)) {
@@ -1454,12 +1465,10 @@ app.post('/api/judge/scores/:entryId', (req, res) => {
 });
 
 // GET /api/judge/my-scores — return this judge's existing scores for current stage
-app.get('/api/judge/my-scores', (req, res) => {
-  const { judgeName, judgePassword } = req.query;
-  if (!judgeName) return res.status(400).json({ error: '缺少评委姓名' });
-  if (judgePassword !== getJudgePassword()) {
-    return res.status(403).json({ error: '评委密码错误' });
-  }
+// 鉴权：钉钉会话（评委 = 钉钉昵称），不再需要评审密码
+app.get('/api/judge/my-scores', requireAuth, (req, res) => {
+  const judgeName = req.ddUser.nick;
+  if (!judgeName) return res.status(400).json({ error: '无法获取您的钉钉昵称' });
   // 评委名单校验：按当前赛段校验
   const stage = getCurrentStage();
   if (!isJudgeInList(judgeName, stage)) {
