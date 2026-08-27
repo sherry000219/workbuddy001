@@ -32428,6 +32428,16 @@
       "prizeName": "云社区10积分",
       "isWin": true,
       "drawnAt": "2026-08-27T03:55:21.984Z"
+    },
+    {
+      "id": "dr_mtazpdwq_9t6o7g",
+      "userId": "Un8r69FPcxb2bEiSyLtOAeQiEiE",
+      "userName": "汝丽丽",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaxi5lr_95ct1m",
+      "prizeName": "云社区10积分",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:55:30.602Z"
     }
   ],
   "settings": {
@@ -32651,7 +32661,7 @@
         {
           "id": "prize_mtaxi5lr_95ct1m",
           "name": "云社区10积分",
-          "stock": 11,
+          "stock": 10,
           "total": 15,
           "createdAt": "2026-08-27T02:53:54.015Z"
         }
