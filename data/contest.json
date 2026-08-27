@@ -23953,6 +23953,21 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-27T03:09:45.317Z"
+    },
+    {
+      "id": "bet_mtay3a1h_fcot9k",
+      "voterId": "xiSZrVRRLxyP2bEiSyLtOAeQiEiE",
+      "voterName": "刁永宝",
+      "voterMobile": "18655046884",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQLPD3pXcQIqVjfNAyDNAyCwihoyw7W3jqcHqBJuWsw6AA_800_800.png",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-27T03:10:19.541Z"
     }
   ],
   "drawRecords": [
@@ -30525,6 +30540,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:10:15.712Z"
+    },
+    {
+      "id": "dr_mtay39eb_vt04d7",
+      "userId": "amme4VLJfpXqkIPCNV0nRwiEiE",
+      "userName": "沈昕",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:10:18.707Z"
     }
   ],
   "settings": {
