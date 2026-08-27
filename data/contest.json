@@ -29825,6 +29825,13 @@
           "stock": 1,
           "total": 1,
           "createdAt": "2026-08-27T02:25:24.429Z"
+        },
+        {
+          "id": "prize_mtawj1zs_siusgm",
+          "name": "20元以下饮品任选一杯",
+          "stock": 2,
+          "total": 2,
+          "createdAt": "2026-08-27T02:26:36.376Z"
         }
       ],
       "awarded": []
