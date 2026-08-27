@@ -33169,6 +33169,16 @@
       "prizeName": "小财神盲盒",
       "isWin": true,
       "drawnAt": "2026-08-27T07:48:52.036Z"
+    },
+    {
+      "id": "dr_mtb81kww_92rfg2",
+      "userId": "s68gMn9jdRLqkIPCNV0nRwiEiE",
+      "userName": "黄河",
+      "stage": "semi_final",
+      "prizeId": "prize_msofxnkk_t2rfnf",
+      "prizeName": "20元以下饮品任选1杯",
+      "isWin": true,
+      "drawnAt": "2026-08-27T07:48:56.480Z"
     }
   ],
   "settings": {
@@ -33315,7 +33325,7 @@
         {
           "id": "prize_msofxnkk_t2rfnf",
           "name": "20元以下饮品任选1杯",
-          "stock": 2,
+          "stock": 1,
           "total": 5,
           "createdAt": "2026-08-11T09:11:08.180Z"
         },
