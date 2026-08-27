@@ -197,7 +197,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     <div class="hero-actions" id="heroActions">
       <a href="/app/lucky.html" class="hero-cta" id="heroCtaLucky" style="background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 8px 28px rgba(245,158,11,0.35);">🎁 投票抽奖</a>
       <a href="/app/browse.html" class="hero-cta hero-vote" id="heroCtaVote">🗳️ 复赛投票</a>
-      <a href="/app/browse.html#betting" class="hero-cta" id="heroCtaBet" style="display:none;background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 8px 28px rgba(245,158,11,0.35);">🎯 决赛押宝</a>
+      <a href="/app/browse.html#betting" class="hero-cta" id="heroCtaBet" style="display:none;background: linear-gradient(135deg, #ef4444, #ea580c); box-shadow: 0 8px 28px rgba(239,68,68,0.35);">🎯 决赛押宝</a>
     </div>
   </div>
   <div class="kb-container">
@@ -492,13 +492,14 @@ function updateStageUI(targetStage) {
   if (hint) {
     hint.textContent = targetStage === currentStage ? '（当前赛段）' : '（历史赛段回顾）';
   }
-  // HERO 区按赛段切换：决赛阶段只显示「🎯 决赛押宝」；其他阶段保留「投票抽奖」+「复赛投票」
+  // HERO 区按赛段切换：决赛阶段显示「🎁 投票抽奖」+「🎯 决赛押宝」（不再员工投票，但抽奖保留入口）；
+  // 其他阶段保留「投票抽奖」+「复赛投票」
   const heroLucky = document.getElementById('heroCtaLucky');
   const heroVote = document.getElementById('heroCtaVote');
   const heroBet = document.getElementById('heroCtaBet');
   if (heroLucky && heroVote && heroBet) {
     if (currentStage === 'final' || currentStage === 'awarded') {
-      heroLucky.style.display = 'none';
+      heroLucky.style.display = '';
       heroVote.style.display = 'none';
       heroBet.style.display = '';
       heroBet.textContent = '🎯 决赛押宝';
