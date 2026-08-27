@@ -31736,6 +31736,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:18:39.793Z"
+    },
+    {
+      "id": "dr_mtaye1tc_8c3n2z",
+      "userId": "MiP6iil0VSqViiHLMPgWMviSiPAiEiE",
+      "userName": "王润泽",
+      "stage": "semi_final",
+      "prizeId": "prize_msofxzgn_its3td",
+      "prizeName": "月度 workbuddy 标准版会员",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:18:42.096Z"
     }
   ],
   "settings": {
@@ -31896,7 +31906,7 @@
         {
           "id": "prize_msofxzgn_its3td",
           "name": "月度 workbuddy 标准版会员",
-          "stock": 2,
+          "stock": 1,
           "total": 2,
           "createdAt": "2026-08-11T09:11:23.591Z"
         },
