@@ -29796,6 +29796,13 @@
           "stock": 3,
           "total": 5,
           "createdAt": "2026-08-27T02:17:27.941Z"
+        },
+        {
+          "id": "prize_mtax90rx_tu797q",
+          "name": "小财神盲盒",
+          "stock": 15,
+          "total": 15,
+          "createdAt": "2026-08-27T02:46:47.853Z"
         }
       ],
       "final": [
