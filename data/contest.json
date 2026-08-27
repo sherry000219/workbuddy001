@@ -30815,6 +30815,26 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:11:00.855Z"
+    },
+    {
+      "id": "dr_mtay477f_pjja6e",
+      "userId": "dahfrRiiKm52FUrWP6VnNPwiEiE",
+      "userName": "段紫腾",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:11:02.523Z"
+    },
+    {
+      "id": "dr_mtay49a1_4waqk7",
+      "userId": "qz2EdTHiiImXCiSESyUNcrIQiEiE",
+      "userName": "刘璐瑶",
+      "stage": "preliminary",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:11:05.209Z"
     }
   ],
   "settings": {
