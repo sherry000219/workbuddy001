@@ -23337,8 +23337,9 @@
       "entryDept": "中小微事业群",
       "track": "business",
       "trackLabel": "业务赋能",
-      "revoked": false,
-      "createdAt": "2026-08-26T02:03:10.209Z"
+      "revoked": true,
+      "createdAt": "2026-08-26T02:03:10.209Z",
+      "revokedAt": "2026-08-27T08:27:11.663Z"
     },
     {
       "id": "bet_mt9g9mlj_pghu2m",
