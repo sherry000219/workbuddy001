@@ -32888,6 +32888,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T06:03:00.032Z"
+    },
+    {
+      "id": "dr_mtb49f0r_b99a9a",
+      "userId": "As4MOnOvMWOxf9RD0xJyawiEiE",
+      "userName": "杜培培",
+      "stage": "preliminary",
+      "prizeId": "prize_msoftnqo_is7ftq",
+      "prizeName": "帐sir抱枕毯",
+      "isWin": true,
+      "drawnAt": "2026-08-27T06:03:03.627Z"
     }
   ],
   "settings": {
@@ -32934,7 +32944,7 @@
         {
           "id": "prize_msoftnqo_is7ftq",
           "name": "帐sir抱枕毯",
-          "stock": 1,
+          "stock": 0,
           "total": 2,
           "createdAt": "2026-08-11T09:08:01.776Z"
         },
