@@ -31115,6 +31115,26 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:11:59.831Z"
+    },
+    {
+      "id": "dr_mtay5flo_rds7ee",
+      "userId": "LyQ47lC1Ck6FUrWP6VnNPwiEiE",
+      "userName": "巩似玉",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:12:00.060Z"
+    },
+    {
+      "id": "dr_mtay5gd9_322ue8",
+      "userId": "0b8iSVD1PtGh0NTSPVJ3E7giEiE",
+      "userName": "刘嘉欣",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaw5u57_zo4lke",
+      "prizeName": "云社区20积分",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:12:01.053Z"
     }
   ],
   "settings": {
@@ -31331,7 +31351,7 @@
         {
           "id": "prize_mtaw5u57_zo4lke",
           "name": "云社区20积分",
-          "stock": 14,
+          "stock": 13,
           "total": 15,
           "createdAt": "2026-08-27T02:16:19.675Z"
         },
