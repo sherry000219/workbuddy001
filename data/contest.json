@@ -24163,8 +24163,9 @@
       "entryDept": "福鹿事业部",
       "track": "efficiency",
       "trackLabel": "效率提升",
-      "revoked": false,
-      "createdAt": "2026-08-27T03:25:06.542Z"
+      "revoked": true,
+      "createdAt": "2026-08-27T03:25:06.542Z",
+      "revokedAt": "2026-08-27T03:31:19.872Z"
     },
     {
       "id": "bet_mtayq84q_7s9q7m",
