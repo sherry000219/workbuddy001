@@ -32523,6 +32523,16 @@
       "prizeName": "云社区10积分",
       "isWin": true,
       "drawnAt": "2026-08-27T04:01:22.048Z"
+    },
+    {
+      "id": "dr_mtazznwo_fo89ms",
+      "userId": "Qx4Jmrh1chmXYzje1j6eGgiEiE",
+      "userName": "胡妍",
+      "stage": "semi_final",
+      "prizeId": "prize_msofwsrv_3fa59m",
+      "prizeName": "云帐房LOGO款黑色双肩包",
+      "isWin": true,
+      "drawnAt": "2026-08-27T04:03:30.120Z"
     }
   ],
   "settings": {
@@ -32641,7 +32651,7 @@
         {
           "id": "prize_msofwsrv_3fa59m",
           "name": "云帐房LOGO款黑色双肩包",
-          "stock": 1,
+          "stock": 0,
           "total": 1,
           "createdAt": "2026-08-11T09:10:28.267Z"
         },
