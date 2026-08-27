@@ -31946,6 +31946,16 @@
       "prizeName": "云社区20积分",
       "isWin": true,
       "drawnAt": "2026-08-27T03:20:21.227Z"
+    },
+    {
+      "id": "dr_mtaygb10_e5mw01",
+      "userId": "FES03VPkszTaR5eVPMv3CgiEiE",
+      "userName": "顾欣怡",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaw59t5_4yv6ye",
+      "prizeName": "MBTI小徽章（非南京补50积分）",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:20:27.348Z"
     }
   ],
   "settings": {
@@ -32155,7 +32165,7 @@
         {
           "id": "prize_mtaw59t5_4yv6ye",
           "name": "MBTI小徽章（非南京补50积分）",
-          "stock": 12,
+          "stock": 11,
           "total": 15,
           "createdAt": "2026-08-27T02:15:53.321Z"
         },
