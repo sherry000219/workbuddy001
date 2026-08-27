@@ -29825,6 +29825,13 @@
           "stock": 1,
           "total": 1,
           "createdAt": "2026-08-27T02:23:43.501Z"
+        },
+        {
+          "id": "prize_mtawhih9_ecz4no",
+          "name": "小米手环9pro",
+          "stock": 1,
+          "total": 1,
+          "createdAt": "2026-08-27T02:25:24.429Z"
         }
       ],
       "awarded": []
