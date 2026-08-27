@@ -24028,6 +24028,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-27T03:12:22.068Z"
+    },
+    {
+      "id": "bet_mtay8rui_4vzw68",
+      "voterId": "ZGVJkHiSvReaXYzje1j6eGgiEiE",
+      "voterName": "董鑫坤",
+      "voterMobile": "18828583607",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD3rhr0lfisfNA7zNAtCwpSzgd9ieyckKTC5GQlKTAA_720_956.jpg",
+      "stage": "final",
+      "entryId": "entry_1786374088143_40x0ai",
+      "entryTitle": "领航·云帐房干部运营平台：让每一次干部洞见和决策，都有数据的远见。",
+      "entryDept": "职能中台",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-27T03:14:35.898Z"
     }
   ],
   "drawRecords": [
