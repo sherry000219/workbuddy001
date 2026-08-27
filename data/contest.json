@@ -29811,6 +29811,13 @@
           "stock": 1,
           "total": 1,
           "createdAt": "2026-08-27T02:20:30.078Z"
+        },
+        {
+          "id": "prize_mtawbk1s_k1et8y",
+          "name": "云厂价值观定制卫衣",
+          "stock": 1,
+          "total": 1,
+          "createdAt": "2026-08-27T02:20:46.528Z"
         }
       ],
       "awarded": []
