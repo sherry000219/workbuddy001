@@ -29905,6 +29905,26 @@
       "prizeName": "帐sir抱枕毯",
       "isWin": true,
       "drawnAt": "2026-08-27T03:09:10.952Z"
+    },
+    {
+      "id": "dr_mtay1uut_i6ejzv",
+      "userId": "Cqf9sCKhpxWsWBQhciPQMfAiEiE",
+      "userName": "陈梅雪",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:13.205Z"
+    },
+    {
+      "id": "dr_mtay1v0c_9cgbok",
+      "userId": "8f8wzii630wxBQ32FiilaP3AiEiE",
+      "userName": "徐航",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:13.404Z"
     }
   ],
   "settings": {
