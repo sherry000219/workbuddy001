@@ -30050,6 +30050,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:09:23.110Z"
+    },
+    {
+      "id": "dr_mtay23tk_z5x8uh",
+      "userId": "Hs1lfHRo5qSXYzje1j6eGgiEiE",
+      "userName": "吕玲",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaxdqd9_vmiu9h",
+      "prizeName": "校招透明A4文件夹（非南京补50积分）",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:09:24.824Z"
     }
   ],
   "settings": {
@@ -30294,7 +30304,7 @@
         {
           "id": "prize_mtaxdqd9_vmiu9h",
           "name": "校招透明A4文件夹（非南京补50积分）",
-          "stock": 13,
+          "stock": 12,
           "total": 15,
           "createdAt": "2026-08-27T02:50:27.645Z"
         },
