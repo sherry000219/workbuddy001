@@ -30415,6 +30415,36 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:10:04.661Z"
+    },
+    {
+      "id": "dr_mtay30k5_ov7p7r",
+      "userId": "KiioojKWDH7j2bEiSyLtOAeQiEiE",
+      "userName": "刘美美",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaxi5lr_95ct1m",
+      "prizeName": "云社区10积分",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:10:07.253Z"
+    },
+    {
+      "id": "dr_mtay30qs_y5url2",
+      "userId": "bUjNh6tO7RHqkIPCNV0nRwiEiE",
+      "userName": "Viki(楚艳勤)",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaw67p1_q53e3r",
+      "prizeName": "云社区50积分",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:10:07.492Z"
+    },
+    {
+      "id": "dr_mtay31s9_axulhf",
+      "userId": "JCh4iSviSr2zr6fsPZ9RvXvwiEiE",
+      "userName": "徐瑞",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:10:08.841Z"
     }
   ],
   "settings": {
@@ -30638,7 +30668,7 @@
         {
           "id": "prize_mtaw67p1_q53e3r",
           "name": "云社区50积分",
-          "stock": 11,
+          "stock": 10,
           "total": 15,
           "createdAt": "2026-08-27T02:16:37.237Z"
         },
@@ -30666,7 +30696,7 @@
         {
           "id": "prize_mtaxi5lr_95ct1m",
           "name": "云社区10积分",
-          "stock": 15,
+          "stock": 14,
           "total": 15,
           "createdAt": "2026-08-27T02:53:54.015Z"
         }
