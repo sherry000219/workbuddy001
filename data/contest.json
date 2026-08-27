@@ -29570,6 +29570,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-21T09:57:47.656Z"
+    },
+    {
+      "id": "dr_mtay0ve5_poc2c5",
+      "userId": "qHFb13ALXHzhuoCrGUaaiPAiEiE",
+      "userName": "徐聪明",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaw6kw6_rbrs40",
+      "prizeName": "云社区1000积分",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:08:27.245Z"
     }
   ],
   "settings": {
@@ -29707,23 +29717,30 @@
           "createdAt": "2026-08-11T09:10:45.295Z"
         },
         {
+          "id": "prize_msofxdh9_gzt65b",
+          "name": "小财神盲盒",
+          "stock": 3,
+          "total": 3,
+          "createdAt": "2026-08-11T09:10:55.101Z"
+        },
+        {
           "id": "prize_msofxib0_fj7kw1",
           "name": "帐sir抱枕毯",
-          "stock": 1,
+          "stock": 2,
           "total": 2,
           "createdAt": "2026-08-11T09:11:01.356Z"
         },
         {
           "id": "prize_msofxnkk_t2rfnf",
           "name": "20元以下饮品任选1杯",
-          "stock": 3,
+          "stock": 5,
           "total": 5,
           "createdAt": "2026-08-11T09:11:08.180Z"
         },
         {
           "id": "prize_msofxzgn_its3td",
           "name": "月度 workbuddy 标准版会员",
-          "stock": 1,
+          "stock": 2,
           "total": 2,
           "createdAt": "2026-08-11T09:11:23.591Z"
         },
@@ -29736,10 +29753,17 @@
         },
         {
           "id": "prize_msofyqvu_s8pi5h",
-          "name": "小米手环9pro",
+          "name": "小米手持挂烫机2代",
           "stock": 1,
           "total": 1,
           "createdAt": "2026-08-11T09:11:59.130Z"
+        },
+        {
+          "id": "prize_msofzyli_f893s1",
+          "name": "小米手环9pro",
+          "stock": 1,
+          "total": 1,
+          "createdAt": "2026-08-11T09:12:55.782Z"
         },
         {
           "id": "prize_msog0ovt_qfukyq",
@@ -29751,9 +29775,16 @@
         {
           "id": "prize_msog4cb2_9zweea",
           "name": "云厂价值观定制卫衣",
-          "stock": 1,
+          "stock": 3,
           "total": 2,
           "createdAt": "2026-08-11T09:16:20.174Z"
+        },
+        {
+          "id": "prize_mspr7ff0_8053rf",
+          "name": "特步护腰坐垫椅",
+          "stock": 2,
+          "total": 2,
+          "createdAt": "2026-08-12T07:14:26.124Z"
         },
         {
           "id": "prize_mtaw59t5_4yv6ye",
@@ -29779,7 +29810,7 @@
         {
           "id": "prize_mtaw6kw6_rbrs40",
           "name": "云社区1000积分",
-          "stock": 2,
+          "stock": 1,
           "total": 2,
           "createdAt": "2026-08-27T02:16:54.342Z"
         },
@@ -29789,20 +29820,6 @@
           "stock": 3,
           "total": 5,
           "createdAt": "2026-08-27T02:17:27.941Z"
-        },
-        {
-          "id": "prize_mtax90rx_tu797q",
-          "name": "小财神盲盒",
-          "stock": 15,
-          "total": 15,
-          "createdAt": "2026-08-27T02:46:47.853Z"
-        },
-        {
-          "id": "prize_mtax9bse_ehil38",
-          "name": "特步护腰坐垫椅",
-          "stock": 1,
-          "total": 1,
-          "createdAt": "2026-08-27T02:47:02.126Z"
         },
         {
           "id": "prize_mtaxdqd9_vmiu9h",
