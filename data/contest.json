@@ -30270,6 +30270,36 @@
       "prizeName": "云社区50积分",
       "isWin": true,
       "drawnAt": "2026-08-27T03:09:37.312Z"
+    },
+    {
+      "id": "dr_mtay2elv_pyr2b2",
+      "userId": "1OxlRiPbsLsIiE",
+      "userName": "肖艳",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:38.803Z"
+    },
+    {
+      "id": "dr_mtay2era_owgtml",
+      "userId": "zHwoEdGt7n6asvb74vtOagiEiE",
+      "userName": "桂万彬",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:38.998Z"
+    },
+    {
+      "id": "dr_mtay2fds_3m9l3s",
+      "userId": "QapaV2eLlcnw9Ua01bSbBAiEiE",
+      "userName": "周可妍",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:39.808Z"
     }
   ],
   "settings": {
