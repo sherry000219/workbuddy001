@@ -29781,6 +29781,13 @@
           "stock": 15,
           "total": 15,
           "createdAt": "2026-08-27T02:16:37.237Z"
+        },
+        {
+          "id": "prize_mtaw6kw6_rbrs40",
+          "name": "云社区1000积分",
+          "stock": 2,
+          "total": 2,
+          "createdAt": "2026-08-27T02:16:54.342Z"
         }
       ],
       "final": [],
