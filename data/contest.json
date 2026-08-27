@@ -24302,6 +24302,21 @@
       "revoked": true,
       "createdAt": "2026-08-27T06:32:43.777Z",
       "revokedAt": "2026-08-27T07:26:41.914Z"
+    },
+    {
+      "id": "bet_mtb79y4y_uvw6nm",
+      "voterId": "ZTEJk3LZCHzLjsIZuwWnpAiEiE",
+      "voterName": "贾治维",
+      "voterMobile": "13321150624",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1786014745788_j70nld",
+      "entryTitle": "恋爱式哄客销售技巧",
+      "entryDept": "福鹿事业部",
+      "track": "business",
+      "trackLabel": "业务赋能",
+      "revoked": false,
+      "createdAt": "2026-08-27T07:27:27.250Z"
     }
   ],
   "drawRecords": [
