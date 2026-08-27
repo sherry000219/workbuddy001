@@ -23923,6 +23923,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-27T03:09:09.383Z"
+    },
+    {
+      "id": "bet_mtay1xfm_j9rct4",
+      "voterId": "73uhOw1Kcwj1A7nMzMii3DQiEiE",
+      "voterName": "李亮",
+      "voterMobile": "15735046658",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-27T03:09:16.546Z"
     }
   ],
   "drawRecords": [
@@ -29945,6 +29960,26 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:09:15.004Z"
+    },
+    {
+      "id": "dr_mtay1x98_rluux8",
+      "userId": "Cqf9sCKhpxWsWBQhciPQMfAiEiE",
+      "userName": "陈梅雪",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:16.316Z"
+    },
+    {
+      "id": "dr_mtay1xeo_oswtea",
+      "userId": "8f8wzii630wxBQ32FiilaP3AiEiE",
+      "userName": "徐航",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:16.512Z"
     }
   ],
   "settings": {
