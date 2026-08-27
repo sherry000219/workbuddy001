@@ -29804,6 +29804,13 @@
           "stock": 2,
           "total": 2,
           "createdAt": "2026-08-27T02:20:11.590Z"
+        },
+        {
+          "id": "prize_mtawb7cu_eighlr",
+          "name": "特步护腰坐垫椅",
+          "stock": 1,
+          "total": 1,
+          "createdAt": "2026-08-27T02:20:30.078Z"
         }
       ],
       "awarded": []
