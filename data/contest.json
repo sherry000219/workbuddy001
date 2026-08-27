@@ -29980,6 +29980,66 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:09:16.512Z"
+    },
+    {
+      "id": "dr_mtay1ysr_amx6py",
+      "userId": "QapaV2eLlcnw9Ua01bSbBAiEiE",
+      "userName": "周可妍",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:18.315Z"
+    },
+    {
+      "id": "dr_mtay1z6k_u7ezip",
+      "userId": "JFbWkd5tiSgzLjsIZuwWnpAiEiE",
+      "userName": "刘思远",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:18.812Z"
+    },
+    {
+      "id": "dr_mtay1z9f_zirkl1",
+      "userId": "zgGjErp89iiLLjsIZuwWnpAiEiE",
+      "userName": "陈玉婷",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:18.915Z"
+    },
+    {
+      "id": "dr_mtay1zet_twjyim",
+      "userId": "8f8wzii630wxBQ32FiilaP3AiEiE",
+      "userName": "徐航",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:19.109Z"
+    },
+    {
+      "id": "dr_mtay1zvk_y399fc",
+      "userId": "Hs1lfHRo5qSXYzje1j6eGgiEiE",
+      "userName": "吕玲",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:19.712Z"
+    },
+    {
+      "id": "dr_mtay216i_8yjkvb",
+      "userId": "QapaV2eLlcnw9Ua01bSbBAiEiE",
+      "userName": "周可妍",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaxdqd9_vmiu9h",
+      "prizeName": "校招透明A4文件夹（非南京补50积分）",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:09:21.402Z"
     }
   ],
   "settings": {
@@ -30224,7 +30284,7 @@
         {
           "id": "prize_mtaxdqd9_vmiu9h",
           "name": "校招透明A4文件夹（非南京补50积分）",
-          "stock": 14,
+          "stock": 13,
           "total": 15,
           "createdAt": "2026-08-27T02:50:27.645Z"
         },
