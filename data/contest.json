@@ -30955,6 +30955,26 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:11:20.624Z"
+    },
+    {
+      "id": "dr_mtay4osk_4jqf35",
+      "userId": "Ov1QiSgb4iSBiisWBQhciPQMfAiEiE",
+      "userName": "王中浩",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:11:25.316Z"
+    },
+    {
+      "id": "dr_mtay4q0o_ou1kme",
+      "userId": "xNAVC2kwyEciSCCT8iPOxxygiEiE",
+      "userName": "周紫怡",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaw59t5_4yv6ye",
+      "prizeName": "MBTI小徽章（非南京补50积分）",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:11:26.904Z"
     }
   ],
   "settings": {
@@ -31164,7 +31184,7 @@
         {
           "id": "prize_mtaw59t5_4yv6ye",
           "name": "MBTI小徽章（非南京补50积分）",
-          "stock": 15,
+          "stock": 14,
           "total": 15,
           "createdAt": "2026-08-27T02:15:53.321Z"
         },
