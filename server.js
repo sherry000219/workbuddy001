@@ -2829,13 +2829,17 @@ app.post('/api/force-sync', async (req, res) => {
     }
   }
 
-  // 一次性数据迁移（2026-08-26）：决赛待打分作品展示顺序
-  // 个人组 蒋蔚文↔吕玲 互换、团队组 姚靖↔郭彦柳 互换；幂等——仅在与目标不一致时写入
+  // 一次性数据迁移（2026-08-27 v2）：决赛待打分作品展示顺序——按赛道分组后的目标顺序
+  // 个人：效率提升(王顺泽/任歆迪/周韦昊/时海龙) → 创意应用(蒋蔚文/徐聪明/周紫怡/吕玲) → 业务赋能(徐航/刘璐瑶/桂万彬)
+  // 团队：朱梦瑶/李铭铖/姚靖/郭彦柳/苏万灵
+  // 版本控制：每个版本只应用一次，之后管理后台的手动调整不会被重启覆盖
+  const JUDGE_ORDER_SEED_VER = 2;
   const JUDGE_ORDER_SEED = {
-    individual: ['周韦昊', '徐聪明', '周紫怡', '蒋蔚文', '徐航', '王顺泽', '桂万彬', '吕玲', '任歆迪', '刘璐瑶', '时海龙'],
-    team: ['李铭铖', '姚靖', '朱梦瑶', '郭彦柳', '苏万灵']
+    individual: ['王顺泽', '任歆迪', '周韦昊', '时海龙', '蒋蔚文', '徐聪明', '周紫怡', '吕玲', '徐航', '刘璐瑶', '桂万彬'],
+    team: ['朱梦瑶', '李铭铖', '姚靖', '郭彦柳', '苏万灵']
   };
   (function migrateJudgeOrder() {
+    if ((db.settings.judgeOrderSeedVer || 0) >= JUDGE_ORDER_SEED_VER) return;
     const rank = {};
     JUDGE_ORDER_SEED.individual.forEach((n, i) => { rank['i:' + n] = i + 1; });
     JUDGE_ORDER_SEED.team.forEach((n, i) => { rank['t:' + n] = i + 1; });
@@ -2849,10 +2853,13 @@ app.post('/api/force-sync', async (req, res) => {
         changed = true;
       }
     }
+    db.settings.judgeOrderSeedVer = JUDGE_ORDER_SEED_VER;
     if (changed) {
-      console.log('[migrate] judgeOrder seeded for finalist entries');
+      console.log('[migrate] judgeOrder seed v' + JUDGE_ORDER_SEED_VER + ' applied');
       saveDB();
       if (GITHUB_TOKEN) ghPush().catch(e => console.error('[migrate] judgeOrder push failed:', e.message));
+    } else {
+      saveDB(); // 仅写版本标记
     }
   })();
 

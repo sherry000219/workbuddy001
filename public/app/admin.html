@@ -604,10 +604,18 @@ function renderJudgeOrderPanel(entryScores) {
       '<span style="flex:1;font-size:13px;font-weight:500;">' + escapeHtml(e.title) + (e.entryType === 'team' ? ' <span style="background:#ede9fe;color:#7c3aed;font-size:11px;padding:1px 6px;border-radius:4px;">👥 团队</span>' : '') + '</span>' +
       '<span style="font-size:12px;color:var(--text-dim);">' + escapeHtml(e.name) + ' · ' + trackLabel(e.track) + '</span></div>';
   }
+  var TRACK_ORDER = ['efficiency', 'creative', 'business'];
   var html = '';
-  if (individual.length > 0) {
-    html += '<div style="padding:8px 12px;background:#f3f4f6;font-size:13px;font-weight:700;color:#374151;border-radius:6px 6px 0 0;">👤 个人参赛（' + individual.length + '）</div>';
-    html += individual.map(rowHtml).join('');
+  TRACK_ORDER.forEach(function(t) {
+    var inTrack = individual.filter(function(e) { return e.track === t; });
+    if (inTrack.length === 0) return;
+    html += '<div style="padding:8px 12px;background:#f3f4f6;font-size:13px;font-weight:700;color:#374151;border-radius:6px 6px 0 0;">👤 个人参赛 · ' + trackLabel(t) + '（' + inTrack.length + '）</div>';
+    html += inTrack.map(rowHtml).join('');
+  });
+  var indOther = individual.filter(function(e) { return TRACK_ORDER.indexOf(e.track) === -1; });
+  if (indOther.length > 0) {
+    html += '<div style="padding:8px 12px;background:#f3f4f6;font-size:13px;font-weight:700;color:#374151;">👤 个人参赛 · 其他（' + indOther.length + '）</div>';
+    html += indOther.map(rowHtml).join('');
   }
   if (team.length > 0) {
     html += '<div style="padding:8px 12px;background:#f3f4f6;font-size:13px;font-weight:700;color:#374151;margin-top:10px;">👥 团队参赛（' + team.length + '）</div>';

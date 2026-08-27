@@ -442,13 +442,42 @@ async function renderJudgePanel() {
     const individual = sortByJudgeOrder(judgableEntries.filter(function(e) { return e.entryType !== 'team'; }));
     const team = sortByJudgeOrder(judgableEntries.filter(function(e) { return e.entryType === 'team'; }));
     const groupColspan = isNewDims ? 11 : 10;
-    let rows = '';
-    if (individual.length > 0) {
-      rows += '<tr class="group-header"><td colspan="' + groupColspan + '">👤 个人参赛（' + individual.length + '）</td></tr>';
-      rows += individual.map(renderEntryRow).join('');
+    const TRACK_ORDER = ['efficiency', 'creative', 'business'];
+    // 评分标准参考行：每个分组下都显示，打分随时对照
+    function rubricRowHtml() {
+      let content;
+      if (isNewDims) {
+        content = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2px 20px;">' +
+          '<div><b>创新性 /20</b>：突破性创新 16~20 ｜ 显著创新 11~15 ｜ 局部创新 6~10 ｜ 创新性不足 0~5</div>' +
+          '<div><b>实用性 /30</b>：完整且已在使用 24~30 ｜ 完整但尚未使用 18~23 ｜ 未来可能使用 12~17 ｜ 不具备实际使用场景 0~11</div>' +
+          '<div><b>可推广性 /20</b>：可跨领域/跨地区推广 16~20 ｜ 可在本单位全面推广 11~15 ｜ 仅适用特定场景/团队 6~10 ｜ 不具备推广条件 0~5</div>' +
+          '<div><b>组织价值 /20</b>：价值显著 16~20 ｜ 价值较明显 11~15 ｜ 价值一般 6~10 ｜ 价值微弱或无法衡量 0~5</div>' +
+          '<div><b>效果展示 /10</b>：展示专业且极具说服力 8~10 ｜ 展示清晰完整 5~7 ｜ 展示基本合格 2~4 ｜ 展示混乱或不完整 0~1</div>' +
+          '</div>';
+      } else {
+        content = '<b>打分维度（总分 100）：</b>实用性 /50 · 创新性 /20 · 可推广性 /15 · 效果呈现 /15';
+      }
+      return '<tr><td colspan="' + groupColspan + '" style="background:#fffbeb;border-bottom:1px solid #fcd34d;padding:8px 14px;font-size:12px;line-height:1.7;color:#78350f;">' + content + '</td></tr>';
     }
+    let rows = '';
+    // 个人参赛：按赛道分组（效率提升 → 创意应用 → 业务赋能）
+    TRACK_ORDER.forEach(function(t) {
+      const inTrack = individual.filter(function(e) { return e.track === t; });
+      if (inTrack.length === 0) return;
+      rows += '<tr class="group-header"><td colspan="' + groupColspan + '">👤 个人参赛 · ' + trackLabel(t) + '（' + inTrack.length + '）</td></tr>';
+      rows += rubricRowHtml();
+      rows += inTrack.map(renderEntryRow).join('');
+    });
+    const indOther = individual.filter(function(e) { return TRACK_ORDER.indexOf(e.track) === -1; });
+    if (indOther.length > 0) {
+      rows += '<tr class="group-header"><td colspan="' + groupColspan + '">👤 个人参赛 · 其他（' + indOther.length + '）</td></tr>';
+      rows += rubricRowHtml();
+      rows += indOther.map(renderEntryRow).join('');
+    }
+    // 团队参赛：一组展示
     if (team.length > 0) {
       rows += '<tr class="group-header"><td colspan="' + groupColspan + '">👥 团队参赛（' + team.length + '）</td></tr>';
+      rows += rubricRowHtml();
       rows += team.map(renderEntryRow).join('');
     }
     if (!rows) {
