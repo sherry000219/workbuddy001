@@ -24211,6 +24211,21 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-27T03:32:28.318Z"
+    },
+    {
+      "id": "bet_mtaywl9z_u5l6gm",
+      "voterId": "IqIIEyFnPvj2bEiSyLtOAeQiEiE",
+      "voterName": "殷志敏",
+      "voterMobile": "15651781772",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-27T03:33:07.127Z"
     }
   ],
   "drawRecords": [
