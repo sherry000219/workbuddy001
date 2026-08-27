@@ -29875,6 +29875,36 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:09:08.811Z"
+    },
+    {
+      "id": "dr_mtay1sjl_myex4r",
+      "userId": "Cqf9sCKhpxWsWBQhciPQMfAiEiE",
+      "userName": "陈梅雪",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:10.209Z"
+    },
+    {
+      "id": "dr_mtay1soz_oef2ho",
+      "userId": "meAv5CvA2CnLjsIZuwWnpAiEiE",
+      "userName": "董亚茹",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:10.403Z"
+    },
+    {
+      "id": "dr_mtay1t48_39gviq",
+      "userId": "2uhHeoUyC5lK2ZTepOEvrwiEiE",
+      "userName": "陈晓雪",
+      "stage": "semi_final",
+      "prizeId": "prize_msofxib0_fj7kw1",
+      "prizeName": "帐sir抱枕毯",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:09:10.952Z"
     }
   ],
   "settings": {
@@ -30021,7 +30051,7 @@
         {
           "id": "prize_msofxib0_fj7kw1",
           "name": "帐sir抱枕毯",
-          "stock": 2,
+          "stock": 1,
           "total": 2,
           "createdAt": "2026-08-11T09:11:01.356Z"
         },
