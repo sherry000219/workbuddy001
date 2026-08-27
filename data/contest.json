@@ -23893,6 +23893,21 @@
       "trackLabel": "业务赋能",
       "revoked": false,
       "createdAt": "2026-08-27T01:52:57.798Z"
+    },
+    {
+      "id": "bet_mtax195u_nevzjq",
+      "voterId": "eHGOFiSnUhY6CGR9aYhZGiPAiEiE",
+      "voterName": "陈梦妮",
+      "voterMobile": "17805149291",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1786340551344_uzahth",
+      "entryTitle": "AI工单智能处理",
+      "entryDept": "产研中心",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-27T02:40:45.474Z"
     }
   ],
   "drawRecords": [
