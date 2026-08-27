@@ -30090,6 +30090,46 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:09:28.245Z"
+    },
+    {
+      "id": "dr_mtay27fs_oqutqk",
+      "userId": "JFbWkd5tiSgzLjsIZuwWnpAiEiE",
+      "userName": "刘思远",
+      "stage": "semi_final",
+      "prizeId": "prize_msofx0kt_78jl02",
+      "prizeName": "云帐房LOGO款餐具礼盒",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:09:29.512Z"
+    },
+    {
+      "id": "dr_mtay27m0_2q39cw",
+      "userId": "2uhHeoUyC5lK2ZTepOEvrwiEiE",
+      "userName": "陈晓雪",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:29.736Z"
+    },
+    {
+      "id": "dr_mtay27n8_lweg8c",
+      "userId": "1OxlRiPbsLsIiE",
+      "userName": "肖艳",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:29.780Z"
+    },
+    {
+      "id": "dr_mtay27pg_1c4kqu",
+      "userId": "c2Ud86q2Q3uyGgvgXVpDDwiEiE",
+      "userName": "曹学成",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:09:29.860Z"
     }
   ],
   "settings": {
@@ -30215,7 +30255,7 @@
         {
           "id": "prize_msofx0kt_78jl02",
           "name": "云帐房LOGO款餐具礼盒",
-          "stock": 3,
+          "stock": 2,
           "total": 3,
           "createdAt": "2026-08-11T09:10:38.381Z"
         },
