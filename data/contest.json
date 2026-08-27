@@ -24056,8 +24056,9 @@
       "entryDept": "福鹿事业部",
       "track": "efficiency",
       "trackLabel": "效率提升",
-      "revoked": false,
-      "createdAt": "2026-08-27T03:15:29.565Z"
+      "revoked": true,
+      "createdAt": "2026-08-27T03:15:29.565Z",
+      "revokedAt": "2026-08-27T03:16:22.340Z"
     }
   ],
   "drawRecords": [
@@ -31500,6 +31501,16 @@
       "prizeName": "20元以下饮品任选1杯",
       "isWin": true,
       "drawnAt": "2026-08-27T03:16:20.157Z"
+    },
+    {
+      "id": "dr_mtayb0gs_j0krn4",
+      "userId": "Qqhnq60WE6KuEjMOsbOFlQiEiE",
+      "userName": "刘木目",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:16:20.380Z"
     }
   ],
   "settings": {
