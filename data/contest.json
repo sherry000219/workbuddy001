@@ -31145,6 +31145,36 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-27T03:12:02.109Z"
+    },
+    {
+      "id": "dr_mtay5ib7_m0gomt",
+      "userId": "mhGadEgjhamxf9RD0xJyawiEiE",
+      "userName": "孙敬",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaxdqd9_vmiu9h",
+      "prizeName": "校招透明A4文件夹（非南京补50积分）",
+      "isWin": true,
+      "drawnAt": "2026-08-27T03:12:03.571Z"
+    },
+    {
+      "id": "dr_mtay5ig6_ta6qky",
+      "userId": "amme4VLJfpXqkIPCNV0nRwiEiE",
+      "userName": "沈昕",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:12:03.750Z"
+    },
+    {
+      "id": "dr_mtay5j7m_inw4k4",
+      "userId": "j6Ab7Ug03J2sWBQhciPQMfAiEiE",
+      "userName": "黄书豪",
+      "stage": "semi_final",
+      "prizeId": null,
+      "prizeName": "谢谢参与",
+      "isWin": false,
+      "drawnAt": "2026-08-27T03:12:04.738Z"
     }
   ],
   "settings": {
@@ -31389,7 +31419,7 @@
         {
           "id": "prize_mtaxdqd9_vmiu9h",
           "name": "校招透明A4文件夹（非南京补50积分）",
-          "stock": 10,
+          "stock": 9,
           "total": 15,
           "createdAt": "2026-08-27T02:50:27.645Z"
         },
