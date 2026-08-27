@@ -32798,6 +32798,16 @@
       "prizeName": "MBTI小徽章（非南京补50积分）",
       "isWin": true,
       "drawnAt": "2026-08-27T05:55:46.177Z"
+    },
+    {
+      "id": "dr_mtb408fn_fadscy",
+      "userId": "qnDHpIJrUFKOtwSFKucwCAiEiE",
+      "userName": "杨娴",
+      "stage": "semi_final",
+      "prizeId": "prize_msofxdh9_gzt65b",
+      "prizeName": "小财神盲盒",
+      "isWin": true,
+      "drawnAt": "2026-08-27T05:55:55.187Z"
     }
   ],
   "settings": {
@@ -32937,7 +32947,7 @@
         {
           "id": "prize_msofxdh9_gzt65b",
           "name": "小财神盲盒",
-          "stock": 15,
+          "stock": 14,
           "total": 3,
           "createdAt": "2026-08-11T09:10:55.101Z"
         },
