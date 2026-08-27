@@ -33023,6 +33023,16 @@
       "prizeName": "云帐房LOGO款64G优盘",
       "isWin": true,
       "drawnAt": "2026-08-27T06:33:13.705Z"
+    },
+    {
+      "id": "dr_mtb5ce4z_cip6g1",
+      "userId": "ZTEJk3LZCHzLjsIZuwWnpAiEiE",
+      "userName": "贾治维",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaw59t5_4yv6ye",
+      "prizeName": "MBTI小徽章（非南京补50积分）",
+      "isWin": true,
+      "drawnAt": "2026-08-27T06:33:22.067Z"
     }
   ],
   "settings": {
@@ -33204,7 +33214,7 @@
         {
           "id": "prize_mtaw59t5_4yv6ye",
           "name": "MBTI小徽章（非南京补50积分）",
-          "stock": 8,
+          "stock": 7,
           "total": 15,
           "createdAt": "2026-08-27T02:15:53.321Z"
         },
