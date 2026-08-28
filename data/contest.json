@@ -24438,6 +24438,21 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-28T02:03:08.182Z"
+    },
+    {
+      "id": "bet_mtcb51wt_iuno3u",
+      "voterId": "6TUp7KsMZHsq7C1qbyiif7wiEiE",
+      "voterName": "张国松",
+      "voterMobile": "15824801566",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1786374088143_40x0ai",
+      "entryTitle": "领航·云帐房干部运营平台：让每一次干部洞见和决策，都有数据的远见。",
+      "entryDept": "职能中台",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-28T02:03:23.501Z"
     }
   ],
   "drawRecords": [
