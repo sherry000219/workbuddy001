@@ -24423,6 +24423,21 @@
       "trackLabel": "创意应用",
       "revoked": false,
       "createdAt": "2026-08-28T02:03:03.897Z"
+    },
+    {
+      "id": "bet_mtcb4q3a_smqs6i",
+      "voterId": "QapaV2eLlcnw9Ua01bSbBAiEiE",
+      "voterName": "周可妍",
+      "voterMobile": "18362980153",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM5NYHWI1h2_NArbNArawLDlXTCussz0KD3laftFgAA_694_694.jpg",
+      "stage": "final",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-28T02:03:08.182Z"
     }
   ],
   "drawRecords": [
