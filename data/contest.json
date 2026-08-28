@@ -24348,6 +24348,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-28T00:44:36.913Z"
+    },
+    {
+      "id": "bet_mtcagol4_xusszw",
+      "voterId": "IDAwlo0ZIRzqkIPCNV0nRwiEiE",
+      "voterName": "肖宇",
+      "voterMobile": "15933772513",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1785124018451_kk1g17",
+      "entryTitle": "服务质检CT",
+      "entryDept": "中小微事业群",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-28T01:44:26.488Z"
     }
   ],
   "drawRecords": [
