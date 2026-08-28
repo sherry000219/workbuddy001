@@ -1196,7 +1196,7 @@ const _voteRL = new Map(); // 投票频率限制: userId -> lastVoteTimestamp
 const VOTE_COOLDOWN_MS = 3000;
 
 app.get('/api/voting/status', (req, res) => {
-  res.json({ votingEnabled: !!db.settings.votingEnabled, currentStage: getCurrentStage() });
+  res.json({ votingEnabled: !!db.settings.votingEnabled, currentStage: getCurrentStage(), isBettingOpen: isBettingOpen() });
 });
 
 app.post('/api/votes/:entryId', requireAuth, (req, res) => {
@@ -1291,6 +1291,9 @@ function getEntryBetTrack(entry) {
 // 押宝开放赛段：复赛押宝、决赛押宝都可开（投票仅在初赛/复赛，押宝可延伸到决赛）
 const BETTING_STAGES = ['semi_final', 'final'];
 function isBettingOpen() {
+  // 管理员手动封盘：停止新押宝与撤销（已有押宝记录保留）。
+  // 典型场景：决赛已展示/公示分数，继续押宝有失公平，需立即停止。
+  if (db.settings.bettingClosed) return false;
   return BETTING_STAGES.includes(getCurrentStage());
 }
 function getBettingStage() {
@@ -1770,6 +1773,10 @@ app.post('/api/settings', verifyAdminToken, async (req, res) => {
   }
   if (req.body.luckyListEnabled !== undefined) {
     db.settings.luckyListEnabled = Boolean(req.body.luckyListEnabled);
+  }
+  // 停止押宝（封盘）：true = 立即停止新押宝与撤销，已有押宝记录保留
+  if (req.body.bettingClosed !== undefined) {
+    db.settings.bettingClosed = Boolean(req.body.bettingClosed);
   }
   saveDB();
   ghPush().catch(e => console.error('[settings] GitHub push failed:', e.message));

@@ -315,6 +315,7 @@ let ddRemaining = 5;
 let votingEnabled = false;
 let currentStage = 'preliminary';
 let isVotingStage = true;
+let isBettingOpen = false;
 
 const STAGE_LABELS = {
   preliminary: '初赛',
@@ -501,8 +502,13 @@ function updateStageUI(targetStage) {
     if (currentStage === 'final' || currentStage === 'awarded') {
       heroLucky.style.display = '';
       heroVote.style.display = 'none';
-      heroBet.style.display = '';
-      heroBet.textContent = '🎯 决赛押宝';
+      // 管理员封盘（停止押宝）后隐藏押宝入口
+      if (isBettingOpen) {
+        heroBet.style.display = '';
+        heroBet.textContent = '🎯 决赛押宝';
+      } else {
+        heroBet.style.display = 'none';
+      }
     } else {
       heroLucky.style.display = '';
       heroVote.style.display = '';
@@ -518,6 +524,7 @@ async function checkVotingStatus() {
     votingEnabled = !!data.votingEnabled;
     currentStage = data.currentStage || 'preliminary';
     isVotingStage = isStageVoting(currentStage);
+    isBettingOpen = !!data.isBettingOpen;
   } catch(e) {
     votingEnabled = false;
   }
