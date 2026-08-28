@@ -24573,6 +24573,21 @@
       "trackLabel": "创意应用",
       "revoked": false,
       "createdAt": "2026-08-28T02:57:22.514Z"
+    },
+    {
+      "id": "bet_mtcd4iya_3xa4sd",
+      "voterId": "3iSLHyoRwC6L2bEiSyLtOAeQiEiE",
+      "voterName": "张路伟",
+      "voterMobile": "18505617834",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1785933777405_l85dpc",
+      "entryTitle": "亮照业务支撑系统",
+      "entryDept": "福鹿事业部",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-28T02:58:58.162Z"
     }
   ],
   "drawRecords": [
