@@ -1297,7 +1297,9 @@ function isBettingOpen() {
   return BETTING_STAGES.includes(getCurrentStage());
 }
 function getBettingStage() {
-  return isBettingOpen() ? getCurrentStage() : null;
+  // 赛段解析与封盘（bettingClosed）解耦：封盘后统计/历史/结算仍按当前赛段展示已有押宝，
+  // 仅禁止新押与撤销（isBettingOpen 已单独拦截）。否则封盘会导致押宝统计显示为 0，像被清零。
+  return BETTING_STAGES.includes(getCurrentStage()) ? getCurrentStage() : null;
 }
 
 // 当前有效押宝（未撤销，限定赛段）
@@ -1951,7 +1953,28 @@ function getUserStageHits(userId, stage) {
       hitEntryIds.add(e.id);
     }
   }
+  // 押宝押中：押中的作品最终获得赛道冠军（一等奖）→ 押中一个，抽一次。
+  // 与投票押中互不占用：同一作品既被投票押中又被押宝押中，两项各计 1 次。
+  const betHits = getUserStageBetHits(userId, stage);
+  hits += betHits.hits;
+  betHits.hitEntryIds.forEach(id => hitEntryIds.add(id));
   return { hits, hitEntryIds: [...hitEntryIds] };
+}
+
+// 押宝押中（结算后生效）：该用户在指定赛段的有效押宝中，押中赛道冠军（award=first）的数量。
+// 每人每赛段仅 1 注有效押宝，故每赛段最多 +1 次抽奖资格。
+function getUserStageBetHits(userId, stage) {
+  const bets = db.bets.filter(b => b.voterId === userId && !b.revoked && (b.stage || 'semi_final') === stage);
+  let hits = 0;
+  const hitEntryIds = [];
+  for (const b of bets) {
+    const e = db.entries.find(x => x.id === b.entryId);
+    if (e && e.roundStatus === 'awarded' && e.award === 'first' && !hitEntryIds.includes(e.id)) {
+      hits++;
+      hitEntryIds.push(e.id);
+    }
+  }
+  return { hits, hitEntryIds };
 }
 
 function getUserStageDrawRecords(userId, stage) {
@@ -1976,6 +1999,13 @@ function getStageTotalAllowedDraws(stage) {
     }
     total += voters.size;
   }
+  // 押宝押中：押中赛道冠军的押宝人数（每人每赛段最多 1 注有效，押中一个抽一次）
+  const champIds = new Set(db.entries.filter(e => e.roundStatus === 'awarded' && e.award === 'first').map(e => e.id));
+  const bettors = new Set();
+  for (const b of db.bets) {
+    if (!b.revoked && (b.stage || 'semi_final') === stage && champIds.has(b.entryId)) bettors.add(b.voterId);
+  }
+  total += bettors.size;
   return total;
 }
 

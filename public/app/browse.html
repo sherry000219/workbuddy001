@@ -330,10 +330,19 @@ function updateVotingUI() {
   else if (!isVotingStage) { banner.style.display = 'block'; banner.innerHTML = '📋 当前为<strong>' + STAGE_LABELS[currentStage] + '</strong>阶段，不支持投票'; banner.style.background = 'rgba(37,99,235,0.06)'; banner.style.borderColor = 'rgba(37,99,235,0.15)'; banner.style.color = '#2563eb'; }
   else { banner.style.display = 'block'; banner.innerHTML = '⏸️ <strong>投票暂未开启</strong> — 请等待管理员开放投票通道'; banner.style.background = 'rgba(255,215,64,0.08)'; banner.style.borderColor = 'rgba(255,215,64,0.2)'; banner.style.color = '#ffd740'; }
   if (betBanner) {
-    betBanner.style.display = (isBettingOpen && ddAuthed) ? 'block' : 'none';
     if (isBettingOpen && ddAuthed) {
+      betBanner.style.display = 'block';
       const stageName = bettingStage === 'final' ? '决赛' : '复赛';
       betBanner.innerHTML = '🎯 <strong>' + stageName + '押宝进行中</strong> — 每人每赛段仅限押宝 1 个作品，预测它为某赛道冠军；押宝后可撤销 1 次并重新选择。押中人数越少，获奖概率越大！';
+    } else if (!isBettingOpen && bettingStage && ddAuthed) {
+      // 封盘：押宝数据已封存（保留），展示只读提示
+      betBanner.style.display = 'block';
+      betBanner.style.background = 'rgba(107,114,128,0.08)';
+      betBanner.style.borderColor = 'rgba(107,114,128,0.2)';
+      betBanner.style.color = '#6b7280';
+      betBanner.innerHTML = '🔒 <strong>押宝已截止（封盘）</strong> — 全部押宝数据已封存，结果以赛道冠军为准；押中赛道冠军可获得抽奖资格（押中一个，抽一次）';
+    } else {
+      betBanner.style.display = 'none';
     }
   }
   updateMyBetBanner();
@@ -363,6 +372,9 @@ function updateMyBetBanner() {
     } else {
       html += '🎯 <strong>您还未' + betStageLabel(bettingStage) + '押宝</strong>，可在下方选择 1 个作品进行押宝';
     }
+  } else if (myBet && bettingStage) {
+    // 封盘后仍展示已封存的押宝（只读，不可撤销）
+    html += '🔒 <strong>押宝已封存</strong>——您' + betStageLabel(bettingStage) + '押宝《' + escapeHtml(myBet.entryTitle) + '》（' + (myBet.trackLabel || '') + '），结果以赛道冠军为准；押中可获得抽奖资格（押中一个，抽一次）';
   }
   // 跨赛段历史（重点：复赛押宝在决赛阶段展示）
   const otherHist = (bettingStage === 'final') ? semiHist : (bettingStage === 'semi_final' ? finalHist : []);

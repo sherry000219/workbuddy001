@@ -337,7 +337,7 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
             <input type="checkbox" id="adminBettingClosedToggle" onchange="saveBettingClosed(this.checked)" style="width:18px;height:18px;accent-color:#ef4444;">
             <span>⛔ 停止押宝（封盘）</span>
           </label>
-          <span style="color:var(--text-dim);font-size:12px;">勾选后立即停止新押宝与撤销（用户端押宝入口同步隐藏），已有押宝记录全部保留。适用于分数已公示后封盘</span>
+          <span style="color:var(--text-dim);font-size:12px;">勾选后立即封盘：停止新押宝与撤销（用户端押宝入口隐藏），已有押宝数据全部封存保留、下方分布继续展示；结算后押中赛道冠军的押宝人自动获得抽奖资格（押中一个，抽一次）</span>
         </div>
         <div id="betSummaryList" style="max-height:400px;overflow-y:auto;"></div>
       </div>
