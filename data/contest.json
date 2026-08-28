@@ -35031,9 +35031,12 @@
         "薛兴华",
         "张旭睿",
         "黄河",
+        "程航",
+        "杨晓东",
         "徐聪明"
       ]
     },
-    "judgeOrderSeedVer": 2
+    "judgeOrderSeedVer": 2,
+    "bettingClosed": true
   }
 }
