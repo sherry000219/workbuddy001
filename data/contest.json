@@ -24393,6 +24393,21 @@
       "trackLabel": "创意应用",
       "revoked": false,
       "createdAt": "2026-08-28T02:02:19.942Z"
+    },
+    {
+      "id": "bet_mtcb4b2t_mwk7tw",
+      "voterId": "iPgPEIVzgoTQiSCCT8iPOxxygiEiE",
+      "voterName": "啊坤",
+      "voterMobile": "17344559051",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPD2enf7pXac_NBQbNBQaw2e3W_bZj27QKS22c-qygAA_1286_1286.jpg",
+      "stage": "final",
+      "entryId": "entry_1785925402853_n2ttu7",
+      "entryTitle": "销售&服务话术库一键生成",
+      "entryDept": "福鹿事业部",
+      "track": "business",
+      "trackLabel": "业务赋能",
+      "revoked": false,
+      "createdAt": "2026-08-28T02:02:48.725Z"
     }
   ],
   "drawRecords": [
