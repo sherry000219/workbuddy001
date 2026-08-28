@@ -476,7 +476,7 @@ function updateStageUI(targetStage) {
   const desc = document.getElementById('rankingDesc');
   if (desc) {
     if (targetStage === 'final' || targetStage === 'awarded') {
-      desc.innerHTML = '决赛阶段：按评委打分（100%）排名，并叠加复赛 40% 权重<br><strong style="color:#ef4444;font-size:13px;">综合分 = 40% × 复赛综合分 + 60% × 决赛评委均分</strong>';
+      desc.innerHTML = '决赛阶段：仅按决赛评委打分排名<br><strong style="color:#ef4444;font-size:13px;">综合分 = 决赛评委均分（100%）；不叠加初赛/复赛分数，不含投票与押宝</strong>';
     } else if (targetStage === 'semi_final') {
       desc.innerHTML = '复赛阶段：按专家评审分（80%）+ 全员投票分（20%）合并计算，并叠加初赛 40% 权重<br><strong style="color:#ef4444;font-size:13px;">综合分 = 40% × 初赛综合分 + 60% × 复赛当前综合分；得票率会引起分数变动，参与投票的人越多，得票分数会降低，不属于异常</strong>';
     } else {

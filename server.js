@@ -448,14 +448,15 @@ function getCompositeScore(entryId, stage) {
     currentComposite = Math.round((avgScore * 0.8 + voteScore * 0.2) * 100) / 100;
   }
 
-  // 赛段晋级时，上一赛段综合分按 40% 权重继承到本赛段（当前赛段 60%），保留 2 位小数
+  // 赛段继承：仅复赛吸收初赛综合分（初赛 40% + 复赛当前 60%），保留 2 位小数
   if (stage === 'semi_final') {
     const prevComposite = getCompositeScore(entryId, 'preliminary');
     return Math.round((prevComposite * 0.4 + currentComposite * 0.6) * 100) / 100;
   }
+  // 决赛/结算：综合分 = 决赛评委均分（100%），
+  // 不吸收初赛/复赛综合分，也不含投票、押宝（押宝本就不参与计分）
   if (stage === 'final' || stage === 'awarded') {
-    const prevComposite = getCompositeScore(entryId, 'semi_final');
-    return Math.round((prevComposite * 0.4 + currentComposite * 0.6) * 100) / 100;
+    return currentComposite;
   }
   return currentComposite;
 }
