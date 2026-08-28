@@ -33840,6 +33840,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-28T03:04:14.085Z"
+    },
+    {
+      "id": "dr_mtcdbcok_lxzoru",
+      "userId": "gYHt7JXYzoX6fsPZ9RvXvwiEiE",
+      "userName": "王晔",
+      "stage": "preliminary",
+      "prizeId": "prize_mswm7chf_3tibc5",
+      "prizeName": "云社区10积分",
+      "isWin": true,
+      "drawnAt": "2026-08-28T03:04:16.628Z"
     }
   ],
   "settings": {
@@ -33921,7 +33931,7 @@
         {
           "id": "prize_mswm7chf_3tibc5",
           "name": "云社区10积分",
-          "stock": 15,
+          "stock": 14,
           "total": 20,
           "createdAt": "2026-08-17T02:28:47.475Z"
         },
