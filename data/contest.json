@@ -24558,6 +24558,21 @@
       "trackLabel": "效率提升",
       "revoked": false,
       "createdAt": "2026-08-28T02:28:04.248Z"
+    },
+    {
+      "id": "bet_mtcd2h5e_3kacqq",
+      "voterId": "vpscILNqQT2xf9RD0xJyawiEiE",
+      "voterName": "刘诗雨",
+      "voterMobile": "18360959636",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lADPDgQ9qjXf3EPNAvDNAu4_750_752.jpg",
+      "stage": "final",
+      "entryId": "entry_1786334382444_r429gr",
+      "entryTitle": "workbuddy应用大赛比赛平台",
+      "entryDept": "职能中台",
+      "track": "creative",
+      "trackLabel": "创意应用",
+      "revoked": false,
+      "createdAt": "2026-08-28T02:57:22.514Z"
     }
   ],
   "drawRecords": [
