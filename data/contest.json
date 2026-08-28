@@ -20305,7 +20305,18 @@
       "value": 15,
       "presentation": 6,
       "stage": "final",
-      "updatedAt": "2026-08-28T06:36:54.799Z"
+      "updatedAt": "2026-08-28T06:36:55.115Z"
+    },
+    {
+      "entryId": "entry_1785751983953_jddr0p",
+      "judgeName": "张旭睿",
+      "practicality": 20,
+      "innovation": 8,
+      "scalability": 16,
+      "value": 15,
+      "presentation": 9,
+      "stage": "final",
+      "updatedAt": "2026-08-28T06:37:16.593Z"
     }
   ],
   "bets": [
