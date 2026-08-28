@@ -23878,9 +23878,8 @@
       "entryDept": "中小微事业群",
       "track": "team",
       "trackLabel": "团队赛道",
-      "revoked": true,
-      "createdAt": "2026-08-26T01:59:22.174Z",
-      "revokedAt": "2026-08-27T03:28:38.619Z"
+      "revoked": false,
+      "createdAt": "2026-08-26T01:59:22.174Z"
     },
     {
       "id": "bet_mt9g90wr_h0ell1",
@@ -23909,9 +23908,8 @@
       "entryDept": "中小微事业群",
       "track": "business",
       "trackLabel": "业务赋能",
-      "revoked": true,
-      "createdAt": "2026-08-26T02:03:10.209Z",
-      "revokedAt": "2026-08-27T08:27:11.663Z"
+      "revoked": false,
+      "createdAt": "2026-08-26T02:03:10.209Z"
     },
     {
       "id": "bet_mt9g9mlj_pghu2m",
@@ -34713,7 +34711,7 @@
         {
           "id": "prize_msoftnqo_is7ftq",
           "name": "帐sir抱枕毯",
-          "stock": 0,
+          "stock": 1,
           "total": 2,
           "createdAt": "2026-08-11T09:08:01.776Z"
         },
@@ -34748,14 +34746,14 @@
         {
           "id": "prize_mswm7chf_3tibc5",
           "name": "云社区10积分",
-          "stock": 14,
+          "stock": 17,
           "total": 20,
           "createdAt": "2026-08-17T02:28:47.475Z"
         },
         {
           "id": "prize_mswm7ljy_i0jjgj",
           "name": "云社区50积分",
-          "stock": 8,
+          "stock": 12,
           "total": 20,
           "createdAt": "2026-08-17T02:28:59.230Z"
         },
@@ -34776,7 +34774,7 @@
         {
           "id": "prize_mswt7jjv_0z7njk",
           "name": "校招透明A4文件夹（非南京补50积分）",
-          "stock": 2,
+          "stock": 4,
           "total": 10,
           "createdAt": "2026-08-17T05:44:53.947Z"
         }
@@ -34785,37 +34783,65 @@
         {
           "id": "prize_msofwsrv_3fa59m",
           "name": "云帐房LOGO款黑色双肩包",
-          "stock": 0,
+          "stock": 1,
           "total": 1,
           "createdAt": "2026-08-11T09:10:28.267Z"
         },
         {
           "id": "prize_msofx0kt_78jl02",
           "name": "云帐房LOGO款餐具礼盒",
-          "stock": 2,
+          "stock": 3,
           "total": 3,
           "createdAt": "2026-08-11T09:10:38.381Z"
         },
         {
           "id": "prize_msofx5wv_gsfvef",
           "name": "云帐房LOGO款64G优盘",
-          "stock": 5,
+          "stock": 3,
           "total": 3,
           "createdAt": "2026-08-11T09:10:45.295Z"
         },
         {
           "id": "prize_msofxdh9_gzt65b",
           "name": "小财神盲盒",
-          "stock": 10,
+          "stock": 3,
           "total": 3,
           "createdAt": "2026-08-11T09:10:55.101Z"
         },
         {
+          "id": "prize_msofxib0_fj7kw1",
+          "name": "帐sir抱枕毯",
+          "stock": 2,
+          "total": 2,
+          "createdAt": "2026-08-11T09:11:01.356Z"
+        },
+        {
           "id": "prize_msofxnkk_t2rfnf",
           "name": "20元以下饮品任选1杯",
-          "stock": 1,
+          "stock": 5,
           "total": 5,
           "createdAt": "2026-08-11T09:11:08.180Z"
+        },
+        {
+          "id": "prize_msofxzgn_its3td",
+          "name": "月度 workbuddy 标准版会员",
+          "stock": 2,
+          "total": 2,
+          "createdAt": "2026-08-11T09:11:23.591Z"
+        },
+        {
+          "id": "prize_msofy8bp_aq6wak",
+          "name": "季度 workbuddy 标准版会员",
+          "stock": 1,
+          "total": 1,
+          "createdAt": "2026-08-11T09:11:35.077Z"
+        },
+        {
+          "id": "prize_msofyqvu_s8pi5h",
+          "name": "小米手持挂烫机2代",
+          "stock": 1,
+          "total": 1,
+          "createdAt": "2026-08-11T09:11:59.130Z"
         },
         {
           "id": "prize_msofzyli_f893s1",
@@ -34837,6 +34863,13 @@
           "stock": 3,
           "total": 2,
           "createdAt": "2026-08-11T09:16:20.174Z"
+        },
+        {
+          "id": "prize_mspr7ff0_8053rf",
+          "name": "特步护腰坐垫椅",
+          "stock": 2,
+          "total": 2,
+          "createdAt": "2026-08-12T07:14:26.124Z"
         },
         {
           "id": "prize_mtaw59t5_4yv6ye",
@@ -34872,13 +34905,6 @@
           "stock": 7,
           "total": 15,
           "createdAt": "2026-08-27T02:50:27.645Z"
-        },
-        {
-          "id": "prize_mtb4h6as_opu3tx",
-          "name": "帐sir抱枕毯",
-          "stock": 2,
-          "total": 2,
-          "createdAt": "2026-08-27T06:09:05.572Z"
         }
       ],
       "final": [
@@ -34967,8 +34993,7 @@
         "黄河",
         "程航",
         "杨晓东",
-        "徐聪明",
-        "刘木目"
+        "徐聪明"
       ]
     },
     "judgeOrderSeedVer": 2
