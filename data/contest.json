@@ -24513,6 +24513,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-28T02:09:58.507Z"
+    },
+    {
+      "id": "bet_mtcbdu9q_shgn6l",
+      "voterId": "1qDlCNLwkx9ViPxQEzbiiGUAiEiE",
+      "voterName": "都风景",
+      "voterMobile": "15865194600",
+      "voterAvatar": "",
+      "stage": "final",
+      "entryId": "entry_1786418743612_h5sx2m",
+      "entryTitle": "合同风险智能预警平台：风险先知，提前预警合同到期与风险，实现用工管理提效。",
+      "entryDept": "职能中台",
+      "track": "efficiency",
+      "trackLabel": "效率提升",
+      "revoked": false,
+      "createdAt": "2026-08-28T02:10:13.502Z"
     }
   ],
   "drawRecords": [
