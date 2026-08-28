@@ -24453,6 +24453,21 @@
       "trackLabel": "团队赛道",
       "revoked": false,
       "createdAt": "2026-08-28T02:03:23.501Z"
+    },
+    {
+      "id": "bet_mtcb5229_kt5cfy",
+      "voterId": "aj8usGIMtwexf9RD0xJyawiEiE",
+      "voterName": "高碧儿",
+      "voterMobile": "15152752671",
+      "voterAvatar": "https://static-legacy.dingtalk.com/media/lQDPM465xWw0J13NBCjNBCiwA5pjS-Ic2gEHB323HcIJAA_1064_1064.jpg",
+      "stage": "final",
+      "entryId": "entry_1785348752114_picbqa",
+      "entryTitle": "智数驱动 · 赋能一线」\u000b——基于 AI 全链路开发的工单智能看板与业务洞察平台",
+      "entryDept": "中小微事业群",
+      "track": "team",
+      "trackLabel": "团队赛道",
+      "revoked": false,
+      "createdAt": "2026-08-28T02:03:23.698Z"
     }
   ],
   "drawRecords": [
