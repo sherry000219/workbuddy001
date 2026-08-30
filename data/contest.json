@@ -25303,8 +25303,9 @@
       "entryDept": "职能中台",
       "track": "team",
       "trackLabel": "团队赛道",
-      "revoked": false,
-      "createdAt": "2026-08-28T03:27:06.354Z"
+      "revoked": true,
+      "createdAt": "2026-08-28T03:27:06.354Z",
+      "revokedAt": "2026-08-30T09:32:04.793Z"
     },
     {
       "id": "bet_mtcis6br_a0wpkk",
