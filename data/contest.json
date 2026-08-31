@@ -35817,6 +35817,304 @@
             "prize": "64G优盘",
             "drawnAt": "2026-08-31T05:42:45.325Z"
           }
+        ],
+        "team": [
+          {
+            "userId": "ksffgVVIU39HYLO5ljX24giEiE",
+            "name": "陶鼎",
+            "avatar": "",
+            "betStage": "决赛",
+            "prize": "workbuddy标准版月度会员",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "gvpWakiiiiXuHj1OyqnXJb6AiEiE",
+            "name": "金洪亮",
+            "avatar": "",
+            "betStage": "复赛",
+            "prize": "卫衣",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "OMDii3wYtuMfqkIPCNV0nRwiEiE",
+            "name": "吴月飞",
+            "avatar": "",
+            "betStage": "复赛",
+            "prize": "卫衣",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "7kW8MgaAq8j6fsPZ9RvXvwiEiE",
+            "name": "李亚飞",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM52SjLrG42HNBADNBACw3UK8-a50wwUJ3-hU5uOYAQ_1024_1024.jpg",
+            "betStage": "复赛",
+            "prize": "卫衣",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "PtPiSGlsVKAwq7C1qbyiif7wiEiE",
+            "name": "时键皓",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPD4k7IiDyaonNAaHNAaGwLMSHCHv-ilsIjZBW6DGDAA_417_417.jpg",
+            "betStage": "复赛",
+            "prize": "卫衣",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "eHGOFiSnUhY6CGR9aYhZGiPAiEiE",
+            "name": "陈梦妮",
+            "avatar": "",
+            "betStage": "决赛",
+            "prize": "帐sir抱枕毯",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "wI3D9z9WRLqrNgIiSVDjY9giEiE",
+            "name": "陈晨",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM4c50-qseOPNBE7NBE6we42oE3O_ywoJJ7Si0kouAA_1102_1102.jpg",
+            "betStage": "复赛",
+            "prize": "餐具套盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "Ov1QiSgb4iSBiisWBQhciPQMfAiEiE",
+            "name": "王中浩",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM5u5nMQIeFvNAnPNAnOw069zTAANZ_wKOz7HHiV5AA_627_627.jpg",
+            "betStage": "复赛",
+            "prize": "餐具套盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "iiZGYFRFDG4VnQSDQrMcL6wiEiE",
+            "name": "王世静",
+            "avatar": "https://static-legacy.dingtalk.com/media/lALPD0X7Tt7hHYXNBQDNBQA_1280_1280.png",
+            "betStage": "复赛",
+            "prize": "餐具套盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "ziPI7AnythUFBQ32FiilaP3AiEiE",
+            "name": "张万新",
+            "avatar": "",
+            "betStage": "复赛",
+            "prize": "餐具套盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "j5mBRUIyhVUq7C1qbyiif7wiEiE",
+            "name": "汪娟",
+            "avatar": "https://static-legacy.dingtalk.com/media/lADPDgtYuIK3wPrNAbPNAbM_435_435.jpg",
+            "betStage": "复赛",
+            "prize": "鼠标垫",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "msGFlWiP19T9ViPxQEzbiiGUAiEiE",
+            "name": "杨文强",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPD3q7fErhoU_NBPnNBPmw_YtW-xyPrRAJOKwW_6sbAA_1273_1273.jpg",
+            "betStage": "复赛",
+            "prize": "64G优盘",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "lNB3AIpq0VlBQ32FiilaP3AiEiE",
+            "name": "尹建平",
+            "avatar": "https://static-legacy.dingtalk.com/media/lADPDiCpxCX229XNAzzNAzw_828_828.jpg",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "5Qzmzv8iiCyq31vvaTC7VngiEiE",
+            "name": "韩松成",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPD39_HkcPh53NBADNBACwEgEqt8kQw5kJ2_s-bOwIAA_1024_1024.jpg",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "UM1jVJwAqfBBQ32FiilaP3AiEiE",
+            "name": "宿雪峰",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQLPD2hVNowsm6XNAyDNAyCwW92y0D399g0J2BneV4adAA_800_800.png",
+            "betStage": "决赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "EbUcvuYeTVTd6psP3CUKQwiEiE",
+            "name": "袁晶晶",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM5mIdEWEHPfNBNHNBNGwYzIG0aVp6NwHoYcf_AQQAA_1233_1233.jpg",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "UoRkQKE9uoWBQ6PoLKu0JgiEiE",
+            "name": "殷攀飞",
+            "avatar": "https://static-legacy.dingtalk.com/media/lALPD15ht8SaqPXNBQDNBQA_1280_1280.png",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "ZTEJk3LZCHzLjsIZuwWnpAiEiE",
+            "name": "贾治维",
+            "avatar": "",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "c2Ud86q2Q3uyGgvgXVpDDwiEiE",
+            "name": "曹学成",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM5DKMBKARAPNAjXNAkOwhIrASPuBcGgIzfye1M4gAA_579_565.jpg",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "8IDLPEiP10uiPsWBQhciPQMfAiEiE",
+            "name": "陈西成",
+            "avatar": "",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "zcXe2cJYvXr6fsPZ9RvXvwiEiE",
+            "name": "樊静",
+            "avatar": "https://static-legacy.dingtalk.com/media/lADPDiQ3UCMwAJHNA7_NA78_959_959.jpg",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "UiSE3MEYziSI2xf9RD0xJyawiEiE",
+            "name": "朱梦瑶",
+            "avatar": "",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "KTeQqBP3ryTLjsIZuwWnpAiEiE",
+            "name": "孙萍",
+            "avatar": "",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "EQDoCiiT7URZBQ32FiilaP3AiEiE",
+            "name": "杨栓",
+            "avatar": "https://static-legacy.dingtalk.com/media/lALPD0P8QkSskJzNAyDNAyA_800_800.png",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "qnDHpIJrUFKOtwSFKucwCAiEiE",
+            "name": "杨娴",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM5D11_-t1avNBJjNBJiwsszaD9gcGJkJBuCIJpr8AA_1176_1176.jpg",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "uc9j71zGCkS31vvaTC7VngiEiE",
+            "name": "付仕达",
+            "avatar": "",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "dqlP6iiqKPMSsWBQhciPQMfAiEiE",
+            "name": "邓家伟",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPD4pxRYn4kqvNA6zNA6yw8BM8r3aooc4IApyoJmD5AA_940_940.jpg",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "4Tzs8KCqh2zaiP6BjIKRO0QiEiE",
+            "name": "王婷婷",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPD3mHKt9aaO3NBkDNBkCwHABlqV-2Y_AJ3C-hdpU6AA_1600_1600.jpg",
+            "betStage": "决赛",
+            "prize": "小财神盲盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "MVKjABUrj1LwCNSF0VGlOwiEiE",
+            "name": "程慧",
+            "avatar": "",
+            "betStage": "复赛",
+            "prize": "小财神盲盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "mSdjSSP3EJ20wvfVzkiSvIgiEiE",
+            "name": "陈龙海",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQLPD34KOcU5OG3M78zvsFLbOcqSjyeuCdlhA9URBwA_239_239.png",
+            "betStage": "复赛",
+            "prize": "小财神盲盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "rufpiPmF8DW4ubZXpqI5rPwiEiE",
+            "name": "朱疆坤",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPD4o44eT8KK3NA4TNA4SwqzgOHO6rmSgIZgQF5QQ0AA_900_900.jpg",
+            "betStage": "复赛",
+            "prize": "小财神盲盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "4HVsqDTr5ERK2ZTepOEvrwiEiE",
+            "name": "顾诗琪",
+            "avatar": "https://static-legacy.dingtalk.com/media/lADPDg7mWY36H1rNAzvNAzs_827_827.jpg",
+            "betStage": "复赛",
+            "prize": "小财神盲盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "0tjfyWwiSjAuyGgvgXVpDDwiEiE",
+            "name": "蒋纬威",
+            "avatar": "https://static-legacy.dingtalk.com/media/lADPD2sQ6HWkSM_NC9DNC9A_3024_3024.jpg",
+            "betStage": "决赛",
+            "prize": "小财神盲盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "dgM7l9zZmiicq7C1qbyiif7wiEiE",
+            "name": "杨靖",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM5KYNgdq7MLNAj_NAj-wJVbpmbHe00MET3JZwYAFAA_575_575.jpg",
+            "betStage": "复赛",
+            "prize": "小财神盲盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "YpoScCGC6sWsWBQhciPQMfAiEiE",
+            "name": "屈倬坤",
+            "avatar": "https://static-legacy.dingtalk.com/media/lADPDgQ9rFVH9dbNASzNASw_300_300.jpg",
+            "betStage": "复赛",
+            "prize": "小财神盲盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "bLaqXH5k1VEiE",
+            "name": "王薇",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPD3UXNVJkU-_NBGfNBGmwOEKbBu8fgtAGi33Mh_Z0AQ_1129_1127.jpg",
+            "betStage": "复赛",
+            "prize": "小财神盲盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          },
+          {
+            "userId": "uFLy5BQIBUPhuoCrGUaaiPAiEiE",
+            "name": "纪亭",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM4xGOE5H77vNAyTNAyawlwkivb0CeHoIC9MwjVisAA_806_804.jpg",
+            "betStage": "复赛",
+            "prize": "小财神盲盒",
+            "drawnAt": "2026-08-31T05:50:06.865Z"
+          }
         ]
       }
     }
