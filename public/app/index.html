@@ -195,7 +195,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
     <h1 class="hero-title">云帐房头号玩家第三季</h1>
     <p class="hero-sub">解决一个真实工作难题，秀出你的 AI 实战力，做云厂头号玩家。</p>
     <div class="hero-actions" id="heroActions">
-      <a href="/app/lucky.html" class="hero-cta" id="heroCtaLucky" style="background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 8px 28px rgba(245,158,11,0.35);">🎁 投票抽奖</a>
+      <!-- 投票抽奖入口已取消 -->
       <a href="/app/browse.html" class="hero-cta hero-vote" id="heroCtaVote">🗳️ 复赛投票</a>
       <a href="/app/browse.html#betting" class="hero-cta" id="heroCtaBet" style="display:none;background: linear-gradient(135deg, #ef4444, #ea580c); box-shadow: 0 8px 28px rgba(239,68,68,0.35);">🎯 决赛押宝</a>
     </div>
@@ -210,9 +210,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 <!-- ===== NAVIGATION LINKS ===== -->
 <div class="nav-section">
   <div class="nav-links">
-    <a href="/app/judge.html" class="nav-link"><span class="nl-icon">⚖️</span> 评委入口</a>
     <a href="/app/admin.html" class="nav-link"><span class="nl-icon">⚙️</span> 管理后台</a>
-    <a href="/app/lucky-list.html" id="luckyNavLink" class="nav-link" style="display:none;"><span class="nl-icon">🎁</span> 幸运投票人名单</a>
+    <a href="#bet-announce" id="luckyNavLink" class="nav-link"><span class="nl-icon">🎯</span> 押宝中奖名单</a>
   </div>
 </div>
 
@@ -272,6 +271,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 </div>
 
 </div><!-- .main-container -->
+
+<!-- ===== 获奖名单 + 押宝中奖名单 公布 ===== -->
+<div id="awardAnnounce"></div>
+<div id="betAnnounce"></div>
+<script src="/app/winners-data.js"></script>
+<script>
+  renderAwards(document.getElementById('awardAnnounce'));
+  renderBets(document.getElementById('betAnnounce'));
+</script>
 
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
