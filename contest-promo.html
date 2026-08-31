@@ -301,7 +301,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 </section>
 
 <!-- ===== 获奖公布 ===== -->
-<div id="promoAward"></div>
 <div id="promoBet"></div>
 <script>
 // 自动生成于 2026-08-31T07:11:45.559Z
@@ -938,7 +937,6 @@ function ensureAwStyle() {
 function renderAwards(container) { if (!container) return; ensureAwStyle(); container.innerHTML = awBuildAwards(); }
 function renderBets(container) { if (!container) return; ensureAwStyle(); container.innerHTML = awBuildBets(); }
 
-renderAwards(document.getElementById('promoAward'));
 renderBets(document.getElementById('promoBet'));
 </script>
 <!-- ===== FAQ ===== -->
