@@ -361,6 +361,13 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
         <div id="betSummaryList" style="max-height:400px;overflow-y:auto;"></div>
       </div>
     </details>
+    <details class="card" style="margin-bottom:16px;">
+      <summary>🔍 决赛评委打分明细（查验 · 五维逐项）</summary>
+      <div style="padding:16px 4px;">
+        <p style="color:var(--text-dim);font-size:13px;margin-bottom:12px;">按作品展开可查验每位评委的五维打分（创新性/实用性/可推广性/组织价值/效果展示）、总分与打分时间；<strong style="color:#ef4444;">红色 = 该评委未打分</strong>。数据为当前赛段打分记录，结算后自动保留。</p>
+        <div id="judgeScoreDetail"></div>
+      </div>
+    </details>
     <div class="score-table" style="overflow-x:auto;">
       <table style="min-width:900px;">
         <thead>
@@ -553,6 +560,7 @@ async function renderAdminDashboard() {
     renderBetSummary(betData);
     renderStageManagePanel(entryScores);
     renderJudgeOrderPanel(entryScores);
+    renderJudgeScoreDetail();
 
     var unscoredMap = {};
     if (allJudges.length > 0 && entryScores.length > 0) {
@@ -682,6 +690,66 @@ async function saveJudgeOrder() {
     if (hint) hint.textContent = '保存于 ' + new Date().toLocaleTimeString('zh-CN');
     loadAdminDashboard();
   } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ========== 决赛评委打分明细（查验） ==========
+function renderJudgeScoreDetail() {
+  const el = document.getElementById('judgeScoreDetail');
+  if (!el) return;
+  const isNewDims = currentStage === 'final' || currentStage === 'awarded';
+  const dims = isNewDims
+    ? [['创新性', 'innovation', 20], ['实用性', 'practicality', 30], ['可推广性', 'scalability', 20], ['组织价值', 'value', 20], ['效果展示', 'presentation', 10]]
+    : [['实用性', 'practicality', 50], ['创新性', 'innovation', 20], ['可推广性', 'scalability', 15], ['效果呈现', 'presentation', 15]];
+  const fin = (entryScores || []).filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
+  if (!fin.length) {
+    el.innerHTML = '<div style="padding:28px;text-align:center;color:var(--text-dim);font-size:13px;background:#f9fafb;border:1px dashed #e5e7eb;border-radius:10px;">当前赛段暂无决赛入围作品</div>';
+    return;
+  }
+  const groups = [
+    { key: 'efficiency', label: '🚀 效率提升赛道', color: '#ff6b35', items: fin.filter(e => e.entryType !== 'team' && (e.track || 'efficiency') === 'efficiency') },
+    { key: 'creative', label: '💡 创意应用赛道', color: '#7c3aed', items: fin.filter(e => e.entryType !== 'team' && (e.track || 'efficiency') === 'creative') },
+    { key: 'business', label: '🤝 业务赋能赛道', color: '#2563eb', items: fin.filter(e => e.entryType !== 'team' && (e.track || 'efficiency') === 'business') },
+    { key: 'team', label: '👥 团队组', color: '#f59e0b', items: fin.filter(e => e.entryType === 'team') }
+  ];
+  groups.forEach(g => g.items.sort((a, b) => (b.composite || 0) - (a.composite || 0)));
+  const judges = allJudges || [];
+  let html = '';
+  groups.forEach(g => {
+    if (!g.items.length) return;
+    html += `<div style="padding:8px 14px;margin-top:14px;background:${g.color}10;border-left:4px solid ${g.color};border-radius:8px;font-size:14px;font-weight:700;color:${g.color};">${g.label} <span style="font-weight:400;font-size:12px;opacity:.75;">（${g.items.length} 件）</span></div>`;
+    g.items.forEach(e => {
+      const scored = (e.scores || []).length;
+      const missing = judges.length - scored;
+      const scoreRows = judges.map(j => {
+        const s = (e.scores || []).find(sc => sc.judgeName === j);
+        if (!s) {
+          return `<tr style="background:rgba(239,68,68,0.04);"><td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-weight:600;color:#374151;">${escHtml(j)}</td>${dims.map(() => '<td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;text-align:center;color:#9ca3af;">-</td>').join('')}<td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;text-align:center;color:#ef4444;font-weight:700;">未打分</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#9ca3af;font-size:11px;">-</td></tr>`;
+        }
+        return `<tr><td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-weight:600;color:#374151;">${escHtml(j)}</td>${dims.map(d => `<td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;text-align:center;color:#374151;">${s[d[1]] ?? 0}<span style="color:#9ca3af;font-size:10px;">/${d[2]}</span></td>`).join('')}<td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;text-align:center;font-weight:700;color:#111827;">${s.total ?? ''}</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#9ca3af;font-size:11px;">${s.updatedAt ? new Date(s.updatedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}</td></tr>`;
+      }).join('');
+      const badge = awardBadge(e.award) || '';
+      html += `<details style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;margin-top:8px;">
+        <summary style="cursor:pointer;padding:10px 14px;font-size:13px;list-style:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="color:#9ca3af;font-size:11px;">▸</span>
+          <span style="font-weight:700;color:#111827;">${escHtml(e.title)}</span> ${badge}
+          <span style="font-size:12px;color:#6b7280;">${escHtml(e.name)}${e.entryType === 'team' ? ' · 👥团队' : ''}</span>
+          <span style="margin-left:auto;font-size:12px;color:#6b7280;">均分 <strong style="color:#111827;">${e.avgScore ?? '-'}</strong> ｜ 综合分 <strong style="color:${g.color};">${fmtScore(e.composite)}</strong> ｜ 已打 <strong style="color:${missing > 0 ? '#ef4444' : '#15803d'};">${scored}/${judges.length}</strong>${missing > 0 ? '（缺 ' + missing + '）' : ' ✓'}</span>
+        </summary>
+        <div style="padding:0 14px 12px;overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px;">
+            <thead><tr style="background:#f9fafb;">
+              <th style="text-align:left;padding:6px 10px;color:#6b7280;font-size:11px;">评委</th>
+              ${dims.map(d => `<th style="text-align:center;padding:6px 8px;color:#6b7280;font-size:11px;">${d[0]}/${d[2]}</th>`).join('')}
+              <th style="text-align:center;padding:6px 8px;color:#6b7280;font-size:11px;">总分</th>
+              <th style="text-align:left;padding:6px 8px;color:#6b7280;font-size:11px;">打分时间</th>
+            </tr></thead>
+            <tbody>${scoreRows}</tbody>
+          </table>
+        </div>
+      </details>`;
+    });
+  });
+  el.innerHTML = html;
 }
 
 function renderBetSummary(betData) {
