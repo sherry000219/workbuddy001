@@ -35451,12 +35451,30 @@
     "finalDraw": {
       "prizes": {
         "business": [
-          "测试1",
-          "测试2",
-          "测试3",
-          "测试4",
-          "测试5",
-          "测试6"
+          {
+            "name": "workbuddy标准版月度会员",
+            "count": 1
+          },
+          {
+            "name": "卫衣",
+            "count": 2
+          },
+          {
+            "name": "帐sir抱枕毯",
+            "count": 1
+          },
+          {
+            "name": "餐具套盒",
+            "count": 2
+          },
+          {
+            "name": "鼠标垫",
+            "count": 1
+          },
+          {
+            "name": "64G优盘",
+            "count": 1
+          }
         ],
         "team": [
           {
