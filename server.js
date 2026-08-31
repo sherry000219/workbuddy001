@@ -1965,20 +1965,29 @@ function getUserStageHits(userId, stage) {
   return { hits, hitEntryIds: [...hitEntryIds] };
 }
 
-// 押宝押中（结算后生效）：该用户在指定赛段的有效押宝中，押中赛道冠军（award=first）的数量。
+// 押宝押中（结算后生效）：该用户在指定赛段的有效押宝中，押中冠军的数量。
+// 冠军 = 各个人赛道一等奖（award=first）+ 团队赛道冠军（团队优秀奖中综合分最高者）。
 // 每人每赛段仅 1 注有效押宝，故每赛段最多 +1 次抽奖资格。
 function getUserStageBetHits(userId, stage) {
   const bets = db.bets.filter(b => b.voterId === userId && !b.revoked && (b.stage || 'semi_final') === stage);
+  const championIds = getBetChampionIds();
   let hits = 0;
   const hitEntryIds = [];
   for (const b of bets) {
-    const e = db.entries.find(x => x.id === b.entryId);
-    if (e && e.roundStatus === 'awarded' && e.award === 'first' && !hitEntryIds.includes(e.id)) {
+    if (championIds.has(b.entryId) && !hitEntryIds.includes(b.entryId)) {
       hits++;
-      hitEntryIds.push(e.id);
+      hitEntryIds.push(b.entryId);
     }
   }
   return { hits, hitEntryIds };
+}
+
+// 押宝冠军集合：个人赛道一等奖 + 团队赛道冠军（不含被设为一等奖的团队，避免重复）
+function getBetChampionIds() {
+  const ids = new Set(db.entries.filter(e => e.roundStatus === 'awarded' && e.award === 'first').map(e => e.id));
+  const teamChamp = getTeamChampion();
+  if (teamChamp) ids.add(teamChamp.id);
+  return ids;
 }
 
 function getUserStageDrawRecords(userId, stage) {
@@ -2003,8 +2012,8 @@ function getStageTotalAllowedDraws(stage) {
     }
     total += voters.size;
   }
-  // 押宝押中：押中赛道冠军的押宝人数（每人每赛段最多 1 注有效，押中一个抽一次）
-  const champIds = new Set(db.entries.filter(e => e.roundStatus === 'awarded' && e.award === 'first').map(e => e.id));
+  // 押宝押中：押中冠军（个人赛道一等奖 + 团队赛道冠军）的押宝人数（每人每赛段最多 1 注有效）
+  const champIds = getBetChampionIds();
   const bettors = new Set();
   for (const b of db.bets) {
     if (!b.revoked && (b.stage || 'semi_final') === stage && champIds.has(b.entryId)) bettors.add(b.voterId);
@@ -2380,14 +2389,28 @@ app.get('/api/admin/draw-records', verifyAdminToken, (req, res) => {
 });
 
 // ========== API: FINAL LIVE DRAW（决赛现场抽奖 — 押宝支持者 · 管理员专属） ==========
-// 场景：三个赛道第一名（结算 award=first），每个冠军有自己的押宝支持者（含复赛+决赛两段有效押宝）；
-// 管理员为每个赛道配置奖池后点击抽奖一次，从该冠军的支持者中抽出中奖名单与对应奖品。普通用户无权限。
-const FINAL_DRAW_TRACKS = ['efficiency', 'creative', 'business'];
+// 场景：三个个人赛道第一名（结算 award=first）+ 团队赛道冠军（团队优秀奖中决赛综合分最高者），
+// 每个冠军有自己的押宝支持者（含复赛+决赛两段有效押宝）；管理员为每个赛道配置奖池后点击抽奖一次，
+// 从该冠军的支持者中抽出中奖名单与对应奖品。普通用户无权限。
+const FINAL_DRAW_TRACKS = ['efficiency', 'creative', 'business', 'team'];
+
+// 团队赛道冠军：团队组一等奖（award=first 的团队作品，如《AI工单智能处理》）；
+// 若无团队一等奖则取团队优秀奖中决赛综合分最高者；再退为决赛综合分最高的团队作品（供预演/试抽）
+function getTeamChampion() {
+  const teams = db.entries.filter(e => e.entryType === 'team' && (e.roundStatus === 'finalist' || e.roundStatus === 'awarded'));
+  if (!teams.length) return null;
+  const firstPrize = teams.filter(e => e.award === 'first');
+  const excellence = teams.filter(e => e.award === 'team_excellence');
+  const pool = firstPrize.length ? firstPrize : (excellence.length ? excellence : teams);
+  return pool.slice().sort((a, b) => (getCompositeScore(b.id, 'final') || 0) - (getCompositeScore(a.id, 'final') || 0))[0];
+}
 
 function getFinalDrawData() {
   const champions = {};
   for (const t of FINAL_DRAW_TRACKS) {
-    champions[t] = db.entries.find(e => e.roundStatus === 'awarded' && e.award === 'first' && (e.track || 'efficiency') === t) || null;
+    champions[t] = t === 'team'
+      ? getTeamChampion()
+      : (db.entries.find(e => e.entryType !== 'team' && e.roundStatus === 'awarded' && e.award === 'first' && (e.track || 'efficiency') === t) || null);
   }
   // 各赛道冠军的支持者：押中该冠军的有效押宝，按人去重（一人一票，含复赛/决赛两段）
   const supporters = {};

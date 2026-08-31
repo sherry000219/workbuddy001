@@ -332,7 +332,7 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
       </style>
       <div style="background:var(--bg-card);border:1px solid #e5e7eb;border-radius:var(--radius);padding:24px;margin-top:12px;box-shadow:var(--shadow);">
         <div style="background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(245,158,11,0.08));border:1px solid rgba(255,107,53,0.2);border-radius:12px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:#374151;line-height:1.8;">
-          <strong style="color:#ff6b35;">玩法说明：</strong>三个赛道第一名各有自己的押宝支持者（押中该冠军的同事，含复赛+决赛两段押宝，一人一票）。为每个赛道配置奖池后点击「开始抽奖」，从该冠军的支持者中随机抽出中奖名单——<strong>每个赛道只能抽一次</strong>，奖品按顺序对应中奖者。本功能仅管理员可操作。
+          <strong style="color:#ff6b35;">玩法说明：</strong>三个个人赛道第一名 + 团队组一等奖，共 4 组冠军，各有自己的押宝支持者（押中该冠军的同事，含复赛+决赛两段押宝，一人一票）。为每个赛道配置奖池后点击「开始抽奖」，从该冠军的支持者中随机抽出中奖名单——<strong>每个赛道只能抽一次</strong>，奖品按顺序对应中奖者。本功能仅管理员可操作。
         </div>
         <div id="finalDrawTracks" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;"></div>
       </div>
@@ -1207,17 +1207,18 @@ async function exportDrawRecordsCSV() {
 const FD_TRACK_META = {
   efficiency: { label: '效率提升赛道', color: '#ff6b35', grad: 'linear-gradient(135deg,#ff6b35,#f59e0b)' },
   creative:   { label: '创意应用赛道', color: '#7c3aed', grad: 'linear-gradient(135deg,#7c3aed,#a855f7)' },
-  business:   { label: '业务赋能赛道', color: '#2563eb', grad: 'linear-gradient(135deg,#2563eb,#0ea5e9)' }
+  business:   { label: '业务赋能赛道', color: '#2563eb', grad: 'linear-gradient(135deg,#2563eb,#0ea5e9)' },
+  team:       { label: '团队赛道', color: '#f59e0b', grad: 'linear-gradient(135deg,#f59e0b,#fb923c)' }
 };
 let _fdData = null;
-let _fdPrizeDraft = { efficiency: [], creative: [], business: [] };
+let _fdPrizeDraft = { efficiency: [], creative: [], business: [], team: [] };
 let _fdTestResults = {}; // 试抽结果（仅内存，不落库、不公布，刷新即消失）
 
 async function loadFinalDraw() {
   if (!adminToken) return;
   try {
     _fdData = await api('/api/admin/final-draw', { headers: { 'x-admin-token': adminToken } });
-    ['efficiency', 'creative', 'business'].forEach(t => {
+    Object.keys(FD_TRACK_META).forEach(t => {
       _fdPrizeDraft[t] = ((_fdData.prizes || {})[t] || []).slice();
     });
     renderFinalDraw();
