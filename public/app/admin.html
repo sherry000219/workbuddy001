@@ -318,6 +318,13 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
         </div>
       </div>
     </details>
+    <details style="margin-bottom:20px;" open>
+      <summary>🏆 押宝成功名单（押中赛道冠军 · <span id="fdHitsTotal">0</span> 人）</summary>
+      <div style="background:var(--bg-card);border:1px solid #e5e7eb;border-radius:var(--radius);padding:24px;margin-top:12px;box-shadow:var(--shadow);">
+        <p style="color:var(--text-dim);font-size:13px;margin-bottom:14px;">以下为押中各赛道第一名的押宝人（含复赛+决赛两段有效押宝，一人一票）——他们获得抽奖资格（押中一个，抽一次），并构成决赛现场抽奖的支持者池。<button class="btn btn-outline btn-sm" style="margin-left:10px;" onclick="fdExportHitsCSV()">📥 导出名单 CSV</button></p>
+        <div id="fdHitsList"></div>
+      </div>
+    </details>
     <details style="margin-bottom:20px;">
       <summary>🎊 决赛现场抽奖（押宝支持者 · 管理员专属）</summary>
       <style>
@@ -1223,11 +1230,71 @@ function fdChips(list) {
 function renderFinalDraw() {
   const el = document.getElementById('finalDrawTracks');
   if (!el || !_fdData) return;
+  renderFdHits();
   if (!_fdData.settled) {
     el.innerHTML = '<div style="grid-column:1/-1;padding:36px 24px;text-align:center;color:var(--text-dim);font-size:14px;background:#f9fafb;border:1px dashed #e5e7eb;border-radius:12px;">⏳ 尚未结算——请先完成决赛结算（确定各赛道第一名）后，此处才会显示冠军、支持者与奖池配置。</div>';
     return;
   }
   el.innerHTML = Object.keys(FD_TRACK_META).map(t => fdTrackCard(t)).join('');
+}
+
+// 押宝成功名单：押中各赛道冠军的押宝人（含复赛+决赛两段，一人一票）
+function renderFdHits() {
+  const wrap = document.getElementById('fdHitsList');
+  const totalEl = document.getElementById('fdHitsTotal');
+  if (!wrap || !_fdData) return;
+  if (!_fdData.settled) {
+    if (totalEl) totalEl.textContent = '0';
+    wrap.innerHTML = '<div style="padding:28px;text-align:center;color:var(--text-dim);font-size:14px;background:#f9fafb;border:1px dashed #e5e7eb;border-radius:12px;">⏳ 尚未结算——结算确定各赛道第一名后，此处自动显示押中冠军的押宝人名单。</div>';
+    return;
+  }
+  let total = 0;
+  const blocks = Object.keys(FD_TRACK_META).map(t => {
+    const meta = FD_TRACK_META[t];
+    const champ = (_fdData.champions || {})[t];
+    const sup = (_fdData.supporters || {})[t] || [];
+    total += sup.length;
+    let champLine;
+    if (champ) {
+      champLine = `🏆 冠军：《${escHtml(champ.title)}》· ${escHtml(champ.name)}${champ.dept ? ' · ' + escHtml(champ.dept) : ''}`;
+    } else {
+      champLine = '⚠️ 该赛道尚未产生第一名';
+    }
+    const rows = sup.map((s, i) => `<tr>
+      <td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;color:${meta.color};font-weight:700;">${i + 1}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;font-weight:600;color:#111827;">${escHtml(s.name)}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;"><span style="padding:1px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${s.betStage === '决赛' ? 'rgba(37,99,235,0.1)' : 'rgba(245,158,11,0.12)'};color:${s.betStage === '决赛' ? '#2563eb' : '#b45309'};">${escHtml(s.betStage)}押宝</span></td>
+      <td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;color:#6b7280;font-size:12px;">${s.betAt ? new Date(s.betAt).toLocaleString('zh-CN') : '-'}</td>
+    </tr>`).join('');
+    return `<div style="background:#fff;border:1px solid #e5e7eb;border-left:4px solid ${meta.color};border-radius:12px;padding:16px 18px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+        <div style="font-weight:800;font-size:14px;color:#111827;">${meta.label} <span style="font-weight:400;color:#6b7280;font-size:12px;">${champLine}</span></div>
+        <span style="font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;background:${meta.color}12;color:${meta.color};">押中 ${sup.length} 人</span>
+      </div>
+      ${sup.length ? `<table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:#f9fafb;"><th style="text-align:left;padding:6px 10px;font-size:12px;color:#6b7280;">#</th><th style="text-align:left;padding:6px 10px;font-size:12px;color:#6b7280;">押宝人</th><th style="text-align:left;padding:6px 10px;font-size:12px;color:#6b7280;">押宝赛段</th><th style="text-align:left;padding:6px 10px;font-size:12px;color:#6b7280;">押宝时间</th></tr></thead><tbody>${rows}</tbody></table>` : '<div style="color:#9ca3af;font-size:13px;padding:6px 0;">该冠军暂无押宝支持者</div>'}
+    </div>`;
+  }).join('');
+  if (totalEl) totalEl.textContent = String(total);
+  wrap.innerHTML = blocks;
+}
+
+// 导出押宝成功名单 CSV
+function fdExportHitsCSV() {
+  if (!_fdData || !_fdData.settled) return showToast('尚未结算，暂无可导出的名单', 'error');
+  let csv = '﻿赛道,冠军作品,冠军作者,押宝人,押宝赛段,押宝时间\n';
+  Object.keys(FD_TRACK_META).forEach(t => {
+    const meta = FD_TRACK_META[t];
+    const champ = (_fdData.champions || {})[t];
+    const sup = (_fdData.supporters || {})[t] || [];
+    sup.forEach(s => {
+      csv += `"${csvCell(meta.label)}","${csvCell(champ ? champ.title : '-')}","${csvCell(champ ? champ.name : '-')}","${csvCell(s.name)}","${csvCell(s.betStage + '押宝')}","${csvCell(s.betAt ? new Date(s.betAt).toLocaleString('zh-CN') : '-')}\"\n`;
+    });
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = '押宝成功名单.csv'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('已导出押宝成功名单 CSV', 'success');
 }
 
 function fdTrackCard(t) {
