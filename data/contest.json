@@ -35759,6 +35759,64 @@
             "prize": "64G优盘",
             "drawnAt": "2026-08-31T05:42:05.857Z"
           }
+        ],
+        "business": [
+          {
+            "userId": "mkiibgHXiip3zhuoCrGUaaiPAiEiE",
+            "name": "童伟正",
+            "avatar": "https://static-legacy.dingtalk.com/media/lADPDgtYw-Rh7ADNAjDNAjA_560_560.jpg",
+            "betStage": "决赛",
+            "prize": "workbuddy标准版月度会员",
+            "drawnAt": "2026-08-31T05:42:45.325Z"
+          },
+          {
+            "userId": "4ptiS7WRAZt0q7C1qbyiif7wiEiE",
+            "name": "许恒琪",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM4OPOqz8MQvNAkfNAruwfDwnSQeY8oIKPjxKjwTFAA_699_583.jpg",
+            "betStage": "复赛",
+            "prize": "卫衣",
+            "drawnAt": "2026-08-31T05:42:45.325Z"
+          },
+          {
+            "userId": "iiJwDubu19XnrhDpORNXnlgiEiE",
+            "name": "魏培昕",
+            "avatar": "https://static-legacy.dingtalk.com/media/lADPDh0cSPmVC9bNAsrNAmQ_612_714.jpg",
+            "betStage": "复赛",
+            "prize": "卫衣",
+            "drawnAt": "2026-08-31T05:42:45.325Z"
+          },
+          {
+            "userId": "sJpVx6mqjORh18vxiPPgiSqAiEiE",
+            "name": "李宗书",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM4aFv3JQQQnNArLNArKwwIqr5s4Aj_4HUxsNaWu5AA_690_690.jpg",
+            "betStage": "决赛",
+            "prize": "帐sir抱枕毯",
+            "drawnAt": "2026-08-31T05:42:45.325Z"
+          },
+          {
+            "userId": "JCh4iSviSr2zr6fsPZ9RvXvwiEiE",
+            "name": "徐瑞",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM4sQFSnrHYfNAfrNAfqwKEXbCgF4KQwHALWXGKIPAA_506_506.jpg",
+            "betStage": "复赛",
+            "prize": "餐具套盒",
+            "drawnAt": "2026-08-31T05:42:45.325Z"
+          },
+          {
+            "userId": "amme4VLJfpXqkIPCNV0nRwiEiE",
+            "name": "沈昕",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM5c2jfobiNnNBDrNBDiw-UnwDh4sUDMHizAldQfdAA_1080_1082.jpg",
+            "betStage": "复赛",
+            "prize": "头号玩家纪念冰箱贴+鼠标垫",
+            "drawnAt": "2026-08-31T05:42:45.325Z"
+          },
+          {
+            "userId": "ZTEJk3LZCHzLjsIZuwWnpAiEiE",
+            "name": "贾治维",
+            "avatar": "",
+            "betStage": "决赛",
+            "prize": "64G优盘",
+            "drawnAt": "2026-08-31T05:42:45.325Z"
+          }
         ]
       }
     }
