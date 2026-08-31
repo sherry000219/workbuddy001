@@ -359,8 +359,9 @@ function getJudgableEntries(stage) {
   if (stage === 'semi_final') {
     return db.entries.filter(e => e.roundStatus === 'semi_finalist');
   }
-  if (stage === 'final') {
-    return db.entries.filter(e => e.roundStatus === 'finalist');
+  if (stage === 'final' || stage === 'awarded') {
+    // 结算后（awarded）仍按决赛作品集展示：awarded 不是打分赛段，入围/获奖作品都要保留可见
+    return db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
   }
   return [];
 }
@@ -2440,6 +2441,31 @@ function getFinalDrawData() {
 
 app.get('/api/admin/final-draw', verifyAdminToken, (req, res) => {
   res.json(getFinalDrawData());
+});
+
+// GET /api/admin/final-scores — 决赛评委打分明细：直接按决赛阶段取数，
+// 不依赖当前赛段（任何赛段状态下都可查验；结算后仍读取 final 打分记录）
+app.get('/api/admin/final-scores', verifyAdminToken, (req, res) => {
+  const entries = db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
+  const scores = db.judgeScores.filter(s => (s.stage || 'preliminary') === 'final');
+  const allJudges = [...new Set(scores.map(s => s.judgeName))].sort();
+  const entryScores = entries.map(e => {
+    const es = scores.filter(s => s.entryId === e.id).map(s => ({
+      judgeName: s.judgeName,
+      practicality: s.practicality, innovation: s.innovation, scalability: s.scalability,
+      value: s.value || 0, presentation: s.presentation,
+      total: (s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.value || 0) + (s.presentation || 0),
+      updatedAt: s.updatedAt
+    }));
+    const avg = es.length ? Math.round(es.reduce((a, s) => a + s.total, 0) / es.length) : 0;
+    return {
+      id: e.id, title: e.title, name: e.name, entryType: e.entryType || 'individual',
+      track: e.track, roundStatus: e.roundStatus, award: e.award || null,
+      scores: es, avgScore: avg, judgeCount: es.length,
+      composite: getCompositeScore(e.id, 'final')
+    };
+  });
+  res.json({ entryScores, allJudges, scoreCount: scores.length, totalJudgesExpected: ((db.settings.judgesByStage || {}).final || []).length });
 });
 
 // 设置某赛道奖池（奖品名列表，每个奖品对应 1 名中奖者）
