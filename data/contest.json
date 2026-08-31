@@ -34963,6 +34963,16 @@
       "prizeName": "谢谢参与",
       "isWin": false,
       "drawnAt": "2026-08-31T03:26:16.704Z"
+    },
+    {
+      "id": "dr_mtgolw62_4mlvj2",
+      "userId": "c2Ud86q2Q3uyGgvgXVpDDwiEiE",
+      "userName": "曹学成",
+      "stage": "semi_final",
+      "prizeId": "prize_mtaw7ath_o183or",
+      "prizeName": "五虎临门盲盒",
+      "isWin": true,
+      "drawnAt": "2026-08-31T03:31:28.922Z"
     }
   ],
   "settings": {
@@ -35193,7 +35203,7 @@
         {
           "id": "prize_mtaw7ath_o183or",
           "name": "五虎临门盲盒",
-          "stock": 3,
+          "stock": 2,
           "total": 5,
           "createdAt": "2026-08-27T02:17:27.941Z"
         },
