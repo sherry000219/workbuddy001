@@ -240,7 +240,7 @@ let ddAuthed = false;
 let ddUser = null;
 let loginState = null;
 const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
-const AWARD_LABELS = { first: '🥇 一等奖', second: '🥈 二等奖', third: '🥉 三等奖', excellence: '🎖️ 优秀奖' };
+const AWARD_LABELS = { first: '🥇 一等奖', second: '🥈 二等奖', third: '🥉 三等奖', team_excellence: '🏅 团队优秀奖', excellence: '🎖️ 决赛入围奖' };
 
 // ========== HELPERS ==========
 function showToast(msg, type) { type = type || ''; const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + type + ' show'; setTimeout(function() { t.className = 'toast'; }, 2800); }

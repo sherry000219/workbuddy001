@@ -671,7 +671,8 @@ const AWARD_LABELS = {
   first: '🥇 一等奖',
   second: '🥈 二等奖',
   third: '🥉 三等奖',
-  excellence: '🎖️ 优秀奖'
+  team_excellence: '🏅 团队优秀奖',
+  excellence: '🎖️ 决赛入围奖'
 };
 
 // ========== DINGTALK AUTH ==========
@@ -1473,7 +1474,7 @@ function renderStageManagePanel(entryScores) {
   } else if (currentStage === 'final') {
     var finalEntries = entryScores.filter(function(e) { return e.roundStatus === 'finalist'; });
     var sorted3 = finalEntries.slice().sort(function(a, b) { return (b.composite || 0) - (a.composite || 0); });
-    panel.innerHTML = '<div class="promote-panel"><h3>🏆 结算获奖</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">为决赛作品设置获奖等级。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted3.map(function(e) { return '<div class="promote-entry"><select class="award-select" id="award_' + e.id + '"><option value="">未获奖</option><option value="first" ' + (e.award === 'first' ? 'selected' : '') + '>🥇 一等奖</option><option value="second" ' + (e.award === 'second' ? 'selected' : '') + '>🥈 二等奖</option><option value="third" ' + (e.award === 'third' ? 'selected' : '') + '>🥉 三等奖</option><option value="excellence" ' + (e.award === 'excellence' ? 'selected' : '') + '>🎖️ 优秀奖</option></select><span class="pe-title">' + e.title + '</span><span class="pe-score">评委均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;"><button class="btn btn-gold btn-sm" onclick="adminSettle()">🏆 确认结算</button></div></div>';
+    panel.innerHTML = '<div class="promote-panel"><h3>🏆 结算获奖</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">为决赛作品设置获奖等级。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + sorted3.map(function(e) { return '<div class="promote-entry"><select class="award-select" id="award_' + e.id + '"><option value="">未获奖</option><option value="first" ' + (e.award === 'first' ? 'selected' : '') + '>🥇 一等奖</option><option value="second" ' + (e.award === 'second' ? 'selected' : '') + '>🥈 二等奖</option><option value="third" ' + (e.award === 'third' ? 'selected' : '') + '>🥉 三等奖</option><option value="excellence" ' + (e.award === 'excellence' ? 'selected' : '') + '>🎖️ 决赛入围奖</option></select><span class="pe-title">' + e.title + '</span><span class="pe-score">评委均分: ' + (e.avgScore || '—') + ' | ' + e.name + '</span></div>'; }).join('') + '</div><div style="margin-top:12px;"><button class="btn btn-gold btn-sm" onclick="adminSettle()">🏆 确认结算</button></div></div>';
   } else if (currentStage === 'awarded') {
     panel.innerHTML = '<div class="promote-panel" style="background:linear-gradient(135deg,rgba(255,215,64,0.08),transparent);border:1px solid rgba(255,215,64,0.2);"><h3>🏆 比赛已结算</h3><p style="color:var(--text-dim);font-size:13px;">获奖结果已公布。</p></div>';
   } else {

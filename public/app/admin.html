@@ -401,7 +401,7 @@ let allJudges = [];
 const DRAW_STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛' };
 const STAGE_LABELS = { preliminary: '初赛', semi_final: '复赛', final: '决赛', awarded: '已结算' };
 const ROUND_LABELS = { approved: '初赛', semi_finalist: '复赛晋级', eliminated_semi: '复赛淘汰', finalist: '决赛晋级', eliminated_final: '决赛淘汰', awarded: '已获奖' };
-const AWARD_LABELS = { first: '🥇 一等奖', second: '🥈 二等奖', third: '🥉 三等奖', excellence: '🎖️ 优秀奖' };
+const AWARD_LABELS = { first: '🥇 一等奖', second: '🥈 二等奖', third: '🥉 三等奖', team_excellence: '🏅 团队优秀奖', excellence: '🎖️ 决赛入围奖' };
 
 // ========== HELPERS ==========
 function showToast(msg, type) { type = type || ''; const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + type + ' show'; setTimeout(function() { t.className = 'toast'; }, 2800); }
@@ -832,7 +832,7 @@ function renderStageManagePanel(entryScores) {
     var trackRanks3 = buildTrackRanks(sorted3);
     var rowsHtml3 = renderGroupedRows(sorted3, function(e, idx, isTeam, deptRankNum) {
       var deptRankStr = deptRankNum ? ' | 部门第' + deptRankNum + '名' : '';
-      return '<div class="promote-entry"><select class="award-select" id="award_' + e.id + '"><option value="">未获奖</option><option value="first" ' + (e.award === 'first' ? 'selected' : '') + '>🥇 一等奖</option><option value="second" ' + (e.award === 'second' ? 'selected' : '') + '>🥈 二等奖</option><option value="third" ' + (e.award === 'third' ? 'selected' : '') + '>🥉 三等奖</option><option value="excellence" ' + (e.award === 'excellence' ? 'selected' : '') + '>🎖️ 优秀奖</option></select><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + trackBadgeHtml(e.track) + (isTeam ? teamBadgeHtml() : '') + '</span><span class="pe-score">评委均分: ' + fmtScore(e.avgScore) + trackRankHtml(e, trackRanks3) + orgInfoHtml(e, isTeam) + deptRankStr + ' | ' + e.name + '</span></div>';
+      return '<div class="promote-entry"><select class="award-select" id="award_' + e.id + '"><option value="">未获奖</option><option value="first" ' + (e.award === 'first' ? 'selected' : '') + '>🥇 一等奖</option>' + (isTeam ? '<option value="team_excellence" ' + (e.award === 'team_excellence' ? 'selected' : '') + '>🏅 团队优秀奖</option>' : '<option value="second" ' + (e.award === 'second' ? 'selected' : '') + '>🥈 二等奖</option><option value="third" ' + (e.award === 'third' ? 'selected' : '') + '>🥉 三等奖</option>') + '<option value="excellence" ' + (e.award === 'excellence' ? 'selected' : '') + '>🎖️ 决赛入围奖</option></select><span class="pe-title" style="cursor:pointer;color:#ff6b35;" onclick="openDetail(\'' + e.id + '\')" title="查看详情 / 得分 / 排名">' + e.title + trackBadgeHtml(e.track) + (isTeam ? teamBadgeHtml() : '') + '</span><span class="pe-score">评委均分: ' + fmtScore(e.avgScore) + trackRankHtml(e, trackRanks3) + orgInfoHtml(e, isTeam) + deptRankStr + ' | ' + e.name + '</span></div>';
     });
     panel.innerHTML = '<div class="promote-panel"><h3>🏆 结算获奖</h3><p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">已按个人（细分部门）/ 团队分组，组内按综合分排名排序。为决赛作品设置获奖等级。</p><div style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;">' + rowsHtml3 + '</div><div style="margin-top:12px;"><button class="btn btn-gold btn-sm" onclick="adminSettle()">🏆 确认结算</button></div></div>';
   } else if (currentStage === 'awarded') {

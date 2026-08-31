@@ -2584,7 +2584,7 @@ app.get('/api/admin/export/csv', verifyAdminToken, (req, res) => {
         sd.voteCount, scores.length, avg, composite
       ];
       if (stage === 'awarded') {
-        const awardLabel = { first: '一等奖', second: '二等奖', third: '三等奖', excellence: '优秀奖' }[e.award] || '';
+        const awardLabel = { first: '一等奖', second: '二等奖', third: '三等奖', team_excellence: '团队优秀奖', excellence: '决赛入围奖' }[e.award] || '';
         row.push(awardLabel);
       }
       allJudges.forEach(judge => {
