@@ -706,11 +706,14 @@ function renderRankList(individual, team, containerId, viewStage) {
     });
   }
   function fmtScore(v) { const n = Number(v || 0); return (Math.round(n * 100) / 100).toFixed(2); }
-  // 决赛视图徽章：一/二/三等奖不变；团队 second（历史遗留）→ 团队优秀奖；决赛入围未定奖 → 决赛入围奖
+  // 决赛视图徽章：一/二/三等奖不变；团队优秀奖仅团队作品；团队 second（历史遗留）→ 团队优秀奖；未定奖 → 决赛入围奖
   function finalsBadge(e) {
     if (e.award === 'first') return '<span class="round-badge badge-awarded">🥇 一等奖</span>';
     if (e.award === 'third') return '<span class="round-badge badge-awarded">🥉 三等奖</span>';
-    if (e.award === 'second' || e.award === 'team_excellence') return '<span class="round-badge badge-awarded">🏅 团队优秀奖</span>';
+    if (e.award === 'team_excellence') return '<span class="round-badge badge-awarded">🏅 团队优秀奖</span>';
+    if (e.award === 'second') return e.entryType === 'team'
+      ? '<span class="round-badge badge-awarded">🏅 团队优秀奖</span>'
+      : '<span class="round-badge badge-awarded">🥈 二等奖</span>';
     return '<span class="round-badge badge-awarded">🎖️ 决赛入围奖</span>';
   }
   function rowHtml(e, showRank, tagLabel, tagBg, tagColor) {
