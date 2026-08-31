@@ -367,8 +367,11 @@ function getJudgableEntries(stage) {
 
 // Calculate stage-specific scores for an entry
 function getEntryStageScores(entryId, stage) {
-  const scores = db.judgeScores.filter(s => s.entryId === entryId && (s.stage || 'preliminary') === stage);
-  const voteCount = db.votes.filter(v => v.entryId === entryId && (v.stage || 'preliminary') === stage).length;
+  // 结算（awarded）后仍读取决赛评委打分：awarded 不是真实打分赛段，评委打分发生在 final，
+  // 直接按 awarded 过滤会查不到数据，导致后台分数表/排名/详情显示为空
+  const scoreStage = stage === 'awarded' ? 'final' : stage;
+  const scores = db.judgeScores.filter(s => s.entryId === entryId && (s.stage || 'preliminary') === scoreStage);
+  const voteCount = db.votes.filter(v => v.entryId === entryId && (v.stage || 'preliminary') === scoreStage).length;
   // 维度体系按赛段：决赛/结算五维（含组织价值）；初赛/复赛旧四维
   const isNewDims = stage === 'final' || stage === 'awarded';
   const avgScore = scores.length > 0
@@ -1574,7 +1577,8 @@ app.get('/api/stats', requireAuth, (req, res) => {
   const totalEntries = db.entries.length;
   const approvedEntries = db.entries.filter(e => e.status === 'approved').length;
   const stageVotes = db.votes.filter(v => (v.stage || 'preliminary') === stage).length;
-  const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
+  // 结算后评委数仍按决赛打分统计（awarded 无独立打分记录）
+  const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === (stage === 'awarded' ? 'final' : stage));
   const judgeCount = new Set(stageScores.map(s => s.judgeName)).size;
   // 复赛晋级总数：曾进入过复赛阶段的作品（含晋级决赛的、决赛淘汰的、复赛进行中的）
   const semiFinalists = db.entries.filter(e => e.roundStatus === 'semi_finalist' || e.roundStatus === 'finalist' || e.roundStatus === 'awarded' || e.roundStatus === 'eliminated_final').length;
@@ -2486,7 +2490,8 @@ app.post('/api/admin/final-draw/reset', verifyAdminToken, (req, res) => {
 app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
   const stage = getCurrentStage();
   const entries = getJudgableEntries(stage);
-  const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
+  // 结算后仍显示决赛评委打分（awarded 不是打分赛段，回退读 final）
+  const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === (stage === 'awarded' ? 'final' : stage));
   const allJudges = [...new Set(stageScores.map(s => s.judgeName))].sort();
   // 维度体系按赛段：决赛五维 / 初复赛旧四维（只有决赛改维度）
   const isNewDims = stage === 'final' || stage === 'awarded';
@@ -2556,8 +2561,10 @@ app.get('/api/admin/export/csv', verifyAdminToken, (req, res) => {
   try {
     const stage = getCurrentStage();
     const entries = getJudgableEntries(stage);
-    const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
+    // 结算后仍导出决赛评委打分（awarded 不是打分赛段，回退读 final）
+    const stageScores = db.judgeScores.filter(s => (s.stage || 'preliminary') === (stage === 'awarded' ? 'final' : stage));
     const allJudges = [...new Set(stageScores.map(s => s.judgeName))].sort();
+    const isNewDims = stage === 'final' || stage === 'awarded';
     const trackLabel = { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' };
     const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
 
@@ -2565,14 +2572,18 @@ app.get('/api/admin/export/csv', verifyAdminToken, (req, res) => {
     let headers = ['作品ID', '标题', '姓名', '部门', '子部门', '赛道', '轮次', '提交时间', '投票数', '评委数', '评委均分', '综合分'];
     if (stage === 'awarded') headers.push('获奖等级');
     allJudges.forEach(j => {
-      headers.push(`${j}-总分`, `${j}-实用性(/50)`, `${j}-创新性(/20)`, `${j}-可推广性(/15)`, `${j}-效果呈现(/15)`);
+      if (isNewDims) {
+        headers.push(`${j}-总分`, `${j}-实用性(/30)`, `${j}-创新性(/20)`, `${j}-可推广性(/20)`, `${j}-组织价值(/20)`, `${j}-效果展示(/10)`);
+      } else {
+        headers.push(`${j}-总分`, `${j}-实用性(/50)`, `${j}-创新性(/20)`, `${j}-可推广性(/15)`, `${j}-效果呈现(/15)`);
+      }
     });
     csv += headers.map(esc).join(',') + '\n';
 
     entries.forEach(e => {
       const scores = stageScores.filter(s => s.entryId === e.id);
       const avg = scores.length > 0
-        ? Math.round(scores.reduce((sum, s) => sum + s.practicality + s.innovation + s.scalability + s.presentation, 0) / scores.length)
+        ? Math.round(scores.reduce((sum, s) => sum + s.practicality + s.innovation + s.scalability + (isNewDims ? (s.value || 0) : 0) + s.presentation, 0) / scores.length)
         : 0;
       const sd = getEntryStageScores(e.id, stage);
       const composite = getCompositeScore(e.id, stage);
@@ -2590,9 +2601,14 @@ app.get('/api/admin/export/csv', verifyAdminToken, (req, res) => {
       allJudges.forEach(judge => {
         const s = scores.find(sc => sc.judgeName === judge);
         if (s) {
-          row.push(s.practicality + s.innovation + s.scalability + s.presentation, s.practicality, s.innovation, s.scalability, s.presentation);
+          if (isNewDims) {
+            row.push((s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.value || 0) + (s.presentation || 0), s.practicality, s.innovation, s.scalability, s.value || 0, s.presentation);
+          } else {
+            row.push(s.practicality + s.innovation + s.scalability + s.presentation, s.practicality, s.innovation, s.scalability, s.presentation);
+          }
         } else {
-          row.push('', '', '', '', '');
+          const empty = isNewDims ? ['', '', '', '', '', ''] : ['', '', '', '', ''];
+          row.push(...empty);
         }
       });
       csv += row.map(esc).join(',') + '\n';
