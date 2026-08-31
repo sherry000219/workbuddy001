@@ -723,11 +723,9 @@ function renderRankList(individual, team, containerId, viewStage) {
   function groupHeader(label, count, bg, color) {
     return '<div style="padding:10px 14px;background:' + bg + ';border-bottom:1px solid #e5e7eb;font-size:14px;font-weight:700;color:' + color + ';border-top:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;">' + label + '<span style="font-weight:400;font-size:12px;opacity:.75;">（' + count + ' 个）' + (isFinalsView ? ' · 决赛得分' : '') + '</span></div>';
   }
-  // 拆分四组
+  // 拆分晋级组（淘汰/未晋级作品不展示）
   const advIndividual = (individual || []).filter(isAdvanced);
-  const elimIndividual = (individual || []).filter(e => !isAdvanced(e));
   const advTeam = (team || []).filter(isAdvanced);
-  const elimTeam = (team || []).filter(e => !isAdvanced(e));
   let html = '';
   if (isFinalsView) {
     // 决赛排名：个人按三赛道分组（组内按奖项优先级 + 决赛得分排序），团队不分赛道合并一组
@@ -766,13 +764,9 @@ function renderRankList(individual, team, containerId, viewStage) {
       advTeam.forEach(e => { html += rowHtml(e, true); });
     }
   }
-  if (elimIndividual.length > 0) {
-    html += groupHeader('👤 个人未晋级', elimIndividual.length, '#f3f4f6', '#6b7280');
-    elimIndividual.forEach(e => { html += rowHtml(e, false, '', '', ''); });
-  }
-  if (elimTeam.length > 0) {
-    html += groupHeader('👥 团队未晋级', elimTeam.length, '#f3f4f6', '#6b7280');
-    elimTeam.forEach(e => { html += rowHtml(e, false, '', '', ''); });
+  // 不展示被淘汰/未晋级作品，仅展示晋级（含获奖）作品
+  if (!html) {
+    html = '<div class="empty-state" style="padding:40px 20px;"><div class="icon">🏆</div><p>暂无晋级作品</p></div>';
   }
   container.innerHTML = html;
 }
