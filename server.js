@@ -2473,6 +2473,43 @@ app.post('/api/admin/final-draw/run', verifyAdminToken, (req, res) => {
   res.json({ success: true, track, winners, unassigned: Math.max(0, prizes.length - pool.length), totalSupporters: pool.length });
 });
 
+// 试抽（演练）：与正式抽奖同一套洗牌逻辑，但【不保存结果、不公布、不影响正式抽奖】。
+// 未结算/无冠军/无支持者时自动使用模拟数据，便于赛前提前测试流程。
+app.post('/api/admin/final-draw/test-run', verifyAdminToken, (req, res) => {
+  const { track } = req.body;
+  if (!FINAL_DRAW_TRACKS.includes(track)) return res.status(400).json({ error: '无效赛道' });
+  const data = getFinalDrawData();
+  const champ = data.champions[track];
+  const cfg = db.settings.finalDraw || {};
+  const prizes = (cfg.prizes || {})[track] || [];
+  let supporters = data.supporters[track] || [];
+  let isMock = false;
+  // 真实数据不足（未结算/无冠军/无支持者）→ 用模拟数据完整演练流程
+  if (!champ || !supporters.length) {
+    isMock = true;
+    supporters = Array.from({ length: 12 }, (_, i) => ({
+      userId: 'mock_' + i,
+      name: '测试用户' + (i + 1),
+      avatar: '',
+      betStage: (i % 2 === 0) ? '复赛' : '决赛',
+      betAt: new Date().toISOString()
+    }));
+  }
+  const pool = supporters.slice();
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const usePrizes = prizes.length ? prizes : ['模拟奖品A', '模拟奖品B', '模拟奖品C'];
+  const winners = [];
+  usePrizes.forEach((prize, idx) => {
+    const w = pool[idx];
+    if (w) winners.push({ userId: w.userId, name: w.name, avatar: w.avatar, betStage: w.betStage, prize, drawnAt: new Date().toISOString() });
+  });
+  // 注意：此处刻意不 saveDB、不写 cfg.results —— 纯演练，正式抽奖不受任何影响
+  res.json({ success: true, track, winners, isMock, totalSupporters: pool.length, prizesUsed: usePrizes.length, championTitle: champ ? champ.title : null });
+});
+
 // 重置某赛道抽奖结果（误操作恢复，需二次确认）
 app.post('/api/admin/final-draw/reset', verifyAdminToken, (req, res) => {
   const { track } = req.body;

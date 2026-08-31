@@ -1211,6 +1211,7 @@ const FD_TRACK_META = {
 };
 let _fdData = null;
 let _fdPrizeDraft = { efficiency: [], creative: [], business: [] };
+let _fdTestResults = {}; // 试抽结果（仅内存，不落库、不公布，刷新即消失）
 
 async function loadFinalDraw() {
   if (!adminToken) return;
@@ -1350,12 +1351,28 @@ function fdTrackCard(t) {
     </div>`;
   }
 
+  // 试抽（演练）：任何状态下都可随时测试；结果不落库、不公布
+  const testBtnHtml = `<button id="fdTestBtn_${t}" onclick="fdTestRun('${t}')" style="width:100%;margin-top:10px;padding:9px;border:1.5px dashed #f59e0b;background:rgba(245,158,11,0.05);border-radius:10px;font-size:13px;font-weight:600;color:#b45309;cursor:pointer;transition:all .2s;">🧪 试抽（演练，不保存结果）</button>`;
+  const test = _fdTestResults[t];
+  const testHtml = test ? `<div style="margin-top:10px;padding:12px;border:2px dashed #f59e0b;border-radius:12px;background:rgba(245,158,11,0.04);">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <span style="font-size:12.5px;font-weight:700;color:#b45309;">🧪 试抽结果（仅演练 · 未保存 · 不影响正式抽奖）</span>
+      ${test.isMock ? '<span style="font-size:11px;font-weight:600;padding:1px 8px;border-radius:6px;background:#fff3cd;color:#856404;border:1px solid #ffe69c;">使用模拟数据（未结算）</span>' : '<span style="font-size:11px;font-weight:600;padding:1px 8px;border-radius:6px;background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;">使用真实支持者 ' + test.totalSupporters + ' 人</span>'}
+    </div>
+    ${(test.winners || []).map((w, i) => `<div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px dashed #fcd34d;border-radius:8px;padding:7px 10px;margin-bottom:5px;">
+      <span style="min-width:20px;height:20px;border-radius:50%;background:#f59e0b;color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">${i + 1}</span>
+      <span style="font-weight:600;font-size:13px;color:#111827;">${escHtml(w.name)}</span>
+      <span style="flex:1;"></span>
+      <span style="font-size:12px;color:#92400e;">🎁 ${escHtml(w.prize)}</span>
+    </div>`).join('') || '<div style="font-size:12px;color:#9ca3af;">本次试抽无中奖者</div>'}
+  </div>` : '';
+
   return `<div style="background:#fff;border:1px solid #e5e7eb;border-top:4px solid ${meta.color};border-radius:14px;padding:18px;box-shadow:var(--shadow);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div style="font-weight:800;font-size:15px;color:#111827;">${meta.label}</div>
       <span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;background:${drawn ? '#dcfce7' : '#f3f4f6'};color:${drawn ? '#15803d' : '#6b7280'};">${drawn ? '✅ 已完成抽奖' : '待抽奖'}</span>
     </div>
-    ${champHtml}${supHtml}${bodyHtml}
+    ${champHtml}${supHtml}${bodyHtml}${testBtnHtml}${testHtml}
   </div>`;
 }
 
@@ -1370,6 +1387,23 @@ function fdPrizeRow(t, i, val) {
 
 function fdAddPrize(t) { _fdPrizeDraft[t].push(''); renderFinalDraw(); }
 function fdRemovePrize(t, i) { _fdPrizeDraft[t].splice(i, 1); renderFinalDraw(); }
+
+// 试抽（演练）：调用 /api/admin/final-draw/test-run，结果只存内存，不写库、不公布、不影响正式抽奖
+async function fdTestRun(t) {
+  if (!adminToken) return;
+  const meta = FD_TRACK_META[t];
+  const btn = document.getElementById('fdTestBtn_' + t);
+  if (btn) { btn.disabled = true; btn.textContent = '🧪 试抽中…'; }
+  try {
+    const resp = await api('/api/admin/final-draw/test-run', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ track: t }) });
+    _fdTestResults[t] = { winners: resp.winners || [], isMock: !!resp.isMock, totalSupporters: resp.totalSupporters || 0, at: Date.now() };
+    renderFinalDraw();
+    showToast('🧪 ' + meta.label + '试抽完成（结果未保存，不影响正式抽奖）', 'success');
+  } catch(e) {
+    showToast('试抽失败：' + e.message, 'error');
+    renderFinalDraw();
+  }
+}
 
 async function fdSavePrizes(t) {
   if (!adminToken) return;
