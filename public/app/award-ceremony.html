@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkBuddy AI 应用大赛 · 决赛颁奖</title>
+<style>
+  :root{
+    --bg:#070b18; --gold:#ffd166; --gold2:#f5a623; --text:#eef2fb; --text-dim:#9aa6c4;
+    --eff:#ff6b35; --cre:#a855f7; --bus:#3b82f6; --tea:#f59e0b; --silver:#cbd5e1; --bronze:#d97746;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--bg);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);}
+  /* ===== 翻页容器 ===== */
+  #deck{position:fixed;inset:0;}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
+    padding:6vh 6vw;opacity:0;transition:opacity .45s ease;text-align:center;
+    background:
+      radial-gradient(1100px 600px at 15% -5%, rgba(255,107,53,.16), transparent 60%),
+      radial-gradient(900px 600px at 92% 5%, rgba(124,58,237,.14), transparent 55%),
+      radial-gradient(900px 700px at 50% 120%, rgba(245,158,11,.12), transparent 60%),
+      linear-gradient(180deg,#070b18,#0c1226);}
+  .slide.active{display:flex;opacity:1;}
+  .slide h2{font-size:clamp(26px,4vw,46px);font-weight:900;margin:0 0 6px;letter-spacing:1px;
+    background:linear-gradient(180deg,#fff,#ffd166);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .slide .sub{color:var(--text-dim);font-size:15px;margin-bottom:34px;letter-spacing:2px;}
+
+  /* ===== 封面 ===== */
+  .cover-logo{width:min(280px,46vw);margin-bottom:10px;filter:drop-shadow(0 0 18px rgba(255,107,53,.25));}
+  .cover-ip{position:absolute;right:7vw;bottom:8vh;width:min(180px,24vw);opacity:.9;pointer-events:none;}
+  .cover-kicker{display:inline-block;font-size:13px;letter-spacing:5px;color:var(--gold);
+    border:1px solid rgba(255,209,102,.35);border-radius:999px;padding:6px 18px;margin-bottom:22px;background:rgba(255,209,102,.06);}
+  .cover-title{font-size:clamp(46px,9vw,104px);font-weight:900;letter-spacing:6px;margin:0;
+    background:linear-gradient(180deg,#fff 5%,#ffd166 95%);-webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 60px rgba(255,209,102,.3);}
+  .cover-sub{margin-top:18px;color:var(--text-dim);font-size:clamp(14px,2vw,18px);letter-spacing:3px;}
+
+  /* ===== 奖项分组 ===== */
+  .page-body{width:100%;max-width:1120px;}
+  .grp{margin:0 auto 30px;max-width:1120px;}
+  .grp-title{font-size:20px;font-weight:800;margin:0 0 16px;display:flex;align-items:center;gap:10px;justify-content:center;color:var(--c,#fff);}
+  .grp-title::before{content:"";width:6px;height:22px;border-radius:4px;background:var(--c,#fff);box-shadow:0 0 14px var(--c,#fff);}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+  .card{position:relative;border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);
+    background:rgba(255,255,255,.04);padding:20px 20px 18px;text-align:left;overflow:hidden;
+    transition:transform .18s ease, box-shadow .18s ease;}
+  .card::before{content:"";position:absolute;inset:0;border-radius:var(--radius);padding:1px;
+    background:linear-gradient(135deg,var(--ac,#888),transparent 60%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.7;pointer-events:none;}
+  .card:hover{transform:translateY(-4px);}
+  .c-first{--ac:var(--gold);}    .c-first:hover{box-shadow:0 12px 40px rgba(255,209,102,.22);}
+  .c-second{--ac:var(--silver);} .c-second:hover{box-shadow:0 12px 40px rgba(203,213,225,.18);}
+  .c-third{--ac:var(--bronze);}  .c-third:hover{box-shadow:0 12px 40px rgba(217,119,70,.20);}
+  .c-team{--ac:var(--tea);}      .c-team:hover{box-shadow:0 12px 40px rgba(245,158,11,.20);}
+  .c-exc{--ac:#64748b;}
+  .badge{display:inline-block;font-weight:800;font-size:13px;padding:5px 12px;border-radius:999px;margin-bottom:12px;
+    background:color-mix(in srgb,var(--ac) 18%,transparent);color:var(--ac);border:1px solid color-mix(in srgb,var(--ac) 40%,transparent);}
+  .c-title{font-size:18px;font-weight:800;line-height:1.4;margin-bottom:8px;color:#fff;}
+  .c-meta{font-size:13px;color:var(--text-dim);line-height:1.6;}
+  .c-score{margin-top:14px;font-size:13px;color:var(--text-dim);}
+  .c-score b{font-size:22px;color:var(--gold);font-weight:900;margin-left:6px;font-variant-numeric:tabular-nums;}
+  .empty{color:var(--text-dim);padding:30px;font-size:15px;}
+
+  /* ===== 控制条 ===== */
+  #bar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:14px;
+    background:rgba(12,18,38,.7);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(8px);
+    padding:8px 14px;border-radius:999px;}
+  #bar button{background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;width:34px;height:34px;border-radius:50%;transition:.15s;}
+  #bar button:hover{background:rgba(255,255,255,.12);}
+  .dots{display:flex;gap:8px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:.2s;}
+  .dot.on{background:var(--gold);box-shadow:0 0 10px var(--gold);transform:scale(1.2);}
+  #loginTag{position:fixed;top:16px;right:18px;z-index:40;}
+  .login-btn{background:linear-gradient(135deg,var(--eff),var(--gold2));color:#1b1206;border:none;padding:8px 16px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;}
+  .page-num{position:fixed;top:18px;left:20px;z-index:40;color:var(--text-dim);font-size:13px;letter-spacing:1px;}
+</style>
+</head>
+<body>
+  <div id="loginTag"></div>
+  <div class="page-num" id="pageNum"></div>
+
+  <div id="deck">
+    <!-- 1. 封面 -->
+    <section class="slide active" id="s0">
+      <img class="cover-logo" src="/logo-yzf-white.png" alt="云帐房">
+      <img class="cover-ip" src="/ip-xiaor.webp" alt="">
+      <div class="cover-kicker">2026 赛季 · 头号玩家</div>
+      <h1 class="cover-title">决赛颁奖典礼</h1>
+      <div class="cover-sub">WorkBuddy AI 应用大赛 · 荣耀时刻</div>
+    </section>
+
+    <!-- 2. 个人各赛道 第一名 -->
+    <section class="slide" id="s1">
+      <h2>🥇 个人赛道 · 一等奖</h2>
+      <div class="sub">PERSIONAL · FIRST PRIZE</div>
+      <div class="page-body" id="body-p-first"></div>
+    </section>
+
+    <!-- 3. 个人各赛道 第二名 -->
+    <section class="slide" id="s2">
+      <h2>🥈 个人赛道 · 二等奖</h2>
+      <div class="sub">PERSIONAL · SECOND PRIZE</div>
+      <div class="page-body" id="body-p-second"></div>
+    </section>
+
+    <!-- 4. 个人各赛道 第三名 -->
+    <section class="slide" id="s3">
+      <h2>🥉 个人赛道 · 三等奖</h2>
+      <div class="sub">PERSIONAL · THIRD PRIZE</div>
+      <div class="page-body" id="body-p-third"></div>
+    </section>
+
+    <!-- 5. 个人各赛道 决赛入围奖 -->
+    <section class="slide" id="s4">
+      <h2>🎖️ 个人赛道 · 决赛入围奖</h2>
+      <div class="sub">PERSIONAL · FINALIST</div>
+      <div class="page-body" id="body-p-exc"></div>
+    </section>
+
+    <!-- 6. 团队赛道 第一名 -->
+    <section class="slide" id="s5">
+      <h2>🥇 团队赛道 · 一等奖</h2>
+      <div class="sub">TEAM · FIRST PRIZE</div>
+      <div class="page-body" id="body-t-first"></div>
+    </section>
+
+    <!-- 7. 团队赛道 优秀奖 -->
+    <section class="slide" id="s6">
+      <h2>🏅 团队赛道 · 优秀奖</h2>
+      <div class="sub">TEAM · EXCELLENCE</div>
+      <div class="page-body" id="body-t-exc"></div>
+    </section>
+
+    <!-- 8. 团队赛道 决赛入围奖 -->
+    <section class="slide" id="s7">
+      <h2>🎖️ 团队赛道 · 决赛入围奖</h2>
+      <div class="sub">TEAM · FINALIST</div>
+      <div class="page-body" id="body-t-finalist"></div>
+    </section>
+  </div>
+
+  <div id="bar">
+    <button id="prevBtn" title="上一页 (←)">‹</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" title="下一页 (→)">›</button>
+    <button id="fsBtn" title="全屏 (F)">⛶</button>
+  </div>
+
+<script>
+  const STAGE_LABELS = { preliminary:'初赛', semi_final:'复赛', final:'决赛', awarded:'颁奖' };
+  let ddAuthed=false, ddUser=null, ddRemaining=5, currentStage='preliminary';
+
+  function isInDingTalk(){ try{ return typeof dd!=='undefined' && dd.env && dd.env.platform && dd.env.platform!=='notInDingTalk'; }catch(e){ return false; } }
+  function getCorpId(){ const p=new URLSearchParams(location.search); return p.get('corpId')||p.get('corpid')||''; }
+  async function ddLogin(){
+    const corpId=isInDingTalk()?getCorpId():'';
+    if(corpId){ dd.ready(function(){ dd.runtime.permission.requestAuthCode({ corpId, onSuccess:function(r){ exchangeCode(r.code); }, onFail:function(e){ console.error(e); } }); }); return; }
+    try{ const redirect=location.pathname+location.search; const resp=await fetch('/api/auth/dd-url?redirect='+encodeURIComponent(redirect)); const d=await resp.json(); window.location.href=d.url; }catch(e){}
+  }
+  async function exchangeCode(code){
+    try{ const resp=await fetch('/api/auth/dd-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code}),credentials:'include'}); const d=await resp.json(); if(!resp.ok) throw new Error(d.error||'登录失败'); ddAuthed=true; ddUser=d.user; updateLoginTag(); renderAward(); }catch(e){}
+  }
+  async function checkAuth(){
+    try{ const resp=await fetch('/api/auth/me',{credentials:'include'}); const d=await resp.json(); if(d.user){ ddAuthed=true; ddUser=d.user; } }catch(e){} updateLoginTag();
+  }
+  function updateLoginTag(){
+    const el=document.getElementById('loginTag');
+    el.innerHTML = ddAuthed ? ('<span style="color:var(--text-dim);font-size:13px;">👤 '+(ddUser?ddUser.nick:'')+'</span>') : ('<button class="login-btn" onclick="ddLogin()">钉钉登录</button>');
+  }
+  async function api(url, options){
+    options=options||{};
+    const resp=await fetch(url,{method:options.method||'GET',headers:options.headers||{},body:options.body,credentials:'include'});
+    const data=await resp.json();
+    if(!resp.ok) throw new Error(data.error||'Request failed');
+    return data;
+  }
+
+  const TRACK_GROUPS=[
+    {key:'efficiency',label:'🚀 效率提升赛道',color:'#ff6b35'},
+    {key:'creative',  label:'💡 创意应用赛道',color:'#a855f7'},
+    {key:'business',  label:'🤝 业务赋能赛道',color:'#3b82f6'}
+  ];
+  const PERSONAL_TOP=[ 'first','second','third' ];
+  function badgeOf(e){
+    if(e.award==='first') return {t:'🥇 一等奖',c:'c-first',a:'var(--gold)'};
+    if(e.award==='third') return {t:'🥉 三等奖',c:'c-third',a:'var(--bronze)'};
+    if(e.award==='team_excellence') return {t:'🏅 团队优秀奖',c:'c-team',a:'var(--tea)'};
+    if(e.award==='second') return e.entryType==='team' ? {t:'🏅 团队优秀奖',c:'c-team',a:'var(--tea)'} : {t:'🥈 二等奖',c:'c-second',a:'var(--silver)'};
+    return {t:'🎖️ 决赛入围奖',c:'c-exc',a:'#64748b'};
+  }
+  function fmtScore(v){ const n=Number(v||0); return (Math.round(n*100)/100).toFixed(2); }
+  function deptChain(e){ return [e.dept1||e.dept, e.dept2||e.subdept, e.dept3].filter(function(d){return d;}).join(' / ')||'-'; }
+  function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function cardHtml(e){
+    const b=badgeOf(e);
+    return '<div class="card '+b.c+'"><span class="badge">'+b.t+'</span>'
+      + '<div class="c-title">'+escapeHtml(e.title)+'</div>'
+      + '<div class="c-meta">'+escapeHtml(e.name||'')+' · '+escapeHtml(deptChain(e))+'</div>'
+      + '<div class="c-score">决赛得分 <b>'+fmtScore(e.composite)+'</b></div></div>';
+  }
+  function byScore(a,b){ return (Number(b.composite||0)-Number(a.composite||0)) || (Number(b.judgeAvg||0)-Number(a.judgeAvg||0)); }
+  function personGroupHtml(list, awardFilter){
+    return TRACK_GROUPS.map(function(t){
+      const arr=list.filter(function(e){ return (e.track||'efficiency')===t.key && awardFilter(e); }).sort(byScore);
+      if(!arr.length) return '';
+      return '<div class="grp"><div class="grp-title" style="--c:'+t.color+'">'+t.label+'</div><div class="cards">'+arr.map(cardHtml).join('')+'</div></div>';
+    }).join('') || '<div class="empty">暂无该奖项作品</div>';
+  }
+  function teamHtml(list, awardFilter){
+    const arr=list.filter(awardFilter).sort(byScore);
+    if(!arr.length) return '<div class="empty">暂无该奖项作品</div>';
+    return '<div class="cards">'+arr.map(cardHtml).join('')+'</div>';
+  }
+  function isFinals(e){ return ['finalist','awarded'].includes(e.roundStatus||''); }
+  function isNoPrize(e){ return !['first','second','third','team_excellence'].includes(e.award); }
+
+  async function renderAward(){
+    const ids=['body-p-first','body-p-second','body-p-third','body-p-exc','body-t-first','body-t-exc','body-t-finalist'];
+    ids.forEach(function(id){ const el=document.getElementById(id); if(el) el.innerHTML='<div class="empty">加载中…</div>'; });
+    try{
+      const data=await api('/api/ranking');
+      const individual=(data.individual||[]).filter(function(e){ return e.entryType!=='team' && isFinals(e); });
+      const team=(data.team||[]).filter(isFinals);
+      document.getElementById('body-p-first').innerHTML  = personGroupHtml(individual, function(e){ return e.award==='first'; });
+      document.getElementById('body-p-second').innerHTML = personGroupHtml(individual, function(e){ return e.award==='second'; });
+      document.getElementById('body-p-third').innerHTML  = personGroupHtml(individual, function(e){ return e.award==='third'; });
+      document.getElementById('body-p-exc').innerHTML    = personGroupHtml(individual, isNoPrize);
+      document.getElementById('body-t-first').innerHTML  = teamHtml(team, function(e){ return e.award==='first'; });
+      document.getElementById('body-t-exc').innerHTML    = teamHtml(team, function(e){ return e.award==='team_excellence'; });
+      document.getElementById('body-t-finalist').innerHTML = teamHtml(team, function(e){ return isNoPrize(e); });
+    }catch(e){
+      ids.forEach(function(id){ const el=document.getElementById(id); if(el) el.innerHTML='<div class="empty">加载失败：'+(e.message||'请先登录')+'<br><br><button class="login-btn" onclick="ddLogin()">点击登录后查看</button></div>'; });
+    }
+  }
+
+  // ===== 翻页 =====
+  const slides=Array.from(document.querySelectorAll('.slide'));
+  const dotsEl=document.getElementById('dots');
+  const pageNum=document.getElementById('pageNum');
+  let cur=0;
+  slides.forEach(function(_,i){ const d=document.createElement('span'); d.className='dot'+(i===0?' on':''); d.onclick=function(){ go(i); }; dotsEl.appendChild(d); });
+  function go(n){
+    n=Math.max(0,Math.min(slides.length-1,n));
+    if(n===cur) return;
+    slides[cur].classList.remove('active'); cur=n; slides[cur].classList.add('active');
+    Array.from(dotsEl.children).forEach(function(d,i){ d.className='dot'+(i===cur?' on':''); });
+    pageNum.textContent=(cur+1)+' / '+slides.length;
+  }
+  function toggleFs(){ if(!document.fullscreenElement){ document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); } else { document.exitFullscreen&&document.exitFullscreen(); } }
+  document.getElementById('prevBtn').onclick=function(){ go(cur-1); };
+  document.getElementById('nextBtn').onclick=function(){ go(cur+1); };
+  document.getElementById('fsBtn').onclick=toggleFs;
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' ') { e.preventDefault(); go(cur+1); }
+    else if(e.key==='ArrowLeft') { e.preventDefault(); go(cur-1); }
+    else if(e.key==='f'||e.key==='F') toggleFs();
+  });
+  document.getElementById('deck').addEventListener('click',function(e){
+    if(e.target.closest('#bar')||e.target.closest('.card')) return;
+    const x=e.clientX;
+    if(x < window.innerWidth*0.28) go(cur-1);
+    else if(x > window.innerWidth*0.72) go(cur+1);
+  });
+  pageNum.textContent='1 / '+slides.length;
+
+  window.addEventListener('DOMContentLoaded', async function(){ await checkAuth(); await renderAward(); });
+</script>
+</body>
+</html>
