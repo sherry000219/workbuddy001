@@ -362,9 +362,10 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
       </div>
     </details>
     <details class="card" style="margin-bottom:16px;">
-      <summary>🔍 决赛评委打分明细（查验 · 五维逐项）</summary>
+      <summary>🔍 评委打分明细（查验 · 按赛段查看历史）</summary>
       <div style="padding:16px 4px;">
-        <p style="color:var(--text-dim);font-size:13px;margin-bottom:12px;">按作品展开可查验每位评委的五维打分（创新性/实用性/可推广性/组织价值/效果展示）、总分与打分时间；<strong style="color:#ef4444;">红色 = 该评委未打分</strong>。数据为当前赛段打分记录，结算后自动保留。</p>
+        <p style="color:var(--text-dim);font-size:13px;margin-bottom:10px;">晋级到下一赛段后，仍可切换查看历史赛段的打分明细；按作品展开可查验每位评委的逐项分数、总分与打分时间；<strong style="color:#ef4444;">红色 = 该评委未打分</strong>。</p>
+        <div id="jsdStageTabs" style="display:flex;gap:8px;margin-bottom:12px;"></div>
         <div id="judgeScoreDetail"></div>
       </div>
     </details>
@@ -692,28 +693,54 @@ async function saveJudgeOrder() {
   } catch(e) { showToast(e.message, 'error'); }
 }
 
-// ========== 决赛评委打分明细（查验） ==========
-// 数据来源 /api/admin/final-scores：直接按决赛阶段取数，不依赖当前赛段
+// ========== 评委打分明细（查验 · 按赛段查看历史） ==========
+// 数据来源 /api/admin/stage-scores?stage=xxx：按赛段独立取数，晋级后仍可查验历史赛段
 let _finalScoreData = null;
+let _jsdStage = null; // 用户手动选择的赛段；null=跟随当前赛段
+const JSD_STAGES = [
+  { key: 'preliminary', label: '初赛', dims: [['实用性', 'practicality', 50], ['创新性', 'innovation', 20], ['可推广性', 'scalability', 15], ['效果呈现', 'presentation', 15]] },
+  { key: 'semi_final', label: '复赛', dims: [['实用性', 'practicality', 50], ['创新性', 'innovation', 20], ['可推广性', 'scalability', 15], ['效果呈现', 'presentation', 15]] },
+  { key: 'final', label: '决赛', dims: [['创新性', 'innovation', 20], ['实用性', 'practicality', 30], ['可推广性', 'scalability', 20], ['组织价值', 'value', 20], ['效果展示', 'presentation', 10]] }
+];
+function jsdActiveStage() {
+  if (_jsdStage) return _jsdStage;
+  if (currentStage === 'preliminary') return 'preliminary';
+  if (currentStage === 'semi_final') return 'semi_final';
+  return 'final'; // final/awarded 都默认看决赛
+}
+function jsdSwitch(stage) { _jsdStage = stage; renderJudgeScoreDetail(); }
+function renderJsdTabs(active) {
+  const tabs = document.getElementById('jsdStageTabs');
+  if (!tabs) return;
+  tabs.innerHTML = JSD_STAGES.map(s => {
+    const on = s.key === active;
+    return `<button onclick="jsdSwitch('${s.key}')" style="padding:6px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid ${on ? '#ff6b35' : '#e5e7eb'};background:${on ? 'rgba(255,107,53,0.1)' : '#fff'};color:${on ? '#ff6b35' : '#6b7280'};">${s.label}</button>`;
+  }).join('');
+}
 async function renderJudgeScoreDetail() {
   const el = document.getElementById('judgeScoreDetail');
   if (!el) return;
+  const stage = jsdActiveStage();
+  renderJsdTabs(stage);
+  const stageMeta = JSD_STAGES.find(s => s.key === stage);
+  const dims = stageMeta.dims;
   try {
-    _finalScoreData = await api('/api/admin/final-scores', { headers: { 'x-admin-token': adminToken } });
+    _finalScoreData = await api('/api/admin/stage-scores?stage=' + stage, { headers: { 'x-admin-token': adminToken } });
   } catch(e) {
     el.innerHTML = '<div style="padding:24px;text-align:center;color:#ef4444;font-size:13px;">加载失败：' + escHtml(e.message) + '</div>';
     return;
   }
-  const dims = [['创新性', 'innovation', 20], ['实用性', 'practicality', 30], ['可推广性', 'scalability', 20], ['组织价值', 'value', 20], ['效果展示', 'presentation', 10]];
   const fin = _finalScoreData.entryScores || [];
   const judges = _finalScoreData.allJudges || [];
   if (!fin.length) {
-    el.innerHTML = '<div style="padding:28px;text-align:center;color:var(--text-dim);font-size:13px;background:#f9fafb;border:1px dashed #e5e7eb;border-radius:10px;">暂无决赛入围作品</div>';
+    el.innerHTML = '<div style="padding:28px;text-align:center;color:var(--text-dim);font-size:13px;background:#f9fafb;border:1px dashed #e5e7eb;border-radius:10px;">' + stageMeta.label + '暂无参赛作品</div>';
     return;
   }
   let notice = '';
   if (!judges.length) {
-    notice = '<div style="padding:12px 16px;margin-bottom:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;font-size:13px;color:#b45309;">⏳ 决赛评审尚未开始——' + fin.length + ' 件入围作品待评审，评委打分后此处自动出现明细。</div>';
+    notice = '<div style="padding:12px 16px;margin-bottom:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;font-size:13px;color:#b45309;">⏳ ' + stageMeta.label + '评审尚未开始或无打分记录——' + fin.length + ' 件作品，评委打分后此处自动出现明细。</div>';
+  } else {
+    notice = '<div style="padding:10px 16px;margin-bottom:12px;background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.18);border-radius:10px;font-size:12px;color:#2563eb;">📊 ' + stageMeta.label + '：' + fin.length + ' 件作品 · ' + judges.length + ' 位评委 · 共 ' + (_finalScoreData.scoreCount || 0) + ' 条打分记录</div>';
   }
   const groups = [
     { key: 'efficiency', label: '🚀 效率提升赛道', color: '#ff6b35', items: fin.filter(e => e.entryType !== 'team' && (e.track || 'efficiency') === 'efficiency') },
@@ -1296,7 +1323,7 @@ async function loadFinalDraw() {
   try {
     _fdData = await api('/api/admin/final-draw', { headers: { 'x-admin-token': adminToken } });
     Object.keys(FD_TRACK_META).forEach(t => {
-      _fdPrizeDraft[t] = ((_fdData.prizes || {})[t] || []).slice();
+      _fdPrizeDraft[t] = ((_fdData.prizes || {})[t] || []).map(p => typeof p === 'string' ? { name: p, count: 1 } : { name: p.name || '', count: Math.max(1, parseInt(p.count, 10) || 1) });
     });
     renderFinalDraw();
   } catch(e) { showToast('加载决赛现场抽奖失败：' + e.message, 'error'); }
@@ -1414,7 +1441,7 @@ function fdTrackCard(t) {
     </div>`;
   } else {
     // 未抽奖：奖池编辑 + 抽奖按钮
-    const canDraw = champ && supporters.length > 0 && _fdPrizeDraft[t].filter(p => p.trim()).length > 0;
+    const canDraw = champ && supporters.length > 0 && fdPrizeSlots(t) > 0;
     bodyHtml = `<div style="margin-top:14px;">
       <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">奖池配置（每个奖品对应 1 名中奖者，按顺序对应）</div>
       <div id="fdPrizes_${t}">${_fdPrizeDraft[t].map((p, i) => fdPrizeRow(t, i, p)).join('') || ''}</div>
@@ -1423,9 +1450,9 @@ function fdTrackCard(t) {
         <button class="btn btn-outline btn-sm" onclick="fdSavePrizes('${t}')">💾 保存奖池</button>
       </div>
       <button id="fdRunBtn_${t}" ${canDraw ? '' : 'disabled'} onclick="fdRun('${t}')" style="width:100%;margin-top:14px;padding:12px;border:none;border-radius:12px;font-size:15px;font-weight:700;color:#fff;background:${canDraw ? meta.grad : '#e5e7eb'};cursor:${canDraw ? 'pointer' : 'not-allowed'};box-shadow:${canDraw ? '0 6px 18px ' + meta.color + '40' : 'none'};transition:all .25s;">
-        🎲 开始抽奖${canDraw ? `（从 ${supporters.length} 位支持者中抽 ${_fdPrizeDraft[t].filter(p => p.trim()).length} 名）` : ''}
+        🎲 开始抽奖${canDraw ? `（从 ${supporters.length} 位支持者中抽 ${fdPrizeSlots(t)} 名）` : ''}
       </button>
-      ${!champ ? '<div style="font-size:12px;color:#9ca3af;margin-top:6px;text-align:center;">等待赛道第一名产生</div>' : (!supporters.length ? '<div style="font-size:12px;color:#9ca3af;margin-top:6px;text-align:center;">暂无支持者，无法抽奖</div>' : (!_fdPrizeDraft[t].filter(p => p.trim()).length ? '<div style="font-size:12px;color:#9ca3af;margin-top:6px;text-align:center;">请先配置奖池</div>' : ''))}
+      ${!champ ? '<div style="font-size:12px;color:#9ca3af;margin-top:6px;text-align:center;">等待赛道第一名产生</div>' : (!supporters.length ? '<div style="font-size:12px;color:#9ca3af;margin-top:6px;text-align:center;">暂无支持者，无法抽奖</div>' : (!fdPrizeSlots(t) ? '<div style="font-size:12px;color:#9ca3af;margin-top:6px;text-align:center;">请先配置奖池</div>' : ''))}
     </div>`;
   }
 
@@ -1456,14 +1483,23 @@ function fdTrackCard(t) {
 
 function fdPrizeRow(t, i, val) {
   const meta = FD_TRACK_META[t];
+  const name = val && typeof val === 'object' ? (val.name || '') : (val || '');
+  const count = val && typeof val === 'object' ? Math.max(1, parseInt(val.count, 10) || 1) : 1;
   return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
     <span style="min-width:20px;height:20px;border-radius:6px;background:${meta.color}15;color:${meta.color};font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">${i + 1}</span>
-    <input type="text" value="${escHtml(val || '')}" placeholder="例如：京东卡 500 元" onchange="_fdPrizeDraft['${t}'][${i}]=this.value" style="flex:1;padding:7px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;">
+    <input type="text" value="${escHtml(name)}" placeholder="例如：京东卡 500 元" onchange="_fdPrizeDraft['${t}'][${i}].name=this.value" style="flex:1;padding:7px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;">
+    <span style="font-size:12px;color:#6b7280;white-space:nowrap;">×</span>
+    <input type="number" min="1" max="99" value="${count}" title="数量（中奖名额）" onchange="_fdPrizeDraft['${t}'][${i}].count=Math.max(1,parseInt(this.value,10)||1)" style="width:58px;padding:7px 6px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;text-align:center;">
     <span style="cursor:pointer;font-size:14px;color:#9ca3af;padding:2px 4px;" onclick="fdRemovePrize('${t}',${i})" title="删除">🗑️</span>
   </div>`;
 }
 
-function fdAddPrize(t) { _fdPrizeDraft[t].push(''); renderFinalDraw(); }
+// 奖池槽位数（各奖品数量之和 = 中奖名额）
+function fdPrizeSlots(t) {
+  return (_fdPrizeDraft[t] || []).reduce((a, p) => a + ((p.name || '').trim() ? Math.max(1, parseInt(p.count, 10) || 1) : 0), 0);
+}
+
+function fdAddPrize(t) { _fdPrizeDraft[t].push({ name: '', count: 1 }); renderFinalDraw(); }
 function fdRemovePrize(t, i) { _fdPrizeDraft[t].splice(i, 1); renderFinalDraw(); }
 
 // 试抽（演练）：调用 /api/admin/final-draw/test-run，结果只存内存，不写库、不公布、不影响正式抽奖
@@ -1485,10 +1521,12 @@ async function fdTestRun(t) {
 
 async function fdSavePrizes(t) {
   if (!adminToken) return;
-  const prizes = _fdPrizeDraft[t].map(p => (p || '').trim()).filter(Boolean);
+  const prizes = _fdPrizeDraft[t]
+    .map(p => ({ name: (p.name || '').trim(), count: Math.max(1, parseInt(p.count, 10) || 1) }))
+    .filter(p => p.name);
   try {
-    await api('/api/admin/final-draw/prizes', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ track: t, prizes }) });
-    showToast('已保存' + FD_TRACK_META[t].label + '奖池（' + prizes.length + ' 个奖品）', 'success');
+    const resp = await api('/api/admin/final-draw/prizes', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ track: t, prizes }) });
+    showToast('已保存' + FD_TRACK_META[t].label + '奖池（' + prizes.length + ' 种奖品 · 共 ' + (resp.totalSlots || fdPrizeSlots(t)) + ' 个名额）', 'success');
     await loadFinalDraw();
   } catch(e) { showToast('保存失败：' + e.message, 'error'); }
 }
@@ -1497,8 +1535,8 @@ async function fdRun(t) {
   if (!adminToken) return;
   const meta = FD_TRACK_META[t];
   const supporters = (_fdData.supporters || {})[t] || [];
-  const prizes = _fdPrizeDraft[t].map(p => (p || '').trim()).filter(Boolean);
-  if (!confirm(`确认开始「${meta.label}」现场抽奖？\n\n将从 ${supporters.length} 位支持者中抽出 ${prizes.length} 名中奖者。\n⚠️ 每个赛道只能抽一次，请现场准备好后再点击！`)) return;
+  const slots = fdPrizeSlots(t);
+  if (!confirm(`确认开始「${meta.label}」现场抽奖？\n\n将从 ${supporters.length} 位支持者中抽出 ${slots} 名中奖者。\n⚠️ 每个赛道只能抽一次，请现场准备好后再点击！`)) return;
   const btn = document.getElementById('fdRunBtn_' + t);
   if (btn) { btn.disabled = true; btn.style.background = '#e5e7eb'; btn.style.boxShadow = 'none'; btn.style.cursor = 'not-allowed'; btn.textContent = '🎲 抽奖中，正在揭晓…'; }
   try {

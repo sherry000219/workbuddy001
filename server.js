@@ -2406,6 +2406,30 @@ function getTeamChampion() {
   return pool.slice().sort((a, b) => (getCompositeScore(b.id, 'final') || 0) - (getCompositeScore(a.id, 'final') || 0))[0];
 }
 
+// 奖池规范化：兼容旧的字符串数组，统一为 [{ name, count }]（每个奖品可设数量，数量=中奖名额）
+function normalizeFinalDrawPrizes(list) {
+  const out = [];
+  for (const p of (list || [])) {
+    if (typeof p === 'string') {
+      const n = p.trim();
+      if (n) out.push({ name: n, count: 1 });
+    } else if (p && typeof p === 'object') {
+      const n = String(p.name || '').trim();
+      const c = Math.max(1, Math.min(99, parseInt(p.count, 10) || 1));
+      if (n) out.push({ name: n, count: c });
+    }
+  }
+  return out.slice(0, 100);
+}
+// 展开为抽奖槽位：[{京东卡×2}] -> ['京东卡','京东卡']
+function expandFinalDrawPrizeSlots(prizes) {
+  const slots = [];
+  normalizeFinalDrawPrizes(prizes).forEach(p => {
+    for (let i = 0; i < p.count; i++) slots.push(p.name);
+  });
+  return slots;
+}
+
 function getFinalDrawData() {
   const champions = {};
   for (const t of FINAL_DRAW_TRACKS) {
@@ -2430,11 +2454,13 @@ function getFinalDrawData() {
     supporters[t] = list;
   }
   const cfg = db.settings.finalDraw || {};
+  const prizes = {};
+  FINAL_DRAW_TRACKS.forEach(t => { prizes[t] = normalizeFinalDrawPrizes((cfg.prizes || {})[t]); });
   return {
     settled: db.entries.some(e => e.roundStatus === 'awarded'),
     champions,
     supporters,
-    prizes: cfg.prizes || {},
+    prizes,
     results: cfg.results || {}
   };
 }
@@ -2443,18 +2469,39 @@ app.get('/api/admin/final-draw', verifyAdminToken, (req, res) => {
   res.json(getFinalDrawData());
 });
 
-// GET /api/admin/final-scores — 决赛评委打分明细：直接按决赛阶段取数，
-// 不依赖当前赛段（任何赛段状态下都可查验；结算后仍读取 final 打分记录）
+// GET /api/admin/final-scores — 决赛评委打分明细（兼容旧路径）
 app.get('/api/admin/final-scores', verifyAdminToken, (req, res) => {
-  const entries = db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
-  const scores = db.judgeScores.filter(s => (s.stage || 'preliminary') === 'final');
+  res.json(getStageScoreData('final'));
+});
+
+// GET /api/admin/stage-scores?stage=preliminary|semi_final|final
+// 按赛段查看历史打分明细：晋级到下一赛段后，仍可查验上一赛段的打分记录
+app.get('/api/admin/stage-scores', verifyAdminToken, (req, res) => {
+  const valid = ['preliminary', 'semi_final', 'final'];
+  const stage = valid.includes(req.query.stage) ? req.query.stage : 'final';
+  res.json(getStageScoreData(stage));
+});
+
+// 按赛段聚合打分数据：该赛段参赛作品 + 该赛段全部评委打分 + 综合分
+function getStageScoreData(stage) {
+  let entries;
+  if (stage === 'preliminary') {
+    entries = db.entries.filter(e => e.status === 'approved');
+  } else if (stage === 'semi_final') {
+    // 复赛参与者：含晋级决赛的、决赛淘汰的、获奖的（均经历过复赛）
+    entries = db.entries.filter(e => ['semi_finalist', 'finalist', 'awarded', 'eliminated_final'].includes(e.roundStatus));
+  } else {
+    entries = db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
+  }
+  const scores = db.judgeScores.filter(s => (s.stage || 'preliminary') === stage);
   const allJudges = [...new Set(scores.map(s => s.judgeName))].sort();
+  const isNewDims = stage === 'final';
   const entryScores = entries.map(e => {
     const es = scores.filter(s => s.entryId === e.id).map(s => ({
       judgeName: s.judgeName,
       practicality: s.practicality, innovation: s.innovation, scalability: s.scalability,
       value: s.value || 0, presentation: s.presentation,
-      total: (s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (s.value || 0) + (s.presentation || 0),
+      total: (s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (isNewDims ? (s.value || 0) : 0) + (s.presentation || 0),
       updatedAt: s.updatedAt
     }));
     const avg = es.length ? Math.round(es.reduce((a, s) => a + s.total, 0) / es.length) : 0;
@@ -2462,13 +2509,18 @@ app.get('/api/admin/final-scores', verifyAdminToken, (req, res) => {
       id: e.id, title: e.title, name: e.name, entryType: e.entryType || 'individual',
       track: e.track, roundStatus: e.roundStatus, award: e.award || null,
       scores: es, avgScore: avg, judgeCount: es.length,
-      composite: getCompositeScore(e.id, 'final')
+      composite: getCompositeScore(e.id, stage)
     };
   });
-  res.json({ entryScores, allJudges, scoreCount: scores.length, totalJudgesExpected: ((db.settings.judgesByStage || {}).final || []).length });
-});
+  res_sort(entryScores);
+  return { entryScores, allJudges, scoreCount: scores.length, stage };
 
-// 设置某赛道奖池（奖品名列表，每个奖品对应 1 名中奖者）
+  function res_sort(list) {
+    list.sort((a, b) => (b.composite || 0) - (a.composite || 0));
+  }
+}
+
+// 设置某赛道奖池（奖品列表，支持 [{ name, count }]，每个奖品的数量=中奖名额；兼容旧字符串数组）
 app.post('/api/admin/final-draw/prizes', verifyAdminToken, (req, res) => {
   const { track, prizes } = req.body;
   if (!FINAL_DRAW_TRACKS.includes(track)) return res.status(400).json({ error: '无效赛道' });
@@ -2480,11 +2532,11 @@ app.post('/api/admin/final-draw/prizes', verifyAdminToken, (req, res) => {
   if ((cfg.results[track] || []).length > 0) {
     return res.status(400).json({ error: '该赛道已完成抽奖，不能修改奖池；如需调整请先重置抽奖结果' });
   }
-  const clean = prizes.map(p => String(p || '').trim()).filter(Boolean).slice(0, 50);
+  const clean = normalizeFinalDrawPrizes(prizes);
   cfg.prizes[track] = clean;
   saveDB();
   ghPush().catch(e => console.error('[final-draw prizes] GitHub push failed:', e.message));
-  res.json({ success: true, track, prizes: clean });
+  res.json({ success: true, track, prizes: clean, totalSlots: expandFinalDrawPrizeSlots(clean).length });
 });
 
 // 执行抽奖：每赛道仅一次。洗牌支持者，前 N 名（N=奖池奖品数）中奖并按序对应奖品
@@ -2505,21 +2557,22 @@ app.post('/api/admin/final-draw/run', verifyAdminToken, (req, res) => {
   if (!supporters.length) return res.status(400).json({ error: '该赛道冠军暂无押宝支持者' });
   const prizes = cfg.prizes[track] || [];
   if (!prizes.length) return res.status(400).json({ error: '请先设置该赛道奖池' });
-  // Fisher-Yates 洗牌，前 N 名中奖
+  // Fisher-Yates 洗牌，前 N 名中奖（N=奖池槽位数=各奖品数量之和）
+  const slots = expandFinalDrawPrizeSlots(prizes);
   const pool = supporters.slice();
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
   const winners = [];
-  prizes.forEach((prize, idx) => {
+  slots.forEach((prize, idx) => {
     const w = pool[idx];
     if (w) winners.push({ userId: w.userId, name: w.name, avatar: w.avatar, betStage: w.betStage, prize, drawnAt: new Date().toISOString() });
   });
   cfg.results[track] = winners;
   saveDB();
   ghPush().catch(e => console.error('[final-draw run] GitHub push failed:', e.message));
-  res.json({ success: true, track, winners, unassigned: Math.max(0, prizes.length - pool.length), totalSupporters: pool.length });
+  res.json({ success: true, track, winners, unassigned: Math.max(0, slots.length - pool.length), totalSupporters: pool.length });
 });
 
 // 试抽（演练）：与正式抽奖同一套洗牌逻辑，但【不保存结果、不公布、不影响正式抽奖】。
@@ -2549,7 +2602,7 @@ app.post('/api/admin/final-draw/test-run', verifyAdminToken, (req, res) => {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
-  const usePrizes = prizes.length ? prizes : ['模拟奖品A', '模拟奖品B', '模拟奖品C'];
+  const usePrizes = prizes.length ? expandFinalDrawPrizeSlots(prizes) : ['模拟奖品A', '模拟奖品B', '模拟奖品C'];
   const winners = [];
   usePrizes.forEach((prize, idx) => {
     const w = pool[idx];
