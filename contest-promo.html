@@ -838,6 +838,12 @@ const BET_LABEL = {
   "business": "业务增长赛道",
   "team": "团队赛道"
 };
+const BET_COLOR = {
+  "efficiency": "#ff6b35",
+  "creative": "#8b5cf6",
+  "business": "#2563eb",
+  "team": "#f59e0b"
+};
 
 /* 决赛获奖名单 + 押宝中奖名单 渲染逻辑（被 contest-promo.html 与 app/index.html 共用） */
 function awDisplayAward(e) {
@@ -895,15 +901,20 @@ function awBuildAwards() {
 }
 function awBuildBets() {
   var tracks = ['efficiency', 'creative', 'business', 'team'];
-  var cols = tracks.map(function (t) {
-    var list = (BET_DATA[t] || []).map(function (w) {
-      return '<li><span class="aw-name">' + awEscape(w.name) + '</span>' +
-        '<span class="aw-prize">' + awEscape(w.prize) + '</span>' +
-        (w.betStage ? '<span class="aw-stage">' + awEscape(w.betStage) + '押宝</span>' : '') + '</li>';
+  var blocks = tracks.map(function (t) {
+    var chips = (BET_DATA[t] || []).map(function (w) {
+      return '<div class="aw-bet-chip">' +
+        '<div class="aw-name">' + awEscape(w.name) + '</div>' +
+        '<div class="aw-prize">' + awEscape(w.prize) + '</div>' +
+        (w.betStage ? '<div class="aw-stage">' + awEscape(w.betStage) + '押宝</div>' : '') +
+        '</div>';
     }).join('');
-    return '<div class="aw-bet-col"><h3 class="aw-bet-title">' + (BET_LABEL[t] || t) + '（' + ((BET_DATA[t] || []).length) + '人）</h3><ul class="aw-bet-list">' + list + '</ul></div>';
+    return '<div class="aw-bet-block">' +
+      '<div class="aw-bet-header"><span class="aw-bet-dot" style="background:' + (BET_COLOR[t] || '#ff6b35') + ';"></span>' + (BET_LABEL[t] || t) + '（' + ((BET_DATA[t] || []).length) + '人）</div>' +
+      '<div class="aw-bet-row">' + (chips || '<div class="aw-bet-empty">暂无</div>') + '</div>' +
+      '</div>';
   }).join('');
-  return '<section class="aw-section aw-bet" id="bet-announce"><div class="aw-inner"><div class="section-label">BETTING</div><h2 class="section-title">🎯 押宝中奖名单</h2><p class="section-sub">决赛现场抽奖从押中赛道冠军的支持者中抽出，恭喜以下同事</p><div class="aw-bet-grid">' + cols + '</div></div></section>';
+  return '<section class="aw-section aw-bet" id="bet-announce"><div class="aw-inner"><div class="section-label">BETTING</div><h2 class="section-title">🎯 押宝中奖名单</h2><p class="section-sub">决赛现场抽奖从押中赛道冠军的支持者中抽出，恭喜以下同事</p>' + blocks + '</div></section>';
 }
 var _awStyleDone = false;
 function ensureAwStyle() {
@@ -922,16 +933,16 @@ function ensureAwStyle() {
     '.aw-meta{font-size:13px;color:#4b5563;margin-bottom:6px;}' +
     '.aw-score{font-size:13px;color:#2563eb;font-weight:600;}' +
     '.aw-bet{background:#f8f9fc;}' +
-    '.aw-bet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;}' +
-    '.aw-bet-col{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;}' +
-    '.aw-bet-title{font-size:16px;font-weight:800;margin-bottom:12px;color:#1f2937;}' +
-    '.aw-bet-list{list-style:none;padding:0;margin:0;}' +
-    '.aw-bet-list li{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px dashed #eee;font-size:13px;}' +
-    '.aw-bet-list li:last-child{border-bottom:none;}' +
-    '.aw-name{font-weight:700;color:#1f2937;}' +
-    '.aw-prize{color:#ff6b35;}' +
-    '.aw-stage{color:#6b7280;font-size:11px;}' +
-    '@media(max-width:768px){.aw-grid{grid-template-columns:1fr;}.aw-bet-grid{grid-template-columns:1fr;}}';
+    '.aw-bet-block{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:24px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.04);}' +
+    '.aw-bet-header{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;margin-bottom:16px;color:#1f2937;}' +
+    '.aw-bet-dot{width:10px;height:10px;border-radius:50%;}' +
+    '.aw-bet-row{display:flex;flex-wrap:wrap;gap:12px;}' +
+    '.aw-bet-chip{min-width:150px;flex:1 1 150px;max-width:220px;background:#f8f9fc;border:1px solid #e5e7eb;border-radius:12px;padding:12px 14px;}' +
+    '.aw-bet-chip .aw-name{font-size:14px;font-weight:700;color:#1f2937;margin-bottom:5px;}' +
+    '.aw-bet-chip .aw-prize{font-size:12px;color:#ff6b35;margin-bottom:4px;line-height:1.3;}' +
+    '.aw-bet-chip .aw-stage{font-size:11px;color:#6b7280;}' +
+    '.aw-bet-empty{color:#9ca3af;font-size:13px;padding:8px 0;}' +
+    '@media(max-width:768px){.aw-grid{grid-template-columns:1fr;}.aw-bet-row{gap:10px;}.aw-bet-chip{flex:1 1 130px;min-width:130px;max-width:none;}}';
   document.head.appendChild(style);
 }
 function renderAwards(container) { if (!container) return; ensureAwStyle(); container.innerHTML = awBuildAwards(); }
