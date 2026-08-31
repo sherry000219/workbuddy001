@@ -35709,6 +35709,56 @@
             "prize": "头号玩家纪念冰箱贴",
             "drawnAt": "2026-08-31T05:41:02.135Z"
           }
+        ],
+        "creative": [
+          {
+            "userId": "dahfrRiiKm52FUrWP6VnNPwiEiE",
+            "name": "段紫腾",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM4UZCnXFzUXNAkvNAdiwyBRJWmzPZZcIn-tWvwdSAA_472_587.jpg",
+            "betStage": "复赛",
+            "prize": "workbuddy标准版月度会员",
+            "drawnAt": "2026-08-31T05:42:05.857Z"
+          },
+          {
+            "userId": "vpscILNqQT2xf9RD0xJyawiEiE",
+            "name": "刘诗雨",
+            "avatar": "https://static-legacy.dingtalk.com/media/lADPDgQ9qjXf3EPNAvDNAu4_750_752.jpg",
+            "betStage": "决赛",
+            "prize": "卫衣",
+            "drawnAt": "2026-08-31T05:42:05.857Z"
+          },
+          {
+            "userId": "I884kWX7VmrhuoCrGUaaiPAiEiE",
+            "name": "李艋",
+            "avatar": "",
+            "betStage": "复赛",
+            "prize": "卫衣",
+            "drawnAt": "2026-08-31T05:42:05.857Z"
+          },
+          {
+            "userId": "Zs7TYP9ojLYq7C1qbyiif7wiEiE",
+            "name": "李铭铖",
+            "avatar": "",
+            "betStage": "决赛",
+            "prize": "帐sir抱枕毯",
+            "drawnAt": "2026-08-31T05:42:05.857Z"
+          },
+          {
+            "userId": "18988iSaIyFGxf9RD0xJyawiEiE",
+            "name": "刘沁",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM5dAjxHYkRnNBDjNBDiwUiKjJmPEPCYJhgy5U7uWAA_1080_1080.jpg",
+            "betStage": "决赛",
+            "prize": "餐具套盒",
+            "drawnAt": "2026-08-31T05:42:05.857Z"
+          },
+          {
+            "userId": "bWYDnT68oTFHYLO5ljX24giEiE",
+            "name": "郭彦柳",
+            "avatar": "https://static-legacy.dingtalk.com/media/lQDPM5m0HBTj-HPNAkDNAkCw75NVdy_zW0oJIe6gk5JfAA_576_576.jpg",
+            "betStage": "决赛",
+            "prize": "64G优盘",
+            "drawnAt": "2026-08-31T05:42:05.857Z"
+          }
         ]
       }
     }
