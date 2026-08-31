@@ -2375,6 +2375,114 @@ app.get('/api/admin/draw-records', verifyAdminToken, (req, res) => {
   res.json({ records: db.drawRecords || [] });
 });
 
+// ========== API: FINAL LIVE DRAW（决赛现场抽奖 — 押宝支持者 · 管理员专属） ==========
+// 场景：三个赛道第一名（结算 award=first），每个冠军有自己的押宝支持者（含复赛+决赛两段有效押宝）；
+// 管理员为每个赛道配置奖池后点击抽奖一次，从该冠军的支持者中抽出中奖名单与对应奖品。普通用户无权限。
+const FINAL_DRAW_TRACKS = ['efficiency', 'creative', 'business'];
+
+function getFinalDrawData() {
+  const champions = {};
+  for (const t of FINAL_DRAW_TRACKS) {
+    champions[t] = db.entries.find(e => e.roundStatus === 'awarded' && e.award === 'first' && (e.track || 'efficiency') === t) || null;
+  }
+  // 各赛道冠军的支持者：押中该冠军的有效押宝，按人去重（一人一票，含复赛/决赛两段）
+  const supporters = {};
+  for (const t of FINAL_DRAW_TRACKS) {
+    const list = [];
+    const seen = new Set();
+    const champ = champions[t];
+    if (champ) {
+      for (const b of db.bets) {
+        if (!b.revoked && b.entryId === champ.id && !seen.has(b.voterId)) {
+          seen.add(b.voterId);
+          list.push({ userId: b.voterId, name: b.voterName, avatar: b.voterAvatar || '', betStage: (b.stage || 'semi_final') === 'final' ? '决赛' : '复赛', betAt: b.createdAt });
+        }
+      }
+    }
+    supporters[t] = list;
+  }
+  const cfg = db.settings.finalDraw || {};
+  return {
+    settled: db.entries.some(e => e.roundStatus === 'awarded'),
+    champions,
+    supporters,
+    prizes: cfg.prizes || {},
+    results: cfg.results || {}
+  };
+}
+
+app.get('/api/admin/final-draw', verifyAdminToken, (req, res) => {
+  res.json(getFinalDrawData());
+});
+
+// 设置某赛道奖池（奖品名列表，每个奖品对应 1 名中奖者）
+app.post('/api/admin/final-draw/prizes', verifyAdminToken, (req, res) => {
+  const { track, prizes } = req.body;
+  if (!FINAL_DRAW_TRACKS.includes(track)) return res.status(400).json({ error: '无效赛道' });
+  if (!Array.isArray(prizes)) return res.status(400).json({ error: '参数错误' });
+  if (!db.settings.finalDraw) db.settings.finalDraw = { prizes: {}, results: {} };
+  const cfg = db.settings.finalDraw;
+  cfg.prizes = cfg.prizes || {};
+  cfg.results = cfg.results || {};
+  if ((cfg.results[track] || []).length > 0) {
+    return res.status(400).json({ error: '该赛道已完成抽奖，不能修改奖池；如需调整请先重置抽奖结果' });
+  }
+  const clean = prizes.map(p => String(p || '').trim()).filter(Boolean).slice(0, 50);
+  cfg.prizes[track] = clean;
+  saveDB();
+  ghPush().catch(e => console.error('[final-draw prizes] GitHub push failed:', e.message));
+  res.json({ success: true, track, prizes: clean });
+});
+
+// 执行抽奖：每赛道仅一次。洗牌支持者，前 N 名（N=奖池奖品数）中奖并按序对应奖品
+app.post('/api/admin/final-draw/run', verifyAdminToken, (req, res) => {
+  const { track } = req.body;
+  if (!FINAL_DRAW_TRACKS.includes(track)) return res.status(400).json({ error: '无效赛道' });
+  if (!db.settings.finalDraw) db.settings.finalDraw = { prizes: {}, results: {} };
+  const cfg = db.settings.finalDraw;
+  cfg.prizes = cfg.prizes || {};
+  cfg.results = cfg.results || {};
+  if ((cfg.results[track] || []).length > 0) {
+    return res.status(400).json({ error: '该赛道已抽过奖，每赛道仅可抽奖一次；如需重抽请先重置' });
+  }
+  const data = getFinalDrawData();
+  const champ = data.champions[track];
+  if (!champ) return res.status(400).json({ error: '该赛道尚未产生冠军（请先在结算中确定第一名）' });
+  const supporters = data.supporters[track];
+  if (!supporters.length) return res.status(400).json({ error: '该赛道冠军暂无押宝支持者' });
+  const prizes = cfg.prizes[track] || [];
+  if (!prizes.length) return res.status(400).json({ error: '请先设置该赛道奖池' });
+  // Fisher-Yates 洗牌，前 N 名中奖
+  const pool = supporters.slice();
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const winners = [];
+  prizes.forEach((prize, idx) => {
+    const w = pool[idx];
+    if (w) winners.push({ userId: w.userId, name: w.name, avatar: w.avatar, betStage: w.betStage, prize, drawnAt: new Date().toISOString() });
+  });
+  cfg.results[track] = winners;
+  saveDB();
+  ghPush().catch(e => console.error('[final-draw run] GitHub push failed:', e.message));
+  res.json({ success: true, track, winners, unassigned: Math.max(0, prizes.length - pool.length), totalSupporters: pool.length });
+});
+
+// 重置某赛道抽奖结果（误操作恢复，需二次确认）
+app.post('/api/admin/final-draw/reset', verifyAdminToken, (req, res) => {
+  const { track } = req.body;
+  if (!FINAL_DRAW_TRACKS.includes(track)) return res.status(400).json({ error: '无效赛道' });
+  const cfg = db.settings.finalDraw;
+  if (!cfg || !cfg.results || !(cfg.results[track] || []).length) {
+    return res.status(400).json({ error: '该赛道尚未抽奖，无需重置' });
+  }
+  delete cfg.results[track];
+  saveDB();
+  ghPush().catch(e => console.error('[final-draw reset] GitHub push failed:', e.message));
+  res.json({ success: true, track });
+});
+
 app.get('/api/admin/scores', verifyAdminToken, (req, res) => {
   const stage = getCurrentStage();
   const entries = getJudgableEntries(stage);

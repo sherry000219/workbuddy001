@@ -318,6 +318,18 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
         </div>
       </div>
     </details>
+    <details style="margin-bottom:20px;">
+      <summary>🎊 决赛现场抽奖（押宝支持者 · 管理员专属）</summary>
+      <style>
+        @keyframes fdPop { 0% { opacity: 0; transform: translateY(14px) scale(.92); } 60% { transform: translateY(-3px) scale(1.02); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+      </style>
+      <div style="background:var(--bg-card);border:1px solid #e5e7eb;border-radius:var(--radius);padding:24px;margin-top:12px;box-shadow:var(--shadow);">
+        <div style="background:linear-gradient(135deg,rgba(255,107,53,0.08),rgba(245,158,11,0.08));border:1px solid rgba(255,107,53,0.2);border-radius:12px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:#374151;line-height:1.8;">
+          <strong style="color:#ff6b35;">玩法说明：</strong>三个赛道第一名各有自己的押宝支持者（押中该冠军的同事，含复赛+决赛两段押宝，一人一票）。为每个赛道配置奖池后点击「开始抽奖」，从该冠军的支持者中随机抽出中奖名单——<strong>每个赛道只能抽一次</strong>，奖品按顺序对应中奖者。本功能仅管理员可操作。
+        </div>
+        <div id="finalDrawTracks" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;"></div>
+      </div>
+    </details>
     <details class="card" style="margin-bottom:16px;">
       <summary>🔢 待打分作品排序（评委打分面板展示顺序）</summary>
       <div style="padding:16px 4px;">
@@ -500,6 +512,7 @@ async function adminLogin() {
     updateAdminStageLabel();
     loadLucky();
     loadDrawConfig();
+    loadFinalDraw();
     loadJudges();
     loadVoteDetails();
   } catch(e) { showToast(e.message, 'error'); }
@@ -1181,6 +1194,154 @@ async function exportDrawRecordsCSV() {
     URL.revokeObjectURL(url);
     showToast('已导出抽奖记录 CSV', 'success');
   } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ========== 决赛现场抽奖（押宝支持者 · 管理员专属） ==========
+const FD_TRACK_META = {
+  efficiency: { label: '效率提升赛道', color: '#ff6b35', grad: 'linear-gradient(135deg,#ff6b35,#f59e0b)' },
+  creative:   { label: '创意应用赛道', color: '#7c3aed', grad: 'linear-gradient(135deg,#7c3aed,#a855f7)' },
+  business:   { label: '业务赋能赛道', color: '#2563eb', grad: 'linear-gradient(135deg,#2563eb,#0ea5e9)' }
+};
+let _fdData = null;
+let _fdPrizeDraft = { efficiency: [], creative: [], business: [] };
+
+async function loadFinalDraw() {
+  if (!adminToken) return;
+  try {
+    _fdData = await api('/api/admin/final-draw', { headers: { 'x-admin-token': adminToken } });
+    ['efficiency', 'creative', 'business'].forEach(t => {
+      _fdPrizeDraft[t] = ((_fdData.prizes || {})[t] || []).slice();
+    });
+    renderFinalDraw();
+  } catch(e) { showToast('加载决赛现场抽奖失败：' + e.message, 'error'); }
+}
+
+function fdChips(list) {
+  return list.map(s => `<span title="${escHtml(s.name)}（${s.betStage}押宝）" style="display:inline-flex;align-items:center;gap:5px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:999px;padding:2px 10px 2px 3px;font-size:12px;color:#374151;">${s.avatar ? `<img src="${escHtml(s.avatar)}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'">` : '<span style="width:20px;height:20px;border-radius:50%;background:#e5e7eb;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;">👤</span>'}${escHtml(s.name)}</span>`).join(' ');
+}
+
+function renderFinalDraw() {
+  const el = document.getElementById('finalDrawTracks');
+  if (!el || !_fdData) return;
+  if (!_fdData.settled) {
+    el.innerHTML = '<div style="grid-column:1/-1;padding:36px 24px;text-align:center;color:var(--text-dim);font-size:14px;background:#f9fafb;border:1px dashed #e5e7eb;border-radius:12px;">⏳ 尚未结算——请先完成决赛结算（确定各赛道第一名）后，此处才会显示冠军、支持者与奖池配置。</div>';
+    return;
+  }
+  el.innerHTML = Object.keys(FD_TRACK_META).map(t => fdTrackCard(t)).join('');
+}
+
+function fdTrackCard(t) {
+  const meta = FD_TRACK_META[t];
+  const champ = (_fdData.champions || {})[t];
+  const supporters = (_fdData.supporters || {})[t] || [];
+  const results = ((_fdData.results || {})[t] || []);
+  const drawn = results.length > 0;
+
+  let champHtml;
+  if (champ) {
+    champHtml = `<div style="display:flex;align-items:flex-start;gap:10px;background:linear-gradient(135deg,${meta.color}12,transparent);border:1px solid ${meta.color}30;border-radius:10px;padding:12px;">
+      <span style="font-size:26px;line-height:1;">🏆</span>
+      <div><div style="font-weight:700;font-size:14px;color:#111827;">《${escHtml(champ.title)}》</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:2px;">${escHtml(champ.name)}${champ.dept ? ' · ' + escHtml(champ.dept) : ''} <span style="margin-left:6px;padding:1px 8px;border-radius:6px;font-size:11px;background:${meta.color}18;color:${meta.color};font-weight:600;">赛道第一名</span></div></div>
+    </div>`;
+  } else {
+    champHtml = `<div style="padding:14px;border-radius:10px;background:#f9fafb;border:1px dashed #e5e7eb;color:#6b7280;font-size:13px;">⚠️ 该赛道尚未产生第一名（结算时未设置一等奖）</div>`;
+  }
+
+  const supHtml = `<div style="margin-top:12px;">
+    <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">押宝支持者 <strong style="color:${meta.color};">${supporters.length}</strong> 人（押中该冠军，一人一票）</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:96px;overflow-y:auto;padding:2px;">${supporters.length ? fdChips(supporters) : '<span style="font-size:12px;color:#9ca3af;">暂无支持者</span>'}</div>
+  </div>`;
+
+  let bodyHtml;
+  if (drawn) {
+    // 已抽奖：展示中奖名单
+    bodyHtml = `<div style="margin-top:14px;">
+      <div style="font-size:13px;font-weight:700;color:#b45309;margin-bottom:8px;">🎉 中奖名单（${results.length} 名）</div>
+      ${results.map((w, i) => `<div class="fd-win" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fcd34d;border-radius:10px;padding:9px 12px;margin-bottom:6px;animation:fdPop .5s ${i * 0.18}s both;">
+        <span style="min-width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">${i + 1}</span>
+        <span style="font-weight:700;color:#111827;font-size:13px;">${escHtml(w.name)}</span>
+        <span style="flex:1;"></span>
+        <span style="font-size:12px;color:#92400e;background:#fff;border:1px solid #fcd34d;border-radius:8px;padding:2px 10px;font-weight:600;">🎁 ${escHtml(w.prize)}</span>
+      </div>`).join('')}
+      <div style="margin-top:10px;text-align:right;"><button class="btn btn-outline btn-sm" onclick="fdReset('${t}')">↩️ 重置重抽</button></div>
+    </div>`;
+  } else {
+    // 未抽奖：奖池编辑 + 抽奖按钮
+    const canDraw = champ && supporters.length > 0 && _fdPrizeDraft[t].filter(p => p.trim()).length > 0;
+    bodyHtml = `<div style="margin-top:14px;">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">奖池配置（每个奖品对应 1 名中奖者，按顺序对应）</div>
+      <div id="fdPrizes_${t}">${_fdPrizeDraft[t].map((p, i) => fdPrizeRow(t, i, p)).join('') || ''}</div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn btn-outline btn-sm" onclick="fdAddPrize('${t}')">➕ 添加奖品</button>
+        <button class="btn btn-outline btn-sm" onclick="fdSavePrizes('${t}')">💾 保存奖池</button>
+      </div>
+      <button id="fdRunBtn_${t}" ${canDraw ? '' : 'disabled'} onclick="fdRun('${t}')" style="width:100%;margin-top:14px;padding:12px;border:none;border-radius:12px;font-size:15px;font-weight:700;color:#fff;background:${canDraw ? meta.grad : '#e5e7eb'};cursor:${canDraw ? 'pointer' : 'not-allowed'};box-shadow:${canDraw ? '0 6px 18px ' + meta.color + '40' : 'none'};transition:all .25s;">
+        🎲 开始抽奖${canDraw ? `（从 ${supporters.length} 位支持者中抽 ${_fdPrizeDraft[t].filter(p => p.trim()).length} 名）` : ''}
+      </button>
+      ${!champ ? '<div style="font-size:12px;color:#9ca3af;margin-top:6px;text-align:center;">等待赛道第一名产生</div>' : (!supporters.length ? '<div style="font-size:12px;color:#9ca3af;margin-top:6px;text-align:center;">暂无支持者，无法抽奖</div>' : (!_fdPrizeDraft[t].filter(p => p.trim()).length ? '<div style="font-size:12px;color:#9ca3af;margin-top:6px;text-align:center;">请先配置奖池</div>' : ''))}
+    </div>`;
+  }
+
+  return `<div style="background:#fff;border:1px solid #e5e7eb;border-top:4px solid ${meta.color};border-radius:14px;padding:18px;box-shadow:var(--shadow);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-weight:800;font-size:15px;color:#111827;">${meta.label}</div>
+      <span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;background:${drawn ? '#dcfce7' : '#f3f4f6'};color:${drawn ? '#15803d' : '#6b7280'};">${drawn ? '✅ 已完成抽奖' : '待抽奖'}</span>
+    </div>
+    ${champHtml}${supHtml}${bodyHtml}
+  </div>`;
+}
+
+function fdPrizeRow(t, i, val) {
+  const meta = FD_TRACK_META[t];
+  return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+    <span style="min-width:20px;height:20px;border-radius:6px;background:${meta.color}15;color:${meta.color};font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">${i + 1}</span>
+    <input type="text" value="${escHtml(val || '')}" placeholder="例如：京东卡 500 元" onchange="_fdPrizeDraft['${t}'][${i}]=this.value" style="flex:1;padding:7px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;">
+    <span style="cursor:pointer;font-size:14px;color:#9ca3af;padding:2px 4px;" onclick="fdRemovePrize('${t}',${i})" title="删除">🗑️</span>
+  </div>`;
+}
+
+function fdAddPrize(t) { _fdPrizeDraft[t].push(''); renderFinalDraw(); }
+function fdRemovePrize(t, i) { _fdPrizeDraft[t].splice(i, 1); renderFinalDraw(); }
+
+async function fdSavePrizes(t) {
+  if (!adminToken) return;
+  const prizes = _fdPrizeDraft[t].map(p => (p || '').trim()).filter(Boolean);
+  try {
+    await api('/api/admin/final-draw/prizes', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ track: t, prizes }) });
+    showToast('已保存' + FD_TRACK_META[t].label + '奖池（' + prizes.length + ' 个奖品）', 'success');
+    await loadFinalDraw();
+  } catch(e) { showToast('保存失败：' + e.message, 'error'); }
+}
+
+async function fdRun(t) {
+  if (!adminToken) return;
+  const meta = FD_TRACK_META[t];
+  const supporters = (_fdData.supporters || {})[t] || [];
+  const prizes = _fdPrizeDraft[t].map(p => (p || '').trim()).filter(Boolean);
+  if (!confirm(`确认开始「${meta.label}」现场抽奖？\n\n将从 ${supporters.length} 位支持者中抽出 ${prizes.length} 名中奖者。\n⚠️ 每个赛道只能抽一次，请现场准备好后再点击！`)) return;
+  const btn = document.getElementById('fdRunBtn_' + t);
+  if (btn) { btn.disabled = true; btn.style.background = '#e5e7eb'; btn.style.boxShadow = 'none'; btn.style.cursor = 'not-allowed'; btn.textContent = '🎲 抽奖中，正在揭晓…'; }
+  try {
+    const resp = await api('/api/admin/final-draw/run', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ track: t }) });
+    await loadFinalDraw();
+    const names = (resp.winners || []).map(w => w.name + '（' + w.prize + '）').join('、');
+    showToast('🎉 ' + meta.label + '抽奖完成：' + names, 'success');
+  } catch(e) {
+    showToast('抽奖失败：' + e.message, 'error');
+    renderFinalDraw();
+  }
+}
+
+async function fdReset(t) {
+  if (!adminToken) return;
+  if (!confirm('确认重置「' + FD_TRACK_META[t].label + '」的抽奖结果？\n\n重置后可重新配置奖池并重新抽奖（原中奖结果将清除）。')) return;
+  if (!confirm('二次确认：真的要重置吗？如现场已公布中奖名单，重抽可能引发争议。')) return;
+  try {
+    await api('/api/admin/final-draw/reset', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }, body: JSON.stringify({ track: t }) });
+    showToast('已重置，可重新配置奖池', 'success');
+    await loadFinalDraw();
+  } catch(e) { showToast('重置失败：' + e.message, 'error'); }
 }
 
 function escHtml(s) { return (s==null?'':String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
