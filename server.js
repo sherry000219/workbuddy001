@@ -3,6 +3,8 @@ const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const scoring = require('./lib/scoring');
+const contestConfig = require('./lib/contest-config');
 
 // ========== CONFIG ==========
 const PORT = process.env.PORT || 3000;
@@ -332,54 +334,13 @@ function isJudgeInList(judgeName, stage) {
   return list.some(n => String(n || '').trim().toLowerCase() === normalized);
 }
 
-function isVotingStage(stage) {
-  return stage === 'preliminary' || stage === 'semi_final';
-}
-
-// Entries eligible for voting in a given stage
-function getVotableEntries(stage) {
-  if (stage === 'preliminary') {
-    // 展示所有已过审作品，不过滤 roundStatus（保证晋级后初赛视图不变空）
-    return db.entries.filter(e => e.status === 'approved');
-  }
-  if (stage === 'semi_final') {
-    // 复赛投票分分母：所有复赛参与者（含已晋级决赛的 finalist/awarded/eliminated_final），
-    // 避免晋级决赛后 semi_finalist 集合变空导致投票分全部虚高为满分
-    return db.entries.filter(e => ['semi_finalist', 'finalist', 'awarded', 'eliminated_final'].includes(e.roundStatus));
-  }
-  return [];
-}
-
-// Entries eligible for judging in a given stage
-function getJudgableEntries(stage) {
-  if (stage === 'preliminary') {
-    // 展示所有已过审作品，不过滤 roundStatus（保证晋级后初赛视图不变空）
-    return db.entries.filter(e => e.status === 'approved');
-  }
-  if (stage === 'semi_final') {
-    return db.entries.filter(e => e.roundStatus === 'semi_finalist');
-  }
-  if (stage === 'final' || stage === 'awarded') {
-    // 结算后（awarded）仍按决赛作品集展示：awarded 不是打分赛段，入围/获奖作品都要保留可见
-    return db.entries.filter(e => e.roundStatus === 'finalist' || e.roundStatus === 'awarded');
-  }
-  return [];
-}
-
-// Calculate stage-specific scores for an entry
-function getEntryStageScores(entryId, stage) {
-  // 结算（awarded）后仍读取决赛评委打分：awarded 不是真实打分赛段，评委打分发生在 final，
-  // 直接按 awarded 过滤会查不到数据，导致后台分数表/排名/详情显示为空
-  const scoreStage = stage === 'awarded' ? 'final' : stage;
-  const scores = db.judgeScores.filter(s => s.entryId === entryId && (s.stage || 'preliminary') === scoreStage);
-  const voteCount = db.votes.filter(v => v.entryId === entryId && (v.stage || 'preliminary') === scoreStage).length;
-  // 维度体系按赛段：决赛/结算五维（含组织价值）；初赛/复赛旧四维
-  const isNewDims = stage === 'final' || stage === 'awarded';
-  const avgScore = scores.length > 0
-    ? Math.round(scores.reduce((sum, s) => sum + (s.practicality || 0) + (s.innovation || 0) + (s.scalability || 0) + (isNewDims ? (s.value || 0) : 0) + (s.presentation || 0), 0) / scores.length)
-    : 0;
-  return { scores, voteCount, avgScore, judgeCount: scores.length };
-}
+// ========== 评分：统一委托 lib/scoring.js（PRD FR-5 全局唯一实现） ==========
+// 算法只在 lib/scoring.js 实现一份；此处仅薄封装，保持内部调用签名不变。
+// 严禁在此处或任何前端/脚本里再写一份评分逻辑。
+function isVotingStage(stage) { return scoring.isVotingStage(stage); }
+function getVotableEntries(stage) { return scoring.votableEntries(db, stage); }
+function getJudgableEntries(stage) { return scoring.judgableEntries(db, stage); }
+function getEntryStageScores(entryId, stage) { return scoring.stageScores(db, entryId, stage); }
 
 // ========== 统一晋级规则（管理后台勾选面板与排名页共用） ==========
 // 部门归属键：中小微事业群下钻二级部门，其余用一级部门
@@ -439,30 +400,7 @@ function computePromotePlan(annotated) {
 
 // Calculate composite score for an entry in a specific stage
 function getCompositeScore(entryId, stage) {
-  const { avgScore, voteCount } = getEntryStageScores(entryId, stage);
-  let currentComposite;
-  if (stage === 'final' || stage === 'awarded') {
-    currentComposite = avgScore; // 100% judge score, no voting
-  } else {
-    // For preliminary and semi_final: 80% judge + 20% votes（保留 2 位小数）
-    const votable = getVotableEntries(stage);
-    const allVoteCounts = votable.map(e => getEntryStageScores(e.id, stage).voteCount);
-    const maxVotes = Math.max(1, ...allVoteCounts, voteCount);
-    const voteScore = (voteCount / maxVotes) * 100;
-    currentComposite = Math.round((avgScore * 0.8 + voteScore * 0.2) * 100) / 100;
-  }
-
-  // 赛段继承：仅复赛吸收初赛综合分（初赛 40% + 复赛当前 60%），保留 2 位小数
-  if (stage === 'semi_final') {
-    const prevComposite = getCompositeScore(entryId, 'preliminary');
-    return Math.round((prevComposite * 0.4 + currentComposite * 0.6) * 100) / 100;
-  }
-  // 决赛/结算：综合分 = 决赛评委均分（100%），
-  // 不吸收初赛/复赛综合分，也不含投票、押宝（押宝本就不参与计分）
-  if (stage === 'final' || stage === 'awarded') {
-    return currentComposite;
-  }
-  return currentComposite;
+  return scoring.compositeScore(db, entryId, stage);
 }
 
 // Count user's votes in current stage
@@ -1567,9 +1505,34 @@ app.get('/api/ranking', requireAuth, (req, res) => {
       return { ...e, promoteType: pt, promoteDept: deptKeyOf(e) };
     }).sort((a, b) => (b.composite || 0) - (a.composite || 0)).slice(0, 30);
   };
-  const individual = enrich(entries.filter(e => e.entryType !== 'team'));
-  const team = enrich(entries.filter(e => e.entryType === 'team'));
-  res.json({ individual, team, currentStage: targetStage });
+  // 守恒校验（PRD FR-3）：必须在 enrich 之前，用未截断的列表校验，
+  // 否则 slice(0,30) 的展示截断会被误判成数据丢失
+  const indList = entries.filter(e => e.entryType !== 'team');
+  const teamList = entries.filter(e => e.entryType === 'team');
+  const conservation = contestConfig.checkConservation(entries, [{ items: indList }, { items: teamList }]);
+  const grouped = contestConfig.groupEntries(entries);
+  if (!conservation.ok || !grouped.conservation.ok) {
+    console.error('[守恒校验失败] /api/ranking', JSON.stringify({
+      stage: targetStage,
+      typeSplit: { total: conservation.total, sum: conservation.sum, missing: conservation.missing.map(e => e.id) },
+      trackSplit: { total: grouped.conservation.total, sum: grouped.conservation.sum }
+    }));
+  }
+
+  const individual = enrich(indList);
+  const team = enrich(teamList);
+  res.json({
+    individual,
+    team,
+    currentStage: targetStage,
+    conservation: {
+      ok: conservation.ok,
+      total: conservation.total,
+      counted: conservation.sum,
+      unclassified: grouped.unclassified,
+      truncated: (indList.length - individual.length) + (teamList.length - team.length)
+    }
+  });
 });
 
 // ========== API: STATS ==========
@@ -1592,6 +1555,14 @@ app.get('/api/stats', requireAuth, (req, res) => {
 });
 
 // ========== API: EXPORT ==========
+// ========== API: 赛道配置（PRD FR-3：赛道集中配置，供前端动态取用，避免硬编码） ==========
+app.get('/api/tracks', requireAuth, (req, res) => {
+  res.json({
+    tracks: contestConfig.getTracks(),
+    teamGroup: contestConfig.getTeamGroup()
+  });
+});
+
 app.get('/api/export/json', verifyAdminToken, (req, res) => {
   res.json({ entries: db.entries, votes: db.votes, judgeScores: db.judgeScores, settings: db.settings });
 });

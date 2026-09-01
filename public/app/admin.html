@@ -742,13 +742,8 @@ async function renderJudgeScoreDetail() {
   } else {
     notice = '<div style="padding:10px 16px;margin-bottom:12px;background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.18);border-radius:10px;font-size:12px;color:#2563eb;">📊 ' + stageMeta.label + '：' + fin.length + ' 件作品 · ' + judges.length + ' 位评委 · 共 ' + (_finalScoreData.scoreCount || 0) + ' 条打分记录</div>';
   }
-  const groups = [
-    { key: 'efficiency', label: '🚀 效率提升赛道', color: '#ff6b35', items: fin.filter(e => e.entryType !== 'team' && (e.track || 'efficiency') === 'efficiency') },
-    { key: 'creative', label: '💡 创意应用赛道', color: '#7c3aed', items: fin.filter(e => e.entryType !== 'team' && (e.track || 'efficiency') === 'creative') },
-    { key: 'business', label: '🤝 业务赋能赛道', color: '#2563eb', items: fin.filter(e => e.entryType !== 'team' && (e.track || 'efficiency') === 'business') },
-    { key: 'other', label: '🧩 其他赛道', color: '#6b7280', items: fin.filter(e => e.entryType !== 'team' && !['efficiency', 'creative', 'business'].includes(e.track || 'efficiency')) },
-    { key: 'team', label: '👥 团队组', color: '#f59e0b', items: fin.filter(e => e.entryType === 'team') }
-  ];
+  // 按 /api/tracks 配置动态生成（PRD FR-3），内置守恒校验：分组之和不等即报错
+  const groups = buildTrackGroups(fin);
   groups.forEach(g => g.items.sort((a, b) => (b.composite || 0) - (a.composite || 0)));
   let html = notice;
   groups.forEach(g => {
@@ -1754,6 +1749,44 @@ async function exportVoteDetailsCSV() {
   window.open('/api/admin/votes/export/csv?stage=' + encodeURIComponent(stage) + '&adminToken=' + encodeURIComponent(adminToken), '_blank');
 }
 
+// ========== 赛道分组（PRD FR-3：按 /api/tracks 配置动态生成，杜绝硬编码漏作品） ==========
+let TRACKS_CONFIG = null;
+const FALLBACK_TRACKS = [
+  { key: 'efficiency', label: '🚀 效率提升赛道', color: '#ff6b35' },
+  { key: 'creative', label: '💡 创意设计赛道', color: '#7c3aed' },
+  { key: 'business', label: '🤝 业务赋能赛道', color: '#2563eb' },
+  { key: 'other', label: '🧩 其他', color: '#6b7280', fallback: true }
+];
+const FALLBACK_TEAM_GROUP = { key: 'team', label: '👥 团队组', color: '#f59e0b' };
+
+function buildTrackGroups(fin) {
+  const cfg = TRACKS_CONFIG || {};
+  const tracks = (cfg.tracks && cfg.tracks.length) ? cfg.tracks : FALLBACK_TRACKS;
+  const tg = cfg.teamGroup || FALLBACK_TEAM_GROUP;
+  const keys = tracks.map(function (t) { return t.key; });
+  const fb = tracks.find(function (t) { return t.fallback; });
+  const fbKey = fb ? fb.key : null;
+  const groups = tracks.map(function (t) {
+    let items;
+    if (fbKey && t.key === fbKey) {
+      // 兜底赛道收纳所有未匹配到其他赛道的个人作品，保证一件不丢
+      const otherKeys = keys.filter(function (k) { return k !== fbKey; });
+      items = fin.filter(function (e) { return e.entryType !== 'team' && otherKeys.indexOf(e.track || '') === -1; });
+    } else {
+      items = fin.filter(function (e) { return e.entryType !== 'team' && (e.track || '') === t.key; });
+    }
+    return { key: t.key, label: t.label, color: t.color, items: items };
+  });
+  groups.push({ key: tg.key, label: tg.label, color: tg.color, items: fin.filter(function (e) { return e.entryType === 'team'; }) });
+  // 守恒校验：各分组之和必须等于总数，不等即有作品被漏掉
+  const sum = groups.reduce(function (a, g) { return a + g.items.length; }, 0);
+  if (sum !== fin.length) {
+    console.error('[守恒校验失败] 赛道分组：总数 ' + fin.length + '，分组合计 ' + sum +
+      '，有 ' + (fin.length - sum) + ' 件作品未归入任何分组');
+  }
+  return groups;
+}
+
 // ========== INIT ==========
 async function init() {
   await checkAuth();
@@ -1761,6 +1794,10 @@ async function init() {
     const resp = await fetch('/api/voting/status'); const data = await resp.json();
     currentStage = data.currentStage || 'preliminary'; isVotingStage = isStageVoting(currentStage);
   } catch(e) {}
+  // 加载赛道配置（PRD FR-3），失败时 buildTrackGroups 自动回退到内置默认值
+  try {
+    const tr = await api('/api/tracks'); TRACKS_CONFIG = tr || null;
+  } catch (e) { TRACKS_CONFIG = null; }
   updateAdminStageLabel();
   renderAdminPage();
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDetail(); });
