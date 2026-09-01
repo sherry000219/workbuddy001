@@ -140,7 +140,27 @@ async function exchangeDingTalkCode(code) {
 }
 
 // ========== JSON FILE STORAGE ==========
-const DB_FILE = path.join(DB_DIR, 'contest.json');
+// 多赛事平台（FR-1）：DB_FILE 不再固定指向单一 contest.json，
+// 而是指向「当前激活赛事」的数据文件，随切换而改变；其余 80+ 端点逻辑保持不变。
+let DB_FILE = path.join(DB_DIR, 'contest.json');
+const PLATFORM_FILE = path.join(DB_DIR, 'platform.json');
+let activeContestId = null;
+function contestFileFor(id) { return path.join(DB_DIR, 'contest_' + String(id) + '.json'); }
+function setActiveContest(id) {
+  activeContestId = id;
+  DB_FILE = contestFileFor(id);
+}
+// 切换内存中的 db 内容到指定赛事（db 为 const 引用，仅替换其属性）
+function activateContestInMemory(id) {
+  setActiveContest(id);
+  const loaded = loadDB();
+  db.entries = loaded.entries;
+  db.votes = loaded.votes;
+  db.judgeScores = loaded.judgeScores;
+  db.bets = loaded.bets || [];
+  db.drawRecords = loaded.drawRecords || [];
+  db.settings = loaded.settings;
+}
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const GITHUB_REPO = 'sherry000219/workbuddy001';
 const GITHUB_DATA_BRANCH = 'data';
@@ -172,6 +192,106 @@ const DEFAULT_DB = {
     judgesByStage: { preliminary: [], semi_final: [], final: [] }  // 按赛段评委名单
   }
 };
+
+// ========== PLATFORM (FR-1 多赛事平台) ==========
+const STATUS_LABELS = { draft: '草稿', open: '报名中', running: '进行中', finished: '已结束', archived: '已归档' };
+// 全新部署（本地无旧 contest.json）时，标记需从 GitHub 旧路径 data/contest.json 回填首个赛事
+let needSeedFromLegacy = false;
+function defaultPlatform() { return { contests: [], activeId: null }; }
+function loadPlatform() {
+  try {
+    const raw = fs.readFileSync(PLATFORM_FILE, 'utf8');
+    const p = JSON.parse(raw);
+    if (!p || !Array.isArray(p.contests)) return null;
+    if (!p.activeId || !p.contests.find(c => c.id === p.activeId)) {
+      p.activeId = p.contests.length ? p.contests[0].id : null;
+    }
+    return p;
+  } catch (e) { return null; }
+}
+function savePlatform(platformObj) {
+  try {
+    fs.writeFileSync(PLATFORM_FILE, JSON.stringify(platformObj, null, 2), 'utf8');
+    ghPushPlatformSchedule();
+  } catch (e) { console.error('[platform] save failed:', e.message); }
+}
+function writeContestFile(id, dataObj) {
+  fs.writeFileSync(contestFileFor(id), JSON.stringify(dataObj, null, 2), 'utf8');
+}
+function readContestFile(id) {
+  try { return JSON.parse(fs.readFileSync(contestFileFor(id), 'utf8')); }
+  catch (e) { return null; }
+}
+function countEntriesInContest(id) {
+  const d = readContestFile(id);
+  return d ? ((d.entries || []).length) : 0;
+}
+// 首次启动：把旧的单赛事 contest.json 迁移为平台中的第一个赛事（WorkBuddy 大赛 Season3）
+function migrateToPlatform() {
+  const firstId = 'workbuddy-s3';
+  const oldPath = path.join(DB_DIR, 'contest.json');
+  const plat = defaultPlatform();
+  if (fs.existsSync(oldPath)) {
+    try {
+      const old = JSON.parse(fs.readFileSync(oldPath, 'utf8'));
+      const hasData = (old.entries || []).length > 0 || (old.votes || []).length > 0 || (old.judgeScores || []).length > 0;
+      if (hasData) {
+        writeContestFile(firstId, old); // 旧数据整体作为首个赛事种子
+        // 旧文件改名备份，避免被 ghPull 当成活跃文件反复拉取
+        if (!fs.existsSync(oldPath + '.legacy')) {
+          try { fs.renameSync(oldPath, oldPath + '.legacy'); } catch (e) {}
+        }
+      }
+    } catch (e) { console.error('[migrate] old contest read failed:', e.message); }
+  } else {
+    // 本地无旧 contest.json（如 Render 全新部署，数据在 GitHub 旧路径 data/contest.json）。
+    // 标记需要从旧远程文件回填，待启动联网阶段执行，避免激活赛事为空导致启动拉取被防清空守卫拦截。
+    needSeedFromLegacy = true;
+  }
+  const seed = {
+    id: firstId,
+    name: 'WorkBuddy AI 应用大赛 Season3【头号玩家】',
+    season: 'Season 3',
+    slogan: '人人都是头号玩家，用 AI 重塑工作',
+    status: 'finished',
+    bannerUrl: '',
+    description: '面向全公司的 AI 应用一站式竞赛：报名投递 + 展示 + 评审。本届已结束，作为平台种子赛事保留成绩与作品档案。',
+    timeline: [],
+    contact: '',
+    createdAt: Date.now()
+  };
+  plat.contests.push(seed);
+  plat.activeId = firstId;
+  savePlatform(plat);
+  return plat;
+}
+// 生成赛事 id：名称拼音/英文 slug + 时间戳后缀，保证唯一且可读
+function genContestId(name) {
+  const base = String(name || 'contest')
+    .toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-').replace(/^\-+|\-+$/g, '')
+    .slice(0, 24) || 'contest';
+  return base + '-' + Date.now().toString(36);
+}
+
+// 全新部署场景下，从 GitHub 旧路径 data/contest.json 回填首个赛事数据，
+// 避免激活赛事为空触发防清空守卫而拒绝拉取。仅当本地确实无数据且远程旧文件有数据时才生效。
+async function seedActiveFromLegacyRemote() {
+  if (!needSeedFromLegacy || !GITHUB_TOKEN || !activeContestId) return false;
+  try {
+    const { status, data } = await ghReq('GET', `/repos/${GITHUB_REPO}/contents/data/contest.json?ref=${GITHUB_DATA_BRANCH}`);
+    if (status !== 200 || !data || !data.content) return false;
+    const buf = Buffer.from(data.content, data.encoding || 'base64');
+    const remote = JSON.parse(buf.toString('utf8'));
+    if (!remote || ((remote.entries || []).length === 0 && (remote.votes || []).length === 0 && (remote.judgeScores || []).length === 0)) return false;
+    writeContestFile(activeContestId, remote);
+    console.log('[migrate] Seeded active contest from legacy remote data/contest.json — entries:', (remote.entries || []).length, '| votes:', (remote.votes || []).length, '| scores:', (remote.judgeScores || []).length);
+    needSeedFromLegacy = false;
+    return true;
+  } catch (e) {
+    console.error('[migrate] legacy remote seed failed:', e.message);
+    return false;
+  }
+}
 
 function loadDB() {
   try {
@@ -300,6 +420,12 @@ function loadDBWithRecovery() {
   }
   return local;
 }
+
+// ========== 平台初始化（FR-1）==========
+// 先于一切数据载入确定「激活赛事」，使后续 loadDB / ghPull / ghPush 全部作用于正确的分文件。
+let platform = loadPlatform();
+if (!platform) platform = migrateToPlatform();
+if (platform.activeId) setActiveContest(platform.activeId);
 
 const db = loadDBWithRecovery();
 
@@ -490,7 +616,7 @@ async function ghFetchRemoteViaGitData() {
     if (!commitSha) return null;
     const tree = await ghReq('GET', `/repos/${GITHUB_REPO}/git/trees/${commitSha}?recursive=1`);
     if (tree.status >= 400) return null;
-    const node = (tree.data.tree || []).find(n => n.path === 'data/contest.json');
+    const node = (tree.data.tree || []).find(n => n.path === 'data/contest_' + activeContestId + '.json');
     if (!node || !node.sha) return null;
     const blob = await ghReq('GET', `/repos/${GITHUB_REPO}/git/blobs/${node.sha}`);
     if (blob.status >= 400 || !blob.data.content) return null;
@@ -502,7 +628,7 @@ async function ghFetchRemoteViaGitData() {
   }
 }
 
-  const { status, data } = await ghReq('GET', `/repos/${GITHUB_REPO}/contents/data/contest.json?ref=${GITHUB_DATA_BRANCH}`);
+  const { status, data } = await ghReq('GET', `/repos/${GITHUB_REPO}/contents/data/contest_${activeContestId}.json?ref=${GITHUB_DATA_BRANCH}`);
   _syncStatus.lastStatus = status;
   _syncStatus.lastResponse = data && data.message ? data.message : null;
   if (status === 404) {
@@ -513,10 +639,10 @@ async function ghFetchRemoteViaGitData() {
     }
     // File doesn't exist yet — use current in-memory data (not empty DEFAULT_DB)
     // 这样即使 Render 重启，内存中的 db（已 loadDB）也不会被空数据覆盖
-    console.log('[gh] data/contest.json not found, creating with current data...');
+    console.log('[gh] data/contest_' + activeContestId + '.json not found, creating with current data...');
     const currentData = JSON.stringify(db, null, 2);
     const body = { message: 'auto: init data file', content: Buffer.from(currentData).toString('base64'), branch: GITHUB_DATA_BRANCH };
-    const createResp = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest.json`, body);
+    const createResp = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest_${activeContestId}.json`, body);
     if (createResp.status >= 400) throw new Error(createResp.data.message || 'Failed to create data file');
     _ghSha = createResp.data.content.sha;
     // 不覆盖本地文件！本地已经是正确的数据（loadDB 加载的）
@@ -740,7 +866,33 @@ async function ghFetchRemoteViaGitData() {
 function ghPushSchedule() {
   if (!GITHUB_TOKEN) return;
   if (_ghTimer) clearTimeout(_ghTimer);
-  _ghTimer = setTimeout(() => { ghPush().catch(() => {}); }, 1000);
+  _ghTimer = setTimeout(() => { ghPush().then(() => ghPushPlatform()).catch(() => {}); }, 1000);
+}
+
+// ===== PLATFORM GITHUB SYNC（platform.json 元数据备份）=====
+let _ghPlatformSha = null;
+let _ghPlatformTimer = null;
+async function ghPushPlatform() {
+  if (!GITHUB_TOKEN) return;
+  try {
+    const buf = fs.readFileSync(PLATFORM_FILE);
+    const body = { message: 'auto: sync platform', content: buf.toString('base64'), branch: GITHUB_DATA_BRANCH };
+    if (_ghPlatformSha) body.sha = _ghPlatformSha;
+    const { status, data } = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/platform.json`, body);
+    if (status === 404) {
+      const b2 = { message: 'auto: init platform', content: buf.toString('base64'), branch: GITHUB_DATA_BRANCH };
+      const r2 = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/platform.json`, b2);
+      if (r2.status < 400 && r2.data && r2.data.content) _ghPlatformSha = r2.data.content.sha;
+      return;
+    }
+    if (status >= 400) return;
+    if (data && data.content) _ghPlatformSha = data.content.sha;
+  } catch (e) { /* silent */ }
+}
+function ghPushPlatformSchedule() {
+  if (!GITHUB_TOKEN) return;
+  if (_ghPlatformTimer) clearTimeout(_ghPlatformTimer);
+  _ghPlatformTimer = setTimeout(() => { ghPushPlatform().catch(() => {}); }, 1500);
 }
 
 // 进程退出前强制同步一次（Render 休眠/重启时触发）
@@ -757,6 +909,7 @@ async function forceSyncBeforeExit() {
     await ghPush().catch(e => console.error('[gh] exit push #1 failed:', e.message));
     await ghPush().catch(e => console.error('[gh] exit push #2 failed:', e.message));
     await ghPushSessions();
+    await ghPushPlatform().catch(e => console.error('[gh] exit platform push failed:', e.message));
     console.log('[gh] Force sync complete');
   } catch (e) {
     console.error('[gh] Force sync failed:', e.message);
@@ -792,7 +945,7 @@ async function doGhPush() {
       const buf = fs.readFileSync(DB_FILE);
       const body = { message: 'auto: sync data', content: buf.toString('base64'), branch: GITHUB_DATA_BRANCH };
       if (_ghSha) body.sha = _ghSha;
-      const { status, data } = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest.json`, body);
+      const { status, data } = await ghReq('PUT', `/repos/${GITHUB_REPO}/contents/data/contest_${activeContestId}.json`, body);
       if (status === 409 || (status === 422 && data.message && data.message.includes('SHA'))) {
         // 409 Conflict / 422 SHA mismatch：远程数据被其他人更新了
         // 先 pull 合并最新数据，再 push
@@ -911,6 +1064,10 @@ app.use((req, res, next) => {
 });
 
 // Explicit routes for app pages (no trailing-slash redirect)
+// 根路由：云帐房赛事平台（多赛事主页）
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'platform.html')));
+app.get('/platform.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'platform.html')));
+
 app.get(['/app', '/app/'], (req, res) => res.sendFile(path.join(__dirname, 'public', 'app', 'index.html')));
 app.get('/app/submit.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'app', 'submit.html')));
 app.get('/app/browse.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'app', 'browse.html')));
@@ -2149,6 +2306,140 @@ function generateAdminToken() {
   return token;
 }
 
+// ========== PLATFORM API (FR-1 多赛事平台) ==========
+function publicContestView(c) {
+  return {
+    id: c.id, name: c.name, season: c.season || '', slogan: c.slogan || '',
+    status: c.status || 'draft', statusLabel: STATUS_LABELS[c.status || 'draft'] || (c.status || 'draft'),
+    bannerUrl: c.bannerUrl || '', description: c.description || '',
+    timeline: c.timeline || [], contact: c.contact || '', createdAt: c.createdAt || null,
+    entryCount: countEntriesInContest(c.id)
+  };
+}
+
+// 列出全部赛事（含作品数），供平台主页与后台使用
+app.get('/api/platform/contests', requireAuth, (req, res) => {
+  try {
+    const contests = (platform.contests || []).map(publicContestView);
+    res.json({ activeId: activeContestId, contests });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// 当前激活赛事信息
+app.get('/api/platform/active', requireAuth, (req, res) => {
+  try {
+    const c = (platform.contests || []).find(x => x.id === activeContestId);
+    res.json({ activeId: activeContestId, contest: c ? publicContestView(c) : null });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// 切换当前激活赛事（载入其数据到内存；各赛事数据文件完全隔离）
+app.post('/api/platform/activate', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.body || {};
+    const c = (platform.contests || []).find(x => x.id === id);
+    if (!c) return res.status(404).json({ error: '赛事不存在' });
+    activateContestInMemory(id);
+    platform.activeId = id;
+    savePlatform(platform);
+    res.json({ success: true, activeId: id });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// 新建赛事（管理员）
+app.post('/api/platform/contests', verifyAdminToken, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const name = (b.name || '').trim();
+    if (!name) return res.status(400).json({ error: '赛事名称必填' });
+    const id = genContestId(name);
+    const newContest = {
+      id, name,
+      season: b.season || '',
+      slogan: b.slogan || '',
+      status: b.status || 'draft',
+      bannerUrl: b.bannerUrl || '',
+      description: b.description || '',
+      timeline: Array.isArray(b.timeline) ? b.timeline : [],
+      contact: b.contact || '',
+      createdAt: Date.now()
+    };
+    // 是否从已有赛事复制配置（仅配置，不含作品数据）
+    const seedData = JSON.parse(JSON.stringify(DEFAULT_DB));
+    if (b.copyFrom && (platform.contests || []).find(x => x.id === b.copyFrom)) {
+      const src = readContestFile(b.copyFrom);
+      if (src && src.settings) seedData.settings = JSON.parse(JSON.stringify(src.settings));
+    }
+    writeContestFile(id, seedData);
+    platform.contests.push(newContest);
+    savePlatform(platform);
+    res.json({ success: true, id, contest: publicContestView(newContest) });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// 更新赛事元数据（管理员）
+app.put('/api/platform/contests/:id', verifyAdminToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const b = req.body || {};
+    const c = (platform.contests || []).find(x => x.id === id);
+    if (!c) return res.status(404).json({ error: '赛事不存在' });
+    ['name', 'season', 'slogan', 'status', 'bannerUrl', 'description', 'contact'].forEach(k => {
+      if (b[k] !== undefined) c[k] = b[k];
+    });
+    if (Array.isArray(b.timeline)) c.timeline = b.timeline;
+    savePlatform(platform);
+    res.json({ success: true, contest: publicContestView(c) });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// 复制赛事为新一届（仅配置，不含作品数据）
+app.post('/api/platform/contests/:id/copy', verifyAdminToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const src = (platform.contests || []).find(x => x.id === id);
+    if (!src) return res.status(404).json({ error: '源赛事不存在' });
+    const b = req.body || {};
+    const name = (b.name || (src.name + '（副本）')).trim();
+    const newId = genContestId(name);
+    const copy = {
+      id: newId, name,
+      season: b.season || src.season || '',
+      slogan: b.slogan || src.slogan || '',
+      status: b.status || 'draft',
+      bannerUrl: b.bannerUrl || src.bannerUrl || '',
+      description: b.description || src.description || '',
+      timeline: b.timeline || src.timeline || [],
+      contact: b.contact || src.contact || '',
+      createdAt: Date.now()
+    };
+    const srcData = readContestFile(id);
+    const seedData = JSON.parse(JSON.stringify(DEFAULT_DB));
+    if (srcData && srcData.settings) seedData.settings = JSON.parse(JSON.stringify(srcData.settings));
+    writeContestFile(newId, seedData);
+    platform.contests.push(copy);
+    savePlatform(platform);
+    res.json({ success: true, id: newId, contest: publicContestView(copy) });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// 删除赛事（管理员；不能删除最后一个，不能删除当前激活赛事）
+app.delete('/api/platform/contests/:id', verifyAdminToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const b = req.body || {};
+    if ((platform.contests || []).length <= 1) return res.status(400).json({ error: '至少保留一个赛事，无法删除' });
+    if (id === activeContestId) return res.status(400).json({ error: '请先切换到其他赛事再删除当前赛事' });
+    if (!b.confirm && req.query.confirm !== 'true') return res.status(400).json({ error: '需确认：delete 时传入 confirm=true（query 或 body 均可）' });
+    const idx = (platform.contests || []).findIndex(x => x.id === id);
+    if (idx === -1) return res.status(404).json({ error: '赛事不存在' });
+    platform.contests.splice(idx, 1);
+    savePlatform(platform);
+    try { if (fs.existsSync(contestFileFor(id))) fs.unlinkSync(contestFileFor(id)); } catch (e) {}
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 function verifyAdminToken(req, res, next) {
   const token = req.headers['x-admin-token'] || req.query.adminToken;
   if (!token || !adminTokens.has(token) || Date.now() > adminTokens.get(token)) {
@@ -2992,6 +3283,21 @@ app.post('/api/force-sync', async (req, res) => {
     if (!GITHUB_TOKEN) console.log(`  ⚠️  GITHUB_TOKEN not set — data WILL be lost on restart!`);
     console.log(`========================================\n`);
   });
+
+  // 全新部署回填：若平台初始化时本地无旧数据（需要从 GitHub 旧路径 data/contest.json 取回），
+  // 在正式拉取前先把首个赛事数据写回本地，避免激活赛事为空触发防清空守卫而拒绝拉取。
+  if (needSeedFromLegacy && GITHUB_TOKEN) {
+    console.log('[migrate] No local contest data; seeding active contest from legacy remote data/contest.json ...');
+    const seeded = await seedActiveFromLegacyRemote();
+    if (seeded) {
+      const refreshed = loadDB();
+      db.entries = refreshed.entries; db.votes = refreshed.votes; db.judgeScores = refreshed.judgeScores;
+      db.bets = refreshed.bets || []; db.drawRecords = refreshed.drawRecords || []; db.settings = refreshed.settings;
+      console.log('[migrate] Active contest seeded locally — entries:', db.entries.length);
+    } else {
+      console.warn('[migrate] Legacy remote seed failed — proceeding with empty active contest');
+    }
+  }
 
   // Try GitHub sync with retries
   if (GITHUB_TOKEN) {

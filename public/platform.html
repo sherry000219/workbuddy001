@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云帐房赛事平台</title>
+<script src="https://g.alicdn.com/dingding/dingtalk-jsapi/3.1.0/dingtalk.open.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #f5f7fb; --card: #ffffff; --text: #1f2937; --dim: #6b7280;
+    --accent: #ff6b35; --accent2: #2563eb; --accent3: #7c3aed;
+    --radius: 18px; --shadow: 0 6px 24px rgba(17,24,39,0.07);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; padding: 14px 28px; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); border-bottom: 1px solid #eef0f4; }
+  .topbar img { height: 30px; }
+  .topbar .brand { font-weight: 800; font-size: 17px; letter-spacing: .5px; }
+  .topbar .brand span { color: var(--accent); }
+  .topbar .spacer { flex: 1; }
+  .topbar a.admin-link { color: var(--dim); text-decoration: none; font-size: 13px; padding: 8px 14px; border: 1px solid #e5e7eb; border-radius: 10px; transition: .2s; }
+  .topbar a.admin-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  .hero { max-width: 1080px; margin: 0 auto; padding: 56px 24px 24px; text-align: center; }
+  .hero .kicker { display: inline-block; background: rgba(255,107,53,0.1); color: var(--accent); font-size: 13px; font-weight: 700; letter-spacing: 2px; padding: 6px 16px; border-radius: 20px; margin-bottom: 18px; }
+  .hero h1 { font-size: clamp(30px, 5vw, 48px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .hero h1 .grad { background: linear-gradient(135deg, var(--accent), var(--accent3)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { color: var(--dim); font-size: 16px; max-width: 620px; margin: 0 auto; line-height: 1.7; }
+
+  .section-head { max-width: 1080px; margin: 36px auto 0; padding: 0 24px; display: flex; align-items: center; gap: 10px; }
+  .section-head h2 { font-size: 20px; font-weight: 700; }
+  .section-head .count { color: var(--dim); font-size: 14px; }
+  .grid { max-width: 1080px; margin: 18px auto 60px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+  .card { background: var(--card); border: 1px solid #eef0f4; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(17,24,39,0.12); }
+  .card .banner { height: 96px; background: linear-gradient(135deg, var(--accent), var(--accent3)); position: relative; display: flex; align-items: center; justify-content: center; }
+  .card .banner .logo { width: 54px; height: 54px; background: #fff; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--accent); font-size: 22px; box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+  .card .body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+  .card .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .badge { font-size: 12px; padding: 3px 10px; border-radius: 12px; background: #f3f4f6; color: var(--dim); font-weight: 600; }
+  .badge.status-finished { background: rgba(37,99,235,0.1); color: var(--accent2); }
+  .badge.status-running { background: rgba(16,185,129,0.12); color: #059669; }
+  .badge.status-open { background: rgba(255,107,53,0.12); color: var(--accent); }
+  .badge.status-draft { background: #f3f4f6; color: var(--dim); }
+  .badge.status-archived { background: #f3f4f6; color: #9ca3af; }
+  .card h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; line-height: 1.35; }
+  .card .slogan { color: var(--accent3); font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+  .card .desc { color: var(--dim); font-size: 13px; line-height: 1.6; flex: 1; }
+  .card .meta { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid #f1f2f5; }
+  .card .meta .ents { font-size: 13px; color: var(--dim); }
+  .card .meta .ents b { color: var(--text); font-size: 16px; }
+  .card .enter { background: var(--accent); color: #fff; border: none; padding: 9px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: .2s; }
+  .card .enter:hover { background: #e55d2b; }
+  .card.active-ring { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .empty-state { max-width: 1080px; margin: 40px auto; padding: 60px 24px; text-align: center; color: var(--dim); }
+  .login-wrap { max-width: 1080px; margin: 80px auto; padding: 60px 24px; text-align: center; }
+  .login-wrap button { background: var(--accent); color: #fff; border: none; padding: 14px 40px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1f2937; color: #fff; padding: 12px 22px; border-radius: 10px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 50; }
+  .toast.show { opacity: 1; }
+  .foot { text-align: center; color: #9ca3af; font-size: 12px; padding: 24px; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <img src="/logo-yzf-dark.png" alt="云帐房" onerror="this.style.display='none'">
+    <div class="brand">云帐房<span>赛事平台</span></div>
+    <div class="spacer"></div>
+    <a class="admin-link" href="/app/admin.html">⚙️ 管理后台</a>
+  </div>
+
+  <div class="hero">
+    <div class="kicker">CLOUD ACCOUNTANT · CONTEST HUB</div>
+    <h1>云帐房<span class="grad">赛事平台</span></h1>
+    <p>一个平台，承载多场赛事。报名投递、展示、评审、投票、抽奖——一站式搞定。选择下方任意赛事进入，或作为管理员新建一场新赛事。</p>
+  </div>
+
+  <div class="section-head">
+    <h2>📋 全部赛事</h2>
+    <span class="count" id="contestCount"></span>
+  </div>
+  <div class="grid" id="contestGrid"></div>
+
+  <div class="foot">云帐房 · WorkBuddy 大赛平台 · 多赛事版</div>
+  <div class="toast" id="toast"></div>
+
+<script>
+function isInDingTalk() {
+  try { return typeof dd !== 'undefined' && dd.env && dd.env.platform && dd.env.platform !== 'notInDingTalk'; }
+  catch (e) { return false; }
+}
+function getCorpId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('corpId') || params.get('corpid') || '';
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show';
+  setTimeout(function(){ t.className = 'toast'; }, 2600);
+}
+async function ddLogin() {
+  const corpId = isInDingTalk() ? getCorpId() : '';
+  if (corpId) {
+    dd.ready(function() {
+      dd.runtime.permission.requestAuthCode({
+        corpId: corpId,
+        onSuccess: function(result) { exchangeCode(result.code); },
+        onFail: function(err) { console.error(err); showToast('获取钉钉授权失败，请确认从钉钉工作台打开'); }
+      });
+    });
+    return;
+  }
+  try {
+    const redirect = window.location.pathname + window.location.search;
+    const resp = await fetch('/api/auth/dd-url?redirect=' + encodeURIComponent(redirect));
+    const data = await resp.json();
+    window.location.href = data.url;
+  } catch (e) { showToast('无法发起钉钉登录'); }
+}
+async function exchangeCode(code) {
+  try {
+    const resp = await fetch('/api/auth/dd-code', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code, redirect: window.location.pathname + window.location.search })
+    });
+    const data = await resp.json();
+    if (data.success) { window.location.reload(); }
+    else { showToast(data.error || '登录失败'); }
+  } catch (e) { showToast('登录请求失败'); }
+}
+
+const STATUS_CLASS = { draft: 'status-draft', open: 'status-open', running: 'status-running', finished: 'status-finished', archived: 'status-archived' };
+
+async function loadContests() {
+  try {
+    const resp = await fetch('/api/platform/contests');
+    if (resp.status === 401) {
+      document.getElementById('contestGrid').innerHTML =
+        '<div class="login-wrap"><p style="margin-bottom:20px;color:#6b7280;">查看赛事需先登录钉钉账号</p><button onclick="ddLogin()">钉钉登录</button></div>';
+      return;
+    }
+    const data = await resp.json();
+    const grid = document.getElementById('contestGrid');
+    const activeId = data.activeId;
+    document.getElementById('contestCount').textContent = '（共 ' + data.contests.length + ' 场）';
+    if (!data.contests.length) {
+      grid.innerHTML = '<div class="empty-state">暂无赛事，请前往管理后台新建。</div>';
+      return;
+    }
+    grid.innerHTML = data.contests.map(function(c) {
+      const cls = STATUS_CLASS[c.status] || 'status-draft';
+      const initial = (c.name || '?').trim().charAt(0);
+      return '<div class="card' + (c.id === activeId ? ' active-ring' : '') + '">' +
+        '<div class="banner"><div class="logo">' + initial + '</div></div>' +
+        '<div class="body">' +
+          '<div class="badges"><span class="badge ' + cls + '">' + (c.statusLabel || c.status) + '</span>' +
+          (c.season ? '<span class="badge">' + escapeHtml(c.season) + '</span>' : '') + '</div>' +
+          '<h3>' + escapeHtml(c.name) + '</h3>' +
+          (c.slogan ? '<div class="slogan">' + escapeHtml(c.slogan) + '</div>' : '') +
+          '<div class="desc">' + escapeHtml(c.description || '暂无简介') + '</div>' +
+          '<div class="meta"><div class="ents"><b>' + (c.entryCount || 0) + '</b> 件作品</div>' +
+          '<button class="enter" onclick="enterContest(\'' + c.id + '\')">进入 →</button></div>' +
+        '</div></div>';
+    }).join('');
+  } catch (e) {
+    document.getElementById('contestGrid').innerHTML = '<div class="empty-state">加载失败：' + e.message + '</div>';
+  }
+}
+
+async function enterContest(id) {
+  try {
+    const resp = await fetch('/api/platform/activate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id })
+    });
+    if (!resp.ok) { showToast('切换赛事失败'); return; }
+    window.location.href = '/app';
+  } catch (e) { showToast('进入赛事失败'); }
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(m) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+  });
+}
+
+loadContests();
+</script>
+</body>
+</html>

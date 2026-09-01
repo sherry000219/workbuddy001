@@ -388,6 +388,27 @@ details select, details input[type="checkbox"] { accent-color: var(--accent); }
         <tbody id="adminScoreBody"></tbody>
       </table>
     </div>
+    <!-- ===== 赛事管理 (FR-1 多赛事平台) ===== -->
+    <details class="card" style="margin-bottom:16px;" open>
+      <summary>🗂️ 赛事管理（多赛事平台）</summary>
+      <div style="padding:16px 4px;" id="contestManageWrap">
+        <p style="color:var(--text-dim);font-size:13px;margin-bottom:12px;">平台支持多场赛事并行，数据完全隔离。可在此新建赛事、复制为新一届、切换当前赛事或删除。</p>
+        <div id="contestManageList"></div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #eef0f4;">
+          <div style="font-weight:600;font-size:14px;margin-bottom:10px;">➕ 新建赛事</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:10px;">
+            <input type="text" id="newCName" placeholder="赛事名称（必填）" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+            <input type="text" id="newCSeason" placeholder="届数，如 Season 4" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+            <input type="text" id="newCSlogan" placeholder="主题口号" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+            <select id="newCStatus" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+              <option value="draft">草稿</option><option value="open">报名中</option><option value="running">进行中</option><option value="finished">已结束</option><option value="archived">已归档</option>
+            </select>
+          </div>
+          <textarea id="newCDesc" placeholder="赛事简介 / 规则说明" rows="2" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;resize:vertical;margin-bottom:10px;"></textarea>
+          <button class="btn btn-primary btn-sm" onclick="createContest()">🚀 创建赛事</button>
+        </div>
+      </div>
+    </details>
   </div>
 </div>
 
@@ -512,6 +533,7 @@ async function adminLogin() {
   try {
     const data = await api('/api/admin/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) });
     adminAuthed = true; adminToken = data.token; adminPassword = pw;
+    loadContestManage();
     document.getElementById('adminLogin').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
     document.getElementById('adminPanel').classList.add('active');
@@ -1787,6 +1809,83 @@ function buildTrackGroups(fin) {
   return groups;
 }
 
+// ========== 赛事管理 (FR-1 多赛事平台) ==========
+function escHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+async function loadContestManage() {
+  if (!adminToken) return;
+  try {
+    const data = await api('/api/platform/contests', { headers: { 'x-admin-token': adminToken } });
+    const wrap = document.getElementById('contestManageList');
+    if (!wrap) return;
+    if (!data.contests || !data.contests.length) { wrap.innerHTML = '<p style="color:var(--text-dim);font-size:13px;">暂无其他赛事。</p>'; return; }
+    wrap.innerHTML = (data.contests || []).map(function(c) {
+      const isActive = c.id === data.activeId;
+      const st = c.statusLabel || c.status;
+      return '<div style="display:flex;align-items:center;gap:10px;padding:12px;border:1px solid #eef0f4;border-radius:10px;margin-bottom:8px;flex-wrap:wrap;">' +
+        '<div style="flex:1;min-width:200px;"><div style="font-weight:600;">' + escHtml(c.name) + (c.season ? ' <span style="color:var(--text-dim);font-size:12px;">' + escHtml(c.season) + '</span>' : '') + '</div>' +
+        '<div style="font-size:12px;color:var(--text-dim);">' + escHtml(st) + ' · ' + (c.entryCount||0) + ' 件作品</div></div>' +
+        (isActive ? '<span style="font-size:12px;color:var(--accent);font-weight:600;">● 当前</span>'
+                  : '<button class="btn btn-outline btn-sm" style="border-color:var(--accent);color:var(--accent);" onclick="activateContest(\'' + c.id + '\')">设为当前</button>') +
+        '<button class="btn btn-outline btn-sm" onclick="copyContest(\'' + c.id + '\')">复制为新届</button>' +
+        '<button class="btn btn-outline btn-sm" onclick="editContest(\'' + c.id + '\')">编辑</button>' +
+        (isActive ? '<button class="btn btn-outline btn-sm" disabled style="opacity:.4;border-color:#ef4444;color:#ef4444;">删除</button>'
+                  : '<button class="btn btn-outline btn-sm" style="border-color:#ef4444;color:#ef4444;" onclick="deleteContest(\'' + c.id + '\')">删除</button>') +
+        '</div>';
+    }).join('');
+  } catch (e) { console.error(e); }
+}
+async function activateContest(id) {
+  if (!adminToken) return;
+  try {
+    await api('/api/platform/activate', { method:'POST', headers:{ 'Content-Type':'application/json','x-admin-token':adminToken }, body: JSON.stringify({ id }) });
+    showToast('已切换到该赛事，刷新后后台将展示其数据', 'success');
+    loadContestManage();
+  } catch(e){ showToast('切换失败：'+(e.message||''), 'error'); }
+}
+async function createContest() {
+  if (!adminToken) return;
+  const name = document.getElementById('newCName').value.trim();
+  if (!name) return showToast('请填写赛事名称', 'error');
+  const body = { name, season: document.getElementById('newCSeason').value.trim(), slogan: document.getElementById('newCSlogan').value.trim(), status: document.getElementById('newCStatus').value, description: document.getElementById('newCDesc').value.trim() };
+  try {
+    await api('/api/platform/contests', { method:'POST', headers:{ 'Content-Type':'application/json','x-admin-token': adminToken }, body: JSON.stringify(body) });
+    showToast('赛事创建成功', 'success');
+    document.getElementById('newCName').value='';document.getElementById('newCSeason').value='';document.getElementById('newCSlogan').value='';document.getElementById('newCDesc').value='';
+    loadContestManage();
+  } catch(e){ showToast('创建失败：'+(e.message||''), 'error'); }
+}
+async function copyContest(id) {
+  if (!adminToken) return;
+  const name = prompt('复制为新一届赛事，请输入新赛事名称：', '');
+  if (!name) return;
+  try {
+    await api('/api/platform/contests/'+encodeURIComponent(id)+'/copy', { method:'POST', headers:{ 'Content-Type':'application/json','x-admin-token':adminToken }, body: JSON.stringify({ name }) });
+    showToast('已复制为新赛事（仅配置，不含作品）', 'success');
+    loadContestManage();
+  } catch(e){ showToast('复制失败：'+(e.message||''), 'error'); }
+}
+async function editContest(id) {
+  if (!adminToken) return;
+  const data = await api('/api/platform/contests', { headers: { 'x-admin-token': adminToken } });
+  const c = (data.contests||[]).find(x=>x.id===id); if(!c) return;
+  const name = prompt('赛事名称：', c.name); if(name===null) return;
+  const slogan = prompt('主题口号：', c.slogan||''); if(slogan===null) return;
+  const desc = prompt('简介：', c.description||''); if(desc===null) return;
+  const status = prompt('状态(draft/open/running/finished/archived)：', c.status||'draft'); if(status===null) return;
+  try {
+    await api('/api/platform/contests/'+encodeURIComponent(id), { method:'PUT', headers:{ 'Content-Type':'application/json','x-admin-token':adminToken }, body: JSON.stringify({ name, slogan, description:desc, status }) });
+    showToast('已保存', 'success'); loadContestManage();
+  } catch(e){ showToast('保存失败：'+(e.message||''), 'error'); }
+}
+async function deleteContest(id) {
+  if (!adminToken) return;
+  if (!confirm('确认删除该赛事？该操作不可恢复（当前赛事不可删除）。')) return;
+  try {
+    await api('/api/platform/contests/'+encodeURIComponent(id)+'?confirm=true', { method:'DELETE', headers:{ 'x-admin-token': adminToken } });
+    showToast('已删除', 'success'); loadContestManage();
+  } catch(e){ showToast('删除失败：'+(e.message||''), 'error'); }
+}
+
 // ========== INIT ==========
 async function init() {
   await checkAuth();
@@ -1805,5 +1904,6 @@ async function init() {
 
 init();
 </script>
+<script src="/platform-bridge.js"></script>
 </body>
 </html>
