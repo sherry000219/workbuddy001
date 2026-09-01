@@ -1,0 +1,17 @@
+{
+  "contests": [
+    {
+      "id": "workbuddy-s3",
+      "name": "WorkBuddy AI 应用大赛 Season3【头号玩家】",
+      "season": "Season 3",
+      "slogan": "人人都是头号玩家，用 AI 重塑工作",
+      "status": "finished",
+      "bannerUrl": "",
+      "description": "面向全公司的 AI 应用一站式竞赛：报名投递 + 展示 + 评审。本届已结束，作为平台种子赛事保留成绩与作品档案。",
+      "timeline": [],
+      "contact": "",
+      "createdAt": 1788258585502
+    }
+  ],
+  "activeId": "workbuddy-s3"
+}
