@@ -301,6 +301,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
 </section>
 
 <!-- ===== 获奖公布 ===== -->
+<div id="promoRank"></div>
 <div id="promoBet"></div>
 <script>
 // 自动生成于 2026-08-31T07:11:45.559Z
@@ -948,6 +949,85 @@ function ensureAwStyle() {
 function renderAwards(container) { if (!container) return; ensureAwStyle(); container.innerHTML = awBuildAwards(); }
 function renderBets(container) { if (!container) return; ensureAwStyle(); container.innerHTML = awBuildBets(); }
 
+/* ===== 成绩排名（初赛/复赛/决赛） ===== */
+const RANK_DATA = {"preliminary":{"individual":[{"r":1,"t":"亮照业务支撑系统","n":"王顺泽","d":"福鹿事业部","k":"efficiency","j":81,"v":66,"c":80.9,"a":"一等奖"},{"r":2,"t":"workbuddy应用大赛比赛平台","n":"徐聪明","d":"职能中台","k":"creative","j":82,"v":50,"c":77.8,"a":"一等奖"},{"r":3,"t":"《财税宫斗局》","n":"吕玲","d":"福鹿事业部","k":"creative","j":76,"v":61,"c":75.68,"a":"决赛入围奖"},{"r":4,"t":"最适配销售的CRM：用Workbuddy定制化系统","n":"刘璐瑶","d":"中小微事业群","k":"business","j":77,"v":50,"c":73.8,"a":"三等奖"},{"r":5,"t":"恋爱式哄客销售技巧","n":"徐航","d":"福鹿事业部","k":"business","j":67,"v":82,"c":73.6,"a":"一等奖"},{"r":6,"t":"岗位校准Agent：让招聘从经验判断，走向标准化人才定义","n":"周紫怡","d":"职能中台","k":"creative","j":78,"v":45,"c":73.38,"a":"二等奖"},{"r":7,"t":"客户不改接口，260家必须手报：一个 Skill 进去，1分钟一张表","n":"任歆迪","d":"有度税智","k":"efficiency","j":74,"v":48,"c":70.91,"a":"三等奖"},{"r":8,"t":"合同税务风险检测","n":"蒋蔚文","d":"有度税智","k":"creative","j":75,"v":35,"c":68.54,"a":"三等奖"},{"r":9,"t":"合同风险智能预警平台：风险先知，提前预警合同到期与风险，实现用工管理提效。","n":"周韦昊","d":"职能中台","k":"efficiency","j":71,"v":12,"c":59.73,"a":"决赛入围奖"},{"r":10,"t":"销售&服务话术库一键生成","n":"桂万彬","d":"福鹿事业部","k":"business","j":68,"v":18,"c":58.79,"a":"二等奖"},{"r":11,"t":"AI驱动的招聘工作台","n":"刘嘉欣","d":"职能中台","k":"business","j":72,"v":2,"c":58.09,"a":""},{"r":12,"t":"数科中心业务工作台","n":"万鑫","d":"数科中心","k":"business","j":66,"v":19,"c":57.43,"a":""},{"r":13,"t":"授课学堂素材批量下载器","n":"徐聪明","d":"职能中台","k":"efficiency","j":66,"v":13,"c":55.97,"a":""},{"r":14,"t":"财税账套智能生成与创建助手","n":"杨绵绵","d":"产研中心","k":"creative","j":67,"v":5,"c":54.82,"a":""},{"r":15,"t":"库存商品科目，存货辅助核算明细账查询工具","n":"彭文杰","d":"中小微事业群","k":"creative","j":58,"v":25,"c":52.5,"a":""},{"r":16,"t":"新手村扫地僧师傅","n":"徐艺珊","d":"中小微事业群","k":"business","j":63,"v":8,"c":52.35,"a":""},{"r":17,"t":"往来账龄分析工具","n":"时海龙","d":"中小微事业群","k":"efficiency","j":58,"v":22,"c":51.77,"a":"二等奖"},{"r":18,"t":"C盘爆红不用慌！Windows精准瘦身指南","n":"仲旭","d":"福鹿事业部","k":"creative","j":57,"v":23,"c":51.21,"a":""},{"r":19,"t":"客户画像","n":"钟超群","d":"中小微事业群","k":"other","j":55,"v":26,"c":50.34,"a":""},{"r":20,"t":"往来核对生成器","n":"潘鑫玲","d":"中小微事业群","k":"creative","j":62,"v":3,"c":50.33,"a":""},{"r":21,"t":"ClipQueue批量粘贴工具","n":"时海龙","d":"中小微事业群","k":"efficiency","j":57,"v":12,"c":48.53,"a":""},{"r":22,"t":"没有交接账务资料的非零申报账套，也可生成期初数据做账","n":"邓闻倩","d":"中小微事业群","k":"creative","j":55,"v":8,"c":45.95,"a":""},{"r":23,"t":"需求上线日历","n":"杨绵绵","d":"产研中心","k":"creative","j":54,"v":11,"c":45.88,"a":""},{"r":24,"t":"减轻数据挪动，快速整理工资表","n":"张晓荣","d":"中小微事业群","k":"efficiency","j":55,"v":7,"c":45.71,"a":""},{"r":25,"t":"企业财务情况分析表","n":"潘鑫玲","d":"中小微事业群","k":"business","j":55,"v":4,"c":44.98,"a":""},{"r":26,"t":"客成新客户上线周期每日数据统计反馈","n":"唐源","d":"中小微事业群","k":"efficiency","j":52,"v":6,"c":43.06,"a":""},{"r":27,"t":"根据发票生成存货期初","n":"肖玉婷","d":"中小微事业群","k":"other","j":52,"v":5,"c":42.82,"a":""},{"r":28,"t":"PDF工具箱","n":"时海龙","d":"中小微事业群","k":"efficiency","j":50,"v":8,"c":41.95,"a":""},{"r":29,"t":"西藏银行回单负数处理工具","n":"王歆歆","d":"中小微事业群","k":"other","j":49,"v":9,"c":41.4,"a":""},{"r":30,"t":"降低设计信息获取成本｜复杂表格轻量化输出方案","n":"许海蓉","d":"中小微事业群","k":"efficiency","j":45,"v":2,"c":36.49,"a":""},{"r":31,"t":"对比竞品功能优劣和成本对比表","n":"裴海涛","d":"中小微事业群","k":"business","j":25,"v":7,"c":21.71,"a":""}],"team":[{"r":1,"t":"AI工单智能处理","n":"朱梦瑶","d":"产研中心","k":"efficiency","j":79,"v":74,"c":81.25,"a":"一等奖"},{"r":2,"t":"智数驱动 · 赋能一线」\u000b——基于 AI 全链路开发的工单智能看板与业务洞察平台","n":"姚靖","d":"中小微事业群","k":"business","j":76,"v":55,"c":74.21,"a":"团队优秀奖"},{"r":3,"t":"领航·云帐房干部运营平台：让每一次干部洞见和决策，都有数据的远见。","n":"李铭铖","d":"职能中台","k":"creative","j":79,"v":16,"c":67.1,"a":"团队优秀奖"},{"r":4,"t":"数据哨兵——基于 Skill 的实时动态看板","n":"郭彦柳","d":"中小微事业群","k":"creative","j":75,"v":23,"c":65.61,"a":"团队入围奖"},{"r":5,"t":"服务质检CT","n":"苏万灵","d":"中小微事业群","k":"business","j":69,"v":37,"c":64.22,"a":"团队入围奖"},{"r":6,"t":"日常运营小助手——一点一点贴近你的心","n":"张恒恒","d":"中小微事业群","k":"business","j":71,"v":18,"c":61.19,"a":""},{"r":7,"t":"四川分公司 WorkBuddy 实战应用","n":"唐源","d":"中小微事业群","k":"efficiency","j":60,"v":6,"c":49.46,"a":""}]},"semi_final":{"individual":[{"r":1,"t":"亮照业务支撑系统","n":"王顺泽","d":"福鹿事业部","k":"efficiency","j":81,"v":78,"c":79.67,"a":"一等奖"},{"r":2,"t":"《财税宫斗局》","n":"吕玲","d":"福鹿事业部","k":"creative","j":71,"v":61,"c":70.95,"a":"决赛入围奖"},{"r":3,"t":"workbuddy应用大赛比赛平台","n":"徐聪明","d":"职能中台","k":"creative","j":78,"v":21,"c":70.83,"a":"一等奖"},{"r":4,"t":"岗位校准Agent：让招聘从经验判断，走向标准化人才定义","n":"周紫怡","d":"职能中台","k":"creative","j":69,"v":72,"c":70.25,"a":"二等奖"},{"r":5,"t":"恋爱式哄客销售技巧","n":"徐航","d":"福鹿事业部","k":"business","j":72,"v":52,"c":69.62,"a":"一等奖"},{"r":6,"t":"合同税务风险检测","n":"蒋蔚文","d":"有度税智","k":"creative","j":74,"v":31,"c":66.29,"a":"三等奖"},{"r":7,"t":"最适配销售的CRM：用Workbuddy定制化系统","n":"刘璐瑶","d":"中小微事业群","k":"business","j":69,"v":30,"c":65.89,"a":"三等奖"},{"r":8,"t":"客户不改接口，260家必须手报：一个 Skill 进去，1分钟一张表","n":"任歆迪","d":"有度税智","k":"efficiency","j":68,"v":42,"c":65.55,"a":"三等奖"},{"r":9,"t":"销售&服务话术库一键生成","n":"桂万彬","d":"福鹿事业部","k":"business","j":68,"v":7,"c":56.91,"a":"二等奖"},{"r":10,"t":"合同风险智能预警平台：风险先知，提前预警合同到期与风险，实现用工管理提效。","n":"周韦昊","d":"职能中台","k":"efficiency","j":65,"v":8,"c":55.96,"a":"决赛入围奖"},{"r":11,"t":"授课学堂素材批量下载器","n":"徐聪明","d":"职能中台","k":"efficiency","j":67,"v":11,"c":55.74,"a":""},{"r":12,"t":"数科中心业务工作台","n":"万鑫","d":"数科中心","k":"business","j":64,"v":11,"c":54.88,"a":""},{"r":13,"t":"AI驱动的招聘工作台","n":"刘嘉欣","d":"职能中台","k":"business","j":62,"v":3,"c":53.32,"a":""},{"r":14,"t":"财税账套智能生成与创建助手","n":"杨绵绵","d":"产研中心","k":"creative","j":63,"v":9,"c":53.14,"a":""},{"r":15,"t":"客户画像","n":"钟超群","d":"中小微事业群","k":"other","j":61,"v":32,"c":52.88,"a":""},{"r":16,"t":"往来账龄分析工具","n":"时海龙","d":"中小微事业群","k":"efficiency","j":59,"v":13,"c":50.43,"a":"二等奖"},{"r":17,"t":"库存商品科目，存货辅助核算明细账查询工具","n":"彭文杰","d":"中小微事业群","k":"creative","j":59,"v":10,"c":50.4,"a":""},{"r":18,"t":"新手村扫地僧师傅","n":"徐艺珊","d":"中小微事业群","k":"business","j":60,"v":2,"c":49.96,"a":""},{"r":19,"t":"往来核对生成器","n":"潘鑫玲","d":"中小微事业群","k":"creative","j":57,"v":14,"c":49,"a":""},{"r":20,"t":"C盘爆红不用慌！Windows精准瘦身指南","n":"仲旭","d":"福鹿事业部","k":"creative","j":55,"v":8,"c":47.75,"a":""},{"r":21,"t":"ClipQueue批量粘贴工具","n":"时海龙","d":"中小微事业群","k":"efficiency","j":49,"v":7,"c":43.69,"a":""}],"team":[{"r":1,"t":"AI工单智能处理","n":"朱梦瑶","d":"产研中心","k":"efficiency","j":78,"v":111,"c":81.94,"a":"一等奖"},{"r":2,"t":"智数驱动 · 赋能一线」\u000b——基于 AI 全链路开发的工单智能看板与业务洞察平台","n":"姚靖","d":"中小微事业群","k":"business","j":76,"v":48,"c":71.35,"a":"团队优秀奖"},{"r":3,"t":"服务质检CT","n":"苏万灵","d":"中小微事业群","k":"business","j":72,"v":37,"c":64.25,"a":"团队入围奖"},{"r":4,"t":"领航·云帐房干部运营平台：让每一次干部洞见和决策，都有数据的远见。","n":"李铭铖","d":"职能中台","k":"creative","j":70,"v":15,"c":62.06,"a":"团队优秀奖"},{"r":5,"t":"数据哨兵——基于 Skill 的实时动态看板","n":"郭彦柳","d":"中小微事业群","k":"creative","j":71,"v":10,"c":61.4,"a":"团队入围奖"},{"r":6,"t":"日常运营小助手——一点一点贴近你的心","n":"张恒恒","d":"中小微事业群","k":"business","j":63,"v":23,"c":57.2,"a":""},{"r":7,"t":"四川分公司 WorkBuddy 实战应用","n":"唐源","d":"中小微事业群","k":"efficiency","j":63,"v":18,"c":51.97,"a":""}]},"final":{"individual":[{"r":1,"t":"亮照业务支撑系统","n":"王顺泽","d":"福鹿事业部","k":"efficiency","j":82,"v":0,"c":82,"a":"一等奖"},{"r":2,"t":"workbuddy应用大赛比赛平台","n":"徐聪明","d":"职能中台","k":"creative","j":80,"v":0,"c":80,"a":"一等奖"},{"r":3,"t":"岗位校准Agent：让招聘从经验判断，走向标准化人才定义","n":"周紫怡","d":"职能中台","k":"creative","j":78,"v":0,"c":78,"a":"二等奖"},{"r":4,"t":"恋爱式哄客销售技巧","n":"徐航","d":"福鹿事业部","k":"business","j":76,"v":0,"c":76,"a":"一等奖"},{"r":5,"t":"销售&服务话术库一键生成","n":"桂万彬","d":"福鹿事业部","k":"business","j":72,"v":0,"c":72,"a":"二等奖"},{"r":6,"t":"合同税务风险检测","n":"蒋蔚文","d":"有度税智","k":"creative","j":72,"v":0,"c":72,"a":"三等奖"},{"r":7,"t":"《财税宫斗局》","n":"吕玲","d":"福鹿事业部","k":"creative","j":71,"v":0,"c":71,"a":"决赛入围奖"},{"r":8,"t":"往来账龄分析工具","n":"时海龙","d":"中小微事业群","k":"efficiency","j":70,"v":0,"c":70,"a":"二等奖"},{"r":9,"t":"最适配销售的CRM：用Workbuddy定制化系统","n":"刘璐瑶","d":"中小微事业群","k":"business","j":67,"v":0,"c":67,"a":"三等奖"},{"r":10,"t":"客户不改接口，260家必须手报：一个 Skill 进去，1分钟一张表","n":"任歆迪","d":"有度税智","k":"efficiency","j":65,"v":0,"c":65,"a":"三等奖"},{"r":11,"t":"合同风险智能预警平台：风险先知，提前预警合同到期与风险，实现用工管理提效。","n":"周韦昊","d":"职能中台","k":"efficiency","j":63,"v":0,"c":63,"a":"决赛入围奖"}],"team":[{"r":1,"t":"AI工单智能处理","n":"朱梦瑶","d":"产研中心","k":"efficiency","j":80,"v":0,"c":80,"a":"一等奖"},{"r":2,"t":"领航·云帐房干部运营平台：让每一次干部洞见和决策，都有数据的远见。","n":"李铭铖","d":"职能中台","k":"creative","j":77,"v":0,"c":77,"a":"团队优秀奖"},{"r":3,"t":"智数驱动 · 赋能一线」\u000b——基于 AI 全链路开发的工单智能看板与业务洞察平台","n":"姚靖","d":"中小微事业群","k":"business","j":77,"v":0,"c":77,"a":"团队优秀奖"},{"r":4,"t":"服务质检CT","n":"苏万灵","d":"中小微事业群","k":"business","j":74,"v":0,"c":74,"a":"团队入围奖"},{"r":5,"t":"数据哨兵——基于 Skill 的实时动态看板","n":"郭彦柳","d":"中小微事业群","k":"creative","j":69,"v":0,"c":69,"a":"团队入围奖"}]}};
+const RANK_TRACK = {efficiency:{l:"效率提升",c:"#ff6b35"},creative:{l:"创意设计",c:"#7c3aed"},business:{l:"业务增长",c:"#2563eb"},other:{l:"其他",c:"#6b7280"}};
+const RANK_STAGES = [{key:"preliminary",label:"初赛"},{key:"semi_final",label:"复赛"},{key:"final",label:"决赛"}];
+var _rankStage = "preliminary";
+function rkSub(st){
+  if (st === "preliminary") return "初赛成绩 = 评委打分 80% + 全员投票 20%";
+  if (st === "semi_final") return "复赛成绩 = 初赛 40% + 复赛（评委 80% + 投票 20%）60%";
+  return "决赛成绩 = 评委五维打分均分（不继承前轮、不含投票）";
+}
+function rkRows(list, withVotes) {
+  return list.map(function (x) {
+    var t = RANK_TRACK[x.k] || RANK_TRACK.other;
+    var medal = x.r === 1 ? "\uD83E\uDD47" : x.r === 2 ? "\uD83E\uDD48" : x.r === 3 ? "\uD83E\uDD49" : String(x.r);
+    return "<tr>" +
+      '<td class="rk-no">' + medal + '</td>' +
+      '<td class="rk-title">' + awEscape(x.t) + (x.a ? '<span class="rk-award">' + awEscape(x.a) + '</span>' : '') + '</td>' +
+      '<td class="rk-name">' + awEscape(x.n) + '</td>' +
+      '<td class="rk-dept">' + awEscape(x.d) + '</td>' +
+      '<td><span class="rk-track" style="color:' + t.c + ';background:' + t.c + '18;">' + t.l + '</span></td>' +
+      '<td class="rk-num">' + x.j + '</td>' +
+      (withVotes ? '<td class="rk-num">' + x.v + '</td>' : '') +
+      '<td class="rk-num rk-score">' + x.c + '</td>' +
+      '</tr>';
+  }).join("");
+}
+function rkBuild() {
+  var st = _rankStage;
+  var d = RANK_DATA[st] || { individual: [], team: [] };
+  var withVotes = (st !== "final");
+  var colN = withVotes ? 8 : 7;
+  var head = "<tr><th>名次</th><th>作品</th><th>姓名</th><th>部门</th><th>赛道</th><th>评委均分</th>" + (withVotes ? "<th>票数</th>" : "") + "<th>综合分</th></tr>";
+  var tabs = RANK_STAGES.map(function (s) {
+    return '<button class="rk-tab' + (s.key === st ? ' active' : '') + '" onclick="rkSwitch(\'' + s.key + '\')">' + s.label + '</button>';
+  }).join("");
+  var tbl = function (list) {
+    var rows = rkRows(list, withVotes);
+    return '<table class="rk-table"><thead>' + head + '</thead><tbody>' +
+      (rows || '<tr><td colspan="' + colN + '" class="rk-empty">暂无数据</td></tr>') + '</tbody></table>';
+  };
+  var body =
+    '<div class="rk-group"><h3 class="rk-group-title">\uD83D\uDC64 个人赛道（' + d.individual.length + '）</h3>' + tbl(d.individual) + '</div>' +
+    '<div class="rk-group"><h3 class="rk-group-title">\uD83D\uDC65 团队赛道（' + d.team.length + '）</h3>' + tbl(d.team) + '</div>';
+  return '<section class="aw-section" id="rank-announce"><div class="aw-inner">' +
+    '<div class="section-label">RANKING</div><h2 class="section-title">\uD83D\uDCCA 成绩排名</h2>' +
+    '<p class="section-sub">' + rkSub(st) + '</p>' +
+    '<div class="rk-tabs">' + tabs + '</div>' + body + '</div></section>';
+}
+function rkSwitch(k) { _rankStage = k; var c = document.getElementById("promoRank"); if (c) renderRank(c); }
+var _rkStyleDone = false;
+function ensureRankStyle() {
+  if (_rkStyleDone) return; _rkStyleDone = true;
+  var s = document.createElement("style");
+  s.textContent =
+    '.rk-tabs{display:flex;gap:10px;margin:24px 0 28px;flex-wrap:wrap;}' +
+    '.rk-tab{padding:9px 22px;border-radius:22px;border:1px solid #e5e7eb;background:#fff;font-size:14px;font-weight:700;color:#6b7280;cursor:pointer;transition:all .2s;}' +
+    '.rk-tab:hover{border-color:#ff6b35;color:#ff6b35;}' +
+    '.rk-tab.active{background:#ff6b35;border-color:#ff6b35;color:#fff;box-shadow:0 6px 18px rgba(255,107,53,.28);}' +
+    '.rk-group{margin-bottom:36px;}' +
+    '.rk-group-title{font-size:18px;font-weight:800;margin-bottom:14px;color:#1f2937;}' +
+    '.rk-table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;}' +
+    '.rk-table th{background:#f8f9fc;padding:11px 12px;text-align:left;font-weight:700;color:#374151;border-bottom:1px solid #e5e7eb;white-space:nowrap;}' +
+    '.rk-table td{padding:11px 12px;border-bottom:1px solid #f1f3f6;color:#4b5563;vertical-align:middle;}' +
+    '.rk-table tbody tr:last-child td{border-bottom:none;}' +
+    '.rk-table tbody tr:hover{background:#fffaf7;}' +
+    '.rk-no{font-weight:800;color:#6b7280;width:56px;}' +
+    '.rk-title{font-weight:600;color:#1f2937;line-height:1.45;min-width:180px;}' +
+    '.rk-award{display:inline-block;margin-left:6px;font-size:11px;font-weight:700;color:#ff6b35;background:rgba(255,107,53,.1);padding:2px 8px;border-radius:10px;white-space:nowrap;}' +
+    '.rk-name{font-weight:600;color:#1f2937;white-space:nowrap;}' +
+    '.rk-dept{font-size:12px;color:#6b7280;}' +
+    '.rk-track{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;}' +
+    '.rk-num{text-align:center;font-weight:700;color:#374151;white-space:nowrap;}' +
+    '.rk-score{color:#ff6b35;}' +
+    '.rk-empty{text-align:center;color:#9ca3af;padding:24px;}' +
+    '@media(max-width:768px){.rk-table{font-size:12px;}.rk-table th,.rk-table td{padding:8px 7px;}.rk-dept{display:none;}.rk-title{min-width:120px;}}';
+  document.head.appendChild(s);
+}
+function renderRank(container) { if (!container) return; ensureAwStyle(); ensureRankStyle(); container.innerHTML = rkBuild(); }
+renderRank(document.getElementById('promoRank'));
 renderBets(document.getElementById('promoBet'));
 </script>
 <!-- ===== FAQ ===== -->

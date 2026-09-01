@@ -420,7 +420,7 @@ const AWARD_LABELS = { first: '🥇 一等奖', second: '🥈 二等奖', third:
 
 // ========== HELPERS ==========
 function showToast(msg, type) { type = type || ''; const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + type + ' show'; setTimeout(function() { t.className = 'toast'; }, 2800); }
-function trackLabel(t) { return { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' }[t] || t; }
+function trackLabel(t) { return { efficiency: '效率提升', creative: '创意应用', business: '业务赋能', other: '其他' }[t] || t; }
 function roundBadge(rs) { if (!rs || rs === 'approved') return ''; const map = { semi_finalist: '<span class="round-badge badge-semi">🟢 复赛</span>', finalist: '<span class="round-badge badge-final">🔵 决赛</span>', awarded: '<span class="round-badge badge-awarded">🏆 已获奖</span>', eliminated_semi: '<span class="round-badge badge-eliminated">淘汰</span>', eliminated_final: '<span class="round-badge badge-eliminated">淘汰</span>' }; return map[rs] || ''; }
 function awardBadge(award) { if (!award) return ''; return '<span class="round-badge badge-awarded">' + (AWARD_LABELS[award] || award) + '</span>'; }
 function linkify(text) { if (!text) return ''; const urlRegex = /(https?:\/\/[^\s<]+)/gi; return text.replace(/\n/g, '<br>').replace(urlRegex, function(url) { let cleanUrl = url.replace(/[.,;:!?)\]]+$/, ''); return '<a href="' + cleanUrl + '" target="_blank" rel="noopener" style="color:#ff6b35;word-break:break-all;">' + cleanUrl + '</a>'; }); }
@@ -746,6 +746,7 @@ async function renderJudgeScoreDetail() {
     { key: 'efficiency', label: '🚀 效率提升赛道', color: '#ff6b35', items: fin.filter(e => e.entryType !== 'team' && (e.track || 'efficiency') === 'efficiency') },
     { key: 'creative', label: '💡 创意应用赛道', color: '#7c3aed', items: fin.filter(e => e.entryType !== 'team' && (e.track || 'efficiency') === 'creative') },
     { key: 'business', label: '🤝 业务赋能赛道', color: '#2563eb', items: fin.filter(e => e.entryType !== 'team' && (e.track || 'efficiency') === 'business') },
+    { key: 'other', label: '🧩 其他赛道', color: '#6b7280', items: fin.filter(e => e.entryType !== 'team' && !['efficiency', 'creative', 'business'].includes(e.track || 'efficiency')) },
     { key: 'team', label: '👥 团队组', color: '#f59e0b', items: fin.filter(e => e.entryType === 'team') }
   ];
   groups.forEach(g => g.items.sort((a, b) => (b.composite || 0) - (a.composite || 0)));
@@ -828,7 +829,7 @@ function renderStageManagePanel(entryScores) {
     });
     return ranks;
   }
-  var TRACK_BADGE = { efficiency: '效率提升', creative: '创意应用', business: '业务赋能' };
+  var TRACK_BADGE = { efficiency: '效率提升', creative: '创意应用', business: '业务赋能', other: '其他' };
   var TRACK_STYLE = {
     efficiency: 'background:#dbeafe;color:#1d4ed8;',
     creative: 'background:#fce7f3;color:#be185d;',
