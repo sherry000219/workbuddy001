@@ -3,7 +3,6 @@ services:
     name: workbuddy-contest
     runtime: node
     repo: https://github.com/sherry000219/workbuddy001
-    plan: free
     buildCommand: npm install
     startCommand: node server.js
     envVars:

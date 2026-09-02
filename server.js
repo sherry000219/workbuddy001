@@ -277,20 +277,28 @@ function genContestId(name) {
 // 避免激活赛事为空触发防清空守卫而拒绝拉取。仅当本地确实无数据且远程旧文件有数据时才生效。
 async function seedActiveFromLegacyRemote() {
   if (!needSeedFromLegacy || !GITHUB_TOKEN || !activeContestId) return false;
-  try {
-    const { status, data } = await ghReq('GET', `/repos/${GITHUB_REPO}/contents/data/contest.json?ref=${GITHUB_DATA_BRANCH}`);
-    if (status !== 200 || !data || !data.content) return false;
-    const buf = Buffer.from(data.content, data.encoding || 'base64');
-    const remote = JSON.parse(buf.toString('utf8'));
-    if (!remote || ((remote.entries || []).length === 0 && (remote.votes || []).length === 0 && (remote.judgeScores || []).length === 0)) return false;
-    writeContestFile(activeContestId, remote);
-    console.log('[migrate] Seeded active contest from legacy remote data/contest.json — entries:', (remote.entries || []).length, '| votes:', (remote.votes || []).length, '| scores:', (remote.judgeScores || []).length);
-    needSeedFromLegacy = false;
-    return true;
-  } catch (e) {
-    console.error('[migrate] legacy remote seed failed:', e.message);
-    return false;
+  // 优先从旧路径 data/contest.json 回填；若该路径已被新结构覆盖而缺失，
+  // 退而从当前激活赛事文件 data/contest_<id>.json 恢复，确保空部署也能拿到真实数据。
+  const candidates = [
+    `/repos/${GITHUB_REPO}/contents/data/contest.json?ref=${GITHUB_DATA_BRANCH}`,
+    `/repos/${GITHUB_REPO}/contents/data/contest_${activeContestId}.json?ref=${GITHUB_DATA_BRANCH}`
+  ];
+  for (const url of candidates) {
+    try {
+      const { status, data } = await ghReq('GET', url);
+      if (status !== 200 || !data || !data.content) continue;
+      const buf = Buffer.from(data.content, data.encoding || 'base64');
+      const remote = JSON.parse(buf.toString('utf8'));
+      if (!remote || ((remote.entries || []).length === 0 && (remote.votes || []).length === 0 && (remote.judgeScores || []).length === 0)) continue;
+      writeContestFile(activeContestId, remote);
+      console.log('[migrate] Seeded active contest from legacy remote', url, '— entries:', (remote.entries || []).length, '| votes:', (remote.votes || []).length, '| scores:', (remote.judgeScores || []).length);
+      needSeedFromLegacy = false;
+      return true;
+    } catch (e) {
+      console.error('[migrate] legacy remote seed attempt failed:', url, e.message);
+    }
   }
+  return false;
 }
 
 function loadDB() {
