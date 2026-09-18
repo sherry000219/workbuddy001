@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>云帐房综合活动平台 · 原型</title>
+  <style>
+    :root { --bg:#0f172a; --card:#1e293b; --fg:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif; background:var(--bg); color:var(--fg); }
+    header { padding:28px 24px 8px; }
+    h1 { margin:0; font-size:22px; }
+    .sub { color:var(--muted); margin-top:6px; font-size:13px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; padding:20px 24px; }
+    .card { background:var(--card); border-radius:14px; padding:18px; border:1px solid #2b3a52; }
+    .card h2 { margin:0 0 6px; font-size:17px; color:var(--accent); }
+    .card p { margin:0; color:var(--muted); font-size:13px; line-height:1.6; }
+    .tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:999px; background:#0ea5e9/20; color:var(--accent); margin-top:10px; }
+    footer { padding:10px 24px 30px; color:var(--muted); font-size:12px; }
+    code { background:#0b1220; padding:1px 6px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>云帐房综合活动平台</h1>
+    <div class="sub">原型骨架 · Render + JSON + GitHub 技术栈 · 三模块统一管理后台（PRD v1.2）</div>
+  </header>
+  <div class="grid">
+    <div class="card">
+      <h2>赛事中心</h2>
+      <p>沿用现有竞赛引擎：报名投稿 / 赛道 / 赛段 / 评分 / 投票 / 晋级 / 奖项 / 押宝抽奖。部分赛事可开放院校学生外部报名（手机号+短信）。</p>
+      <span class="tag">API: /api/contests</span>
+    </div>
+    <div class="card">
+      <h2>活动中心</h2>
+      <p>两类：①报名类（团建/培训/讲座/节日/打卡/调研）②评选类（价值观代言人评选、AI 作品提报：材料提交 + 投票）。</p>
+      <span class="tag">API: /api/activities</span>
+    </div>
+    <div class="card">
+      <h2>社区</h2>
+      <p>员工论坛核心：板块 / 发帖 / 评论 / 点赞 / 云金币 / 金币商城 / 官方账号 / 富媒体。</p>
+      <span class="tag">API: /api/community</span>
+    </div>
+    <div class="card">
+      <h2>统一平台层</h2>
+      <p>统一用户（钉钉+外部学生）/ 权限 / 审核审计 / 钉钉推送 / 媒体 / 后台外壳 / 模块编排。</p>
+      <span class="tag">API: /api/modules · /api/admin/overview</span>
+    </div>
+  </div>
+  <footer>
+    健康检查：<code>GET /api/health</code> ｜ 钉钉免登（开发态）：<code>POST /api/auth/dingtalk/exchange</code> ｜ 外部学生：<code>/api/auth/external/*</code>
+  </footer>
+</body>
+</html>

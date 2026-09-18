@@ -1,0 +1,23 @@
+node_modules/
+data/
+.env
+*.log
+.DS_Store
+
+# 本地冒烟/诊断临时文件
+smoke*.txt
+smoke*.mjs
+_t.mjs
+diag.txt
+test.txt
+tout.log
+terr.log
+runstate.txt
+prep.txt
+clean*.txt
+gi.txt
+deltest.txt
+kill.txt
+lsremote.txt
+cp_git.txt
+gh_*.txt
